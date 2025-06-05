@@ -514,7 +514,7 @@ const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
                         window.location.reload()
                       }}
                     >
-                      Enroll Now - It's Free
+                      Enroll Now - It&apos;s Free
                     </Button>
                   )}
 
@@ -707,7 +707,7 @@ const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
                   <div className="text-center space-y-3">
                     <h3 className="text-lg font-semibold text-slate-900">Still have questions?</h3>
                     <p className="text-slate-600">
-                      Can't find the answer you're looking for? Please chat with our friendly team.
+                      Can&apos;t find the answer you&apos;re looking for? Please chat with our friendly team.
                     </p>
                     <Button className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700">
                       Contact Support

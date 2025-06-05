@@ -6,15 +6,15 @@ import { Calendar, Clock, DollarSign, ArrowLeft, AlertTriangle, CheckCircle, Map
 import Link from "next/link"
 
 const TestDatesRegistrationPage = () => {
-  const testDates2024 = [
-    { date: "March 9, 2024", registration: "February 23, 2024", late: "February 27, 2024", status: "past" },
-    { date: "May 4, 2024", registration: "April 19, 2024", late: "April 23, 2024", status: "past" },
-    { date: "June 1, 2024", registration: "May 17, 2024", late: "May 21, 2024", status: "past" },
-    { date: "August 24, 2024", registration: "August 9, 2024", late: "August 13, 2024", status: "past" },
-    { date: "October 5, 2024", registration: "September 6, 2024", late: "September 24, 2024", status: "past" },
-    { date: "November 2, 2024", registration: "October 4, 2024", late: "October 22, 2024", status: "past" },
-    { date: "December 7, 2024", registration: "November 8, 2024", late: "November 26, 2024", status: "past" },
-  ]
+  // const testDates2024 = [
+  //   { date: "March 9, 2024", registration: "February 23, 2024", late: "February 27, 2024", status: "past" },
+  //   { date: "May 4, 2024", registration: "April 19, 2024", late: "April 23, 2024", status: "past" },
+  //   { date: "June 1, 2024", registration: "May 17, 2024", late: "May 21, 2024", status: "past" },
+  //   { date: "August 24, 2024", registration: "August 9, 2024", late: "August 13, 2024", status: "past" },
+  //   { date: "October 5, 2024", registration: "September 6, 2024", late: "September 24, 2024", status: "past" },
+  //   { date: "November 2, 2024", registration: "October 4, 2024", late: "October 22, 2024", status: "past" },
+  //   { date: "December 7, 2024", registration: "November 8, 2024", late: "November 26, 2024", status: "past" },
+  // ]
 
   const testDates2025 = [
     { date: "March 8, 2025", registration: "February 21, 2025", late: "February 25, 2025", status: "upcoming" },

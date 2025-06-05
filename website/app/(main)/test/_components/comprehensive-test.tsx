@@ -30,7 +30,7 @@ interface ComprehensiveTestProps {
 }
 
 export const ComprehensiveTest = ({ course, questions, userId, existingResult }: ComprehensiveTestProps) => {
-  const router = useRouter()
+  
   const [hasStarted, setHasStarted] = useState(false)
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string[]>>({})

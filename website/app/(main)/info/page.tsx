@@ -43,7 +43,7 @@ const ArticlesPage = () => {
 
         {/* Articles Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
-          {articles.map((article, index) => (
+          {articles.map((article) => (
             <Card
               key={article.href}
               className="group hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden pb-6"

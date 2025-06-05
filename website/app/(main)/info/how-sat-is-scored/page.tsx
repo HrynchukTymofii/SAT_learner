@@ -71,8 +71,8 @@ const HowSATIsScoredPage = () => {
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
                 <h3 className="text-lg font-semibold text-blue-900 mb-3">Step 1: Raw Score</h3>
                 <p className="text-blue-800 mb-3">
-                  Your raw score is simply the number of questions you answered correctly. There's no penalty for wrong
-                  answers, so it's always better to guess than leave a question blank.
+                  Your raw score is simply the number of questions you answered correctly. There&apos;s no penalty for wrong
+                  answers, so it&apos;s always better to guess than leave a question blank.
                 </p>
                 <div className="bg-white rounded-lg p-4">
                   <div className="text-sm text-slate-600 mb-2">Example: Math Section</div>

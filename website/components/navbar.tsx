@@ -67,21 +67,21 @@ export function Navbar() {
               <div className="flex flex-col gap-2">
                 <h3 className="text-lg font-semibold">Tests</h3>
                 <Link
-                  href="/tests"
+                  href="/test"
                   className="ml-4 flex items-center gap-2 rounded-md p-2 hover:bg-accent"
                   onClick={() => setIsOpen(false)}
                 >
                   Full Practice Test
                 </Link>
                 <Link
-                  href="/tests"
+                  href="/test"
                   className="ml-4 flex items-center gap-2 rounded-md p-2 hover:bg-accent"
                   onClick={() => setIsOpen(false)}
                 >
                   Math Section
                 </Link>
                 <Link
-                  href="/tests"
+                  href="/test"
                   className="ml-4 flex items-center gap-2 rounded-md p-2 hover:bg-accent"
                   onClick={() => setIsOpen(false)}
                 >
@@ -251,7 +251,7 @@ interface ListItemProps extends React.ComponentPropsWithoutRef<"div"> {
   href: string
 }
 
-export function ListItem({ className, title, href, children, ...props }: ListItemProps) {
+export function ListItem({ className, title, href, children }: ListItemProps) {
   return (
       <NavigationMenuLink asChild>
         <Link

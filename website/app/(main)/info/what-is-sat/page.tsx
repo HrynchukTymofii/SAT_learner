@@ -74,7 +74,7 @@ const WhatIsSATPage = () => {
               <p className="text-lg text-slate-700 leading-relaxed mb-6">
                 The SAT (Scholastic Assessment Test) is a standardized test widely used for college admissions in the
                 United States. Originally called the Scholastic Aptitude Test, the SAT is developed and administered by
-                the College Board and is designed to assess a student's readiness for college.
+                the College Board and is designed to assess a student&apos;s readiness for college.
               </p>
 
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
