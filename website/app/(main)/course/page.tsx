@@ -2,8 +2,7 @@ import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import CoursePage from "./_components/course-page"
 
-const CourseIdPage = async ({ params }: { params: { courseId: string } }) => {
-  // For demo purposes, using a hardcoded ID
+const CourseIdPage = async () => {
   const courseId = process.env.COURSE_ID;
   // Mock userId for demonstration - in a real app, this would come from auth
   const userId = "user"
