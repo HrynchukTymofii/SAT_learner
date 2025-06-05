@@ -6,7 +6,6 @@ import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import { GrFormNextLink } from "react-icons/gr";
 import axios from "axios";
-import CodeSection from "./codeBox";
 import { Lesson, MuxData } from "@prisma/client";
 import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-editor";
 import { useState } from "react";

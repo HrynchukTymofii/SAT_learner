@@ -2,8 +2,6 @@
 
 import {
   File,
-  Github,
-  Youtube,
   ChevronDown,
   ChevronRight,
   Play,
@@ -40,7 +38,7 @@ interface CoursePageProps {
   userId: string
 }
 
-const CoursePage = ({ course, attachments, isEnrolled, userId }: CoursePageProps) => {
+const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
   const [isLoading, setIsLoading] = useState(true)
   const [openChapters, setOpenChapters] = useState<string[]>([])
   const [showEnrollPrompt, setShowEnrollPrompt] = useState(false)

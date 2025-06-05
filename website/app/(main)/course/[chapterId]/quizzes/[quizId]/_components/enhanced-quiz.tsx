@@ -43,8 +43,7 @@ interface EnhancedQuizProps {
   existingResult: any
 }
 
-export const EnhancedQuiz = ({ quiz, questions, courseId, chapterId, userId, existingResult }: EnhancedQuizProps) => {
-  const router = useRouter()
+export const EnhancedQuiz = ({ quiz, questions, courseId, userId, existingResult }: EnhancedQuizProps) => {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0)
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string[]>>({})
   const [isSubmitted, setIsSubmitted] = useState(false)
@@ -381,7 +380,7 @@ export const EnhancedQuiz = ({ quiz, questions, courseId, chapterId, userId, exi
   )
 }
 
-const QuizResults = ({ results, quiz, questions, selectedAnswers, onRetry, courseId }: any) => {
+const QuizResults = ({ results, quiz, onRetry }: any) => {
   const router = useRouter()
 
   const getPerformanceMessage = () => {

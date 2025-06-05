@@ -1,22 +1,22 @@
 "use client"
 
 //import { SignInButton, useAuth } from "@clerk/nextjs";
-import { PiShootingStarFill} from "react-icons/pi";
-import axios from "axios";
-import toast from "react-hot-toast";
+//import { PiShootingStarFill} from "react-icons/pi";
+//import axios from "axios";
+//import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
-import { db } from "@/lib/db";
+//import { db } from "@/lib/db";
 
 interface CourseEnrolBlockProps{
     courseId: string;
 }
 
-const CourseEnrolBlock = ({courseId} : CourseEnrolBlockProps) => {
+const CourseEnrolBlock = ({/*{courseId} : CourseEnrolBlockProps*/}) => {
     //const { userId } = useAuth();
 
-    const router = useRouter();
+    //const router = useRouter();
 
-    const firstChapterId = ""
+    //const firstChapterId = ""
 
     // const onEnrol = async () => {
     //   try {

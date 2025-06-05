@@ -7,39 +7,64 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'WebView Demo',
+      title: 'WebView Navigation App',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: WebViewPage(),
+      home: BottomNavPage(),
       debugShowCheckedModeBanner: false,
     );
   }
 }
 
-class WebViewPage extends StatefulWidget {
+class BottomNavPage extends StatefulWidget {
   @override
-  _WebViewPageState createState() => _WebViewPageState();
+  _BottomNavPageState createState() => _BottomNavPageState();
 }
 
-class _WebViewPageState extends State<WebViewPage> {
-  late final WebViewController _controller;
+class _BottomNavPageState extends State<BottomNavPage> {
+  int _selectedIndex = 0;
+
+  final List<String> _urls = [
+    'https://fibipals.com',     // Home URL
+    'https://example.com/course', // Course URL (replace with your own)
+    'https://example.com/tests',  // Tests URL (replace with your own)
+  ];
+
+  late final List<WebViewController> _controllers;
 
   @override
   void initState() {
     super.initState();
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..loadRequest(Uri.parse('https://fibipals.com'));
+    _controllers = _urls.map((url) {
+      final controller = WebViewController()
+        ..setJavaScriptMode(JavaScriptMode.unrestricted)
+        ..loadRequest(Uri.parse(url));
+      return controller;
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lesson Viewer'),
+        title: Text(['Home', 'Course', 'Tests'][_selectedIndex]),
       ),
-      body: WebViewWidget(controller: _controller),
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: _controllers
+            .map((controller) => WebViewWidget(controller: controller))
+            .toList(),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.menu_book), label: 'Course'),
+          BottomNavigationBarItem(icon: Icon(Icons.quiz), label: 'Tests'),
+        ],
+        onTap: (index) => setState(() => _selectedIndex = index),
+      ),
     );
   }
 }

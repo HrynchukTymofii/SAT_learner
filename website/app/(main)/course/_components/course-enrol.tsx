@@ -10,7 +10,7 @@ interface CourseEnrolProps {
   courseId: string
 }
 
-const CourseEnrol = ({ courseId }: CourseEnrolProps) => {
+const CourseEnrol = ({/*{ courseId }: CourseEnrolProps*/}) => {
   const [isLoading, setIsLoading] = useState(false)
 
   const handleEnrollment = async () => {

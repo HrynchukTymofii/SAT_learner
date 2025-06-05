@@ -1,6 +1,6 @@
 "use client"
 
-import type { Challenge, Chapter, Course, Lesson, Quiz } from "@prisma/client"
+import type { Chapter, Course, Lesson, Quiz } from "@prisma/client"
 import {
   CheckCircle,
   ChevronLeft,
@@ -9,7 +9,6 @@ import {
   HelpCircle,
   Menu,
   PlayCircle,
-  Trophy,
   X,
   ChevronDown,
 } from "lucide-react"
@@ -17,7 +16,6 @@ import Link from "next/link"
 import { useEffect, useState } from "react"
 import { buildStyles, CircularProgressbar } from "react-circular-progressbar"
 import "react-circular-progressbar/dist/styles.css"
-import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible"
@@ -267,7 +265,7 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
                   </CollapsibleTrigger>
                   <CollapsibleContent className="bg-slate-50 dark:bg-slate-800/50">
                     <div className="p-2 space-y-1.5">
-                      {combinedItems.map((item, itemIndex) => {
+                      {combinedItems.map((item) => {
                         const isCurrentItem = currentItemId === item.id && currentItemType === item.type
 
                         // Determine icon and styling based on item type
