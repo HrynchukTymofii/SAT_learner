@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getIsSubscribed } from "@/actions/get-is-subscribed";
+//import { getIsSubscribed } from "@/actions/get-is-subscribed";
 
 export async function POST(req: Request) {
   try {
@@ -9,9 +9,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
     }
 
-    const isSubscribed = await getIsSubscribed(userId, courseId);
+    //const isSubscribed = await getIsSubscribed(userId, courseId);
 
-    return NextResponse.json({ isSubscribed });
+    return null;
   } catch (error) {
     console.error("[GET_IS_SUBSCRIBED]", error);
     return NextResponse.json({ error: "Internal Server Error" }, { status: 500 });
