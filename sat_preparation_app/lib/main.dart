@@ -26,9 +26,9 @@ class _BottomNavPageState extends State<BottomNavPage> {
   int _selectedIndex = 0;
 
   final List<String> _urls = [
-    'https://fibipals.com/info',     // Home URL
-    'https://example.com/course', // Course URL (replace with your own)
-    'https://example.com/test',  // Tests URL (replace with your own)
+    'https://sat-ecosystem.vercel.app/info?embed=true',     // Home URL
+    'https://sat-ecosystem.vercel.app/course?embed=true', // Course URL (replace with your own)
+    'https://sat-ecosystem.vercel.app/test?embed=true',  // Tests URL (replace with your own)
   ];
 
   late final List<WebViewController> _controllers;

@@ -303,12 +303,12 @@ export const EnhancedQuiz = ({ quiz, questions, courseId, userId, existingResult
                     onClick={() => navigateToQuestion(index)}
                   >
                     <span className="mr-1 lg:mr-2">{index + 1}</span>
-                    <span className="hidden lg:inline">
+                    {/* <span className="hidden lg:inline">
                       {question.questionType === "multiple_choice" && "MC"}
                       {question.questionType === "single_choice" && "SC"}
                       {question.questionType === "true_false" && "TF"}
                       {question.questionType === "open_ended" && "OE"}
-                    </span>
+                    </span> */}
                     {status === "correct" && <CheckCircle className="h-3 w-3 ml-auto" />}
                     {status === "incorrect" && <AlertCircle className="h-3 w-3 ml-auto" />}
                     {status === "answered" && !isSubmitted && (

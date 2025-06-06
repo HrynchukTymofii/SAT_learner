@@ -30,6 +30,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { useState, useEffect } from "react"
 import { Loader } from "@/components/loader"
 import { motion } from "framer-motion"
+import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-editor"
 
 interface CoursePageProps {
   course: any
@@ -287,10 +288,8 @@ const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
                     </div>
                   )}
 
-                  <div className="prose prose-slate max-w-none">
-                    <p>
-                      {course.description || "Learn the essential skills and concepts in this comprehensive course."}
-                    </p>
+                  <div className="">
+                    <ReadOnlyEditor initialContent= {course.description || "Learn the essential skills and concepts in this comprehensive course."}/>
                   </div>
                 </CardContent>
               </Card>

@@ -69,7 +69,7 @@ export function ReadOnlyEditor({ initialContent = ""}: ReadOnlyEditorProps) {
         autocorrect: "off",
         autocapitalize: "off",
         "aria-label": "Lesson content area, start typing to enter text.",
-        class: "p-6 focus:outline-none prose prose-lg dark:prose-invert max-w-none",
+        class: "focus:outline-none prose prose-lg dark:prose-invert max-w-none",
       },
     },
     extensions: [
