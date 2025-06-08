@@ -1,8 +1,12 @@
+'use client'
+
 import { Navbar } from '@/components/navbar';
+import { SessionProvider } from 'next-auth/react';
 import React, { Suspense } from 'react'
 
-const MainLayout = async ({ children }: { children: React.ReactNode;}) => {
+const MainLayout =  ({ children }: { children: React.ReactNode;}) => {
   return (
+    <SessionProvider>
     <div className='max-w-7xl'>
       <Suspense fallback={null}>
         <Navbar />
@@ -11,6 +15,7 @@ const MainLayout = async ({ children }: { children: React.ReactNode;}) => {
         {children}
       </main>
     </div>
+    </SessionProvider>
   )
 }
 

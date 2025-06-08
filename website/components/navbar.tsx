@@ -2,7 +2,7 @@
 
 import * as React from "react"
 import Link from "next/link"
-import { useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { BookOpen, GraduationCap, Home, Menu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -16,18 +16,17 @@ import {
 } from "@/components/ui/navigation-menu"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
-
-// Mock authentication state - replace with your actual auth logic
-const useAuth = () => {
-  const [isLoggedIn, setIsLoggedIn] = React.useState(false)
-  return { isLoggedIn, setIsLoggedIn }
-}
+import { LoginModal } from "./login-modal"
+import { signOut, useSession } from "next-auth/react"
 
 export function Navbar() {
   const searchParams = useSearchParams()
   const isEmbedded = searchParams.get("embed") === "true"
-  const { isLoggedIn, setIsLoggedIn } = useAuth()
+  //const [isLoggedIn, setIsLoggedIn] = React.useState(false)
   const [isOpen, setIsOpen] = React.useState(false)
+
+  const { data: session, status } = useSession()
+  const isLoggedIn = !!session
 
   // Hide navbar if embedded
   if (isEmbedded) {
@@ -124,13 +123,16 @@ export function Navbar() {
               </div>
 
               {isLoggedIn ? (
-                <Link
-                  href="/dashboard"
-                  className="mt-4 flex w-full items-center justify-center rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground"
-                  onClick={() => setIsOpen(false)}
-                >
-                  Dashboard
-                </Link>
+                <>
+                  <Link
+                    href="/dashboard"
+                    className="mt-4 flex w-full items-center justify-center rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground"
+                    onClick={() => setIsOpen(false)}
+                  >
+                    Dashboard
+                  </Link>
+                  <Button variant="outline" onClick={() => signOut()}>Logout</Button>
+                </>
               ) : (
                 <Link
                   href="/login"
@@ -190,19 +192,15 @@ export function Navbar() {
         {/* Auth Button */}
         <div className="ml-auto flex items-center gap-2">
           {isLoggedIn ? (
-            <Button asChild>
-              <Link href="/dashboard">Dashboard</Link>
-            </Button>
+            <>
+              <Button asChild><Link href="/dashboard">Dashboard</Link></Button>
+              <Button variant="outline" onClick={() => signOut()}>Logout</Button>
+            </>
           ) : (
-            <Button asChild>
-              <Link href="/login">Login</Link>
-            </Button>
+            <LoginModal>
+              <Button variant="secondary">Login</Button>
+            </LoginModal>
           )}
-
-          {/* Toggle for demo purposes */}
-          <Button variant="ghost" size="sm" onClick={() => setIsLoggedIn(!isLoggedIn)} className="hidden sm:flex">
-            (Demo: Toggle Auth)
-          </Button>
         </div>
       </div>
     </header>

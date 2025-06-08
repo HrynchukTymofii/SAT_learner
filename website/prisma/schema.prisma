@@ -12,12 +12,21 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-model User{
-  id String @id @default(uuid())
-  userId String
-  isPro Boolean @default(false)
-  league String @default("Beginner")
-  points Int @default(0)
+model User{  
+  userId        String    @id @default(uuid())
+  isPro         Boolean   @default(false)
+  league        String    @default("Beginner")
+  points        Int       @default(0)
+  platform      String?
+  name          String?
+  email         String?
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  editingCourses CourseEditor[]
 }
 
 model Course{
@@ -34,8 +43,7 @@ model Course{
   price Float?
   isFree Boolean @default(true)
   isPublished Boolean @default(false)
-  categoryId String?
-  category Category? @relation(fields: [categoryId], references: [id])
+  categories CourseCategory[]
 
   chapters Chapter[]
 
@@ -45,11 +53,24 @@ model Course{
 
   subscriptions  CourseSubscription[]
 
+  courseEditors CourseEditor[]
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@index([categoryId])
 }
+
+model CourseEditor {
+  id        String   @id @default(uuid())
+  userId    String
+  courseId  String
+  addedAt   DateTime @default(now())
+
+  user      User     @relation(fields: [userId], references: [userId])
+  course    Course   @relation(fields: [courseId], references: [id])
+
+  @@unique([userId, courseId])
+}
+
 
 model CourseSubscription {
   id          String   @id @default(uuid())
@@ -66,8 +87,20 @@ model CourseSubscription {
 model Category{
   id String @id @default(uuid())
   name String @unique
-  course Course[]
+  courses    CourseCategory[]
 }
+
+model CourseCategory {
+  id         String   @id @default(uuid())
+  courseId   String
+  categoryId String
+
+  course     Course   @relation(fields: [courseId], references: [id])
+  category   Category @relation(fields: [categoryId], references: [id])
+
+  @@unique([courseId, categoryId])
+}
+
 
 model Attachment{
   id String @id @default(uuid())
@@ -113,6 +146,7 @@ model Lesson {
   content     String?    @db.Text
   videoUrl    String?    @db.Text
   youTubeVideoUrl String? @db.Text
+  description  String?
   position    Int
   isPublished Boolean @default(false)
   isFree      Boolean @default(false)
@@ -183,6 +217,7 @@ model QuizQuestion {
   question    String
   questionType String?
   questionImageUrl  String? 
+  imageHeight Int @default(200)
   options     Json       
   answers     Json
   hint       String?     
