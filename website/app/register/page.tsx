@@ -11,6 +11,7 @@ import Link from "next/link"
 import { AuthProviders } from "@/components/auth-providers"
 import { registerUser } from "@/lib/registerUser"
 import { useRouter } from "next/navigation"
+import { signIn } from "next-auth/react"
 
 export default function RegisterPage() {
   const router = useRouter()
@@ -36,7 +37,17 @@ export default function RegisterPage() {
         password,
       })
 
-      router.push("/login")
+      const res = await signIn("credentials", {
+        redirect: false,
+        email,
+        password,
+      });
+
+      if (res?.ok) {
+        router.push("/profile")
+      } else {
+        alert("Login failed after registration.");
+      }
     } catch (error) {
       console.error("Registration error:", error)
       alert("Failed to register. Please try again.")

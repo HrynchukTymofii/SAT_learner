@@ -14,6 +14,7 @@ import { Highlight } from "@tiptap/extension-highlight"
 import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Underline } from "@tiptap/extension-underline"
+import Mathematics from '@tiptap/extension-mathematics'
 
 // --- Custom Extensions ---
 import { Link } from "@/components/tiptap-extension/link-extension"
@@ -84,6 +85,11 @@ export function ReadOnlyEditor({ initialContent = ""}: ReadOnlyEditorProps) {
       Superscript,
       Subscript,
       Selection,
+      Mathematics.configure({
+        katexOptions: {
+          maxSize: 300,
+        },
+      }),
       ImageUploadNode.configure({
         accept: "image/*",
         maxSize: MAX_FILE_SIZE,

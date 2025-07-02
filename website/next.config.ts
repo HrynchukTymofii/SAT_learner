@@ -8,6 +8,11 @@ const nextConfig: NextConfig = {
             hostname: 'utfs.io',
             pathname: '/**',
           },
+          {
+            protocol: 'https',
+            hostname: 'p48gqac1wm.ufs.sh',
+            pathname: '/**',
+          },
         ],
       },
 };

@@ -7,14 +7,14 @@ import React, { Suspense } from 'react'
 const MainLayout =  ({ children }: { children: React.ReactNode;}) => {
   return (
     <SessionProvider>
-    <div className='max-w-7xl'>
-      <Suspense fallback={null}>
-        <Navbar />
-      </Suspense>
-      <main className='flex justify-center h-full'>
-        {children}
-      </main>
-    </div>
+    <div className='max-w-7xl mx-auto'>
+        <Suspense fallback={null}>
+          <Navbar />
+        </Suspense>
+        <main className='flex justify-center max-w-7xl mx-auto h-full'>
+          {children}
+        </main>
+      </div>
     </SessionProvider>
   )
 }

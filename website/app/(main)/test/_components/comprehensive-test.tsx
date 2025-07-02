@@ -13,6 +13,7 @@ import axios from "axios"
 import { useRouter } from "next/navigation"
 import { Checkbox } from "@/components/ui/checkbox"
 import { cn } from "@/lib/utils"
+import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-editor"
 
 interface ComprehensiveTestProps {
   course: any
@@ -325,7 +326,8 @@ export const ComprehensiveTest = ({ course, questions, userId, existingResult }:
               </div>
             </CardHeader>
             <CardContent className="space-y-6">
-              <div className="text-slate-900 text-lg leading-relaxed">{currentQuestion.question}</div>
+              <ReadOnlyEditor initialContent={currentQuestion.question}/>
+              
 
               <div className="space-y-3">
                 {currentQuestion.options.map((option, index) => {
@@ -341,7 +343,7 @@ export const ComprehensiveTest = ({ course, questions, userId, existingResult }:
                       )}
                       onClick={() => handleAnswerSelect(option)}
                     >
-                      <Checkbox checked={isSelected} className="h-5 w-5" onChange={() => handleAnswerSelect(option)} />
+                      {/* <Checkbox checked={isSelected} className="h-5 w-5" onChange={() => handleAnswerSelect(option)} /> */}
                       <span className="flex-1 text-slate-700">{option}</span>
                     </div>
                   )

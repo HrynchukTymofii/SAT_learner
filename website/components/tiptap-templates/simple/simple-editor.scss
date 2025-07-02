@@ -52,15 +52,15 @@ body {
   margin: 0 auto;
 }
 
-.simple-editor-content .tiptap.ProseMirror {
-  padding: 2rem 2rem;
-}
+// .simple-editor-content .tiptap.ProseMirror {
+//   padding: 2rem 2rem;
+// }
 
-@media screen and (max-width: 480px) {
-  .simple-editor-content .tiptap.ProseMirror {
-    padding: 1rem 1.5rem;
-  }
-}
+// @media screen and (max-width: 480px) {
+//   .simple-editor-content .tiptap.ProseMirror {
+//     padding: 1rem 1.5rem;
+//   }
+// }
 
 
 @keyframes fadeIn {

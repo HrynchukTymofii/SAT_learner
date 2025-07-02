@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useState } from "react"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Card, CardContent } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -45,8 +45,19 @@ export function LoginModal({ children }: LoginModalProps) {
         password,
       })
 
-      setOpen(false) // Close modal
-      router.push("/dashboard") // Or wherever you want
+      const res = await signIn("credentials", {
+        redirect: false,
+        email: regEmail,
+        password,
+      });
+
+      if (res?.ok) {
+        router.push("/profile")
+      } else {
+        alert("Login failed after registration.");
+      }
+
+      setOpen(false)
     } catch (error) {
       console.error("Registration error:", error)
       alert("Failed to register. Please try again.")
@@ -55,6 +66,7 @@ export function LoginModal({ children }: LoginModalProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
+      <DialogTitle></DialogTitle>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md p-0 bg-transparent border-0 shadow-none">
         <div className="relative">

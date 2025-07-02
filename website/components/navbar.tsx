@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { BookOpen, GraduationCap, Home, Menu } from "lucide-react"
+import { BarChart2, BookOpen, GraduationCap, Home, Menu } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -18,15 +18,16 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { cn } from "@/lib/utils"
 import { LoginModal } from "./login-modal"
 import { signOut, useSession } from "next-auth/react"
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar"
+import { useAuth } from "@/lib/useAuth"
 
 export function Navbar() {
   const searchParams = useSearchParams()
   const isEmbedded = searchParams.get("embed") === "true"
-  //const [isLoggedIn, setIsLoggedIn] = React.useState(false)
+  const {user} = useAuth()
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const { data: session, status } = useSession()
-  const isLoggedIn = !!session
+  const isLoggedIn = !!user
 
   // Hide navbar if embedded
   if (isEmbedded) {
@@ -64,7 +65,7 @@ export function Navbar() {
               </Link>
 
               <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold">Tests</h3>
+                <h3 className="text-lg font-semibold">Online SAT</h3>
                 <Link
                   href="/test"
                   className="ml-4 flex items-center gap-2 rounded-md p-2 hover:bg-accent"
@@ -157,7 +158,7 @@ export function Navbar() {
               </NavigationMenuItem>
 
               <NavigationMenuItem>
-                <NavigationMenuTrigger>Tests</NavigationMenuTrigger>
+                <NavigationMenuTrigger>Online SAT</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
                     {testItems.map((item) => (
@@ -193,12 +194,30 @@ export function Navbar() {
         <div className="ml-auto flex items-center gap-2">
           {isLoggedIn ? (
             <>
-              <Button asChild><Link href="/dashboard">Dashboard</Link></Button>
-              <Button variant="outline" onClick={() => signOut()}>Logout</Button>
+            {user.isPro &&
+             <Link
+              href="/dashboard"
+              className="flex items-center gap-2 px-3 py-2 rounded-md font-semibold text-sm bg-gradient-to-br from-blue-500 to-blue-600 text-white"
+            >
+              <BarChart2 className="w-4 h-4" />
+              Dashboard
+            </Link>}
+              <Link
+                href="/profile"
+                className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted transition-colors"
+              >
+                <Avatar className="h-6 w-6 ">
+                  <AvatarImage src={user?.image || ''} />
+                  <AvatarFallback className="bg-green-500">{(user?.name?.charAt(0) || 'U')}</AvatarFallback>
+                </Avatar>
+                <span className="text-sm font-medium text-foreground">
+                  {user?.name?.split(' ')[0] || 'Користувач'}
+                </span>
+              </Link>
             </>
           ) : (
             <LoginModal>
-              <Button variant="secondary">Login</Button>
+              <Button variant="secondary" className="cursor-pointer">Login</Button>
             </LoginModal>
           )}
         </div>
@@ -215,12 +234,12 @@ const testItems = [
   },
   {
     title: "Math Section",
-    href: "/test",
+    href: "/test/math-section",
     description: "Practice tests focused on the math section of the SAT.",
   },
   {
     title: "Reading & Writing Section",
-    href: "/test",
+    href: "/test/readwrite-section",
     description: "Practice tests for the reading and writing sections.",
   },
 ]

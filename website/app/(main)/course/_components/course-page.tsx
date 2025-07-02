@@ -32,16 +32,17 @@ import FaqSection from "./faq-section"
 
 import StorySection from "./story-section"
 import PromiseSection from "./promise-section"
+import { LoginFirstModal } from "./login-require-madal"
 
 interface CoursePageProps {
   course: any
-  attachments: any[]
   isEnrolled: boolean
-  userId: string
+  userId: string | null
 }
 
-const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
+const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
   const [openChapters, setOpenChapters] = useState<string[]>([])
+  const [showLoginModal, setShowLoginModal] = useState(false)
 
   const toggleChapter = (chapterId: string) => {
     setOpenChapters((prev) => (prev.includes(chapterId) ? prev.filter((id) => id !== chapterId) : [...prev, chapterId]))
@@ -50,6 +51,10 @@ const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
   const handleContentClick = (chapterId: string, contentId: string, contentType: string) => {
     // Navigate to content
     window.location.href = `/course/${chapterId}/${contentType}s/${contentId}`
+  }
+
+  const handleEnroll = () => {
+
   }
 
   // Calculate course progress
@@ -221,17 +226,22 @@ const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
                           Continue Learning
                         </Button>
                       </div>
-                    ) : (
-                      <Button
+                    ) : 
+                      userId ? (<Button
                         className="w-full bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-600 hover:from-indigo-700 hover:via-violet-700 hover:to-purple-700 transition-all duration-300"
-                        onClick={() => {
-                          // Enrollment logic would go here
-                          window.location.reload()
-                        }}
+                        onClick={() => handleEnroll()}
+                        
                       >
                         Enroll Now - It&apos;s Free
-                      </Button>
-                    )}
+                      </Button>) :
+                      (<Button
+                        className="w-full bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-600 hover:from-indigo-700 hover:via-violet-700 hover:to-purple-700 transition-all duration-300"
+                          onClick={() => setShowLoginModal(true)}
+                      >
+                        Enroll Now - It&apos;s Free
+                      </Button>)
+                    }
+                    <LoginFirstModal isOpen={showLoginModal} onClose={() => setShowLoginModal(false)} />
 
                     <div className="mt-6 space-y-4">
                       <div className="flex items-center gap-2">
@@ -250,31 +260,6 @@ const CoursePage = ({ course, attachments, isEnrolled }: CoursePageProps) => {
                   </CardContent>
                 </Card>
               </motion.div>
-
-              {/* Attachments */}
-              {attachments.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: 0.5 }}
-                >
-                  <Card className="shadow-lg border-0 bg-white">
-                    <CardHeader>
-                      <CardTitle className="text-xl font-bold text-slate-900">Course Materials</CardTitle>
-                    </CardHeader>
-                    <CardContent className="space-y-2">
-                      {attachments.map((attachment, index) => (
-                        <Link href={attachment.url} target="_blank" key={index}>
-                          <div className="flex items-center p-3 hover:bg-slate-50 rounded-md transition-colors">
-                            <File className="h-4 w-4 mr-2 flex-shrink-0 text-slate-500" />
-                            <p className="line-clamp-1 text-slate-700 hover:text-slate-900">{attachment.name}</p>
-                          </div>
-                        </Link>
-                      ))}
-                    </CardContent>
-                  </Card>
-                </motion.div>
-              )}
             </div>
           </div>
         </motion.div>

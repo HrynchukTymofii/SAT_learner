@@ -9,6 +9,6 @@ export function useAuth() {
     userId: session?.user?.userId,
     user: session?.user,
     isAuthenticated: !!session?.user,
-    isLoading: status === "loading",
+    isPro: session?.user?.isPro
   }
 }
