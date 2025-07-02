@@ -5,7 +5,7 @@ import CoursePage from "./_components/course-page"
 const CourseIdPage = async () => {
   const courseId = process.env.COURSE_ID;
   // Mock userId for demonstration - in a real app, this would come from auth
-  const userId = "user"
+  const userId = "user1"
 
   const course = await db.course.findUnique({
     where: {
@@ -49,7 +49,7 @@ const CourseIdPage = async () => {
     },
   })
 
-  const isEnrolled = true
+  const isEnrolled = false
   //const isEnrolled = !!enrollment
 
   if (!course) {
