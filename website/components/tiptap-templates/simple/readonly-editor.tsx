@@ -15,6 +15,7 @@ import { Subscript } from "@tiptap/extension-subscript"
 import { Superscript } from "@tiptap/extension-superscript"
 import { Underline } from "@tiptap/extension-underline"
 import Mathematics from '@tiptap/extension-mathematics'
+import { TextStyleKit } from '@tiptap/extension-text-style'
 
 // --- Custom Extensions ---
 import { Link } from "@/components/tiptap-extension/link-extension"
@@ -99,6 +100,7 @@ export function ReadOnlyEditor({ initialContent = ""}: ReadOnlyEditorProps) {
       }),
       TrailingNode,
       Link.configure({ openOnClick: false }),
+      TextStyleKit,
     ],
     content: getInitialContent(),
   })
