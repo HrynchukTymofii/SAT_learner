@@ -18,7 +18,7 @@ import Mathematics from '@tiptap/extension-mathematics'
 import { TextStyleKit } from '@tiptap/extension-text-style'
 
 // --- Custom Extensions ---
-import { Link } from "@/components/tiptap-extension/link-extension"
+import { Link } from "@tiptap/extension-link"
 import { Selection } from "@/components/tiptap-extension/selection-extension"
 import { TrailingNode } from "@/components/tiptap-extension/trailing-node-extension"
 
