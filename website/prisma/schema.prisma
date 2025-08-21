@@ -27,7 +27,22 @@ model User{
   updatedAt     DateTime  @updatedAt
 
   editingCourses CourseEditor[]
+
+  userQuizQuestion UserQuizQuestion[]
+
+  messages           UserMessage[]     @relation("UserMessages")
 }
+
+model UserMessage {
+  id        String   @id @default(cuid())
+  topic     String
+  message   String
+  createdAt DateTime @default(now())
+
+  userId    String
+  user      User     @relation("UserMessages", fields: [userId], references: [userId])
+}
+
 
 model Course{
   id String @id @default(uuid())
@@ -229,8 +244,32 @@ model QuizQuestion {
   quizId      String
   quiz        Quiz       @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
+  userQuestions       UserQuizQuestion[]
+
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
+}
+
+model UserQuizQuestion{
+  id  String     @id @default(uuid())
+
+  questionId String
+  question   QuizQuestion  @relation(fields: [questionId], references: [id])
+
+  userId String
+  user User @relation(fields: [userId], references: [userId])
+
+  liked  Boolean @default(false)
+  disliked Boolean @default(false)
+
+  saved  Boolean @default(false)
+
+  comments Json?
+
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([userId, questionId])
 }
 
 model QuizResult {
