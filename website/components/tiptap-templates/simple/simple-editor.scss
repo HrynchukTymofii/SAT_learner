@@ -23,6 +23,13 @@ body {
   font-family: "DM Sans", sans-serif;
 }
 
+.tiptap mark {
+  border-radius: 0.3rem;
+  box-decoration-break: clone;
+  padding: 0.1rem 0.3rem;
+  border-bottom: 3px solid rgba(0, 0, 0, 0.4);
+}
+
 .content-wrapper {
   height: calc(100% - var(--tt-toolbar-height));
   overflow-y: auto;
