@@ -24,6 +24,7 @@ body {
 }
 
 .tiptap mark {
+  display: inline-block;
   border-radius: 0.3rem;
   box-decoration-break: clone;
   padding: 0.1rem 0.3rem;
@@ -57,6 +58,23 @@ body {
   max-width: 800px;
   width: 100%;
   margin: 0 auto;
+}
+
+:root {
+  --tt-color-highlight-green: #a5d6a7;
+  --tt-color-highlight-green-contrast: #2e7d32;
+
+  --tt-color-highlight-blue: #90caf9;
+  --tt-color-highlight-blue-contrast: #1565c0;
+
+  --tt-color-highlight-red: #ef9a9a;
+  --tt-color-highlight-red-contrast: #c62828;
+
+  --tt-color-highlight-purple: #ce93d8;
+  --tt-color-highlight-purple-contrast: #6a1b9a;
+
+  --tt-color-highlight-yellow: #f57f17;
+  --tt-color-highlight-yellow-contrast: #f57f17;
 }
 
 // .simple-editor-content .tiptap.ProseMirror {

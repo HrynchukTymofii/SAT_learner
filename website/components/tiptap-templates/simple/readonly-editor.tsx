@@ -1,49 +1,49 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { EditorContent, EditorContext, useEditor } from "@tiptap/react"
+import * as React from "react";
+import { EditorContent, EditorContext, useEditor } from "@tiptap/react";
 
 // --- Tiptap Core Extensions ---
-import { StarterKit } from "@tiptap/starter-kit"
-import { Image } from "@tiptap/extension-image"
-import { TaskItem } from "@tiptap/extension-task-item"
-import { TaskList } from "@tiptap/extension-task-list"
-import { TextAlign } from "@tiptap/extension-text-align"
-import { Typography } from "@tiptap/extension-typography"
-import { Highlight } from "@tiptap/extension-highlight"
-import { Subscript } from "@tiptap/extension-subscript"
-import { Superscript } from "@tiptap/extension-superscript"
-import { Underline } from "@tiptap/extension-underline"
-import Mathematics from '@tiptap/extension-mathematics'
-import { TextStyleKit } from '@tiptap/extension-text-style'
+import { StarterKit } from "@tiptap/starter-kit";
+import { Image } from "@tiptap/extension-image";
+import { TaskItem } from "@tiptap/extension-task-item";
+import { TaskList } from "@tiptap/extension-task-list";
+import { TextAlign } from "@tiptap/extension-text-align";
+import { Typography } from "@tiptap/extension-typography";
+import { Highlight } from "@tiptap/extension-highlight";
+import { Subscript } from "@tiptap/extension-subscript";
+import { Superscript } from "@tiptap/extension-superscript";
+import { Underline } from "@tiptap/extension-underline";
+import Mathematics from "@tiptap/extension-mathematics";
+import { TextStyleKit } from "@tiptap/extension-text-style";
+
 
 // --- Custom Extensions ---
-import { Link } from "@tiptap/extension-link"
-import { Selection } from "@/components/tiptap-extension/selection-extension"
-import { TrailingNode } from "@/components/tiptap-extension/trailing-node-extension"
+import { Link } from "@tiptap/extension-link";
+import { Selection } from "@/components/tiptap-extension/selection-extension";
+import { TrailingNode } from "@/components/tiptap-extension/trailing-node-extension";
 
 // --- Tiptap Node ---
-import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension"
-import "@/components/tiptap-node/code-block-node/code-block-node.scss"
-import "@/components/tiptap-node/list-node/list-node.scss"
-import "@/components/tiptap-node/image-node/image-node.scss"
-import "@/components/tiptap-node/paragraph-node/paragraph-node.scss"
+import { ImageUploadNode } from "@/components/tiptap-node/image-upload-node/image-upload-node-extension";
+import "@/components/tiptap-node/code-block-node/code-block-node.scss";
+import "@/components/tiptap-node/list-node/list-node.scss";
+import "@/components/tiptap-node/image-node/image-node.scss";
+import "@/components/tiptap-node/paragraph-node/paragraph-node.scss";
 
 // --- Lib ---
-import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils"
+import { handleImageUpload, MAX_FILE_SIZE } from "@/lib/tiptap-utils";
 
 // --- Styles ---
-import "@/components/tiptap-templates/simple/simple-editor.scss"
+import "@/components/tiptap-templates/simple/simple-editor.scss";
 
 interface ReadOnlyEditorProps {
-  initialContent: string
+  initialContent: string;
 }
 
-export function ReadOnlyEditor({ initialContent = ""}: ReadOnlyEditorProps) {
+export function ReadOnlyEditor({ initialContent = "" }: ReadOnlyEditorProps) {
   const getInitialContent = () => {
-
     try {
-      return JSON.parse(initialContent)
+      return JSON.parse(initialContent);
     } catch {
       return {
         type: "doc",
@@ -60,11 +60,11 @@ export function ReadOnlyEditor({ initialContent = ""}: ReadOnlyEditorProps) {
         ],
       };
     }
-  }
+  };
 
   const editor = useEditor({
     immediatelyRender: false,
-    editable: false, 
+    editable: false,
     editorProps: {
       attributes: {
         autocomplete: "off",
@@ -103,19 +103,19 @@ export function ReadOnlyEditor({ initialContent = ""}: ReadOnlyEditorProps) {
       TextStyleKit,
     ],
     content: getInitialContent(),
-  })
+  });
 
   return (
     <div className={` relative`}>
       <EditorContext.Provider value={{ editor }}>
-
         <div className="content-wrapper overflow-hidden relative">
-          <EditorContent editor={editor}
+          <EditorContent
+            editor={editor}
             role="presentation"
-            className={`simple-editor-content transition-all duration-300`} />
-
+            className={`simple-editor-content transition-all duration-300`}
+          />
         </div>
       </EditorContext.Provider>
     </div>
-  )
+  );
 }
