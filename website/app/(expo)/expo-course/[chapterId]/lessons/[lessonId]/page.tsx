@@ -16,21 +16,12 @@ const LessonPage = async ({ params }: { params: Promise<{ chapterId: string; les
         }
     });
 
-    // const sections = await db.lessonSection.findMany({
-    //     where: {
-    //       lessonId: lessonId,
-    //     },
-    //     orderBy: {
-    //         position: 'asc'
-    //     }
-    // });
-
     if (!lesson) {
         toast.error("Something went wrong!")
         return redirect(`/courses/${courseId}/chapters/${chapterId}`);
     }
 
-    return <LessonContent lesson={lesson} lessonId={lessonId} chapterId={chapterId} courseId={courseId}/>
+    return <LessonContent lesson={lesson} />
 }
 
 export default LessonPage
