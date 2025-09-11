@@ -1,6 +1,34 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
 
+export async function GET(req: Request, { params }: { params: Promise<{ quizId: string }> }) {
+  try {
+    const { quizId } = await params;
+
+    if (!quizId) {
+      return new NextResponse("Missing required fields", { status: 400 });
+    }
+
+    const quiz = await db.quiz.findUnique({
+      where: { id: quizId },
+      include: {
+        questions: {
+          orderBy: { position: "asc" },
+        },
+      },
+    });
+
+    if (!quiz) {
+      return new NextResponse("Quiz not found", { status: 404 });
+    }
+
+    return NextResponse.json({ success: true, data: quiz });
+  } catch (error) {
+    console.error("Error fetching quiz:", error);
+    return new NextResponse("Internal Error", { status: 500 });
+  }
+}
+
 
 export async function POST(
   req: Request,
