@@ -152,6 +152,33 @@ export async function updateUserPoints(userId: string, points: number) {
 }
 
 
+export async function enrollUser(userId: string, courseId: string) {
+  try {
+    const existing = await db.courseSubscription.findFirst({
+      where: { userId, courseId },
+    });
+
+    if (existing) {
+      return { success: false, message: "User already enrolled" };
+    }
+
+    const userSubscription = await db.courseSubscription.create({
+      data: {
+        userId,
+        courseId,
+      },
+    });
+
+    revalidatePath("/course")
+
+    return { success: true, data: userSubscription }
+  } catch (error) {
+    console.error("Enrollment failed:", error)
+    return { success: false, error: (error as Error).message }
+  }
+}
+
+
 export async function deleteUserAccount(userId: string) {
   try {
     await db.userQuizQuestion.deleteMany({ where: { userId } })

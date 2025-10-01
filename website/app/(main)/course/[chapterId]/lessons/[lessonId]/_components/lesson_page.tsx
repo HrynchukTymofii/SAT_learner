@@ -10,13 +10,9 @@ import { Lesson, MuxData } from "@prisma/client";
 import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-editor";
 import { useState } from "react";
 import { Loader } from "@/components/loader";
-
-type LessonWithMuxData = Lesson & {
-    muxData: MuxData | null;
-};
-
+import { useAuth } from "@/lib/useAuth";
 interface LessonProps {
-    lesson: LessonWithMuxData;
+    lesson: Lesson;
     lessonId: string;
     chapterId: string;
     courseId: string;
@@ -25,7 +21,10 @@ interface LessonProps {
 const LessonContent = ({ lesson, lessonId, chapterId, courseId }: LessonProps) => {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
-    const userId = 'user';
+    const user = useAuth()
+    const userId = user.userId
+
+    if(!userId) return
 
     const handleNextLesson = async () => {
         try {

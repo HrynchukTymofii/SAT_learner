@@ -35,7 +35,7 @@ const FullTestPage = async () => {
     })
 
     // Hardcoded array of available quiz IDs for full tests
-    const availableQuizIds = ["d1b42b93-b580-4bf7-b0af-b70efde22c69", "d1b42b93-b580-4bf7-b0af-b70efde22c69", "d1b42b93-b580-4bf7-b0af-b70efde22c69"]
+    const availableQuizIds = ["d1b42b93-b580-4bf7-b0af-b70efde22c69"]
 
     // Get quiz details and results for each available quiz
     const quizPromises = availableQuizIds.map(async (quizId) => {

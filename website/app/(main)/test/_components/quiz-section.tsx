@@ -435,11 +435,11 @@ export const QuizSection = ({
   const currentQuestion = currentQuiz.questions[currentQuestionIndex]
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="w-full max-w-7xl min-h-screen bg-gray-50">
       {/* Compact Header */}
       <div className="bg-white border-b shadow-sm  mt-4 rounded-lg">
-        <div className="max-w-7xl mx-auto px-4 py-3">
-          <div className="flex items-center justify-between mb-2">
+        <div className=" mx-auto px-4 py-3">
+          <div className="w-full flex items-center justify-between mb-2">
             <div className="flex items-center gap-4">
               <h1 className="text-lg md:text-xl font-bold text-slate-900">{sectionTitle}</h1>
               <Badge variant="outline" className="bg-blue-50 text-blue-700 text-xs md:text-sm">

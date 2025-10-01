@@ -167,18 +167,18 @@ export const EnhancedQuiz = ({ quiz, questions, courseId, userId, existingResult
     setIsLoading(true)
 
     try {
-      // const response = await axios.post("/api/quiz/submit", {
-      //   userId,
-      //   quizId: quiz.id,
-      //   answers: selectedAnswers,
-      //   timeSpent,
-      // })
+      const response = await axios.post("/api/user/course/quiz", {
+        userId,
+        quizId: quiz.id,
+        answers: selectedAnswers,
+        timeSpent,
+      })
 
-      // if (response.status === 200) {
-      setIsSubmitted(true)
-      calculateAndShowResults(selectedAnswers)
-      toast.success("Quiz submitted successfully!")
-      // }
+      if (response.status === 200) {
+        setIsSubmitted(true)
+        calculateAndShowResults(selectedAnswers)
+        toast.success("Quiz submitted successfully!")
+      }
     } catch (error) {
       console.error("Error submitting quiz:", error)
       toast.error("Error submitting quiz. Please try again.")
@@ -256,7 +256,7 @@ export const EnhancedQuiz = ({ quiz, questions, courseId, userId, existingResult
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-6 space-y-6">
+    <div className="max-w-6xl w-full mx-auto p-4 md:p-6 space-y-6">
       {/* Header */}
       <Card className="shadow-lg border-0 bg-white py-6">
         <CardHeader className="pb-4">

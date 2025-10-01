@@ -1,12 +1,16 @@
 import { db } from "@/lib/db"
 import { redirect } from "next/navigation"
 import { EnhancedQuiz } from "./_components/enhanced-quiz";
+import { auth } from "@/lib/getAuth";
 
 
 const QuizPage = async ({ params }: { params: Promise<{ chapterId: string; quizId: string }> }) => {
-  const {  chapterId, quizId } = await params
+  const { chapterId, quizId } = await params
   const courseId = process.env.COURSE_ID || "";
-  const userId = "user"
+  const user = await auth()
+  const userId = user.userId
+
+  if (!userId)return
 
   const quiz = await db.quiz.findUnique({
     where: { id: quizId },

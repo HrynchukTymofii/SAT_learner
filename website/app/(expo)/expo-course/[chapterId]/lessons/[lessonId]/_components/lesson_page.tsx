@@ -4,17 +4,13 @@ import LessonYouTubeVideo from "@/components/lightYouTubeVideo";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
 import axios from "axios";
-import { Lesson, MuxData } from "@prisma/client";
+import { Lesson } from "@prisma/client";
 import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-editor";
 import { useState } from "react";
 import { Loader } from "@/components/loader";
 
-type LessonWithMuxData = Lesson & {
-    muxData: MuxData | null;
-};
-
 interface LessonProps {
-    lesson: LessonWithMuxData;
+    lesson: Lesson;
 }
 
 const LessonContent = ({ lesson }: LessonProps) => {

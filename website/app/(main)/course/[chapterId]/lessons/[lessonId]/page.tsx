@@ -10,24 +10,12 @@ const LessonPage = async ({ params }: { params: Promise<{ chapterId: string; les
     const lesson = await db.lesson.findUnique({
         where: {
           id: lessonId,
-        }, 
-        include: {
-            muxData: true
         }
     });
 
-    // const sections = await db.lessonSection.findMany({
-    //     where: {
-    //       lessonId: lessonId,
-    //     },
-    //     orderBy: {
-    //         position: 'asc'
-    //     }
-    // });
-
     if (!lesson) {
         toast.error("Something went wrong!")
-        return redirect(`/courses/${courseId}/chapters/${chapterId}`);
+        return redirect(`/course/${courseId}/chapters/${chapterId}`);
     }
 
     return <LessonContent lesson={lesson} lessonId={lessonId} chapterId={chapterId} courseId={courseId}/>

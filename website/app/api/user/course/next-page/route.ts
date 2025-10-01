@@ -51,9 +51,11 @@ export async function POST(req: Request) {
 
       for (const item of items) {
         if (foundCurrent) {
-          // Return the next item after the current one
           return NextResponse.json(item);
         }
+
+        console.log(item.id + "===" + currentItemId + "==" + item.id === currentItemId)
+        console.log(chapter.id + "===" + currentChapterId + "==" + chapter.id === currentChapterId)
 
         if (item.id === currentItemId && chapter.id === currentChapterId) {
           foundCurrent = true;

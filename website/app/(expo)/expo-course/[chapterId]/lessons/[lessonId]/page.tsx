@@ -11,14 +11,11 @@ const LessonPage = async ({ params }: { params: Promise<{ chapterId: string; les
         where: {
           id: lessonId,
         }, 
-        include: {
-            muxData: true
-        }
     });
 
     if (!lesson) {
         toast.error("Something went wrong!")
-        return redirect(`/courses/${courseId}/chapters/${chapterId}`);
+        return redirect(`/course/${courseId}/chapters/${chapterId}`);
     }
 
     return <LessonContent lesson={lesson} />

@@ -10,6 +10,7 @@ import { Card, CardContent } from "@/components/ui/card"
 import { CheckCircle, XCircle, BookOpen, ImageIcon } from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
+import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-editor"
 
 interface QuizQuestionProps {
   question: {
@@ -293,7 +294,9 @@ export const EnhancedQuizQuestion = ({
         </div>
 
         {/* Question Text */}
-        <div className="text-slate-900 text-lg leading-relaxed">{question.question}</div>
+        <div className="text-slate-900 text-lg leading-relaxed">
+          <ReadOnlyEditor initialContent={question.question} />
+        </div>
 
         {/* Question Image */}
         {question.questionImageUrl && (

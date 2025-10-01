@@ -32,6 +32,8 @@ model User{
   userQuizQuestion UserQuizQuestion[]
 
   messages           UserMessage[]     @relation("UserMessages")
+
+  comments Comment[]
 }
 
 model UserMessage {
@@ -176,6 +178,8 @@ model Lesson {
   chapter     Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   progress LessonProgress[]
 
+  comments Comment[]
+
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -247,6 +251,8 @@ model QuizQuestion {
 
   userQuestions       UserQuizQuestion[]
 
+  comments Comment[]
+
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
 }
@@ -264,8 +270,6 @@ model UserQuizQuestion{
   disliked Boolean @default(false)
 
   saved  Boolean @default(false)
-
-  comments Json?
 
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -288,6 +292,30 @@ model QuizResult {
   updatedAt   DateTime  @updatedAt
 
   @@unique([userId, quizId])
+}
+
+model Comment {
+  id        String   @id @default(uuid())
+  content   String   @db.Text
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  authorId String
+  author   User @relation(fields: [authorId], references: [userId], onDelete: Cascade)
+
+  // For lesson comments
+  lessonId String? 
+  lesson   Lesson? @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+
+  // For quiz question comments
+  quizQuestionId String?
+  quizQuestion   QuizQuestion? @relation(fields: [quizQuestionId], references: [id], onDelete: Cascade)
+
+  // Optionally support threaded comments
+  parentId String?
+  parent   Comment? @relation("CommentThread", fields: [parentId], references: [id])
+  replies  Comment[] @relation("CommentThread")
 }
 
 model Challenge {

@@ -19,13 +19,8 @@ export default async function QuestionPage({ params }: Props) {
   if (!question) return notFound();
 
   return (
-    <div className="p-4 bg-white min-h-screen">
-      <h2 className="mb-4 text-lg font-semibold">
-        {question.position}. Question
-      </h2>
-      <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <ReadOnlyEditor initialContent={question.question} />
-      </div>
+    <div className="bg-white p-4 ">
+      <ReadOnlyEditor initialContent={question.question} />
     </div>
   );
 }
