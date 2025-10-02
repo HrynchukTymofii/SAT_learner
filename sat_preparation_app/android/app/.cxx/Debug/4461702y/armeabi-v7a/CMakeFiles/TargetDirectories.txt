@@ -1,2 +1,0 @@
-C:/Users/tim20/Desktop/SAT ecosystem/sat_preparation_app/android/app/.cxx/Debug/4461702y/armeabi-v7a/CMakeFiles/edit_cache.dir
-C:/Users/tim20/Desktop/SAT ecosystem/sat_preparation_app/android/app/.cxx/Debug/4461702y/armeabi-v7a/CMakeFiles/rebuild_cache.dir
