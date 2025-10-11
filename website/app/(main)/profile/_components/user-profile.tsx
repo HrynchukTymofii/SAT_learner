@@ -231,16 +231,17 @@ export default function UserProfilePage() {
   }
 
   const handleLogout = () => {
-      startTransition(() => {
-        signOut({
-          callbackUrl: "/",
-        }).catch(() => {
-          toast.error("Помилка", {
-            description: "Не вдалося вийти з акаунту",
-          })
-        })
-      })
-    }
+    startTransition(() => {
+      signOut({
+        callbackUrl: "/", // redirect to home after logout
+      }).catch(() => {
+        toast.error("Error", {
+          description: "Failed to log out of the account",
+        });
+      });
+    });
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 p-4 md:p-6">
       <div className="max-w-4xl mx-auto space-y-6">
