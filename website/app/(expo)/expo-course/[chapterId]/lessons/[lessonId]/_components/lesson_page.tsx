@@ -16,7 +16,7 @@ interface LessonProps {
 const LessonContent = ({ lesson }: LessonProps) => {
 
     return (
-        <div className="flex flex-col gap-y-8 p-2 lg:w-[768px] w-full mx-auto flex-1 bg-[#f8fafc] dark:bg-[#0f172a]">
+        <div className="flex flex-col gap-y-8 py-2 lg:w-[768px] w-full mx-auto flex-1 bg-[#f8fafc] dark:bg-[#0f172a]">
             {lesson.content && (
                 <ReadOnlyEditor initialContent={lesson.content} />
             )}
