@@ -21,11 +21,11 @@ export async function POST(req: NextRequest) {
     if (!payload?.email) return NextResponse.json({ error: "No email from Google" }, { status: 400 });
 
     const email = payload.email;
-    const name = payload.name || "Google User";
+    const name = payload.name || "Student";
     const imageUrl = payload.picture;
 
     // 🧠 Check or create user in DB
-    let user = await db.user.findFirst({ where: { email, platform: "PDRecosystem" } });
+    let user = await db.user.findFirst({ where: { email, platform: "SATecosystem" } });
 
     if (!user) {
       user = await db.user.create({

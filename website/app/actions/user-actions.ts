@@ -129,7 +129,7 @@ export async function updateUserPassword(userId: string, newPassword: string) {
 }
 
 
-export async function updateUserPoints(userId: string, points: number) {
+export async function updateUserPoints(userId: string, points: number, platform: 'web' | 'mobile' = 'web') {
   try {
     const updatedUser = await db.user.update({
       where: {
@@ -140,10 +140,29 @@ export async function updateUserPoints(userId: string, points: number) {
           increment: points,
         },
         updatedAt: new Date(),
+        needSync: platform === 'web'
       },
     })
 
     revalidatePath("/dashboard")
+    return { success: true, user: updatedUser }
+  } catch (error) {
+    console.error("Error updating user points:", error)
+    return { success: false, error: "Failed to update points" }
+  }
+}
+
+export async function updateUserNeedSync(userId: string) {
+  try {
+    const updatedUser = await db.user.update({
+      where: {
+        userId: userId,
+      },
+      data: {
+        updatedAt: new Date(),
+        needSync: true
+      },
+    })
     return { success: true, user: updatedUser }
   } catch (error) {
     console.error("Error updating user points:", error)

@@ -19,7 +19,7 @@ export default async function ExplanationPage({ params }: Props) {
   if (!question?.note) return notFound();
 
   return (
-    <div className="bg-white p-4 ">
+    <div className="bg-[#f8fafc] dark:bg-[#0f172a] p-4 ">
       <ReadOnlyEditor initialContent={question.note} />
     </div>
   );
