@@ -5,7 +5,6 @@ import { BookOpen, GraduationCap, Heart, X, Dices, Dot, ChartNoAxesCombined } fr
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
-import TopBlur from "@/components/ui/TobBlur";
 import { LoginRequiredModal } from "@/components/modals/LoginRequiredModal";
 import { GetPremiumModal } from "@/components/modals/GetPremiumModal";
 
@@ -17,7 +16,7 @@ export default function TestsPage() {
 
   const handleModeSelect = (mode: string) => {
     if (mode === "exam") {
-      router.push("/tests/exam" as any);
+      router.push("/tests/exams" as any);
       return;
     }
 
@@ -71,15 +70,15 @@ export default function TestsPage() {
       colors: ["#3b82f6", "#8b5cf6"], // blue–purple
       buttonText: "Go to Practice",
     },
-    {
-        id: "improve",
-        title: "Personalized Practice",
-        description: "Adaptive tasks tailored to your mistakes to help you improve efficiently.",
-        icon: ChartNoAxesCombined,
-        isFree: true,
-        colors: ["#22d3ee", "#0ea5e9"], // teal gradient
-        buttonText: "Start Personalized Practice",  
-    },
+    // {
+    //     id: "improve",
+    //     title: "Personalized Practice",
+    //     description: "Adaptive tasks tailored to your mistakes to help you improve efficiently.",
+    //     icon: ChartNoAxesCombined,
+    //     isFree: true,
+    //     colors: ["#22d3ee", "#0ea5e9"], // teal gradient
+    //     buttonText: "Start Personalized Practice",  
+    // },
     {
       id: "saved",
       title: "Saved",

@@ -1,63 +1,40 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, ScrollView, Image, TouchableOpacity, Pressable, ActivityIndicator } from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Pressable,
+  ActivityIndicator,
+  Animated,
+  StyleSheet,
+} from "react-native";
 import { useAuth, UserType } from "@/context/AuthContext";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
-import { BookOpen, Brain, Calendar, CheckCircle, Star, Trophy, Zap } from "lucide-react-native";
+import {
+  BookOpen,
+  Brain,
+  Calendar,
+  CheckCircle,
+  Contact,
+  LucideIcon,
+  Mails,
+  Settings,
+  Star,
+  Trophy,
+  Zap,
+} from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { getUserData } from "@/lib/api/user";
 import Toast from "react-native-toast-message";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { LinearGradient } from "expo-linear-gradient";
-
-const mockUserData = {
-  name: "Sarah Johnson",
-  email: "sarah.johnson@email.com",
-  league: "Pro",
-  joinDate: "2023-09-15",
-  stats: {
-    totalPoints: 2847,
-    lessonsCompleted: 42,
-    quizzesTaken: 28,
-    averageSATScore: 1340,
-  },
-  achievements: [
-    {
-      id: 1,
-      title: "First Steps",
-      description: "Completed First Lesson",
-      icon: BookOpen,
-      unlocked: true,
-      color: "blue",
-    },
-    { id: 2, title: "High Scorer", description: "Scored 700+", icon: Trophy, unlocked: true, color: "amber" },
-    {
-      id: 3,
-      title: "Consistent",
-      description: "Active 7 days straight",
-      icon: Calendar,
-      unlocked: true,
-      color: "green",
-    },
-    { id: 4, title: "Math Master", description: "Aced 10 Math quizzes", icon: Brain, unlocked: true, color: "purple" },
-    {
-      id: 5,
-      title: "Speed Reader",
-      description: "Complete 5 Reading sections under time",
-      icon: Zap,
-      unlocked: false,
-      color: "gray",
-    },
-    {
-      id: 6,
-      title: "Perfect Practice",
-      description: "Score 100% on any quiz",
-      icon: Star,
-      unlocked: false,
-      color: "gray",
-    },
-  ],
-};
-
+import * as SecureStore from "expo-secure-store";
+import { useCourseDatabase } from "@/lib/db/course";
+import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
+import { ContactDialog } from "@/components/modals/ContactDialog";
+import { GetPremiumModal } from "@/components/modals/GetPremiumModal";
 
 const AnimatedNumber = ({ value }: { value: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -77,17 +54,32 @@ const AnimatedNumber = ({ value }: { value: number }) => {
     return () => clearInterval(timer);
   }, [value]);
 
-  return <Text style={{ fontSize: 20, fontWeight: "bold" }}>{displayValue}</Text>;
+  return (
+    <Text style={{ fontSize: 20, fontWeight: "bold" }}>{displayValue}</Text>
+  );
 };
 
-const AchievementBadge = ({ achievement }: { achievement: typeof mockUserData.achievements[0] }) => {
+export interface Achievement {
+  id: number | string;
+  title: string;
+  description: string;
+  icon: LucideIcon
+  unlocked: boolean;
+  color: string;
+}
+
+const AchievementBadge = ({
+  achievement,
+}: {
+  achievement: Achievement;
+}) => {
   const Icon = achievement.icon;
 
   // Base colors
   const bgColors: Record<string, string> = {
-    blue: achievement.unlocked ? "#60A5FA" : "#E5E7EB",    // lighter blue
-    amber: achievement.unlocked ? "#FBBF24" : "#E5E7EB",   // lighter amber
-    green: achievement.unlocked ? "#34D399" : "#E5E7EB",   // softer green
+    blue: achievement.unlocked ? "#60A5FA" : "#E5E7EB", // lighter blue
+    amber: achievement.unlocked ? "#FBBF24" : "#E5E7EB", // lighter amber
+    green: achievement.unlocked ? "#34D399" : "#E5E7EB", // softer green
     purple: achievement.unlocked ? "#C084FC" : "#E5E7EB",
     gray: "#E5E7EB",
   };
@@ -143,12 +135,12 @@ const AchievementBadge = ({ achievement }: { achievement: typeof mockUserData.ac
             marginBottom: 4,
           }}
         >
-          <Icon size={24} color='white' />
+          <Icon size={24} color="white" />
         </View>
         <Text
           style={{
             fontWeight: "600",
-            color: 'white',
+            color: "white",
             textAlign: "center",
           }}
         >
@@ -183,15 +175,93 @@ const AchievementBadge = ({ achievement }: { achievement: typeof mockUserData.ac
   );
 };
 
+// Example dynamic achievements calculation
+function getDynamicAchievements({
+  lessonsCount,
+  quizzesCount,
+  averageSatScore,
+}: {
+  lessonsCount: number;
+  quizzesCount: number;
+  averageSatScore: number;
+}) {
+  return [
+    {
+      id: 1,
+      title: "First Steps",
+      description: "Completed First Lesson",
+      icon: BookOpen,
+      unlocked: lessonsCount >= 1,
+      color: "blue",
+    },
+    {
+      id: 2,
+      title: "High Scorer",
+      description: "Scored 700+",
+      icon: Trophy,
+      unlocked: averageSatScore >= 700,
+      color: "amber",
+    },
+    {
+      id: 3,
+      title: "Math Master",
+      description: "Aced 10 Math quizzes",
+      icon: Brain,
+      unlocked: quizzesCount >= 10,
+      color: "purple",
+    },
+    {
+      id: 4,
+      title: "Perfect Practice",
+      description: "Score 100% on any quiz",
+      icon: Star,
+      unlocked: quizzesCount > 0 && averageSatScore === 100,
+      color: "green",
+    },
+  ];
+}
+
 
 export default function ProfileScreen() {
   const { token, setToken, user, setUser } = useAuth();
   const router = useRouter();
+  const [contactOpen, setContactOpen] = useState(false);
+  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-
+  const [answers, setAnswers] = useState<Record<string, string>>({});
+  const { getCompletedLessonsCount, getCompletedQuizzesCount, getAverageScoreByChapter } = useCourseDatabase();
+  
+  const [lessonsCount, setLessonsCount] = useState(0);
+  const [quizzesCount, setQuizzesCount] = useState(0);
+  const [averageSatScore, setAverageSatScore] = useState(0);
+  const [achievements, setAchievements] = useState(getDynamicAchievements({ lessonsCount: 0, quizzesCount: 0, averageSatScore: 0 }));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    (async () => {
+      const lessonsRes = await getCompletedLessonsCount();
+      const quizzesRes = await getCompletedQuizzesCount();
+      const avgSatScpreRes = await getAverageScoreByChapter("8d3703a4-41ce-46b0-a27c-e25c0a0702e2");
+
+      const newLessonsCount = lessonsRes.success ? lessonsRes.count : 0;
+      const newQuizzesCount = quizzesRes.success ? quizzesRes.count : 0;
+      const newAverageScore = avgSatScpreRes.success ? avgSatScpreRes.average : 0;
+
+      setLessonsCount(newLessonsCount!);
+      setQuizzesCount(newQuizzesCount!);
+      setAverageSatScore(newAverageScore!);
+
+      setAchievements(
+        getDynamicAchievements({
+          lessonsCount: newLessonsCount!,
+          quizzesCount: newQuizzesCount!,
+          averageSatScore: newAverageScore!,
+        })
+      );
+    })();
+  }, []);
 
   useEffect(() => {
     if (!token) {
@@ -203,13 +273,16 @@ export default function ProfileScreen() {
       try {
         const res = await getUserData(token);
         if (res.success) {
-          const mappedUser: UserType = { ...res.user, categories: res.user.league };
+          const mappedUser: UserType = {
+            ...res.user,
+            categories: res.user.league,
+          };
           setUser(mappedUser);
         } else {
-          setError(res.error || "Помилка завантаження");
+          setError(res.error || "Error loading data");
         }
       } catch {
-        setError("Сталася неочікувана помилка");
+        setError("An unexpected error occurred");
       } finally {
         setLoading(false);
       }
@@ -218,19 +291,50 @@ export default function ProfileScreen() {
     load();
   }, [token]);
 
+  useEffect(() => {
+    const loadAnswers = async () => {
+      const stored = await SecureStore.getItemAsync("onboardingAnswers");
+      if (stored) setAnswers(JSON.parse(stored));
+      else setAnswers({ name: user?.name || "Student" });
+    };
+    loadAnswers();
+  }, [user]);
+
+  
+
   const handleLogout = () => {
     setToken(null);
     setUser(null);
     router.replace("/");
-    Toast.show({ type: "success", text1: "Ви вийшли з акаунту", position: "top", visibilityTime: 700 });
+    Toast.show({
+      type: "success",
+      text1: "You have logged out",
+      position: "top",
+      visibilityTime: 700,
+    });
   };
 
-  if (loading) return <ActivityIndicator size="large" color="#22d3ee" style={{ flex: 1, justifyContent: "center", alignItems: "center" }} />;
+  if (loading)
+    return (
+      <GraduationCap3DLoader/>
+    );
   if (error || !user)
     return (
-      <View style={{ flex: 1, justifyContent: "center", alignItems: "center", padding: 16, backgroundColor: isDark ? "#0f172a" : "#f9fafb" }}>
-        <Text style={{ color: "red", fontSize: 16, marginBottom: 4 }}>Помилка завантаження профілю</Text>
-        {error && <Text style={{ color: isDark ? "#CBD5E1" : "#6B7280" }}>{error}</Text>}
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          padding: 16,
+          backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+        }}
+      >
+        <Text style={{ color: "red", fontSize: 16, marginBottom: 4 }}>
+          Error loading profile
+        </Text>
+        {error && (
+          <Text style={{ color: isDark ? "#CBD5E1" : "#6B7280" }}>{error}</Text>
+        )}
       </View>
     );
 
@@ -243,7 +347,14 @@ export default function ProfileScreen() {
     : "U";
 
   return (
-    <ScrollView contentContainerStyle={{ paddingBottom: 80, backgroundColor: isDark ? "#0f172a" : "#f9fafb" }} showsVerticalScrollIndicator={false}>
+     <View className="flex-1">
+    <ScrollView
+      contentContainerStyle={{
+        paddingBottom: 80,
+        backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+      }}
+      showsVerticalScrollIndicator={false}
+    >
       {/* Header */}
       <View
         style={{
@@ -251,7 +362,7 @@ export default function ProfileScreen() {
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
           padding: 16,
-          paddingTop: 32,
+          paddingTop: 40,
           flexDirection: "row",
           alignItems: "center",
           shadowColor: "#000",
@@ -262,195 +373,531 @@ export default function ProfileScreen() {
         }}
       >
         {user.image ? (
-          <Image source={{ uri: user.image }} style={{ width: 80, height: 80, borderRadius: 999, borderWidth: 2, borderColor: "#fff", marginRight: 12 }} />
+          <Image
+            source={{ uri: user.image }}
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 999,
+              borderWidth: 2,
+              borderColor: "#fff",
+              marginRight: 12,
+            }}
+          />
         ) : (
-          <View style={{ width: 80, height: 80, borderRadius: 999, borderWidth: 2, borderColor: "#fff", backgroundColor: "#22d3ee", marginRight: 12, justifyContent: "center", alignItems: "center" }}>
-            <Text style={{ color: "#fff", fontSize: 24, fontWeight: "bold" }}>{initials}</Text>
+          answers["avatar"] ? 
+          <View
+            className='p-4 px-5 rounded-full border-2 border-white/40 mr-3 bg-[#22d3ee]'
+          >
+            <Text style={{ fontSize: 36 }}>{answers["avatar"]}</Text>
+          </View>
+          : <View
+            style={{
+              width: 80,
+              height: 80,
+              borderRadius: 999,
+              borderWidth: 2,
+              borderColor: "#fff",
+              backgroundColor: "#22d3ee",
+              marginRight: 12,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <Text style={{ color: "#fff", fontSize: 24, fontWeight: "bold" }}>
+              {initials}
+            </Text>
           </View>
         )}
 
         <View style={{ flex: 1 }}>
-          <Text style={{ fontSize: 20, fontWeight: "bold", color: isDark ? "#F1F5F9" : "#1f2937" }}>{user.name}</Text>
-          <Text style={{ color: isDark ? "#CBD5E1" : "#6B7280" }}>{user.email}</Text>
-          {user.isPro && <Text style={{ color: "#7C3AED", marginTop: 2, fontWeight: "600" }}>Pro League</Text>}
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "bold",
+              color: isDark ? "#F1F5F9" : "#1f2937",
+            }}
+          >
+            {user.name}
+          </Text>
+          <Text style={{ color: isDark ? "#CBD5E1" : "#6B7280" }}>
+            {user.email}
+          </Text>
+          {user.isPro && (
+            <Text style={{  marginTop: 6, fontWeight: "600" }} className="text-yellow-500 border border-yellow-500 mr-auto rounded-xl px-2 ">
+              Pro League
+            </Text>
+          )}
         </View>
       </View>
 
       {/* Stats */}
-      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", padding: 16 }}>
-  <LinearGradient
-    colors={["#3B82F6", "#60A5FA"]}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={{
-      width: "48%",
-      borderRadius: 16,
-      padding: 16,
-      marginBottom: 12,
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.15,
-      shadowRadius: 10,
-      elevation: 6,
-    }}
-  >
-    <MaterialIcons name="emoji-events" size={32} color="#fff" />
-    <AnimatedNumber value={mockUserData.stats.totalPoints} />
-    <Text style={{ color: "#fff", fontWeight: "600" }}>Total Points</Text>
-  </LinearGradient>
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          padding: 16,
+        }}
+      >
+        <LinearGradient
+          colors={["#3B82F6", "#60A5FA"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: "48%",
+            borderRadius: 16,
+            padding: 16,
+            marginBottom: 12,
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 10,
+            elevation: 6,
+          }}
+        >
+          <MaterialIcons name="emoji-events" size={32} color="#fff" />
+          <AnimatedNumber value={user.points} />
+          <Text style={{ color: "#fff", fontWeight: "600" }}>Total Points</Text>
+        </LinearGradient>
 
-  <LinearGradient
-    colors={["#22C55E", "#4ADE80"]}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={{
-      width: "48%",
-      borderRadius: 16,
-      padding: 16,
-      marginBottom: 12,
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.15,
-      shadowRadius: 10,
-      elevation: 6,
-    }}
-  >
-    <MaterialIcons name="menu-book" size={32} color="#fff" />
-    <AnimatedNumber value={mockUserData.stats.lessonsCompleted} />
-    <Text style={{ color: "#fff", fontWeight: "600" }}>Lessons Done</Text>
-  </LinearGradient>
+        <LinearGradient
+          colors={["#22C55E", "#4ADE80"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: "48%",
+            borderRadius: 16,
+            padding: 16,
+            marginBottom: 12,
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 10,
+            elevation: 6,
+          }}
+        >
+          <MaterialIcons name="menu-book" size={32} color="#fff" />
+          <AnimatedNumber value={lessonsCount} />
+          <Text style={{ color: "#fff", fontWeight: "600" }}>Lessons Done</Text>
+        </LinearGradient>
 
-  <LinearGradient
-    colors={["#A78BFA", "#C4B5FD"]}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={{
-      width: "48%",
-      borderRadius: 16,
-      padding: 16,
-      marginBottom: 12,
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.15,
-      shadowRadius: 10,
-      elevation: 6,
-    }}
-  >
-    <MaterialIcons name="track-changes" size={32} color="#fff" />
-    <AnimatedNumber value={mockUserData.stats.quizzesTaken} />
-    <Text style={{ color: "#fff", fontWeight: "600" }}>Quizzes Taken</Text>
-  </LinearGradient>
+        <LinearGradient
+          colors={["#A78BFA", "#C4B5FD"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: "48%",
+            borderRadius: 16,
+            padding: 16,
+            marginBottom: 12,
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 10,
+            elevation: 6,
+          }}
+        >
+          <MaterialIcons name="track-changes" size={32} color="#fff" />
+          <AnimatedNumber value={quizzesCount} />
+          <Text style={{ color: "#fff", fontWeight: "600" }}>
+            Quizzes Taken
+          </Text>
+        </LinearGradient>
 
-  <LinearGradient
-    colors={["#FACC15", "#FDE68A"]}
-    start={{ x: 0, y: 0 }}
-    end={{ x: 1, y: 1 }}
-    style={{
-      width: "48%",
-      borderRadius: 16,
-      padding: 16,
-      marginBottom: 12,
-      alignItems: "center",
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 6 },
-      shadowOpacity: 0.15,
-      shadowRadius: 10,
-      elevation: 6,
-    }}
-  >
-    <MaterialIcons name="star" size={32} color="#fff" />
-    <AnimatedNumber value={mockUserData.stats.averageSATScore} />
-    <Text style={{ color: "#fff", fontWeight: "600" }}>Avg SAT Score</Text>
-  </LinearGradient>
-</View>
+        <LinearGradient
+          colors={["#FACC15", "#FDE68A"]}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+          style={{
+            width: "48%",
+            borderRadius: 16,
+            padding: 16,
+            marginBottom: 12,
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 10,
+            elevation: 6,
+          }}
+        >
+          <MaterialIcons name="star" size={32} color="#fff" />
+          {averageSatScore > 0 ? (
+            <AnimatedNumber value={averageSatScore} />
+          ) : (
+            <Text className="text-black font-semibold text-lg">
+              No attempts
+            </Text>
+          )}
+          <Text style={{ color: "#fff", fontWeight: "600" }}>
+            Avg SAT Score
+          </Text>
+        </LinearGradient>
+      </View>
+
+      {/* { user.isPro && <ProCard onClick={() => router.push("/payment")}/>} */}
 
       {/* Achievements */}
-      <View style={{ flexDirection: "row", alignItems: "center", paddingHorizontal: 16, marginBottom: 8 }}>
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          paddingHorizontal: 16,
+          marginBottom: 8,
+        }}
+      >
         <Trophy size={20} color="#D97706" />
-        <Text style={{ fontSize: 18, fontWeight: "bold", color: isDark ? "#F1F5F9" : "#1f2937", marginLeft: 8 }}>Achievements</Text>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: "bold",
+            color: isDark ? "#F1F5F9" : "#1f2937",
+            marginLeft: 8,
+          }}
+        >
+          Achievements
+        </Text>
       </View>
-      <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", paddingHorizontal: 16 }}>
-        {mockUserData.achievements.map((ach) => (
+      <View
+        style={{
+          flexDirection: "row",
+          flexWrap: "wrap",
+          justifyContent: "space-between",
+          paddingHorizontal: 16,
+        }}
+      >
+        {achievements.map((ach) => (
           <AchievementBadge key={ach.id} achievement={ach} />
         ))}
       </View>
 
       <TouchableOpacity
-  onPress={() => router.push("/info")} // Change to your actual SAT info page path
-  style={{
-    backgroundColor: isDark ? "#1e293b" : "#fff",
-    borderRadius: 16,
-    padding: 16,
-    marginHorizontal: 16,
-    marginTop: 16,
-    marginBottom: 12,
-    flexDirection: "row",
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  }}
->
-  {/* Icon */}
-  <View
-    style={{
-      width: 48,
-      height: 48,
-      borderRadius: 999,
-      backgroundColor: "#22d3ee",
-      justifyContent: "center",
-      alignItems: "center",
-      marginRight: 12,
-    }}
-  >
-    <BookOpen size={24} color="#fff" />
-  </View>
+        onPress={() => router.push("/info")} // Change to your actual SAT info page path
+        style={{
+          backgroundColor: isDark ? "#1e293b" : "#fff",
+          borderRadius: 16,
+          padding: 16,
+          marginHorizontal: 16,
+          marginTop: 16,
+          marginBottom: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 3,
+        }}
+      >
+        {/* Icon */}
+        <View
+          style={{
+            width: 48,
+            height: 48,
+            borderRadius: 999,
+            backgroundColor: "#22d3ee",
+            justifyContent: "center",
+            alignItems: "center",
+            marginRight: 12,
+          }}
+        >
+          <BookOpen size={24} color="#fff" />
+        </View>
 
-  {/* Text Content */}
-  <View style={{ flex: 1 }}>
-    <Text style={{ fontSize: 16, fontWeight: "bold", color: isDark ? "#F1F5F9" : "#1f2937", marginBottom: 4 }}>
-      About SAT
-    </Text>
-    <Text style={{ fontSize: 14, color: isDark ? "#CBD5E1" : "#6B7280", lineHeight: 20 }}>
-      Learn how the SAT works, what sections it has, and tips to improve your score.
-    </Text>
-  </View>
+        {/* Text Content */}
+        <View style={{ flex: 1 }}>
+          <Text
+            style={{
+              fontSize: 16,
+              fontWeight: "bold",
+              color: isDark ? "#F1F5F9" : "#1f2937",
+              marginBottom: 4,
+            }}
+          >
+            About SAT
+          </Text>
+          <Text
+            style={{
+              fontSize: 14,
+              color: isDark ? "#CBD5E1" : "#6B7280",
+              lineHeight: 20,
+            }}
+          >
+            Learn how the SAT works, what sections it has, and tips to improve
+            your score.
+          </Text>
+        </View>
 
-  {/* Arrow Icon */}
-  <MaterialIcons name="arrow-forward-ios" size={20} color={isDark ? "#CBD5E1" : "#6B7280"} />
-</TouchableOpacity>
+        {/* Arrow Icon */}
+        <MaterialIcons
+          name="arrow-forward-ios"
+          size={20}
+          color={isDark ? "#CBD5E1" : "#6B7280"}
+        />
+      </TouchableOpacity>
 
       {/* Account Settings */}
       <View style={{ paddingHorizontal: 16, paddingBottom: 32 }}>
-        <Text style={{ fontSize: 18, fontWeight: "bold", color: isDark ? "#F1F5F9" : "#1f2937", marginTop: 16, marginBottom: 8 }}>Account Settings</Text>
-        <TouchableOpacity style={{ backgroundColor: isDark ? "#1e293b" : "#fff", padding: 12, borderRadius: 16, flexDirection: "row", alignItems: "center", marginBottom: 12, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3 }}>
-          <MaterialIcons name="person" size={20} color={isDark ? "#CBD5E1" : "#6B7280"} />
-          <Text style={{ marginLeft: 8, color: isDark ? "#F1F5F9" : "#1f2937" }}>Edit Profile</Text>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: "bold",
+            color: isDark ? "#F1F5F9" : "#1f2937",
+            marginTop: 16,
+            marginBottom: 8,
+          }}
+        >
+          Account Settings
+        </Text>
+        <TouchableOpacity
+          onPress={() => router.push("/edit-profile")}
+          style={{
+            backgroundColor: isDark ? "#1e293b" : "#fff",
+            padding: 12,
+            borderRadius: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
+        >
+          <MaterialIcons
+            name="person"
+            size={20}
+            color={isDark ? "#CBD5E1" : "#6B7280"}
+          />
+          <Text
+            style={{ marginLeft: 8, color: isDark ? "#F1F5F9" : "#1f2937" }}
+          >
+            Edit Profile
+          </Text>
         </TouchableOpacity>
 
-        <TouchableOpacity style={{ backgroundColor: isDark ? "#1e293b" : "#fff", padding: 12, borderRadius: 16, flexDirection: "row", alignItems: "center", marginBottom: 12, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3 }}>
-          <MaterialIcons name="lock" size={20} color={isDark ? "#CBD5E1" : "#6B7280"} />
-          <Text style={{ marginLeft: 8, color: isDark ? "#F1F5F9" : "#1f2937" }}>Change Password</Text>
-        </TouchableOpacity>
+        
 
-        <TouchableOpacity style={{ backgroundColor: isDark ? "#1e293b" : "#fff", padding: 12, borderRadius: 16, flexDirection: "row", alignItems: "center", marginBottom: 12, shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3 }}>
-          <MaterialIcons name="credit-card" size={20} color={isDark ? "#CBD5E1" : "#6B7280"} />
-          <Text style={{ marginLeft: 8, color: isDark ? "#F1F5F9" : "#1f2937" }}>Manage Subscription</Text>
+        <TouchableOpacity
+          onPress={() => router.push("/settings")}
+          style={{
+            backgroundColor: isDark ? "#1e293b" : "#fff",
+            padding: 12,
+            borderRadius: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
+        >
+          <Settings
+            size={20}
+            color={isDark ? "#CBD5E1" : "#6B7280"}
+          />
+          <Text
+            style={{ marginLeft: 8, color: isDark ? "#F1F5F9" : "#1f2937" }}
+          >
+            Settings
+          </Text>
         </TouchableOpacity>
 
         <TouchableOpacity
+          onPress={() => setContactOpen(true)}
+          style={{
+            backgroundColor: isDark ? "#1e293b" : "#fff",
+            padding: 12,
+            borderRadius: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
+        >
+          <Mails
+            size={20}
+            color={isDark ? "#CBD5E1" : "#6B7280"}
+          />
+          <Text
+            style={{ marginLeft: 8, color: isDark ? "#F1F5F9" : "#1f2937" }}
+          >
+            Contact us
+          </Text>
+        </TouchableOpacity>
+
+        {/* <TouchableOpacity
+          style={{
+            backgroundColor: isDark ? "#1e293b" : "#fff",
+            padding: 12,
+            borderRadius: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 12,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
+        >
+          <MaterialIcons
+            name="credit-card"
+            size={20}
+            color={isDark ? "#CBD5E1" : "#6B7280"}
+          />
+          <Text
+            style={{ marginLeft: 8, color: isDark ? "#F1F5F9" : "#1f2937" }}
+          >
+            Manage Subscription
+          </Text>
+        </TouchableOpacity> */}
+
+        <TouchableOpacity
           onPress={handleLogout}
-          style={{ backgroundColor: isDark ? "#1e293b" : "#fff", padding: 12, borderRadius: 16, flexDirection: "row", alignItems: "center", shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 8, elevation: 3 }}
+          style={{
+            backgroundColor: isDark ? "#1e293b" : "#fff",
+            padding: 12,
+            borderRadius: 16,
+            flexDirection: "row",
+            alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.1,
+            shadowRadius: 8,
+            elevation: 3,
+          }}
         >
           <MaterialIcons name="logout" size={20} color="red" />
           <Text style={{ marginLeft: 8, color: "red" }}>Log Out</Text>
         </TouchableOpacity>
       </View>
+      
     </ScrollView>
+      <ContactDialog isOpen={contactOpen} onClose={() => setContactOpen(false)} isDark={isDark}/>
+      {/* <GetPremiumModal isOpen={isPremiumModalOpen} onClose={() => setIsPremiumModalOpen(false)} /> */}
+    </View>
   );
 }
+
+
+interface ProCardProps {
+  onClick: () => void;
+}
+
+const proFeatures = [
+  "Access to all SAT questions",
+  "Full course unlocked",
+  "Saved and wrong questions tracking",
+  "Access to all SAT practice exams"
+];
+
+export const ProCard = ({ onClick }: ProCardProps) => {
+  const glowAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(glowAnim, {
+          toValue: 1,
+          duration: 1500,
+          useNativeDriver: false,
+        }),
+        Animated.timing(glowAnim, {
+          toValue: 0,
+          duration: 1500,
+          useNativeDriver: false,
+        }),
+      ])
+    ).start();
+  }, []);
+
+  const borderColor = glowAnim.interpolate({
+    inputRange: [0, 1],
+    outputRange: ["#facc15", "#fef08a"], // warm glowing gold
+  });
+
+  return (
+    <Animated.View
+      style={[
+        styles.card,
+        {
+          borderColor,
+        },
+      ]}
+      className="m-3 rounded-2xl bg-white dark:bg-[#1e293b] shadow-lg shadow-black/20 mb-8 mt-0 "
+    >
+      <LinearGradient
+        colors={["#facc15", "#fbbf24"]}
+        start={[0, 0]}
+        end={[1, 1]}
+        style={styles.header}
+      >
+        <FontAwesome5 name="crown" size={26} color="#fff" />
+        <Text className="text-white font-extrabold text-xl ml-3">
+          Upgrade to PRO
+        </Text>
+      </LinearGradient>
+
+      <View className="p-5">
+        {proFeatures.map((feature, i) => (
+          <View key={i} className="flex-row items-center mb-3">
+            <FontAwesome5
+              name="check"
+              size={14}
+              color="#16a34a"
+              style={{ marginRight: 8 }}
+            />
+            <Text className="text-gray-700 dark:text-slate-200">{feature}</Text>
+          </View>
+        ))}
+
+        <TouchableOpacity
+          onPress={onClick}
+          activeOpacity={0.9}
+          className="mt-2 rounded-2xl overflow-hidden shadow-md shadow-yellow-500/40"
+        >
+          <LinearGradient
+            colors={["#facc15", "#fbbf24"]}
+            start={[0, 0]}
+            end={[1, 1]}
+            style={styles.button}
+          >
+            <Text className="text-white font-semibold text-center text-base">
+              Go PRO
+            </Text>
+          </LinearGradient>
+        </TouchableOpacity>
+      </View>
+    </Animated.View>
+  );
+};
+
+const styles = StyleSheet.create({
+  card: {
+    borderWidth: 2,
+    borderRadius: 24,
+    overflow: "hidden",
+  },
+  header: {
+    flexDirection: "row",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 18,
+  },
+  button: {
+    paddingVertical: 12,
+    alignItems: "center",
+  },
+});

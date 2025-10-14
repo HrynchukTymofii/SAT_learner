@@ -46,7 +46,7 @@ export default function GraduationCap3DLoader() {
   });
 
   return (
-    <View className="items-center justify-center">
+    <View className="flex-1 items-center justify-center">
       <Svg width={140} height={120} viewBox="0 0 140 120">
         {/* Top 3D square (mortarboard) */}
         <AnimatedPolygon

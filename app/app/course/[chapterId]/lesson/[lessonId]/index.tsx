@@ -31,6 +31,7 @@ import {
 } from "@/lib/api/lesson";
 import GraduationCapLoader from "@/components/ui/GraduationCapLoader";
 import { LinearGradient } from "expo-linear-gradient";
+import { useLessonDatabase } from "@/lib/db/lesson";
 
 export default function LessonScreen() {
   const router = useRouter();
@@ -48,6 +49,7 @@ export default function LessonScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(false);
+  const { markLessonCompletedLocal } = useLessonDatabase()
 
   const allItems = JSON.parse(allItemsStr || "[]");
   const currentIndex = Number(currentIndexStr) || 0;
@@ -156,7 +158,7 @@ export default function LessonScreen() {
         enableOnAndroid
         extraScrollHeight={220}
         keyboardOpeningTime={0}
-        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width)}
+        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width - 20)}
       >
         {/* Lesson Title */}
         <View style={{ marginBottom: 12 }}>
@@ -501,8 +503,9 @@ export default function LessonScreen() {
 
               // If not completed, mark as done first
               if (!currentItem?.completed) {
+                const resLocal = await markLessonCompletedLocal(currentItem?.id)
                 const res = await markLessonAsDone(token, currentItem?.id);
-                if (!res.success) {
+                if (!resLocal) {
                   Toast.show({
                     type: "error",
                     text1: "Error",

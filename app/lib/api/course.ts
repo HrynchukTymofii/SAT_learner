@@ -33,11 +33,15 @@ export const fetchCourseWithProgress = async (token: string) => {
 };
 
 
-export const fetchQuiz = async (quizId: string, token: string) => {
+export const fetchQuizWithResults = async (quizId: string, token: string) => {
   try {
-    const res = await api.get(`/user/course/quiz/${quizId}/quizResult`);
+    const res = await api.get(`/user/course/quiz/${quizId}/quizResult`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
 
-    return { success: true, data: res.data.data };
+    return { success: true, data: res.data };
   } catch (error: any) {
     console.error("❌ Failed to fetch quiz:", error.response?.data || error.message);
     return {

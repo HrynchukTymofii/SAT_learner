@@ -1,69 +1,115 @@
-import React, { useState } from "react"
-import { Modal, View, Text, TouchableOpacity, ActivityIndicator } from "react-native"
-import { Trash2, RotateCcw } from "lucide-react-native"
+import React, { useState } from "react";
+import {
+  Modal,
+  View,
+  Text,
+  Pressable,
+  ActivityIndicator,
+} from "react-native";
+import { Trash2, RotateCcw } from "lucide-react-native";
+import { LinearGradient } from "expo-linear-gradient";
 
 interface ResetTestDialogProps {
-  isOpen: boolean
-  onClose: () => void
-  onConfirm: () => Promise<void>
-  testTitle: string
+  isOpen: boolean;
+  onClose: () => void;
+  onConfirm: () => Promise<void>;
+  testTitle: string;
 }
 
-export const ResetTestDialog = ({ isOpen, onClose, onConfirm, testTitle }: ResetTestDialogProps) => {
-  const [isLoading, setIsLoading] = useState(false)
+export const ResetTestDialog = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  testTitle,
+}: ResetTestDialogProps) => {
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleConfirm = async () => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      await onConfirm()
-      onClose()
+      await onConfirm();
+      onClose();
     } catch (error) {
-      console.error("Error resetting test:", error)
+      console.error("Error resetting test:", error);
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
-    <Modal visible={isOpen} animationType="slide" onRequestClose={onClose} transparent >
+    <Modal
+      visible={isOpen}
+      animationType="fade"
+      transparent
+      onRequestClose={onClose}
+    >
       <View className="flex-1 justify-center items-center bg-black/60 px-4">
-        <View className="bg-white dark:bg-stone-900 p-6 rounded-xl w-full max-w-md">
+        <View className="bg-white dark:bg-[#0f172a] p-6 rounded-2xl w-full max-w-md shadow-lg shadow-black/30">
+          {/* Header */}
           <View className="flex-row items-center justify-center mb-4">
             <Trash2 size={24} color="#dc2626" />
-            <Text className="text-xl font-bold text-red-600 ml-2">Очистити результати?</Text>
+            <Text className="text-xl font-extrabold text-red-600 dark:text-red-400 ml-2">
+              Clear Results?
+            </Text>
           </View>
 
-          <Text className="text-gray-700 dark:text-stone-100 text-base text-center mb-4">
-            Ви вже проходили тест{" "}
-            <Text className="text-black dark:text-stone-300 font-semibold">"{testTitle}"</Text>. Бажаєте видалити попередні результати та почати заново?
+          {/* Description */}
+          <Text className="text-gray-700 dark:text-gray-200 text-base text-center mb-5">
+            You’ve already taken{" "}
+            <Text className="text-black dark:text-white font-semibold">
+              “{testTitle}”
+            </Text>
+            . Do you want to delete your previous results and start over?
           </Text>
 
-          <View className="flex-row gap-x-3">
-            <TouchableOpacity
+          {/* Buttons */}
+          <View className="flex-row gap-3">
+            {/* Cancel */}
+            <Pressable
               onPress={onClose}
-              className="flex-1 border border-green-500 rounded-md py-3 items-center"
               disabled={isLoading}
+              className="flex-1 rounded-2xl bg-blue-50 border border-blue-500 py-3 items-center justify-center shadow-sm"
             >
-              <Text className="text-green-500 font-semibold">Скасувати</Text>
-            </TouchableOpacity>
+              <Text className="text-blue-600 dark:text-blue-400 font-semibold">
+                Cancel
+              </Text>
+            </Pressable>
 
-            <TouchableOpacity
-              onPress={handleConfirm}
-              className={`flex-1 flex-row items-center justify-center bg-green-500 dark:bg-green-600 rounded-md py-3 ${isLoading ? "opacity-70" : ""}`}
+            {/* Confirm */}
+            <Pressable
               disabled={isLoading}
+              onPress={handleConfirm}
+              className={`flex-1 rounded-2xl  shadow-md shadow-blue-400/30 ${
+                isLoading ? "opacity-70" : ""
+              }`}
             >
-              {isLoading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <>
-                  <RotateCcw size={16} color="white" />
-                  <Text className="text-white font-semibold ml-2">Очистити</Text>
-                </>
-              )}
-            </TouchableOpacity>
+              <LinearGradient
+                colors={["#3b82f6", "#2563eb"]}
+                start={[0, 0]}
+                end={[1, 1]}
+                style={{
+                  paddingVertical: 12, // py-3
+                  borderRadius: 16, // rounded-2xl
+                  flexDirection: "row", // flex-row
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color="#fff" />
+                ) : (
+                  <>
+                    <RotateCcw size={16} color="#fff" />
+                    <Text className="text-white font-semibold ml-2">
+                      Reset
+                    </Text>
+                  </>
+                )}
+              </LinearGradient>
+            </Pressable>
           </View>
         </View>
       </View>
     </Modal>
-  )
-}
+  );
+};

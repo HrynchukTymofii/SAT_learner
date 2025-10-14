@@ -3,7 +3,7 @@ import { ExpoConfig } from "expo/config";
 const config: ExpoConfig = {
   name: "SAT Prep App",
   slug: "sat-prep-app",
-  version: "1.0.1",
+  version: "1.0.3",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
   scheme: "satprepapp",
@@ -45,13 +45,13 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "./assets/images/splash-icon-light.png",
+        image: "./assets/images/splash-icon-dark.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#ffffff",
+        backgroundColor: "#f8fafc",
         dark: {
-          image: "./assets/images/splash-icon-dark.png",
-          backgroundColor: "#1c1917",
+          image: "./assets/images/splash-icon-light.png",
+          backgroundColor: "#0f172a",
         },
       },
     ],
@@ -81,12 +81,12 @@ const config: ExpoConfig = {
   },
 
   splash: {
-    image: "./assets/images/splash-icon-light.png",
+    image: "./assets/images/splash-icon-dark.png",
     resizeMode: "contain",
-    backgroundColor: "#ffffff",
+    backgroundColor: "#f8fafc",
     dark: {
-      image: "./assets/images/splash-icon-dark.png",
-      backgroundColor: "#1c1917",
+      image: "./assets/images/splash-icon-light.png",
+      backgroundColor: "#0f172a", 
     },
   },
 };

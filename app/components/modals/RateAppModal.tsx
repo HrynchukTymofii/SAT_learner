@@ -74,8 +74,8 @@ export default function RateApp({ userPoints }: RateAppProps) {
           });
         });
       } else {
-        const playStoreLink = "market://details?id=com.hrynchuk.pdrtests";
-        const webLink = "https://play.google.com/store/apps/details?id=com.hrynchuk.pdrtests"; 
+        const playStoreLink = "market://details?id=com.hrynchuk.satprepapp";
+        const webLink = "https://play.google.com/store/apps/details?id=com.hrynchuk.satprepapp"; 
 
         Linking.openURL(playStoreLink).catch(() => {
           Linking.openURL(webLink).catch(() => {
@@ -261,7 +261,7 @@ export default function RateApp({ userPoints }: RateAppProps) {
 //       const url =
 //         Platform.OS === "ios"
 //           ? "itms-apps://itunes.apple.com/app/6751187640"
-//           : "market://details?id=com.hrynchuk.pdrtests";
+//           : "market://details?id=com.hrynchuk.satprepapp";
 
 //       Linking.openURL(url).catch(() => {
 //         showToast("error", "Не вдалося відкрити магазин");
