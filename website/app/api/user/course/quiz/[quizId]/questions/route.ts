@@ -21,6 +21,7 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ quiz
         hintImageUrl: true,
         note: true,
         quizId: true,
+        updatedAt: true
       },
     });
 

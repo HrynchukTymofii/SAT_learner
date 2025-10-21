@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
             maxScore: true,
             position: true,
             isFree: true,
+            updatedAt: true
           },
         },
       },
