@@ -23,16 +23,21 @@ export async function POST(req: NextRequest) {
       },
       select: {
         id: true,
-        title: true,
         updatedAt: true,
-        totalQuestions: true,
         questions: {
           select: {
             id: true,
             question: true,
+            questionType: true,
+            questionImageUrl: true,
+            imageHeight: true,
             options: true,
             answers: true,
             hint: true,
+            points: true,
+            position: true,
+            hintImageUrl: true,
+            note: true,
             updatedAt: true,
           },
         },
@@ -49,15 +54,21 @@ export async function POST(req: NextRequest) {
     // Optional: also check if any question is newer than local quiz
     const formattedUpdates = updates.map((quiz) => ({
       id: quiz.id,
-      title: quiz.title,
       updatedAt: quiz.updatedAt.toISOString(),
-      totalQuestions: quiz.totalQuestions,
       questions: quiz.questions.map((q) => ({
         id: q.id,
         question: q.question,
+        questionType: q.questionType,
+        questionImageUrl: q.questionImageUrl,
+        localImagePath: null,
+        imageHeight: q.imageHeight,
         options: q.options,
         answers: q.answers,
         hint: q.hint,
+        points: q.points,
+        position: q.position,
+        hintImageUrl: q.hintImageUrl,
+        note: q.note,
         updatedAt: q.updatedAt.toISOString(),
       })),
     }));
