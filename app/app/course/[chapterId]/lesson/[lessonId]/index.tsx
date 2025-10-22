@@ -1,27 +1,22 @@
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   ActivityIndicator,
-  Animated,
   Image,
-  Platform,
   Pressable,
   Text,
   TextInput,
   View,
   StyleSheet,
   useColorScheme,
-  Dimensions,
   TouchableOpacity,
-  Keyboard,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AutoHeightWebView from "react-native-autoheight-webview";
 import { useVideoPlayer, VideoView } from "expo-video";
 import Toast from "react-native-toast-message";
-
 import TopBlur from "@/components/ui/TobBlur";
 import { useAuth } from "@/context/AuthContext";
 import {
@@ -32,6 +27,7 @@ import {
 import GraduationCapLoader from "@/components/ui/GraduationCapLoader";
 import { LinearGradient } from "expo-linear-gradient";
 import { useLessonDatabase } from "@/lib/db/lesson";
+
 
 export default function LessonScreen() {
   const router = useRouter();
@@ -80,10 +76,22 @@ export default function LessonScreen() {
     };
   }, [currentItem?.id, token]);
 
-  const handleBack = () => router.replace("/");
+  useEffect(() => {
+    console.log("🧠 Lesson Page mounted");
+
+    return () => {
+      console.log("🧹 Lesson Page  unmounted");
+    };
+  }, []);
+
+  const handleBack = () => {
+    if (router.canGoBack()) router.back();
+    else router.replace("/");
+  };
+
   const handleNext = () => {
     if (!nextItem) return;
-    router.push({
+    router.replace({
       pathname:
         `/course/${nextItem.chapterId}/${nextItem.type}/${nextItem.id}` as any,
       params: {
@@ -158,7 +166,7 @@ export default function LessonScreen() {
         enableOnAndroid
         extraScrollHeight={220}
         keyboardOpeningTime={0}
-        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width - 20)}
+        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width - 24)}
       >
         {/* Lesson Title */}
         <View style={{ marginBottom: 12 }}>
@@ -209,15 +217,9 @@ export default function LessonScreen() {
           scrollEnabled={false}
           customStyle={
             isDark
-              ? `html, body {
-                background-color: #0f172a;
-                color: #f5f5f4;
-                margin: 0 !important;
-              } 
-              *{
-                background-color: inherit;
-                color: inherit;
-              }`
+              ? `html, body { margin:0; background-color: #0f172a; color: #f5f5f4;} .expo-content {background-color: #0f172a; color: #f5f5f4; } .expo-content blockquote {
+        --blockquote-bg-color: #b7c1cf !important;
+      }`
               : ""
           }
           onLoadStart={() => setLoading(true)}
@@ -695,3 +697,8 @@ const styles = StyleSheet.create({
 //     </SafeAreaView>
 //   );
 // }
+
+
+
+
+//olp_922y9Mx0BXhWSo2vBpeORkJmyjQiCc4FEK3t

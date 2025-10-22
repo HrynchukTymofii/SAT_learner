@@ -97,6 +97,7 @@ async function main() {
       isFree INTEGER DEFAULT 0,
       maxScore INTEGER DEFAULT 0,
       chapterId TEXT NOT NULL,
+      updatedAt TEXT,
       FOREIGN KEY (chapterId) REFERENCES chapters(id) ON DELETE CASCADE
     )`);
 
@@ -118,6 +119,7 @@ async function main() {
       likes INTEGER DEFAULT 0,
       dislikes INTEGER DEFAULT 0,
       quizId TEXT NOT NULL,
+      updatedAt TEXT,
       FOREIGN KEY (quizId) REFERENCES quizzes(id) ON DELETE CASCADE
     )`);
 
@@ -220,7 +222,7 @@ async function main() {
 
       await new Promise<void>((resolve, reject) => {
         db.run(
-          `INSERT OR REPLACE INTO quizzes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT OR REPLACE INTO quizzes VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             q.id,
             q.title,
@@ -231,6 +233,7 @@ async function main() {
             q.isFree ? 1 : 0,
             q.maxScore,
             c.id,
+            q.updatedAt,
           ],
           (err) => (err ? reject(err) : resolve())
         );
@@ -260,8 +263,8 @@ async function main() {
   db.serialize(() => {
     const stmt = db.prepare(
       `INSERT OR REPLACE INTO quiz_questions
-     (id, question, questionType, questionImageUrl, localImagePath, imageHeight, options, answers, hint, points, position, hintImageUrl, note, likes, dislikes, quizId)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     (id, question, questionType, questionImageUrl, localImagePath, imageHeight, options, answers, hint, points, position, hintImageUrl, note, likes, dislikes, quizId, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
 
     for (const qq of withLocalImages) {
@@ -281,7 +284,8 @@ async function main() {
         qq.note || "",
         qq.likes || 0,
         qq.dislikes || 0,
-        qq.quizId
+        qq.quizId,
+        qq.updatedAt
       );
     }
 

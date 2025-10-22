@@ -9,7 +9,8 @@ export default function TimeAlert() {
         colors={["#fee2e2", "#fca5a5"]} 
         start={[0, 0]}
         end={[1, 1]}
-        className="p-3"
+        style={{ padding: 12 }}
+
       >
         <View className="flex-row items-center gap-2">
           <AlertTriangle size={20} color="#ef4444" />

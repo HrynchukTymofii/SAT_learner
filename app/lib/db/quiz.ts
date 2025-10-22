@@ -733,6 +733,18 @@ export function useQuizDatabase() {
     method: "POST" | "PATCH" = "POST"
   ) {
     try {
+      if (method === "POST") {
+        const existing = await db.getFirstAsync(
+          `SELECT * FROM quiz_results WHERE quizId = ? ORDER BY id DESC LIMIT 1`,
+          [quizId]
+        );
+
+        if (existing) {
+          // fallback to PATCH
+          method = "PATCH";
+        }
+      }
+
       const quiz = await db.getFirstAsync<{ id: string; questions: any[] }>(
         `SELECT * FROM quizzes WHERE id = ?`,
         [quizId]
@@ -799,5 +811,109 @@ export function useQuizDatabase() {
     }
   }
 
-  return { submitQuizAnswersLocal, resetQuizLocal, fetchWrongQuizzesLocal, fetchSavedQuizzesLocal, fetchWrongQuestionsLocal, fetchSavedQuestionsLocal,  fetchQuizzesByTopicLocal, fetchQuizByIdLocal, fetchExamsLocal} 
+  async function applyAllQuizUpdatesLocally(updates: any[]) {
+  if (!updates || updates.length === 0) {
+    console.log("ℹ️ No quiz updates to apply.");
+    return { success: true };
+  }
+
+  try {
+    await db.execAsync("BEGIN TRANSACTION;");
+
+    for (const quiz of updates) {
+      // 1️⃣ Update only the updatedAt for existing quizzes
+      await db.runAsync(
+        `UPDATE quizzes 
+        SET updatedAt = ?, 
+            maxScore = ?, 
+            totalQuestions = ? 
+        WHERE id = ?`,
+        [
+          quiz.updatedAt || new Date().toISOString(),
+          quiz.maxScore,
+          quiz.totalQuestions,
+          quiz.id
+        ]
+      );
+
+
+      // 2️⃣ Insert any new questions that do not exist yet
+      if (quiz.questions && quiz.questions.length > 0) {
+        for (const q of quiz.questions) {
+          // Check if the question exists
+          // console.log(q)
+          const existing = await db.getAllAsync(
+            `SELECT id FROM quiz_questions WHERE id = ?`,
+            [q.id]
+          );
+
+          if (!existing || existing.length === 0) {
+            
+            // console.log("Inserting new question:", q.id);
+            // Insert new question
+            await db.runAsync(
+              `INSERT INTO quiz_questions
+              (id, question, questionType, questionImageUrl, localImagePath, imageHeight, options, answers, hint, points, position, hintImageUrl, note, likes, dislikes, quizId)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              [
+                q.id,
+                q.question,
+                q.questionType || "",
+                q.questionImageUrl || "",
+                q.localImagePath || "",
+                q.imageHeight || 200,
+                JSON.stringify(q.options || []),
+                JSON.stringify(q.answers || []),
+                q.hint || "",
+                q.points || 1,
+                q.position || 0,
+                q.hintImageUrl || "",
+                q.note || "",
+                q.likes || 0,
+                q.dislikes || 0,
+                quiz.id,
+              ]
+            );
+          }
+        }
+      }
+    }
+
+    await db.execAsync("COMMIT;");
+    // console.log(`✅ Applied ${updates.length} quiz updates locally.`);
+    return { success: true };
+  } catch (err) {
+    await db.execAsync("ROLLBACK;");
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("❌ Failed to apply quiz updates locally:", message);
+    return { success: false, error: message };
+  }
+}
+
+
+
+  async function fetchLocalQuizTimestamps() {
+    try {
+
+      type QuizRow = { id: string; updatedAt: string };
+      const rows = (await db.getAllAsync(
+        `SELECT id, updatedAt FROM quizzes`
+      )) as QuizRow[];
+
+      const map: Record<string, string> = {};
+      for (const row of rows) {
+        map[row.id] = row.updatedAt;
+      }
+
+      return map;
+    } catch (err) {
+      console.error("❌ Failed to fetch local quiz timestamps:", err);
+      return {};
+    }
+  }
+
+
+
+
+  return { fetchLocalQuizTimestamps, applyAllQuizUpdatesLocally, submitQuizAnswersLocal, resetQuizLocal, fetchWrongQuizzesLocal, fetchSavedQuizzesLocal, fetchWrongQuestionsLocal, fetchSavedQuestionsLocal,  fetchQuizzesByTopicLocal, fetchQuizByIdLocal, fetchExamsLocal} 
 }

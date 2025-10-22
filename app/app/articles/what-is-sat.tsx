@@ -33,7 +33,17 @@ export default function WhatIsSATPage({ navigation }: any) {
           colors={["#3b82f6", "#8b5cf6"]}
           start={[0, 0]}
           end={[1, 0]}
-          className="rounded-3xl p-6 mb-8 shadow-lg"
+          style={{
+  borderRadius: 24,
+  padding: 24,
+  marginBottom: 32,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 10 },
+  shadowOpacity: 0.12,
+  shadowRadius: 20,
+  elevation: 10, // Android shadow
+}}
+
         >
           <View className="flex-row items-center gap-4">
             <View className="p-3 bg-white/20 rounded-full shadow">
@@ -56,8 +66,16 @@ export default function WhatIsSATPage({ navigation }: any) {
               <LinearGradient
                 key={i}
                 colors={fact.colors as [string, string]}
-                style={{ width: cardWidth, minHeight: 120 }}
-                className="rounded-3xl p-4 mb-4 justify-center items-center shadow"
+                style={{ width: cardWidth, minHeight: 120,  borderRadius: 24,
+  padding: 16,
+  marginBottom: 16,
+  justifyContent: "center",
+  alignItems: "center",
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3, }}
               >
                 <fact.icon size={28} color={fact.iconColor} />
                 <Text className="font-bold text-slate-900 text-lg mt-2">{fact.title}</Text>
@@ -70,7 +88,17 @@ export default function WhatIsSATPage({ navigation }: any) {
         {/* Introduction */}
         <LinearGradient
           colors={["#ffffff", "#f9fafb"]}
-          className="rounded-3xl shadow-lg p-6 mb-8"
+          style={{
+  borderRadius: 24,
+  padding: 24,
+  marginBottom: 32,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 10 },
+  shadowOpacity: 0.12,
+  shadowRadius: 20,
+  elevation: 10, // Android shadow
+}}
+
         >
           <Text className="text-2xl font-bold text-slate-900 mb-4">Introduction to SAT</Text>
           <Text className="text-slate-700 leading-relaxed mb-4">
@@ -93,8 +121,17 @@ export default function WhatIsSATPage({ navigation }: any) {
           <View className="flex-row flex-wrap gap-4">
             <LinearGradient
               colors={["#DBEAFE", "#BFDBFE"]}
-              style={{ width: cardWidth }}
-              className="rounded-3xl border border-blue-200 p-4 mb-4 shadow"
+              style={{ width: cardWidth, borderRadius: 24,
+  borderWidth: 1,
+  borderColor: "#bfdbfe",
+  padding: 16,
+  marginBottom: 16,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3, }}
+              // className="rounded-3xl border border-blue-200 p-4 mb-4 shadow"
             >
               <Text className="text-xl font-semibold text-blue-900 mb-2">
                 Evidence-Based Reading and Writing
@@ -106,8 +143,17 @@ export default function WhatIsSATPage({ navigation }: any) {
 
             <LinearGradient
               colors={["#D1FAE5", "#A7F3D0"]}
-              style={{ width: cardWidth }}
-              className="rounded-3xl border border-green-200 p-4 mb-4 shadow"
+              style={{ width: cardWidth, borderRadius: 24,
+  borderWidth: 1,
+  borderColor: "#bbf7d0",
+  padding: 16,
+  marginBottom: 16,
+  shadowColor: "#000",
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.1,
+  shadowRadius: 4,
+  elevation: 3, }}
+              //className="rounded-3xl border border-green-200 p-4 mb-4 shadow"
             >
               <Text className="text-xl font-semibold text-green-900 mb-2">Math</Text>
               <Text className="text-green-800">• Calculator Section: 38 questions, 55 minutes</Text>

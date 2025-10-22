@@ -86,7 +86,10 @@ export default function QuizHeader({
   };
 
   const getBackButtonText = () => {
-    if (Object.keys(answeredQuestions).length >= questions.length || pageType === "saved")
+    if (
+      Object.keys(answeredQuestions).length >= questions.length ||
+      pageType === "saved"
+    )
       return "Back to Topics";
     if (pageType === "exam") return "End Exam";
     return "Finish Later";
@@ -109,7 +112,15 @@ export default function QuizHeader({
           colors={["#3b82f6", "#2563eb"]}
           start={[0, 0]}
           end={[1, 1]}
-          className="rounded-2xl overflow-hidden shadow-md shadow-blue-400/30"
+          style={{
+            borderRadius: 16,
+            overflow: "hidden",
+            shadowColor: "#60a5fa",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.3,
+            shadowRadius: 4,
+            elevation: 4, // Android shadow
+          }}
         >
           <Button
             onPress={() => handleBack()}

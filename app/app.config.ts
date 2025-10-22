@@ -3,7 +3,7 @@ import { ExpoConfig } from "expo/config";
 const config: ExpoConfig = {
   name: "SAT Prep App",
   slug: "sat-prep-app",
-  version: "1.0.3",
+  version: "1.0.4",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
   scheme: "satprepapp",

@@ -1,14 +1,14 @@
 import { useState } from "react";
 import { ScrollView, Text, TouchableOpacity, View, Animated } from "react-native";
 import { useRouter } from "expo-router";
-import { BookOpen, GraduationCap, Heart, X, Dices, Dot, ChartNoAxesCombined } from "lucide-react-native";
+import { BookOpen, GraduationCap, Heart, X } from "lucide-react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 import { LoginRequiredModal } from "@/components/modals/LoginRequiredModal";
 import { GetPremiumModal } from "@/components/modals/GetPremiumModal";
 
-export default function TestsPage() {
+export default function QuizzesPage() {
   const router = useRouter();
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
@@ -146,7 +146,8 @@ export default function TestsPage() {
 
             <View className="bg-white/90 py-2 rounded-lg">
               <Text className="text-center text-black font-semibold">
-                {!user ? "Sign In" : mode.isFree || user.isPro ? mode.buttonText : "👑 PRO"}
+                {!user ? "Sign In" : mode.isFree || 
+                user.isPro ? mode.buttonText : "👑 PRO"}
               </Text>
             </View>
           </LinearGradient>
@@ -229,10 +230,10 @@ export default function TestsPage() {
         isOpen={showLoginModal}
         onClose={() => setShowLoginModal(false)}
       />
-      <GetPremiumModal
+      {/* <GetPremiumModal
         isOpen={showPremiumModal}
         onClose={() => setShowPremiumModal(false)}
-      />
+      /> */}
     </SafeAreaView>
   );
 }

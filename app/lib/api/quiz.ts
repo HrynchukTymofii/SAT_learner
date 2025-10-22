@@ -221,3 +221,37 @@ export async function updateUserPoints(token: string, totalPoints: number): Prom
   }
 }
 
+export async function checkForQuizUpdates(token: string, localUpdatedAt: Record<string, string>) {
+  try {
+    const res = await api.post("/user/course/quiz/updates", 
+      { localUpdatedAt }, 
+      {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+    });
+
+    return res.data;
+  } catch (error: any) {
+    console.error("❌ Failed to check for quiz updates:", error.response?.data || error.message);
+    return null;
+  }
+}
+
+export async function checkAppNeedSync() {
+  try {
+    const res = await api.get(`/apps`);
+
+    return res.data; // { app: { name, needSync } }
+  } catch (error: any) {
+    console.error(
+      "❌ Failed to fetch app needSync status:",
+      error.response?.data || error.message
+    );
+    return null;
+  }
+}
+
+
+

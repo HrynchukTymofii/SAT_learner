@@ -20,6 +20,7 @@ import {
   BookOpen,
   BookCheck,
   ArrowLeft,
+  Lock,
 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useQuizDatabase } from "@/lib/db/quiz";
@@ -37,7 +38,7 @@ type Quiz = {
 
 export default function TestsByTopicScreen() {
   const router = useRouter();
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
   const [filtered, setFiltered] = useState<Quiz[]>([]);
   const [search, setSearch] = useState("");
@@ -62,6 +63,7 @@ export default function TestsByTopicScreen() {
     const loadQuizzes = async () => {
       try {
         const res = await fetchQuizzesByTopicLocal();
+        //console.log(res)
         if (res.success) {
           setQuizzes(res.quizzes);
           setFiltered(res.quizzes);
@@ -80,6 +82,8 @@ export default function TestsByTopicScreen() {
   useEffect(() => {
     setFiltered(
       quizzes.filter((q) =>
+        !q.title.toLowerCase().startsWith("sat exam".toLowerCase()) &&
+        !q.title.toLowerCase().startsWith("theory check".toLowerCase()) &&
         q.title.toLowerCase().includes(search.toLowerCase())
       )
     );
@@ -109,8 +113,14 @@ export default function TestsByTopicScreen() {
     return isDark ? ["#1e293b", "#273449"] : ["#f1f5f9", "#e2e8f0"];
   };
 
-  const handlePress = (quizId: string) =>
+  const handlePress = (quizId: string, isLocked: boolean) => {
+    if (isLocked) {
+      router.push("/payment");
+      return;
+    }
     router.push(`/tests/by-topic/${quizId}` as any);
+  }
+    
 
   return (
     <SafeAreaView
@@ -145,7 +155,7 @@ export default function TestsByTopicScreen() {
         >
           <ArrowLeft size={18} color="#fff" />
           <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
-            Back to Exams
+            Back to Topics
           </Text>
         </TouchableOpacity>
       </LinearGradient>
@@ -198,14 +208,16 @@ export default function TestsByTopicScreen() {
         showsVerticalScrollIndicator={false}
       >
         {filtered.length ? (
-          filtered.map((quiz) => {
+          filtered.map((quiz, index) => {
             const gradientColors = getProgressGradient(quiz.progress);
             const itemTextColor = quiz.progress >= 60 ? "#ffffff" : textColor;
+
+            const isLocked = !user?.isPro && index > 3 || false;
 
             return (
               <TouchableOpacity
                 key={quiz.id}
-                onPress={() => handlePress(quiz.id)}
+                onPress={() => handlePress(quiz.id, isLocked)}
                 style={{
                   marginBottom: 16,
                   borderRadius: 16,
@@ -234,16 +246,22 @@ export default function TestsByTopicScreen() {
                     style={{ marginRight: 12 }}
                   />
                   <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "600",
-                        color: itemTextColor,
-                        marginBottom: 4,
-                      }}
-                    >
-                      {quiz.title}
-                    </Text>
+                    <View className="flex flex-row items-center justify-between">
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: "600",
+                          color: itemTextColor,
+                          marginBottom: 4,
+                          flexShrink: 1
+                        }}
+                        numberOfLines={1}   
+                        ellipsizeMode="tail"
+                      >
+                        {quiz.title}
+                      </Text>
+                      {isLocked && <Lock size={16} color="#2563eb" style={{ marginLeft: 8 }} />}
+                    </View>
                     <View
                       style={{
                         flexDirection: "row",

@@ -4,6 +4,7 @@ import { ResetTestDialog } from "./modals/ResetTestDialog";
 import Toast from "react-native-toast-message";
 import {
   ActivityIndicator,
+  Animated,
   BackHandler,
   Dimensions,
   Platform,
@@ -93,6 +94,7 @@ const TestsPage = ({
 
   const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
   const quizHeaderRef = useRef<QuizHeaderRef>(null);
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   const { resetQuizLocal, submitQuizAnswersLocal } = useQuizDatabase();
   const [isProModalOpen, setIsProModalOpen] = useState(false);
@@ -102,6 +104,17 @@ const TestsPage = ({
   const selectedAnswersRef = useRef(selectedAnswers);
 
   const { width: containerWidth } = useWindowDimensions();
+
+  const isSubmittingRef = useRef(false);
+  const hasStartedExamRef = useRef(false);
+
+  // useEffect(() => {
+  //   console.log("🧠 TestsPage mounted");
+
+  //   return () => {
+  //     console.log("🧹 TestsPage unmounted");
+  //   };
+  // }, []);
 
   useEffect(() => {
     answeredQuestionsRef.current = answeredQuestions;
@@ -164,19 +177,23 @@ const TestsPage = ({
    * Starts the exam automatically when the component mounts
    * if the current page type is "exam".
    */
-  // useEffect(() => {
-  //   if (pageType == "exam") startExam();
-  // }, []);
+  useEffect(() => {
+    if (pageType == "exam") startExam();
+  }, []);
 
-  useFocusEffect(
-    useCallback(() => {
-      if (pageType === "exam") startExam();
+  // useFocusEffect(
+  //   useCallback(() => {
+  //     console.log('preStartExam')
+  //     if (pageType === "exam") startExam();
 
-      return () => {
-        // Cleanup if needed
-      };
-    }, [pageType])
-  );
+  //     return () => {
+  //        hasStartedExamRef.current = false;
+  //     setSelectedAnswers({});
+  //     setAnsweredQuestions({});
+  //     setCurrentQuestionIndex(0);
+  //     };
+  //   }, [pageType])
+  // );
 
   /**
    * Automatically submits the quiz if the user has reached
@@ -225,19 +242,10 @@ const TestsPage = ({
   }, []);
 
   // useEffect(() => {
-  //   if (pageType === "exam") return;
-  //   if (!justAnsweredQuestionId) return;
-
-  //   // Check if the selected answer has been saved
-  //   const isSet =
-  //     selectedAnswers[justAnsweredQuestionId] &&
-  //     selectedAnswers[justAnsweredQuestionId].length > 0;
-
-  //   if (isSet) {
-  //     handleNextQuestion();
-  //     setJustAnsweredQuestionId(null);
-  //   }
-  // }, [selectedAnswers, justAnsweredQuestionId]);
+  //   return () => {
+  //     hasStartedExamRef.current = false;
+  //   };
+  // }, []);
 
   useEffect(() => {
     if (answeredQuestions[currentQuestion.id]) {
@@ -256,6 +264,8 @@ const TestsPage = ({
    * - Shows a success toast notifying the user that the exam has started.
    */
   const startExam = () => {
+    // if (hasStartedExamRef.current) return; // 🔒 prevent duplicates
+    // hasStartedExamRef.current = true;
     setSelectedAnswers({});
     setAnsweredQuestions({});
     setCurrentQuestionIndex(0);
@@ -289,7 +299,7 @@ const TestsPage = ({
       }
     }
     //console.log('Pre router')
-    router.push(backUrl as any);
+    router.replace(backUrl as any);
     //console.log('After router')
   };
 
@@ -474,6 +484,7 @@ const TestsPage = ({
       const isLocked = currentQuestionIndex >= maxFreeIndex;
 
       if (isLocked) {
+        //console.log("isLocked");
         setIsProModalOpen(true);
         return;
       }
@@ -542,8 +553,8 @@ const TestsPage = ({
   };
 
   const submitQuizResults = async () => {
-    //console.log("SubmitQuizResults")
-    // if (isSubmittingRef.current) return; // 🔒 ignore duplicate calls
+    // console.log("SubmitQuizResults")
+    // if (isSubmittingRef.current) return; // 🔒 prevent duplicate submits
     // isSubmittingRef.current = true;
 
     if (pageType === "saved") return;
@@ -697,9 +708,20 @@ const TestsPage = ({
         visibilityTime: 700,
       });
     } finally {
-      // isSubmittingRef.current = false;
+      //isSubmittingRef.current = false;
       setIsSubmitting(false);
     }
+  };
+
+  const hideLoader = () => {
+    Animated.timing(fadeAnim, {
+      toValue: 0,
+      duration: 500, // fade-out duration
+      useNativeDriver: true,
+    }).start(() => {
+      setWebViewLoading(false);
+      fadeAnim.setValue(1); // reset for next loader
+    });
   };
 
   const previousQuestion = () => {
@@ -810,118 +832,130 @@ const TestsPage = ({
             />
           </View>
 
-          {webViewLoading && (
-            <View
-              style={{
-                position: "absolute",
-                top: 0,
-                left: 0,
-                right: 0,
-                bottom: 0,
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: isDark ? "#0f172a" : "#f8fafc",
-                zIndex: 10,
-              }}
-            >
-              <ActivityIndicator />
-            </View>
-          )}
-
-          <AutoHeightWebView
-            key={currentQuestionIndex}
-            source={{
-              uri: `https://www.satlearner.com/expo-course/${quiz.chapterId}/quizzes/${quiz.id}/question/${currentQuestion.id}`,
-            }}
-            style={{
-              width: containerWidth || "100%",
-              minHeight: 10,
-              marginBottom: 4,
-              opacity: webViewLoading ? 0 : 1,
-            }}
-            scrollEnabled={false}
-            customStyle={
-              isDark
-                ? `html, body { background-color: #0f172a; color: #f5f5f4; margin:0;} *{background-color:inherit;color:inherit}`
-                : ""
-            }
-            onLoadStart={() => setWebViewLoading(true)}
-            onLoadEnd={() => setWebViewLoading(false)}
-          />
-          {currentQuestion.questionImageUrl && (
-            <QuestionImage
-              uri={currentQuestion.questionImageUrl}
-              height={currentQuestion.imageHeight * 1.2}
-            />
-          )}
-
-          <QuestionOptions
-            currentQuestion={currentQuestion}
-            selectedAnswers={selectedAnswers}
-            isAnswered={isAnswered}
-            pageType={pageType}
-            handleAnswerSelect={handleAnswerSelect}
-          />
-
-          {/* Explanation */}
-          {isAnswered && currentQuestion.explanation && (
-            <View className="rounded-3xl mt-4 gap-1">
-              <Text
+          <View style={{ position: "relative", flex: 1 }}>
+            {webViewLoading && (
+              <Animated.View
                 style={{
-                  fontSize: 22,
-                  fontWeight: "700",
-                  color: isDark ? "#f1f5f9" : "#1f2937",
+                  position: "absolute",
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                  justifyContent: "center",
+                  alignItems: "center",
+                  backgroundColor: isDark ? "#0f172a" : "#f8fafc",
+                  zIndex: 100,
+                  opacity: fadeAnim,
                 }}
-                className="border border-blue-600 rounded-xl px-4 py-1 ml-2 mr-auto"
               >
-                Explanation
-              </Text>
-              <AutoHeightWebView
-                key={currentQuestion.id}
-                source={{
-                  uri: `https://www.satlearner.com/expo-course/${quiz.chapterId}/quizzes/${quiz.id}/question/${currentQuestion.id}/explanation`,
-                }}
-                style={{
-                  width: containerWidth || "100%",
-                  minHeight: 100,
-                  marginBottom: 8,
-                  opacity: webViewLoading ? 0 : 1,
-                }}
-                scrollEnabled={false}
-                customStyle={
-                  isDark
-                    ? `html, body { background-color: #0f172a; color: #f5f5f4; margin:0;} *{background-color:inherit;color:inherit}`
-                    : ``
-                }
-                onLoadStart={() => setWebViewLoading(true)}
-                onLoadEnd={() => setWebViewLoading(false)}
-              />
-            </View>
-          )}
+                <GraduationCap3DLoader />
+              </Animated.View>
+            )}
 
-          <QuestionBottomNav
-            pageType={pageType}
-            currentQuestionIndex={currentQuestionIndex}
-            questions={questions}
-            isCompleted={isCompleated}
-            isConfirmedAS={isConfirmedAS}
-            selectedAnswers={selectedAnswers}
-            answeredQuestions={answeredQuestions}
-            enableFinishSaved={enableFinishSaved}
-            isSubmitting={isSubmitting}
-            currentIconColor={currentIconColor}
-            currentQuestionId={currentQuestion.id}
-            previousQuestion={previousQuestion}
-            handleNextQuestion={handleNextQuestion}
-            setIsConfirmedAS={setIsConfirmedAS}
-            handleExamAnswerSelect={handleExamAnswerSelect}
-          />
+            <AutoHeightWebView
+              //key={`question-${currentQuestion.id}`}
+              source={{
+                uri: `https://www.satlearner.com/expo-course/${quiz.chapterId}/quizzes/${quiz.id}/question/${currentQuestion.id}`,
+              }}
+              style={{
+                width: containerWidth || "100%",
+                minHeight: 10,
+                marginBottom: 4,
+                //opacity: webViewLoading ? 0 : 1, // fade-in animation
+              }}
+              scrollEnabled={false}
+              customStyle={
+                isDark
+                  ? `html, body { margin:0;} .expo-content {background-color: #0f172a; color: #f5f5f4;}`
+                  : ""
+              }
+              onLoadStart={() => setWebViewLoading(true)}
+              onLoadEnd={() => {
+                setTimeout(() => {
+                  hideLoader();
+                }, 500); // 300ms delay
+              }}
+              //onSizeUpdated={({ height }: { height: number }) => setWebViewHeight(height)}
+            />
+            {currentQuestion.questionImageUrl && (
+              <QuestionImage
+                uri={currentQuestion.questionImageUrl}
+                height={currentQuestion.imageHeight * 1.2}
+              />
+            )}
+
+            <QuestionOptions
+              currentQuestion={currentQuestion}
+              selectedAnswers={selectedAnswers}
+              isAnswered={isAnswered}
+              pageType={pageType}
+              handleAnswerSelect={handleAnswerSelect}
+            />
+
+            {/* Explanation */}
+            {isAnswered && currentQuestion.explanation && (
+              <View className="rounded-3xl mt-4 gap-1">
+                <Text
+                  style={{
+                    fontSize: 22,
+                    fontWeight: "700",
+                    color: isDark ? "#f1f5f9" : "#1f2937",
+                  }}
+                  className="border border-blue-600 rounded-xl px-4 py-1 ml-2 mr-auto"
+                >
+                  Explanation
+                </Text>
+                <AutoHeightWebView
+                  //key={`explanation-currentQuestion.id`}
+                  source={{
+                    uri: `https://www.satlearner.com/expo-course/${quiz.chapterId}/quizzes/${quiz.id}/question/${currentQuestion.id}/explanation`,
+                  }}
+                  style={{
+                    width: containerWidth || "100%",
+                    minHeight: 100,
+                    marginBottom: 8,
+                    // opacity: webViewLoading ? 0 : 1,
+                  }}
+                  scrollEnabled={false}
+                  customStyle={
+                    isDark
+                      ? `html, body { margin:0;} .expo-content {background-color: #0f172a; color: #f5f5f4;}`
+                      : ``
+                  }
+                  onLoadStart={() => setWebViewLoading(true)}
+                  onLoadEnd={() => {
+                    setTimeout(() => {
+                      hideLoader();
+                    }, 500); // 300ms delay
+                  }}
+                />
+              </View>
+            )}
+
+            <QuestionBottomNav
+              pageType={pageType}
+              currentQuestionIndex={currentQuestionIndex}
+              questions={questions}
+              isCompleted={isCompleated}
+              isConfirmedAS={isConfirmedAS}
+              selectedAnswers={selectedAnswers}
+              answeredQuestions={answeredQuestions}
+              enableFinishSaved={enableFinishSaved}
+              isSubmitting={isSubmitting}
+              currentIconColor={currentIconColor}
+              currentQuestionId={currentQuestion.id}
+              previousQuestion={previousQuestion}
+              handleNextQuestion={handleNextQuestion}
+              setIsConfirmedAS={setIsConfirmedAS}
+              handleExamAnswerSelect={handleExamAnswerSelect}
+            />
+          </View>
         </View>
       </ScrollView>
-      <GetPremiumModal
+      {/* <GetPremiumModal
         isOpen={isProModalOpen}
         onClose={() => setIsProModalOpen(false)}
-      />
+      /> */}
       <BottomBlur />
     </SafeAreaView>
   );

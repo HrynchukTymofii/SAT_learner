@@ -33,7 +33,7 @@ const QuizByTopicScreen = () => {
 
         setQuizData(data)
       } catch (err) {
-        setError("Не вдалося завантажити тест")
+        setError("Failed to download the test")
       } finally {
         setLoading(false)
       }
@@ -52,7 +52,7 @@ const QuizByTopicScreen = () => {
   if (error || !quizData) {
     return (
       <View className="flex-1 items-center justify-center">
-        <Text className="text-red-500">{error || "Щось пішло не так"}</Text>
+        <Text className="text-red-500">{error || "Something went wrong("}</Text>
       </View>
     )
   }

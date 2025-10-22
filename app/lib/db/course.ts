@@ -268,8 +268,10 @@ export function useCourseDatabase() {
         SELECT AVG(qr.score) as avgScore
         FROM quiz_results qr
         JOIN quizzes q ON qr.quizId = q.id
+        JOIN chapters c ON q.chapterId = c.id
         WHERE q.chapterId = ?
           AND qr.completed = 1
+          AND (c.isPublished = 0 OR c.isPublished = 0)
         `,
         [chapterId]
       )) as AverageScoreRow[];
@@ -281,5 +283,40 @@ export function useCourseDatabase() {
     }
   }
 
-  return { getCompletedLessonsCount, getCompletedQuizzesCount, getAverageScoreByChapter, getFullCourse, getFullCourseWithProgress }
+  async function hasPerfectScoreInPublishedChapters() {
+    try {
+      const rows = (await db.getAllAsync(
+        `
+        SELECT qr.score, q.maxScore
+        FROM quiz_results qr
+        JOIN quizzes q ON qr.quizId = q.id
+        JOIN chapters c ON q.chapterId = c.id
+        WHERE qr.completed = 1
+          AND q.isPublished = 1
+          AND c.isPublished = 1
+        `
+      )) as { score: number | null; maxScore: number | null }[];
+
+      let hasPerfectScore = false;
+
+      for (const row of rows) {
+        const score = row.score ?? 0;
+        const maxScore = row.maxScore ?? 0;
+        if (maxScore > 0 && score / maxScore === 1) {
+          hasPerfectScore = true;
+          break;
+        }
+      }
+
+      return { success: true, hasPerfectScore };
+    } catch (err) {
+      console.error("❌ Failed to check perfect score in published chapters:", err);
+      return { success: false, error: "Failed to check perfect scores" };
+    }
+  }
+
+
+
+
+  return { getCompletedLessonsCount, hasPerfectScoreInPublishedChapters, getCompletedQuizzesCount, getAverageScoreByChapter, getFullCourse, getFullCourseWithProgress }
 }

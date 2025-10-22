@@ -23,6 +23,7 @@ export function useUserDatabase() {
 
       // 2. Insert quiz results
       for (const r of quizResults) {
+        await db.runAsync(`DELETE FROM quiz_results WHERE quizId = ?`, [r.quizId]);
         await db.runAsync(
           `INSERT OR REPLACE INTO quiz_results 
           (id, quizId, answers, score, completed, attemptCount, synced, updatedAt)
@@ -45,6 +46,7 @@ export function useUserDatabase() {
 
       // 3. Insert user quiz question interactions
       for (const q of userQuizQuestions) {
+        await db.runAsync(`DELETE FROM user_quiz_questions WHERE questionId = ?`, [q.questionId]);
         await db.runAsync(
           `INSERT OR REPLACE INTO user_quiz_questions 
           (id, questionId, liked, disliked, saved)
@@ -64,16 +66,16 @@ export function useUserDatabase() {
 
       // 4. Insert lesson progress
       for (const lp of lessonProgress) {
+        await db.runAsync(`DELETE FROM lesson_progress WHERE lessonId = ?`, [lp.lessonId]);
         await db.runAsync(
           `INSERT OR REPLACE INTO lesson_progress
-          (id, lessonId, completed, synced, updatedAt)
-          VALUES (?, ?, ?, ?, ?)`,
+          (id, lessonId, completed, synced)
+          VALUES (?, ?, ?, ?)`,
           [
             lp.id,
             lp.lessonId,
             lp.completed ? 1 : 0,
             1, // synced
-            lp.updatedAt,
           ]
         );
 

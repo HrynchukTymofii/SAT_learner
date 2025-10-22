@@ -24,7 +24,7 @@ interface QuestionBottomNavProps {
   handleExamAnswerSelect: (option: string) => void;
 }
 
-export default function QuestionBottomNav ({
+export default function QuestionBottomNav({
   pageType,
   currentQuestionIndex,
   questions,
@@ -39,9 +39,9 @@ export default function QuestionBottomNav ({
   previousQuestion,
   handleNextQuestion,
   setIsConfirmedAS,
-  handleExamAnswerSelect
+  handleExamAnswerSelect,
 }: QuestionBottomNavProps) {
-  const router = useRouter()
+  const router = useRouter();
   if (isCompleted) {
     return (
       <View className="flex items-center mt-4 px-3">
@@ -53,7 +53,13 @@ export default function QuestionBottomNav ({
             colors={["#3b82f6", "#2563eb"]}
             start={[0, 0]}
             end={[1, 1]}
-            className="py-3 rounded-2xl flex-row justify-center items-center"
+            style={{
+              paddingVertical: 12,
+              borderRadius: 16,
+              flexDirection: "row",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
           >
             <Text className="text-white font-semibold text-base">
               Finish Review
@@ -66,7 +72,7 @@ export default function QuestionBottomNav ({
 
   // === Normal bottom nav ===
   return (
-    <View className="flex flex-row justify-between items-center mt-4 px-3">
+    <View className="flex flex-row justify-between items-center my-4 px-3 ">
       {/* Previous */}
       <Pressable
         onPress={previousQuestion}
@@ -80,7 +86,14 @@ export default function QuestionBottomNav ({
           colors={["#3b82f6", "#2563eb"]}
           start={[0, 0]}
           end={[1, 1]}
-          className="px-4 py-2 flex-row items-center justify-center rounded-2xl"
+          style={{
+            paddingHorizontal: 16,
+            paddingVertical: 8,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 16,
+          }}
         >
           <ArrowLeft size={18} color="#fff" />
           <Text className="text-white font-semibold ml-2">Previous</Text>
@@ -104,7 +117,14 @@ export default function QuestionBottomNav ({
           colors={["#3b82f6", "#2563eb"]}
           start={[0, 0]}
           end={[1, 1]}
-          className="px-5 py-2 flex-row items-center justify-center rounded-2xl"
+          style={{
+            paddingHorizontal: 20,
+            paddingVertical: 8,
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "center",
+            borderRadius: 16,
+          }}
         >
           {isSubmitting ? (
             <Text className="text-white font-semibold">Saving...</Text>
@@ -153,7 +173,11 @@ function getNextButtonLabel({
   if (pageType === "exam") {
     const totalAnswered = Object.keys(answeredQuestions).length;
 
-    if (totalAnswered === 5 && questionId in answeredQuestions && selectedOption) {
+    if (
+      totalAnswered === 5 &&
+      questionId in answeredQuestions &&
+      selectedOption
+    ) {
       return "Finish Exam";
     }
 

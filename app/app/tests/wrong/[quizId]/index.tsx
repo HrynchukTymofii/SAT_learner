@@ -34,7 +34,7 @@ const WrongQuizScreen = () => {
 
         setQuizData(data)
       } catch (err) {
-        setError("Не вдалося завантажити тест")
+        setError("Failed to download the test")
       } finally {
         setLoading(false)
       }

@@ -26,6 +26,7 @@ import Purchases, {LOG_LEVEL} from "react-native-purchases"
 import { AppState, Platform } from "react-native";
 import { useLoadUserInBackground } from "@/lib/user";
 import { processOfflineQueue } from "@/lib/offlineQueue";
+import { upgradeToPro } from "@/lib/api/user";
 
 
 configureReanimatedLogger({
@@ -34,7 +35,7 @@ configureReanimatedLogger({
 });
 
 function AppSyncWrapper({ children }: { children: React.ReactNode }) {
-  const { token, setUser } = useAuth();
+  const { token, user, setUser } = useAuth();
   const [isOffline, setIsOffline] = useState(false);
   const { loadUserInBackground } = useLoadUserInBackground();
 
@@ -52,6 +53,34 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
       setIsOffline(false);
       await loadUserInBackground({ token, setUser });  //forceSync: true,
       await processOfflineQueue(token);
+
+       if (user && !user.isPro) {
+        const customerInfo = await Purchases.getCustomerInfo();
+
+        const activePro = customerInfo.entitlements.active["PRO for year"];
+        console.log(activePro)
+
+        if (activePro) {
+          const plan =
+            activePro.productIdentifier === "test_year"
+              ? "$rc_annual"
+              : null;
+          
+          if (!plan) {
+            console.warn("Unknown productIdentifier:", activePro.productIdentifier);
+            return;
+          }
+
+          const res = await upgradeToPro(token, plan);
+
+          if (res.success) {
+            if(user) setUser({ ...user, isPro: true });
+            console.log("User upgraded to PRO via RevenueCat sync");
+          } else {
+            console.warn("Failed to sync PRO status:", res.error);
+          }
+        }
+      }
     } catch (err) {
       console.error("Background sync failed:", err);
     }
@@ -62,27 +91,27 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
     syncIfOnline();
   }, [token]);
 
-  // useEffect(() => {
-  //   if (!token) return;
+  useEffect(() => {
+    if (!token) return;
 
-  //   const subscription = AppState.addEventListener("change", (nextAppState) => {
-  //     if (nextAppState === "active") {
-  //       syncIfOnline();
-  //     }
-  //   });
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") {
+        syncIfOnline();
+      }
+    });
 
-  //   return () => subscription.remove();
-  // }, [token]);
+    return () => subscription.remove();
+  }, [token]);
 
-  // useEffect(() => {
-  //   Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
+  useEffect(() => {
+    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
 
-  //   if (Platform.OS === "ios") {
-  //     Purchases.configure({ apiKey: "appl_eiqYtqMLngxgMLMoNpCeHZyJhjJ" });
-  //   } else if (Platform.OS === "android") {
-  //     Purchases.configure({ apiKey: "goog_XAOcRWeLRkcUysywMJWCGyulfmP" });
-  //   }
-  // }, []);
+    if (Platform.OS === "ios") {
+      Purchases.configure({ apiKey: "appl_plYVBUscFYEJQnxkmHBsnMRhbIa" });
+    } else if (Platform.OS === "android") {
+      Purchases.configure({ apiKey: "goog_RDVEiwhMsfMcTDNFxFdGkPiMLes" });
+    }
+  }, []);
 
   return <>{children}</>;
 }

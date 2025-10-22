@@ -45,6 +45,55 @@ export default function ResultsModal({
   const router = useRouter();
 
   if (!showResults || !results) return null;
+  //console.log(results)
+
+  const getGradientColors = (
+  percentage: number,
+  isDark: boolean
+): readonly [string, string] => {
+    if (percentage >= 90) {
+      // Green
+      return isDark ? ["#22c55e", "#16a34a"] : ["#a7f3d0", "#22c55e"];
+    } else if (percentage >= 60) {
+      // Yellow
+      return isDark ? ["#facc15", "#ca8a04"] : ["#fef08a", "#facc15"];
+    } else if (percentage >= 30) {
+      // Blue
+      return isDark ? ["#3b82f6", "#2563eb"] : ["#60a5fa", "#3b82f6"];
+    } else {
+      // Slate gray
+      return isDark ? ["#64748b", "#475569"] : ["#cbd5e1", "#94a3b8"];
+    }
+  };
+
+  const getResultText = (percentage: number, pageType: string): string => {
+    if (pageType === "exam") {
+      if (percentage >= 90) return "Exam Passed! 🎉";
+      if (percentage >= 60) return "Almost Passed…";
+      if (percentage >= 30) return "Keep Trying!";
+      return "Unfortunately, you did not pass";
+    } else {
+      if (percentage >= 90) return "Excellent! 🌟";
+      if (percentage >= 60) return "Good Job!";
+      if (percentage >= 30) return "Keep Going!";
+      return "Needs Improvement…";
+    }
+  };
+
+  const getResultDescription = (percentage: number, pageType: string): string => {
+    if (pageType === "exam") {
+      if (percentage >= 90) return "Congratulations! You successfully completed the exam!";
+      if (percentage >= 60) return "Good effort! Review a few points and try again.";
+      if (percentage >= 30) return "Keep practicing and improve your skills!";
+      return "Try again after reviewing the material.";
+    } else {
+      if (percentage >= 90) return "You successfully passed the test!";
+      if (percentage >= 60) return "Nice work! Keep practicing to master it.";
+      if (percentage >= 30) return "Keep studying and improving!";
+      return "Don't worry, keep practicing and you’ll get it!";
+    }
+  };
+
 
   return (
     <Animated.View
@@ -80,7 +129,7 @@ export default function ResultsModal({
         }}
       >
         <TouchableOpacity
-          onPress={() => {handleBack(false); setShowResults(false);}}
+          onPress={() => {setShowResults(false);}}
           style={{
             flexDirection: "row",
             alignItems: "center",
@@ -100,13 +149,7 @@ export default function ResultsModal({
       >
         {/* Results Card */}
         <LinearGradient
-          colors={
-            results.passed
-              ? [isDark ? "#2563eb" : "#60a5fa", isDark ? "#3b82f6" : "#3b82f6"]
-              : pageType === "exam"
-                ? ["#ef4444", "#dc2626"]
-                : ["#f97316", "#f59e0b"]
-          }
+          colors={getGradientColors(results.percentage, isDark)}
           start={[0, 0]}
           end={[1, 0]}
           style={{
@@ -135,13 +178,7 @@ export default function ResultsModal({
               textAlign: "center",
             }}
           >
-            {results.passed
-              ? pageType === "exam"
-                ? "Exam Passed!"
-                : "Well Done!"
-              : pageType === "exam"
-                ? "Unfortunately, you did not pass"
-                : "Keep Going!"}
+           {getResultText(results.percentage, pageType)}
           </Text>
 
           <Text
@@ -153,13 +190,7 @@ export default function ResultsModal({
               lineHeight: 20,
             }}
           >
-            {results.passed
-              ? pageType === "exam"
-                ? "Congratulations! You successfully completed the exam!"
-                : "You successfully passed the test!"
-              : pageType === "exam"
-                ? "Try again after reviewing the material."
-                : "Keep studying and improving!"}
+            {getResultDescription(results.percentage, pageType)}
           </Text>
         </LinearGradient>
 
@@ -235,7 +266,7 @@ export default function ResultsModal({
             >
               <ArrowLeft size={18} color="#fff" style={{ marginRight: 6 }} />
               <Text style={{ color: "#fff", fontWeight: "600" }}>
-                {backUrl === "/course" ? "Back to Course" : "Back to Topics"}
+                {backUrl === "/" ? "Back to Course" : "Back to Topics"}
               </Text>
             </TouchableOpacity>
           </LinearGradient>
@@ -258,7 +289,7 @@ export default function ResultsModal({
               }}
             >
               <TouchableOpacity
-                onPress={() => router.push(nextTopicUrl as any)}
+                onPress={() => router.replace(nextTopicUrl as any)}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -267,7 +298,7 @@ export default function ResultsModal({
                 }}
               >
                 <Text style={{ color: "#fff", fontWeight: "600" }}>
-                  Go to Next Topic
+                  Go to Next Activity
                 </Text>
               </TouchableOpacity>
             </LinearGradient>
@@ -292,10 +323,10 @@ export default function ResultsModal({
             >
               <TouchableOpacity
                 onPress={() => {
-                  if (["saved", "random", "exam"].includes(pageType))
+                  // if (["saved", "exam"].includes(pageType))
                     handleRetakeQuiz();
-                  if (!["random", "exam"].includes(pageType))
-                    setIsResetDialogOpen(true);
+                  // if (!["exam"].includes(pageType))
+                  //   setIsResetDialogOpen(true);
                 }}
                 style={{
                   flexDirection: "row",

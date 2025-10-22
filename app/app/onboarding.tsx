@@ -149,7 +149,8 @@ export default function Onboarding() {
       colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
       start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
-      className="flex-1"
+      style={{ flex: 1 }}
+
     >
       <ScrollView
         className="flex-1 px-6"

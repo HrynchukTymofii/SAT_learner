@@ -7,6 +7,7 @@ import {
   View,
   Text,
   Pressable,
+  Image,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -23,8 +24,7 @@ const proFeatures = [
   "Access to all SAT practice exams",
   "Full SAT course unlocked",
   "Track saved and wrong questions",
-  "Official-style test simulations",
-  "Offline study support",
+  "400+ SAT-grade problems",
 ];
 
 export default function PaywallScreen() {
@@ -55,7 +55,7 @@ export default function PaywallScreen() {
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleAnim, {
-          toValue: 1.05,
+          toValue: 0.95,
           duration: 1300,
           useNativeDriver: true,
         }),
@@ -73,7 +73,7 @@ export default function PaywallScreen() {
       setLoading(true);
       const { customerInfo } = await Purchases.purchasePackage(pkg);
 
-      if (customerInfo.entitlements.active["pro_access"]) {
+      if (customerInfo.entitlements.active["PRO for year"]) {
         const result = await upgradeToPro(token!, pkg.identifier);
         if (result.success) {
           if (user) setUser({ ...user, isPro: true });
@@ -108,32 +108,43 @@ export default function PaywallScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-white dark:bg-[#0f172a]" edges={["bottom"]}>
+    <SafeAreaView className="flex-1 bg-white dark:bg-[#0f172a]"  edges={["bottom"]}>
       {/* Header Section */}
-      <View className="flex-row items-center justify-between px-5 pt-3 pb-2">
-        <Pressable
-          onPress={() => {
-            if (router.canGoBack()) router.back();
-            else router.push("/");
-          }}
-          className="p-2 rounded-xl bg-gray-200/30 dark:bg-white/10"
-        >
-          <ArrowLeft size={22} color="#0f172a" />
-        </Pressable>
+      <View className="flex-1 relative -mb-10">
+        <Image
+          source={require("@/assets/images/paywall.png")} //satCourseImg.jpg
+          className="w-full h-full"
+          resizeMode="cover"
+        />
 
-        <Text className="text-xl font-bold text-gray-800 dark:text-white">
-          Upgrade to PRO
-        </Text>
-        <View style={{ width: 40 }} />
+        {/* Dark overlay */}
+        <View className="absolute inset-0 bg-black/50 rounded-xl" />
+
+        {/* Glass Back Button */}
+        <View className="absolute top-12 left-4 z-20">
+          <BlurView intensity={90} tint="dark" className="rounded-xl overflow-hidden">
+            <Pressable
+              onPress={() => {
+                if (router.canGoBack()) {
+                  router.back();
+                } else {
+                  router.push("/");
+                }}}
+              className="p-2"
+            >
+              <ArrowLeft size={22} color="white" />
+            </Pressable>
+          </BlurView>
+        </View>
       </View>
-
+    
       {/* Main Content */}
       <LinearGradient
-        colors={["#10B981", "#14B8A6"]}
+        colors={["#1e3a8a", "#3b82f6", "#60a5fa"]} 
         start={[0, 0]}
         end={[1, 1]}
         style={{
-          flex: 1,
+          height: 600,
           borderTopLeftRadius: 30,
           borderTopRightRadius: 30,
           padding: 24,
@@ -145,7 +156,7 @@ export default function PaywallScreen() {
           </Text>
 
           <Text className="text-gray-100 text-base text-center mb-8">
-            Get unlimited access to all tests, lessons, and performance insights.
+            Get unlimited access to all tests, lessons.
           </Text>
 
           {/* Feature list */}
@@ -185,7 +196,11 @@ export default function PaywallScreen() {
                 colors={["#facc15", "#fbbf24"]}
                 start={[0, 0]}
                 end={[1, 1]}
-                className="py-4 rounded-2xl"
+                style={{ 
+  paddingVertical: 16,
+  borderRadius: 16 
+}}
+
               >
                 <Text className="text-white font-bold text-center text-xl">
                   Go PRO

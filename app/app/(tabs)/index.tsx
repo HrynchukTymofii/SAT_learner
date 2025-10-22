@@ -1,7 +1,7 @@
-import { useEffect, useRef, useMemo, useState } from "react";
+import { useEffect, useRef, useMemo, useState, useCallback } from "react";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from "react-native";
-import { useRouter } from "expo-router";
+import { useFocusEffect, useRouter } from "expo-router";
 import { fetchCourse, fetchCourseWithProgress } from "@/lib/api/course";
 import { useAuth } from "@/context/AuthContext";
 import { LinearGradient } from "expo-linear-gradient";
@@ -9,8 +9,9 @@ import Svg, { Circle, Defs, Stop, LinearGradient as LinearGradientSvg } from "re
 import TopBlur from "@/components/ui/TobBlur";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { BookCheck, BookOpen, BookOpenCheck, Pencil } from "lucide-react-native";
+import { BookCheck, BookOpen, BookOpenCheck, Lock, Pencil } from "lucide-react-native";
 import { ChapterWithItems, useCourseDatabase } from "@/lib/db/course";
+import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 
 GoogleSignin.configure({
   webClientId: "329617813146-lmmck18chg6mfgci5i4iddtialht09ij.apps.googleusercontent.com",
@@ -26,7 +27,7 @@ export default function HomeScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const { token } = useAuth();
+  const { token, user } = useAuth();
   const { getFullCourse, getFullCourseWithProgress } = useCourseDatabase();
 
   const [loading, setLoading] = useState(true);
@@ -34,29 +35,53 @@ export default function HomeScreen() {
   const scrollRef = useRef<ScrollView>(null);
 
   // Load course
-  useEffect(() => {
-    const load = async () => {
-      setLoading(true);
-      let res;
-      if (!token) {
-        res = await getFullCourse();
-      } else {
-        res = await getFullCourseWithProgress();
-      }
+  useFocusEffect(
+    useCallback(() => {
+      let isActive = true;
 
-      if (res.success && res.chapters) {
-        setCourse(res.chapters);
-        setTimeout(() => {
-          const firstUnfinishedIndex = findFirstUnfinishedIndex(res.chapters!);
-          if (scrollRef.current && firstUnfinishedIndex >= 0) {
-            scrollRef.current.scrollTo({ y: firstUnfinishedIndex * 160, animated: true });
-          }
-        }, 300);
-      }
-      setLoading(false);
-    };
-    load();
-  }, [token]);
+      const load = async () => {
+        setLoading(true);
+        let res;
+        if (!token) {
+          res = await getFullCourse();
+        } else {
+          res = await getFullCourseWithProgress();
+        }
+
+        if (!isActive) return;
+
+        //console.log(res.chapters![2].items[2]);
+        //console.log(res.chapters![2].items[3]);
+
+        if (res.success && res.chapters) {
+          setCourse(res.chapters);
+          setTimeout(() => {
+            const firstUnfinishedIndex = findFirstUnfinishedIndex(res.chapters!);
+            if (scrollRef.current && firstUnfinishedIndex >= 0) {
+              scrollRef.current.scrollTo({ y: firstUnfinishedIndex * 80, animated: true });
+            }
+          }, 300);
+        }
+
+        setLoading(false);
+      };
+
+      load();
+
+      return () => {
+        isActive = false;
+      };
+    }, [token]) // you can keep token if needed for DB queries
+  );
+
+  // useEffect(() => {
+  //   console.log("🧠 Course mounted");
+
+  //   return () => {
+  //     console.log("🧹 Course unmounted");
+  //   };
+  // }, []);
+
 
   // --- Helpers ---
   const findFirstUnfinishedIndex = (chapters: ChapterWithItems[]) => {
@@ -85,15 +110,9 @@ export default function HomeScreen() {
     return total ? Math.round((completed / total) * 100) : 0;
   };
 
-  const allItems = useMemo(() => {
-    return course.flatMap((chapter) => chapter.items.map((i) => ({ ...i, chapterId: chapter.id })));
-  }, [course]);
-
   if (loading) {
     return (
-      <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? "#0f172a" : "#f8fafc", justifyContent: "center", alignItems: "center" }}>
-        <ActivityIndicator size="large" color="#22d3ee" />
-      </SafeAreaView>
+      <GraduationCap3DLoader />
     );
   }
 
@@ -123,13 +142,13 @@ export default function HomeScreen() {
           alignItems: "center",
         }}>
           <LinearGradient
-            colors={["#6366F1", "#8B5CF6", "#22d3ee"]}
+            colors={["#2563eb", "#1e40af"]} //"#6366F1", "#8B5CF6", "#22d3ee
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={StyleSheet.absoluteFill}
           />
           <Text style={{ fontSize: 22, fontWeight: "bold", color: "#fff", marginBottom: 16, textAlign: "center" }}>
-            {course.length ? "SAT Course" : ""}
+            {course.length ? "SAT Math Course" : ""}
           </Text>
 
           <View style={{ marginBottom: 16, justifyContent: "center", alignItems: "center" }}>
@@ -156,7 +175,8 @@ export default function HomeScreen() {
       {/* Course list */}
       <ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: 34 }} showsVerticalScrollIndicator={false}>
         {course.map((chapter, cIndex) => {
-          const chapterItems = allItems.filter((i) => i.chapterId === chapter.id);
+          const chapterItems = chapter.items.map(i => ({ ...i, chapterId: chapter.id }));
+          const isLocked = !user?.isPro && cIndex > 1;
           return (
             <View key={cIndex} style={{ marginBottom: 12 }}>
               <Text style={{ fontSize: 18, fontWeight: "600", color: isDark ? "#f1f5f9" : "#1f2937", marginBottom: 12 }}>
@@ -164,7 +184,8 @@ export default function HomeScreen() {
               </Text>
 
               {chapterItems.map((item) => {
-                const globalIndex = allItems.findIndex((i) => i.id === item.id && i.type === item.type);
+                const flatItems = course.flatMap(ch => ch.items.map(i => ({ ...i, chapterId: ch.id })));
+                const globalIndex = flatItems.findIndex(i => i.id === item.id && i.type === item.type);
                 const gradientColors: [string, string, ...string[]] =
                   item.type === "lesson"
                     ? item.progress?.length
@@ -178,12 +199,16 @@ export default function HomeScreen() {
                 return (
                   <TouchableOpacity
                     key={`${item.type}-${item.id}`}
-                    onPress={() =>
+                    onPress={() => {
+                      if (isLocked) {
+                        router.push("/payment");
+                        return;
+                      }
                       router.push({
                         pathname: `/course/${item.chapterId}/${item.type}/${item.id}` as any,
-                        params: { allItems: JSON.stringify(allItems), currentIndex: globalIndex },
+                        params: { allItems: JSON.stringify(flatItems), currentIndex: globalIndex },
                       })
-                    }
+                    }}
                     style={{
                       borderRadius: 14,
                       marginBottom: 16,
@@ -195,17 +220,21 @@ export default function HomeScreen() {
                       elevation: 5,
                     }}
                   >
-                    <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ flexDirection: 'row', alignItems: 'center', padding: 16, paddingVertical: 10, borderRadius: 14 }}>
-                      <View style={{ marginRight: 12 }}>
-                        {item.type === 'lesson'
-                          ? item.progress?.length
-                            ? <BookOpenCheck size={28} color={textCol} />
-                            : <BookOpen size={28} color={textCol} />
-                          : item.results?.length
-                            ? <BookCheck size={28} color={textCol} />
-                            : <Pencil size={28} color={textCol} />}
+                    <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, paddingVertical: 10, borderRadius: 14 }}>
+                      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1}}>
+                        <View style={{ marginRight: 12 }}>
+                          {item.type === 'lesson'
+                            ? item.progress?.length
+                              ? <BookOpenCheck size={28} color={textCol} />
+                              : <BookOpen size={28} color={textCol} />
+                            : item.results?.length
+                              ? <BookCheck size={28} color={textCol} />
+                              : <Pencil size={28} color={textCol} />}
+                        </View>
+                        <Text style={{ color: textCol, fontSize: 16, fontWeight: "600", flexShrink: 1 }}         numberOfLines={1}      // limit to single line
+                          ellipsizeMode="tail">{item.title}</Text>
                       </View>
-                      <Text style={{ color: textCol, fontSize: 16, fontWeight: "600" }}>{item.title}</Text>
+                      {isLocked && <Lock size={16} color="#2563eb" style={{ marginLeft: 8 }} />}
                     </LinearGradient>
                   </TouchableOpacity>
                 );

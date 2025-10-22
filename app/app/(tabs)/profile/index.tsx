@@ -6,7 +6,6 @@ import {
   Image,
   TouchableOpacity,
   Pressable,
-  ActivityIndicator,
   Animated,
   StyleSheet,
 } from "react-native";
@@ -15,15 +14,12 @@ import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
 import {
   BookOpen,
   Brain,
-  Calendar,
   CheckCircle,
-  Contact,
   LucideIcon,
   Mails,
   Settings,
   Star,
   Trophy,
-  Zap,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { getUserData } from "@/lib/api/user";
@@ -34,7 +30,7 @@ import * as SecureStore from "expo-secure-store";
 import { useCourseDatabase } from "@/lib/db/course";
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 import { ContactDialog } from "@/components/modals/ContactDialog";
-import { GetPremiumModal } from "@/components/modals/GetPremiumModal";
+
 
 const AnimatedNumber = ({ value }: { value: number }) => {
   const [displayValue, setDisplayValue] = useState(0);
@@ -180,10 +176,12 @@ function getDynamicAchievements({
   lessonsCount,
   quizzesCount,
   averageSatScore,
+  has100Quiz
 }: {
   lessonsCount: number;
   quizzesCount: number;
   averageSatScore: number;
+  has100Quiz: boolean
 }) {
   return [
     {
@@ -215,7 +213,7 @@ function getDynamicAchievements({
       title: "Perfect Practice",
       description: "Score 100% on any quiz",
       icon: Star,
-      unlocked: quizzesCount > 0 && averageSatScore === 100,
+      unlocked: quizzesCount > 0 && has100Quiz,
       color: "green",
     },
   ];
@@ -226,16 +224,16 @@ export default function ProfileScreen() {
   const { token, setToken, user, setUser } = useAuth();
   const router = useRouter();
   const [contactOpen, setContactOpen] = useState(false);
-  const [isPremiumModalOpen, setIsPremiumModalOpen] = useState(false);
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const { getCompletedLessonsCount, getCompletedQuizzesCount, getAverageScoreByChapter } = useCourseDatabase();
+  const { getCompletedLessonsCount, getCompletedQuizzesCount, getAverageScoreByChapter, hasPerfectScoreInPublishedChapters } = useCourseDatabase();
   
   const [lessonsCount, setLessonsCount] = useState(0);
   const [quizzesCount, setQuizzesCount] = useState(0);
   const [averageSatScore, setAverageSatScore] = useState(0);
-  const [achievements, setAchievements] = useState(getDynamicAchievements({ lessonsCount: 0, quizzesCount: 0, averageSatScore: 0 }));
+  const [have100Quiz, setHave100Quiz] = useState(false);
+  const [achievements, setAchievements] = useState(getDynamicAchievements({ lessonsCount: 0, quizzesCount: 0, averageSatScore: 0, has100Quiz: false }));
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -244,6 +242,7 @@ export default function ProfileScreen() {
       const lessonsRes = await getCompletedLessonsCount();
       const quizzesRes = await getCompletedQuizzesCount();
       const avgSatScpreRes = await getAverageScoreByChapter("8d3703a4-41ce-46b0-a27c-e25c0a0702e2");
+      const have100 = await hasPerfectScoreInPublishedChapters();
 
       const newLessonsCount = lessonsRes.success ? lessonsRes.count : 0;
       const newQuizzesCount = quizzesRes.success ? quizzesRes.count : 0;
@@ -252,12 +251,14 @@ export default function ProfileScreen() {
       setLessonsCount(newLessonsCount!);
       setQuizzesCount(newQuizzesCount!);
       setAverageSatScore(newAverageScore!);
+      setHave100Quiz(have100.hasPerfectScore || false)
 
       setAchievements(
         getDynamicAchievements({
           lessonsCount: newLessonsCount!,
           quizzesCount: newQuizzesCount!,
           averageSatScore: newAverageScore!,
+          has100Quiz: have100.hasPerfectScore || false
         })
       );
     })();
@@ -300,12 +301,21 @@ export default function ProfileScreen() {
     loadAnswers();
   }, [user]);
 
+  // useEffect(() => {
+  //   console.log("🧠 Profile mounted");
+
+  //   return () => {
+  //     console.log("🧹 Profle unmounted");
+  //   };
+  // }, []);
+
   
 
   const handleLogout = () => {
     setToken(null);
     setUser(null);
     router.replace("/");
+    router.dismissAll();
     Toast.show({
       type: "success",
       text1: "You have logged out",
@@ -539,7 +549,7 @@ export default function ProfileScreen() {
         </LinearGradient>
       </View>
 
-      {/* { user.isPro && <ProCard onClick={() => router.push("/payment")}/>} */}
+      { !user.isPro && <ProCard onClick={() => router.push("/payment")}/>}
 
       {/* Achievements */}
       <View
@@ -550,7 +560,7 @@ export default function ProfileScreen() {
           marginBottom: 8,
         }}
       >
-        <Trophy size={20} color="#D97706" />
+        <Trophy size={20} color="#fcc00d" />
         <Text
           style={{
             fontSize: 18,
