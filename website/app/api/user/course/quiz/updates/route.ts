@@ -16,14 +16,23 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const localUpdatedAt: Record<string, string> = body.localUpdatedAt || {};
 
+    const quizIds = Object.keys(localUpdatedAt);
+
+    if (!quizIds.length) {
+      return NextResponse.json({ updates: [] }); // nothing to check
+    }
+
     // Get quizzes that might need updates
     const quizzes = await db.quiz.findMany({
       where: {
+        id: { in: quizIds },
         isPublished: true,
       },
       select: {
         id: true,
         updatedAt: true,
+        totalQuestions: true,
+        maxScore: true,
         questions: {
           select: {
             id: true,
@@ -55,6 +64,8 @@ export async function POST(req: NextRequest) {
     const formattedUpdates = updates.map((quiz) => ({
       id: quiz.id,
       updatedAt: quiz.updatedAt.toISOString(),
+      totalQuestions: quiz.totalQuestions,
+      maxScore: quiz.maxScore,
       questions: quiz.questions.map((q) => ({
         id: q.id,
         question: q.question,
