@@ -1,4 +1,5 @@
 import GoogleProvider from "next-auth/providers/google"
+import AppleProvider from "next-auth/providers/apple";
 import CredentialsProvider from "next-auth/providers/credentials"
 import { db } from "@/lib/db"
 import bcrypt from "bcryptjs"
@@ -10,10 +11,10 @@ export const authOptions: NextAuthOptions = {
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
     }),
-    // AppleProvider({
-    //   clientId: process.env.APPLE_ID!,
-    //   clientSecret: process.env.APPLE_SECRET!,
-    // }),
+    AppleProvider({
+      clientId: process.env.APPLE_ID!,
+      clientSecret: process.env.APPLE_SECRET!,
+    }),
     CredentialsProvider({
       name: "credentials",
       credentials: {
