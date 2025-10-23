@@ -8,6 +8,7 @@ import {
   Pressable,
   Animated,
   StyleSheet,
+  Platform,
 } from "react-native";
 import { useAuth, UserType } from "@/context/AuthContext";
 import { MaterialIcons, FontAwesome5 } from "@expo/vector-icons";
@@ -314,7 +315,11 @@ export default function ProfileScreen() {
   const handleLogout = () => {
     setToken(null);
     setUser(null);
-    router.replace("/");
+    if(Platform.OS == "android"){
+      router.replace("/");
+    } else {
+      router.push("/");
+    }
     router.dismissAll();
     Toast.show({
       type: "success",
@@ -372,7 +377,7 @@ export default function ProfileScreen() {
           borderBottomLeftRadius: 32,
           borderBottomRightRadius: 32,
           padding: 16,
-          paddingTop: 40,
+          paddingTop: Platform.OS == "ios" ? 60 : 40,
           flexDirection: "row",
           alignItems: "center",
           shadowColor: "#000",

@@ -9,6 +9,7 @@ import {
   StyleSheet,
   useColorScheme,
   TouchableOpacity,
+  Platform,
 } from "react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
 import { useEffect, useState } from "react";
@@ -86,11 +87,18 @@ export default function LessonScreen() {
 
   const handleBack = () => {
     if (router.canGoBack()) router.back();
-    else router.replace("/");
+    else {
+      if(Platform.OS == "android"){
+        router.replace("/");
+      } else {
+        router.push("/");
+      }
+    }
   };
 
   const handleNext = () => {
     if (!nextItem) return;
+    if(Platform.OS == "android"){
     router.replace({
       pathname:
         `/course/${nextItem.chapterId}/${nextItem.type}/${nextItem.id}` as any,
@@ -99,6 +107,16 @@ export default function LessonScreen() {
         currentIndex: currentIndex + 1,
       },
     });
+        } else {
+          router.push({
+      pathname:
+        `/course/${nextItem.chapterId}/${nextItem.type}/${nextItem.id}` as any,
+      params: {
+        allItems: JSON.stringify(allItems),
+        currentIndex: currentIndex + 1,
+      },
+    });
+        }
   };
 
   return (
@@ -393,10 +411,6 @@ export default function LessonScreen() {
               )}
 
               <TextInput
-                value={newComment}
-                onChangeText={setNewComment}
-                placeholder="Write a comment..."
-                placeholderTextColor={isDark ? "#9ca3af" : "#6b7280"}
                 style={{
                   width: "100%",
                   minHeight: 44,
@@ -409,6 +423,10 @@ export default function LessonScreen() {
                   backgroundColor: isDark ? "#1e293b" : "#fff",
                   marginBottom: 10,
                 }}
+                placeholder="Write a comment..."
+                placeholderTextColor={isDark ? "#9ca3af" : "#6b7280"}
+                value={newComment}
+                onChangeText={setNewComment}
                 multiline
               />
 

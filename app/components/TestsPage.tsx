@@ -298,8 +298,13 @@ const TestsPage = ({
         console.warn("submit failed", e);
       }
     }
-    //console.log('Pre router')
-    router.replace(backUrl as any);
+    console.log('Pre router')
+    if(Platform.OS == "android"){
+      router.replace(backUrl as any);
+    } else {
+      console.log('do push')
+      router.push(backUrl as any);
+    }
     //console.log('After router')
   };
 

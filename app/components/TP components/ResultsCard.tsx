@@ -5,6 +5,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Platform,
 } from "react-native";
 import { LinearGradient } from "expo-linear-gradient";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
@@ -53,7 +54,7 @@ export default function ResultsModal({
 ): readonly [string, string] => {
     if (percentage >= 90) {
       // Green
-      return isDark ? ["#22c55e", "#16a34a"] : ["#a7f3d0", "#22c55e"];
+      return isDark ? ["#22c55e", "#16a34a"] : ["#22c55e", "#16a34a"];
     } else if (percentage >= 60) {
       // Yellow
       return isDark ? ["#facc15", "#ca8a04"] : ["#fef08a", "#facc15"];
@@ -271,8 +272,9 @@ export default function ResultsModal({
             </TouchableOpacity>
           </LinearGradient>
 
-          {/* Next Topic Button */}
-          {nextTopicUrl && pageType === "topic" && (
+          {/* TODO */}
+          {/* Next Topic Button chooses from all quizzes including the theory*/}
+          {/* {nextTopicUrl && pageType === "topic" && (
             <LinearGradient
               colors={["#3b82f6", "#2563eb"]}
               start={[0, 0]}
@@ -289,7 +291,7 @@ export default function ResultsModal({
               }}
             >
               <TouchableOpacity
-                onPress={() => router.replace(nextTopicUrl as any)}
+                onPress={() => { console.log(nextTopicUrl) ;Platform.OS == "android" ? router.replace(nextTopicUrl as any) : router.push(nextTopicUrl as any)}}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -302,7 +304,7 @@ export default function ResultsModal({
                 </Text>
               </TouchableOpacity>
             </LinearGradient>
-          )}
+          )} */}
 
           {/* Retake Quiz Button */}
           {pageType !== "wrong" && (

@@ -32,7 +32,7 @@ export default function QuizzesPage() {
     }
 
     if (!user.isPro) {
-      setShowPremiumModal(true);
+      router.push('/payment');
       return;
     }
 
