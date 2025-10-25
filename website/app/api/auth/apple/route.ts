@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     const JWKS = await getAppleJWKS();
     const { payload } = await jose.jwtVerify(id_token, JWKS, {
       issuer: "https://appleid.apple.com",
-      audience: process.env.APPLE_ID,
+      audience: process.env.APPLE_CLIENT_ID,
     });
 
     const email = frontendEmail || (payload.email as string | undefined);

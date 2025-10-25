@@ -6,6 +6,10 @@ import bcrypt from "bcryptjs"
 import { NextAuthOptions } from "next-auth"
 
 export const authOptions: NextAuthOptions = {
+  session: {
+    strategy: "jwt",
+    maxAge: 60 * 24 * 60 * 60,
+  },
   providers: [
     GoogleProvider({
       clientId: process.env.GOOGLE_CLIENT_ID!,
@@ -52,6 +56,17 @@ export const authOptions: NextAuthOptions = {
       },
     }),
   ],
+  cookies: {
+    pkceCodeVerifier: {
+      name: "next-auth.pkce.code_verifier",
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+      },
+    },
+  },
   pages: {
     signIn: "/login",
   },
@@ -69,15 +84,22 @@ export const authOptions: NextAuthOptions = {
             await db.user.create({
               data: {
                   email: user.email!,
-                  name: user.name || "Anonymous",
+                  name: user.name || "Student",
                   image: user.image,
                   platform: 'SATecosystem',
+                  isPro: false
               },
             });
         }
         }
 
         return true;
+    },
+
+    async redirect({ url, baseUrl }) {
+      if (url.startsWith(baseUrl)) return url
+      if (url.startsWith("/")) return `${baseUrl}${url}`
+      return baseUrl
     },
 
     async jwt({ token, user }) {
@@ -101,6 +123,8 @@ export const authOptions: NextAuthOptions = {
                 token.userId = existingUser.userId
                 token.isPro = existingUser.isPro
                 token.points = existingUser.points
+                token.name = existingUser.name || token.name
+                token.picture = existingUser.image || token.picture
             }
         }
 
