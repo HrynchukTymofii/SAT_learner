@@ -5,10 +5,10 @@ import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-ed
 
 export async function GET(
   req: Request,
-  { params }: { params: { chapterId: string; lessonId: string } }
+  { params }: { params: Promise<{ chapterId: string; lessonId: string }> }
 ) {
   try {
-    const { lessonId } = params;
+    const { lessonId } = await params;
 
     // Fetch lesson from database
     const lesson = await db.lesson.findUnique({
