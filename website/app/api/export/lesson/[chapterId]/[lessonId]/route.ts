@@ -1,7 +1,18 @@
 import { db } from "@/lib/db";
 import { NextResponse } from "next/server";
-import { renderToStaticMarkup } from "react-dom/server";
-import { ReadOnlyEditor } from "@/components/tiptap-templates/simple/readonly-editor";
+import { generateHTML } from "@tiptap/core";
+import StarterKit from "@tiptap/starter-kit";
+import { Image } from "@tiptap/extension-image";
+import { TaskItem } from "@tiptap/extension-task-item";
+import { TaskList } from "@tiptap/extension-task-list";
+import { TextAlign } from "@tiptap/extension-text-align";
+import { Typography } from "@tiptap/extension-typography";
+import { Highlight } from "@tiptap/extension-highlight";
+import { Subscript } from "@tiptap/extension-subscript";
+import { Superscript } from "@tiptap/extension-superscript";
+import { Underline } from "@tiptap/extension-underline";
+import Mathematics from "@tiptap/extension-mathematics";
+import { Link } from "@tiptap/extension-link";
 
 export async function GET(
   req: Request,
@@ -49,11 +60,36 @@ export async function GET(
  * Generate a complete HTML document with embedded styles
  */
 function generateCompleteHtml(content: string, title: string): string {
-  // Extract just the content if it's JSON
-  let htmlContent = content;
+  // Parse TipTap JSON and convert to HTML
+  let htmlContent = "";
 
-  // If content is TipTap JSON, you'll need to convert it to HTML
-  // For now, we'll assume it's already HTML or use the ReadOnlyEditor's output
+  try {
+    const tiptapJson = JSON.parse(content);
+
+    // Convert TipTap JSON to HTML using the same extensions as the editor
+    htmlContent = generateHTML(tiptapJson, [
+      StarterKit,
+      TextAlign.configure({ types: ["heading", "paragraph"] }),
+      Underline,
+      TaskList,
+      TaskItem.configure({ nested: true }),
+      Highlight.configure({ multicolor: true }),
+      Image,
+      Typography,
+      Superscript,
+      Subscript,
+      Mathematics.configure({
+        katexOptions: {
+          maxSize: 300,
+        },
+      }),
+      Link.configure({ openOnClick: false }),
+    ]);
+  } catch (error) {
+    console.error("Failed to parse TipTap JSON:", error);
+    // Fallback: use content as-is if it's not valid JSON
+    htmlContent = content;
+  }
 
   return `<!DOCTYPE html>
 <html lang="en">
