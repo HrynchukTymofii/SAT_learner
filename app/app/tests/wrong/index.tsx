@@ -1,18 +1,12 @@
 import React, { useEffect, useState } from "react"
-import { View, Text, TextInput, FlatList, TouchableOpacity, ActivityIndicator } from "react-native"
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native"
 import { useRouter } from "expo-router"
-import { Button } from "@/~/components/ui/button"
-import { ArrowLeft, XCircle,  RotateCcw, BookOpen } from "lucide-react-native"
+import { ArrowLeft, XCircle, RotateCcw, Search, X } from "lucide-react-native"
 import { useAuth } from "@/context/AuthContext"
-import { fetchWrongQuizzes } from "@/lib/api/quiz"
-import { BlurView } from "expo-blur"
-import TopBlur from "@/components/ui/TobBlur"
-import BottomBlur from "@/components/ui/BottomBlur"
-import { SafeAreaView } from "react-native-safe-area-context"
+import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { useQuizDatabase } from "@/lib/db/quiz"
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader"
-import { useColorScheme } from "nativewind"
-import { LinearGradient } from "expo-linear-gradient"
+import { useColorScheme } from "@/hooks/useColorScheme"
 
 export interface WrongQuiz {
   id: string
@@ -26,12 +20,13 @@ export default function WrongQuizzesScreen() {
   const router = useRouter()
   const { token } = useAuth()
   const { fetchWrongQuizzesLocal } = useQuizDatabase();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const insets = useSafeAreaInsets();
 
   const [quizzes, setQuizzes] = useState<WrongQuiz[]>([])
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
-  const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark";
 
   useEffect(() => {
     if (!token) {
@@ -41,7 +36,6 @@ export default function WrongQuizzesScreen() {
 
     const loadQuizzes = async () => {
       setLoading(true)
-      //const res = await fetchWrongQuizzes(token)
       const res = await fetchWrongQuizzesLocal()
       if (res.success) {
         setQuizzes(res.quizzes)
@@ -54,26 +48,21 @@ export default function WrongQuizzesScreen() {
     loadQuizzes()
   }, [token])
 
-  const bgColor = isDark ? "#0c0c0e" : "#ffffff";
-  const textColor = isDark ? "#f3f4f6" : "#0f172a";
-  const subTextColor = isDark ? "#9ca3af" : "#475569";
-  const inputBg = isDark ? "#1e293b" : "#f8fafc";
-  const inputBorder = isDark ? "#334155" : "#e2e8f0";
-
-  const getCardGradient = (): [string, string] =>
-    isDark ? ["#27272a", "#18181b"] : ["#f9fafb", "#f1f5f9"];
+  if (loading) {
+    return <GraduationCap3DLoader />;
+  }
 
   const handleQuizClick = (quizId: string) => {
     router.push(`/tests/wrong/${quizId}` as any)
   }
 
-  const handleBackToTests = () => {
-    router.push("/tests" as any)
-  }
-
   const handleTakeAllWrong = () => {
     router.push("/tests/wrong/all" as any)
   }
+
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
 
   const filteredQuizzes = quizzes.filter((quiz) =>
     searchTerm.length === 0
@@ -83,250 +72,171 @@ export default function WrongQuizzesScreen() {
 
   const totalWrong = quizzes.reduce((sum, quiz) => sum + quiz.wrongCount, 0)
 
-  if (loading) {
-    return (
-      <GraduationCap3DLoader />
-    );
-  }
-
-
-  const renderQuizItem = ({ item }: { item: WrongQuiz }) => (
-    // <TouchableOpacity
-    //   onPress={() => handleQuizClick(item.id)}
-    //   className="bg-red-50 dark:bg-stone-800 border border-red-200 dark:border-red-800 rounded-lg p-3 mb-2 gap-2"
-    //   activeOpacity={0.8}
-    // >
-    //   <View className="flex flex-row justify-between items-center">
-    //     <Text className="text-gray-800 dark:text-gray-100 font-semibold text-sm flex-1 truncate mr-2">
-    //       {item.title}
-    //     </Text>
-    //     <XCircle color="#b91c1c" size={20} />
-    //   </View>
-
-    //   <View className="flex flex-row justify-end items-center mt-1">
-    //     <Text className="bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 rounded-md px-2 py-0.5 text-xs">
-    //       {item.wrongCount} неправильно
-    //     </Text>
-    //   </View>
-    // </TouchableOpacity>
-    <TouchableOpacity
-      onPress={() => handleQuizClick(item.id)}
-      activeOpacity={0.8}
-      style={{
-        marginBottom: 16,
-        borderRadius: 16,
-        overflow: "hidden",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 4,
-      }}
-    >
-      <LinearGradient
-        colors={getCardGradient()}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          padding: 16,
-          borderRadius: 16,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderWidth: 1,
-          borderColor: isDark ? "#3f3f46" : "#e5e7eb",
-        }}
-      >
-        <View style={{ flex: 1, marginRight: 8 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: textColor,
-              marginBottom: 4,
-            }}
-            numberOfLines={1}
-          >
-            {item.title}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: subTextColor,
-            }}
-          >
-            {item.wrongCount} incorrect answers
-          </Text>
-        </View>
-        <XCircle size={22} color={isDark ? "#f87171" : "#dc2626"} />
-      </LinearGradient>
-    </TouchableOpacity>
-  )
-
   return (
-     <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: bgColor,
-        paddingHorizontal: 16,
-        paddingTop: 8,
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
       {/* Header */}
-      <LinearGradient
-        colors={["#3b82f6", "#2563eb"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{
-  borderRadius: 16,
-  overflow: "hidden",
-  shadowColor: "#60a5fa",
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 4,
-  elevation: 4, // Android shadow
-  marginBottom: 16,
-  marginRight: "auto",
-}}
-
-        //className="rounded-2xl overflow-hidden shadow-md shadow-blue-400/30 mb-4 mr-auto"
-      >
-        <Button
-          onPress={() => router.push("/tests")}
-          className="flex-row items-center bg-transparent px-3 py-2"
-        >
-          <ArrowLeft size={18} color="#fff" />
-          <Text className="text-white font-semibold ml-2">
-            Back to modes
-          </Text>
-        </Button>
-      </LinearGradient>
-
-      {/* Title */}
-      <View style={{ marginBottom: 8 }}>
-        <Text
+      <View style={{
+        paddingTop: insets.top + 12,
+        paddingBottom: 16,
+        paddingHorizontal: 16,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+      }}>
+        {/* Back Button */}
+        <TouchableOpacity
+          onPress={() => router.back()}
           style={{
-            fontSize: 28,
-            fontWeight: "800",
-            color: isDark ? "#60a5fa" : "#2563eb",
-            marginBottom: 4,
+            flexDirection: "row",
+            alignItems: "center",
+            marginBottom: 16,
+            alignSelf: "flex-start",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            borderRadius: 12,
           }}
+          activeOpacity={0.7}
         >
+          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+            Back
+          </Text>
+        </TouchableOpacity>
+
+        {/* Title */}
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 8 }}>
           Wrong Answers
         </Text>
-        <Text
-          style={{
-            color: subTextColor,
-            fontSize: 15,
-          }}
-        >
+        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280"}}>
           Questions you answered incorrectly
         </Text>
+
+        {/* Search Bar */}
+        {/* <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 6,
+        }}>
+          <Search size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+          <TextInput
+            style={{
+              flex: 1,
+              marginLeft: 12,
+              fontSize: 16,
+              color: isDark ? "#ffffff" : "#1f2937",
+            }}
+            placeholder="Search questions..."
+            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
+          {searchTerm.length > 0 && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={clearSearch}
+              style={{ marginLeft: 8 }}
+            >
+              <X size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+            </TouchableOpacity>
+          )}
+        </View> */}
       </View>
 
-      {/* Search */}
-      <TextInput
-        placeholder="Search..."
-        placeholderTextColor={subTextColor}
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        style={{
-          backgroundColor: inputBg,
-          borderWidth: 1,
-          borderColor: inputBorder,
-          borderRadius: 16,
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          color: textColor,
-          marginBottom: 16,
-          fontSize: 15,
-        }}
-      />
-
-      {/* Take all wrong */}
-      {totalWrong > 0 && (
-        <TouchableOpacity
-          onPress={handleTakeAllWrong}
-          activeOpacity={0.9}
-          style={{
-            marginBottom: 20,
-            borderRadius: 16,
-            overflow: "hidden",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 8,
-            elevation: 5,
-          }}
-        >
-          <LinearGradient
-            colors={["#ef4444", "#b91c1c"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+      {/* Content */}
+      <ScrollView
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Take all wrong button */}
+        {totalWrong > 0 && (
+          <TouchableOpacity
+            onPress={handleTakeAllWrong}
+            activeOpacity={0.7}
             style={{
+              marginBottom: 20,
+              backgroundColor: "#EF4444",
+              borderRadius: 16,
+              padding: 16,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              paddingVertical: 14,
-              borderRadius: 16,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 3,
             }}
           >
-            <RotateCcw size={18} color="#fff" style={{ marginRight: 6 }} />
-            <Text
+            <RotateCcw size={20} color="#ffffff" style={{ marginRight: 8 }} />
+            <Text style={{ color: "#ffffff", fontWeight: "bold", fontSize: 16 }}>
+              Retry All ({totalWrong} questions)
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Quiz List */}
+        {filteredQuizzes.length > 0 ? (
+          filteredQuizzes.map((quiz) => (
+            <TouchableOpacity
+              key={quiz.id}
+              onPress={() => handleQuizClick(quiz.id)}
+              activeOpacity={0.7}
               style={{
-                color: "#fff",
-                fontWeight: "600",
-                fontSize: 16,
+                marginBottom: 16,
+                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                borderRadius: 16,
+                padding: 16,
+                borderLeftWidth: 4,
+                borderLeftColor: "#EF4444",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
               }}
             >
-              Retake all wrong questions ({totalWrong})
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      )}
+              {/* Title and Icon */}
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+                  <XCircle size={24} color="#EF4444" style={{ marginRight: 12 }} />
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: isDark ? "#ffffff" : "#1f2937",
+                      flex: 1,
+                    }}
+                    numberOfLines={2}
+                  >
+                    {quiz.title}
+                  </Text>
+                </View>
+              </View>
 
-      {/* List */}
-      {filteredQuizzes.length > 0 ? (
-        <FlatList
-          data={filteredQuizzes}
-          renderItem={renderQuizItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        />
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 60,
-          }}
-        >
-          <BookOpen size={48} color={subTextColor} />
-          <Text
-            style={{
-              marginTop: 12,
-              fontSize: 17,
-              fontWeight: "600",
-              color: subTextColor,
-            }}
-          >
-            {searchTerm ? "No quizzes found" : "No wrong answers yet"}
-          </Text>
-          <Text
-            style={{
-              color: subTextColor,
-              textAlign: "center",
-              marginTop: 4,
-              paddingHorizontal: 16,
-            }}
-          >
-            {searchTerm
-              ? "No results match your search."
-              : "Nice work! You haven’t answered any questions incorrectly yet."}
-          </Text>
-        </View>
-      )}
-    </SafeAreaView>
+              {/* Stats */}
+              <Text style={{ fontSize: 14, color: isDark ? "#94a3b8" : "#6b7280", marginLeft: 36 }}>
+                {quiz.wrongCount} incorrect answer{quiz.wrongCount > 1 ? 's' : ''}
+              </Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <View style={{ alignItems: "center", justifyContent: "center", marginTop: 48 }}>
+            <XCircle size={40} color={isDark ? "#9ca3af" : "#6b7280"} />
+            <Text style={{ fontSize: 16, color: isDark ? "#9ca3af" : "#6b7280", marginTop: 8, textAlign: "center" }}>
+              {searchTerm ? `No questions found matching "${searchTerm}"` : "No wrong answers yet"}
+            </Text>
+            {!searchTerm && (
+              <Text style={{ fontSize: 14, color: isDark ? "#6b7280" : "#9ca3af", marginTop: 4, textAlign: "center", paddingHorizontal: 32 }}>
+                Nice work! You haven't answered any questions incorrectly yet
+              </Text>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   )
 }

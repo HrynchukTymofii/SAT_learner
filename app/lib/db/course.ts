@@ -318,5 +318,210 @@ export function useCourseDatabase() {
 
 
 
-  return { getCompletedLessonsCount, hasPerfectScoreInPublishedChapters, getCompletedQuizzesCount, getAverageScoreByChapter, getFullCourse, getFullCourseWithProgress }
+  /**
+   * Get a single chapter with its lessons and quizzes, including progress/results.
+   */
+  async function getChapterItems(chapterId: string): Promise<{
+    success: boolean;
+    chapter?: ChapterWithItems;
+    error?: string;
+  }> {
+    try {
+      // --- 1. Get the chapter ---
+      const chapterRows = (await db.getAllAsync(
+        `SELECT * FROM chapters WHERE id = ? AND isPublished = 1`,
+        [chapterId]
+      )) as ChapterRow[];
+
+      if (!chapterRows || chapterRows.length === 0) {
+        return { success: false, error: "Chapter not found" };
+      }
+
+      const chapter = chapterRows[0];
+
+      // --- 2. Get lessons for the chapter ---
+      const lessons = (await db.getAllAsync(
+        `
+        SELECT l.*, lp.id AS progressId, lp.completed
+        FROM lessons l
+        LEFT JOIN lesson_progress lp ON lp.lessonId = l.id
+        WHERE l.chapterId = ?
+        ORDER BY l.position ASC
+        `,
+        [chapterId]
+      )) as (CourseItem & { progressId?: string; completed?: number })[];
+
+      const lessonItems: CourseItem[] = lessons.map((l) => ({
+        id: l.id,
+        title: l.title,
+        type: "lesson",
+        chapterId: l.chapterId,
+        position: l.position,
+        progress: l.progressId
+          ? [{ id: l.progressId, completed: !!l.completed }]
+          : [],
+      }));
+
+      // --- 3. Get quizzes for the chapter ---
+      const quizzes = (await db.getAllAsync(
+        `
+        SELECT q.*, qr.id AS resultId, qr.score, qr.completed, qr.attemptCount
+        FROM quizzes q
+        LEFT JOIN quiz_results qr ON qr.quizId = q.id
+        WHERE q.chapterId = ?
+        ORDER BY q.position ASC
+        `,
+        [chapterId]
+      )) as (CourseItem & {
+        resultId?: string;
+        score?: number;
+        completed?: number;
+        attemptCount?: number;
+      })[];
+
+      const quizItems: CourseItem[] = quizzes.map((q) => ({
+        id: q.id,
+        title: q.title,
+        type: "quiz",
+        chapterId: q.chapterId,
+        position: q.position,
+        results: q.resultId
+          ? [
+              {
+                id: q.resultId,
+                score: q.score ?? 0,
+                completed: !!q.completed,
+                attemptCount: q.attemptCount ?? 0,
+              },
+            ]
+          : [],
+      }));
+
+      // --- 4. Combine and sort by position ---
+      const combinedItems = [...lessonItems, ...quizItems].sort(
+        (a, b) => a.position - b.position
+      );
+
+      return {
+        success: true,
+        chapter: {
+          id: chapter.id,
+          title: chapter.title,
+          position: chapter.position,
+          items: combinedItems,
+        },
+      };
+    } catch (err) {
+      console.error("❌ Failed to load chapter items:", err);
+      return { success: false, error: "Failed to fetch chapter items" };
+    }
+  }
+
+  /**
+   * Get the 3 most recent chapters the user has interacted with.
+   * Returns chapters ordered by most recent activity (lesson_progress or quiz_results).
+   */
+  async function getRecentChapters(): Promise<{
+    success: boolean;
+    chapters?: Array<{
+      id: string;
+      title: string;
+      position: number;
+      progress: number;
+      lastActivity: string;
+    }>;
+    error?: string;
+  }> {
+    try {
+      // Get chapters with recent activity from either lessons or quizzes
+      const recentChapters = await db.getAllAsync<{
+        chapterId: string;
+        title: string;
+        position: number;
+        lastActivity: string;
+      }>(
+        `
+        SELECT
+          c.id as chapterId,
+          c.title,
+          c.position,
+          MAX(activity.updatedAt) as lastActivity
+        FROM chapters c
+        INNER JOIN (
+          -- Get lesson progress activities
+          SELECT l.chapterId, lp.updatedAt
+          FROM lesson_progress lp
+          JOIN lessons l ON lp.lessonId = l.id
+          WHERE lp.completed = 1
+
+          UNION ALL
+
+          -- Get quiz result activities
+          SELECT q.chapterId, qr.updatedAt
+          FROM quiz_results qr
+          JOIN quizzes q ON qr.quizId = q.id
+          WHERE qr.completed = 1
+        ) as activity ON activity.chapterId = c.id
+        WHERE c.isPublished = 1
+        GROUP BY c.id, c.title, c.position
+        ORDER BY lastActivity DESC
+        LIMIT 3
+        `
+      );
+
+      //console.log(recentChapters)
+
+      if (!recentChapters || recentChapters.length === 0) {
+        return { success: true, chapters: [] };
+      }
+
+      // Calculate progress for each chapter 
+      const chaptersWithProgress = await Promise.all(
+        recentChapters.map(async (chapter) => {
+          // Get total items (lessons + quizzes) in this chapter
+          const totalItems = await db.getFirstAsync<{ total: number }>(
+            `
+            SELECT
+              (SELECT COUNT(*) FROM lessons WHERE chapterId = ?) +
+              (SELECT COUNT(*) FROM quizzes WHERE chapterId = ?) as total
+            `,
+            [chapter.chapterId, chapter.chapterId]
+          );
+
+          // Get completed items in this chapter
+          const completedItems = await db.getFirstAsync<{ completed: number }>(
+            `
+            SELECT
+              (SELECT COUNT(*) FROM lesson_progress lp
+               JOIN lessons l ON lp.lessonId = l.id
+               WHERE l.chapterId = ? AND lp.completed = 1) +
+              (SELECT COUNT(*) FROM quiz_results qr
+               JOIN quizzes q ON qr.quizId = q.id
+               WHERE q.chapterId = ? AND qr.completed = 1) as completed
+            `,
+            [chapter.chapterId, chapter.chapterId]
+          );
+
+          const total = totalItems?.total ?? 1;
+          const completed = completedItems?.completed ?? 0;
+          const progress = Math.round((completed / total) * 100);
+
+          return {
+            id: chapter.chapterId,
+            title: chapter.title,
+            position: chapter.position,
+            progress,
+            lastActivity: chapter.lastActivity,
+          };
+        })
+      );
+
+      return { success: true, chapters: chaptersWithProgress };
+    } catch (err) {
+      console.error("❌ Failed to get recent chapters:", err);
+      return { success: false, error: "Failed to fetch recent chapters" };
+    }
+  }
+
+  return { getCompletedLessonsCount, hasPerfectScoreInPublishedChapters, getCompletedQuizzesCount, getAverageScoreByChapter, getFullCourse, getFullCourseWithProgress, getChapterItems, getRecentChapters }
 }

@@ -8,13 +8,21 @@ import Animated, {
   withTiming,
   Easing,
 } from "react-native-reanimated";
+import { useAuth } from "@/context/AuthContext";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedPolygon = Animated.createAnimatedComponent(Polygon);
 const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 
 export default function GraduationCap3DLoader() {
+  const { user } = useAuth();
   const progress = useSharedValue(0);
+
+  // Golden color for PRO users, cyan for free users
+  const isPro = user?.isPro;
+  const strokeColor = isPro ? "#FFD700" : "#06B6D4";
+  const fillColor = isPro ? "#FFD70022" : "#06B6D422";
+  const fillColor2 = isPro ? "#FFD70033" : "#06B6D433";
 
   useEffect(() => {
     progress.value = withRepeat(
@@ -46,15 +54,15 @@ export default function GraduationCap3DLoader() {
   });
 
   return (
-    <View className="flex-1 items-center justify-center">
+    <View className="flex-1 items-center justify-center bg-white dark:bg-gray-900">
       <Svg width={140} height={120} viewBox="0 0 140 120">
         {/* Top 3D square (mortarboard) */}
         <AnimatedPolygon
           animatedProps={animatedTopProps}
           points="20,40 70,20 120,40 70,60"
-          stroke="#2563eb"
+          stroke={strokeColor}
           strokeWidth={3}
-          fill="#2563eb22"
+          fill={fillColor}
           strokeLinecap="round"
           strokeLinejoin="round"
         />
@@ -66,29 +74,29 @@ export default function GraduationCap3DLoader() {
           cy="80"
           rx="22"
           ry="8"
-          stroke="#2563eb"
+          stroke={strokeColor}
           strokeWidth={3}
-          fill="#2563eb22"
+          fill={fillColor}
         />
 
         {/* Cylinder body */}
         <AnimatedPath
           animatedProps={animatedBottomProps}
           d="M48,80 v18 a22,8 0 0,0 44,0 v-18"
-          stroke="#2563eb"
+          stroke={strokeColor}
           strokeWidth={3}
-          fill="#2563eb33"
+          fill={fillColor2}
           strokeLinecap="round"
         />
 
         {/* Tassel */}
         <Path
           d="M70,20 v20 l10,10"
-          stroke="#2563eb"
+          stroke={strokeColor}
           strokeWidth={2.5}
           strokeLinecap="round"
         />
-        <Ellipse cx="80" cy="50" rx="2" ry="2" fill="#2563eb" />
+        <Ellipse cx="80" cy="50" rx="2" ry="2" fill={strokeColor} />
       </Svg>
     </View>
   );

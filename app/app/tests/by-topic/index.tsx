@@ -1,29 +1,25 @@
 import { useEffect, useState } from "react";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ScrollView,
   Text,
   View,
   TouchableOpacity,
   TextInput,
-  ActivityIndicator,
-  useColorScheme,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import {
-  Target,
-  Trophy,
-  BookOpen,
+  Book,
   BookCheck,
   ArrowLeft,
   Lock,
+  Search,
+  X,
 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useQuizDatabase } from "@/lib/db/quiz";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 
 type Quiz = {
   id: string;
@@ -48,12 +44,6 @@ export default function TestsByTopicScreen() {
   const isDark = colorScheme === "dark";
   const { fetchQuizzesByTopicLocal } = useQuizDatabase();
 
-  const bgColor = isDark ? "#0f172a" : "#f8fafc";
-  const inputBg = isDark ? "#1e293b" : "#ffffff";
-  const inputBorder = isDark ? "#334155" : "#e5e7eb";
-  const textColor = isDark ? "#f1f5f9" : "#1f2937";
-  const subTextColor = isDark ? "#cbd5e1" : "#6b7280";
-
   useEffect(() => {
     if (!token) router.push("/login");
   }, [token]);
@@ -63,7 +53,6 @@ export default function TestsByTopicScreen() {
     const loadQuizzes = async () => {
       try {
         const res = await fetchQuizzesByTopicLocal();
-        //console.log(res)
         if (res.success) {
           setQuizzes(res.quizzes);
           setFiltered(res.quizzes);
@@ -90,27 +79,20 @@ export default function TestsByTopicScreen() {
   }, [search, quizzes]);
 
   if (loading) {
-    return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: bgColor,
-        }}
-      >
-        <ActivityIndicator size="large" color="#22d3ee" />
-      </SafeAreaView>
-    );
+    return <GraduationCap3DLoader />;
   }
 
-  const getProgressGradient = (p: number): [string, string] => {
-    // subtle muted gradients
-    if (p >= 80)
-      return isDark ? ["#34d399", "#10b981"] : ["#2ed08b", "#0ea972"]; // green
-    if (p >= 60)
-      return isDark ? ["#fbbf24", "#f59e0b"] : ["#f9b81f", "#f4970b"];
-    return isDark ? ["#1e293b", "#273449"] : ["#f1f5f9", "#e2e8f0"];
+  const getProgressColor = (p: number) => {
+    if (p >= 90) return "#10B981"; // Green
+    if (p >= 70) return "#EAB308"; // Yellow
+    if (p >= 50) return "#8B5CF6"; // Purple
+    if (p >= 30) return "#06B6D4"; // Blue/Cyan
+    if (p >= 10) return "#EF4444"; // Red
+    return "#6B7280"; // Neutral gray
+  };
+
+  const clearSearch = () => {
+    setSearch("");
   };
 
   const handlePress = (quizId: string, isLocked: boolean) => {
@@ -123,185 +105,153 @@ export default function TestsByTopicScreen() {
     
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: bgColor, paddingBottom: 20,  paddingTop: 8, }}
-    >
+    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
       {/* Header */}
-      <LinearGradient
-        colors={["#3b82f6", "#2563eb"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{
-          borderRadius: 16,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 5,
-          marginBottom: 16,
-          alignSelf: "flex-start",
-          marginLeft: 12,
-        }}
-      >
+      <View style={{
+        paddingTop: insets.top + 12,
+        paddingBottom: 16,
+        paddingHorizontal: 16,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+      }}>
+        {/* Back Button */}
         <TouchableOpacity
-          onPress={() => router.push("/tests")}
+          onPress={() => router.back()}
           style={{
             flexDirection: "row",
             alignItems: "center",
+            marginBottom: 16,
+            alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            borderRadius: 12,
           }}
+          activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
-            Back to Topics
+          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+            Back
           </Text>
         </TouchableOpacity>
-      </LinearGradient>
 
-      {/* Page Heading */}
-      <View style={{ marginBottom: 8, marginHorizontal: 12 }}>
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "800",
-            color: isDark ? "#60a5fa" : "#2563eb",
-            marginBottom: 4,
-          }}
-        >
-          Tasks by Topics
+        {/* Title */}
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 8 }}>
+          Practice by Topic
         </Text>
-        <Text
-          style={{
-            color: subTextColor,
-            fontSize: 15,
-            marginBottom: 8,
-          }}
-        >
-          Practice SAT Math questions by specific topics. Focus on
-          the areas where you need improvement.
+        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", marginBottom: 16 }}>
+          Focus on specific topics to improve your skills
         </Text>
+
+        {/* Search Bar */}
+        <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 6,
+        }}>
+          <Search size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+          <TextInput
+            style={{
+              flex: 1,
+              marginLeft: 12,
+              fontSize: 16,
+              color: isDark ? "#ffffff" : "#1f2937",
+            }}
+            placeholder="Search topics..."
+            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            value={search}
+            onChangeText={setSearch}
+          />
+          {search.length > 0 && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={clearSearch}
+              style={{ marginLeft: 8 }}
+            >
+              <X size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
-      {/* Search */}
-      <TextInput
-        placeholder="Search topics..."
-        placeholderTextColor={subTextColor}
-        value={search}
-        onChangeText={setSearch}
-        style={{
-          marginHorizontal: 16,
-          marginBottom: 16,
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          borderRadius: 16,
-          backgroundColor: inputBg,
-          borderWidth: 1,
-          borderColor: inputBorder,
-          color: textColor,
-        }}
-      />
-
+      {/* Topics List */}
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 30 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
         {filtered.length ? (
           filtered.map((quiz, index) => {
-            const gradientColors = getProgressGradient(quiz.progress);
-            const itemTextColor = quiz.progress >= 60 ? "#ffffff" : textColor;
-
+            const progressColor = getProgressColor(quiz.progress);
             const isLocked = !user?.isPro && index > 3 || false;
 
             return (
               <TouchableOpacity
                 key={quiz.id}
                 onPress={() => handlePress(quiz.id, isLocked)}
+                activeOpacity={0.7}
                 style={{
                   marginBottom: 16,
+                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
                   borderRadius: 16,
-                  overflow: "hidden",
+                  padding: 16,
+                  borderLeftWidth: 4,
+                  borderLeftColor: progressColor,
                   shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 4 },
+                  shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,
                   shadowRadius: 8,
-                  elevation: 5,
+                  elevation: 3,
                 }}
               >
-                <LinearGradient
-                  colors={gradientColors}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 16,
-                    borderRadius: 16,
-                  }}
-                >
-                  <BookCheck
-                    size={28}
-                    color={itemTextColor}
-                    style={{ marginRight: 12 }}
-                  />
-                  <View style={{ flex: 1 }}>
-                    <View className="flex flex-row items-center justify-between">
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontWeight: "600",
-                          color: itemTextColor,
-                          marginBottom: 4,
-                          flexShrink: 1
-                        }}
-                        numberOfLines={1}   
-                        ellipsizeMode="tail"
-                      >
-                        {quiz.title}
-                      </Text>
-                      {isLocked && <Lock size={16} color="#2563eb" style={{ marginLeft: 8 }} />}
-                    </View>
-                    <View
+                {/* Title and Progress */}
+                <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
+                  <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+                    {quiz.progress > 0 ? (
+                      <BookCheck size={24} color={isDark ? "#06B6D4" : "#0891B2"} style={{ marginRight: 12 }} />
+                    ) : (
+                      <Book size={24} color={isDark ? "#9ca3af" : "#6b7280"} style={{ marginRight: 12 }} />
+                    )}
+                    <Text
                       style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        fontSize: 16,
+                        fontWeight: "bold",
+                        color: isDark ? "#ffffff" : "#1f2937",
+                        flex: 1,
                       }}
+                      numberOfLines={2}
                     >
-                      <Text style={{ fontSize: 14, color: itemTextColor }}>
-                        Questions: {quiz.questionCount}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          fontWeight: "600",
-                          color: itemTextColor,
-                        }}
-                      >
-                        {quiz.progress}%
-                      </Text>
-                    </View>
+                      {quiz.title}
+                    </Text>
                   </View>
-                </LinearGradient>
+                  <View style={{ marginLeft: 8, flexDirection: "row", alignItems: "center" }}>
+                    {isLocked && <Lock size={16} color="#2563eb" style={{ marginRight: 8 }} />}
+                    <Text style={{ fontSize: 18, fontWeight: "bold", color: progressColor }}>
+                      {quiz.progress}%
+                    </Text>
+                  </View>
+                </View>
+
+                {/* Stats */}
+                <Text style={{ fontSize: 14, color: isDark ? "#94a3b8" : "#6b7280" }}>
+                  {quiz.questionCount} questions
+                  {quiz.attemptCount > 0 && ` · ${quiz.attemptCount} attempt${quiz.attemptCount > 1 ? 's' : ''}`}
+                </Text>
               </TouchableOpacity>
             );
           })
         ) : (
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: 50,
-            }}
-          >
-            <BookOpen size={40} color={subTextColor} />
-            <Text style={{ fontSize: 16, color: subTextColor, marginTop: 8 }}>
-              {search ? "No topics found" : "No available topics"}
+          <View style={{ alignItems: "center", justifyContent: "center", marginTop: 48 }}>
+            <Book size={40} color={isDark ? "#9ca3af" : "#6b7280"} />
+            <Text style={{ fontSize: 16, color: isDark ? "#9ca3af" : "#6b7280", marginTop: 8, textAlign: "center" }}>
+              {search ? `No topics found matching "${search}"` : "No available topics"}
             </Text>
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

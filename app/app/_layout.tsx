@@ -156,11 +156,33 @@ export default function RootLayout() {
               value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
             >
               <Stack screenOptions={{ headerShown: false }}>
+                {/* Main tabs */}
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-                <Stack.Screen
-                  name="onboarding"
-                  options={{ headerShown: false }}
-                />
+
+                {/* Auth screens */}
+                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+                <Stack.Screen name="login" options={{ headerShown: false }} />
+                <Stack.Screen name="register" options={{ headerShown: false }} />
+                <Stack.Screen name="auth" options={{ headerShown: false }} />
+
+                {/* Profile & Settings */}
+                <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
+                <Stack.Screen name="settings" options={{ headerShown: false }} />
+                <Stack.Screen name="payment" options={{ headerShown: false }} />
+
+                {/* Calendar */}
+                <Stack.Screen name="calendar" options={{ headerShown: false }} />
+
+                {/* Course (nested stack) */}
+                <Stack.Screen name="course" options={{ headerShown: false }} />
+
+                {/* Info (nested stack) */}
+                <Stack.Screen name="info" options={{ headerShown: false }} />
+
+                {/* Tests (nested stack) */}
+                <Stack.Screen name="tests" options={{ headerShown: false }} />
+
+                {/* Not found */}
                 <Stack.Screen name="+not-found" />
               </Stack>
               <Toast />

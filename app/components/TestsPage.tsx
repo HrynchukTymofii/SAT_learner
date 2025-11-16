@@ -228,16 +228,19 @@ const TestsPage = ({
       return () => backHandler.remove();
     }
 
-    const beforeRemoveListener = navigation.addListener(
-      "beforeRemove",
-      (e: any) => {
-        e.preventDefault();
-        handleBack();
-      }
-    );
+    const onBeforeRemove = (e: any) => {
+      e.preventDefault();
+
+      // Remove the listener to avoid recursive firing
+      navigation.removeListener("beforeRemove", onBeforeRemove);
+
+      handleBack();
+    };
+
+    navigation.addListener("beforeRemove", onBeforeRemove);
 
     return () => {
-      beforeRemoveListener();
+      navigation.removeListener("beforeRemove", onBeforeRemove);
     };
   }, []);
 
@@ -298,11 +301,16 @@ const TestsPage = ({
         console.warn("submit failed", e);
       }
     }
-    console.log('Pre router')
-    if(Platform.OS == "android"){
+    //console.log('Pre router')
+    if (router.canGoBack()) {
+      router.back();
+      return; // stop further code
+    }
+    //console.log("Pre router2");
+    if (Platform.OS == "android") {
       router.replace(backUrl as any);
     } else {
-      console.log('do push')
+      //console.log('do push')
       router.push(backUrl as any);
     }
     //console.log('After router')
@@ -796,7 +804,12 @@ const TestsPage = ({
         testTitle={quiz.title}
       />
       <ScrollView
-        contentContainerStyle={{ minHeight: screenHeight, padding: 8 }}
+        contentContainerStyle={{
+          flexGrow: 1,
+          minHeight: screenHeight,
+          alignItems: "center",
+          padding: 8,
+        }}
         showsVerticalScrollIndicator={false}
       >
         <View className="py-2 pt-1 max-w-4xl gap-y-2">

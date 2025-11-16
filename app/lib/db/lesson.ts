@@ -37,5 +37,21 @@ export function useLessonDatabase() {
     }
   }
 
-  return {markLessonCompletedLocal}
+  /**
+   * Get rendered HTML for a lesson
+   */
+  async function getLessonRenderedHtml(lessonId: string): Promise<string | null> {
+    try {
+      const result = await db.getFirstAsync<{ renderedHtml: string }>(
+        `SELECT renderedHtml FROM lessons WHERE id = ?`,
+        [lessonId]
+      );
+      return result?.renderedHtml || null;
+    } catch (error) {
+      console.error("❌ Failed to get lesson HTML:", error);
+      return null;
+    }
+  }
+
+  return { markLessonCompletedLocal, getLessonRenderedHtml };
 }

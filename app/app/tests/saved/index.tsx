@@ -1,17 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { FlatList, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import { Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
 import { useAuth } from "@/context/AuthContext";
-import { fetchSavedQuizzes } from "@/lib/api/quiz"; 
 import { useRouter } from "expo-router";
-import { Button } from "@/~/components/ui/button";
-import { ArrowLeft, Heart, RotateCcw } from "lucide-react-native";
-import TopBlur from "@/components/ui/TobBlur";
-import BottomBlur from "@/components/ui/BottomBlur";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { ArrowLeft, Heart, RotateCcw, Search, X } from "lucide-react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuizDatabase } from "@/lib/db/quiz";
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
-import { LinearGradient } from "expo-linear-gradient";
-import { useColorScheme } from "nativewind";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export interface SavedQuiz {
   id: string;
@@ -26,8 +21,9 @@ export default function SavedQuizzesScreen() {
     const router = useRouter()
     const { token } = useAuth();
     const { fetchSavedQuizzesLocal } = useQuizDatabase();
-    const { colorScheme } = useColorScheme();
+    const colorScheme = useColorScheme();
     const isDark = colorScheme === "dark";
+    const insets = useSafeAreaInsets();
 
     const [quizzes, setQuizzes] = useState<SavedQuiz[]>([]);
     const [loading, setLoading] = useState(true);
@@ -42,7 +38,6 @@ export default function SavedQuizzesScreen() {
     async function loadQuizzes() {
       setLoading(true);
       const res = await fetchSavedQuizzesLocal();
-      //const res = await fetchSavedQuizzes(token!);
       if (res.success) {
         setQuizzes(res.quizzes ?? []);
       } else {
@@ -54,37 +49,24 @@ export default function SavedQuizzesScreen() {
     loadQuizzes();
   }, [token]);
 
-  const bgColor = isDark ? "#0c0c0e" : "#ffffff";
-  const textColor = isDark ? "#f3f4f6" : "#0f172a";
-  const subTextColor = isDark ? "#9ca3af" : "#475569";
-  const inputBg = isDark ? "#1e293b" : "#f8fafc";
-  const inputBorder = isDark ? "#334155" : "#e2e8f0";
-
-  const getCardGradient = (): [string, string] =>
-    isDark ? ["#27272a", "#18181b"] : ["#f9fafb", "#f1f5f9"];
-
   if (loading) {
-    return (
-      <GraduationCap3DLoader />
-    );
+    return <GraduationCap3DLoader />;
   }
 
   const handleQuizClick = (quizId: string) => {
-    //console.log(`/tests/saved/${quizId}`)
     router.push(`/tests/saved/${quizId}` as any);
-  };
-
-  const handleBackToTests = () => {
-    router.push("/tests" as any);
   };
 
   const handleTakeAllSaved = () => {
     router.push("/tests/saved/all" as any);
   };
 
+  const clearSearch = () => {
+    setSearchTerm("");
+  };
+
   const filteredQuizzes = quizzes.filter((quiz) => {
     if (!searchTerm) return true;
-
     return quiz.questions.some((question) =>
       question.question.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -95,228 +77,171 @@ export default function SavedQuizzesScreen() {
     0
   );
 
-  const renderQuizItem = ({ item }: { item: SavedQuiz }) => (
-    <TouchableOpacity
-      onPress={() => handleQuizClick(item.id)}
-      activeOpacity={0.8}
-      style={{
-        marginBottom: 16,
-        borderRadius: 16,
-        overflow: "hidden",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 0.1,
-        shadowRadius: 6,
-        elevation: 4,
-      }}
-    >
-      <LinearGradient
-        colors={getCardGradient()}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={{
-          padding: 16,
-          borderRadius: 16,
-          flexDirection: "row",
-          alignItems: "center",
-          justifyContent: "space-between",
-          borderWidth: 1,
-          borderColor: isDark ? "#3f3f46" : "#e5e7eb",
-        }}
-      >
-        <View style={{ flex: 1, marginRight: 8 }}>
-          <Text
-            style={{
-              fontSize: 16,
-              fontWeight: "600",
-              color: textColor,
-              marginBottom: 4,
-            }}
-            numberOfLines={1}
-          >
-            {item.title}
-          </Text>
-          <Text
-            style={{
-              fontSize: 14,
-              color: subTextColor,
-            }}
-          >
-            {item.savedCount} saved
-          </Text>
-        </View>
-        <Heart size={22} color={isDark ? "#60a5fa" : "#2563eb"} />
-      </LinearGradient>
-    </TouchableOpacity>
-  );
-
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: bgColor,
-        paddingHorizontal: 16,
-        paddingTop: 8,
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
       {/* Header */}
-      <LinearGradient
-        colors={["#3b82f6", "#2563eb"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{
-          borderRadius: 16,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 5,
-          marginBottom: 16,
-          alignSelf: "flex-start",
-        }}
-      >
+      <View style={{
+        paddingTop: insets.top + 12,
+        paddingBottom: 16,
+        paddingHorizontal: 16,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+      }}>
+        {/* Back Button */}
         <TouchableOpacity
-          onPress={() => router.push("/tests")}
+          onPress={() => router.back()}
           style={{
             flexDirection: "row",
             alignItems: "center",
+            marginBottom: 16,
+            alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            borderRadius: 12,
           }}
+          activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
-            Back to modes
+          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+            Back
           </Text>
         </TouchableOpacity>
-      </LinearGradient>
 
-      {/* Title */}
-      <View style={{ marginBottom: 8 }}>
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "800",
-            color: isDark ? "#60a5fa" : "#2563eb",
-            marginBottom: 4,
-          }}
-        >
+        {/* Title */}
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 8 }}>
           Saved Questions
         </Text>
-        <Text
-          style={{
-            color: subTextColor,
-            fontSize: 15,
-          }}
-        >
+        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
           Your saved questions for quick review
         </Text>
+
+        {/* Search Bar */}
+        {/* <View style={{
+          flexDirection: "row",
+          alignItems: "center",
+          backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+          borderRadius: 12,
+          paddingHorizontal: 16,
+          paddingVertical: 6,
+        }}>
+          <Search size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+          <TextInput
+            style={{
+              flex: 1,
+              marginLeft: 12,
+              fontSize: 16,
+              color: isDark ? "#ffffff" : "#1f2937",
+            }}
+            placeholder="Search questions..."
+            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            value={searchTerm}
+            onChangeText={setSearchTerm}
+          />
+          {searchTerm.length > 0 && (
+            <TouchableOpacity
+              activeOpacity={0.7}
+              onPress={clearSearch}
+              style={{ marginLeft: 8 }}
+            >
+              <X size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+            </TouchableOpacity>
+          )}
+        </View> */}
       </View>
 
-      {/* Search */}
-      <TextInput
-        placeholder="Search..."
-        placeholderTextColor={subTextColor}
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-        style={{
-          backgroundColor: inputBg,
-          borderWidth: 1,
-          borderColor: inputBorder,
-          borderRadius: 16,
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          color: textColor,
-          marginBottom: 16,
-          fontSize: 15,
-        }}
-      />
-
-      {/* Take all saved */}
-      {totalSavedQuestions > 0 && (
-        <TouchableOpacity
-          onPress={handleTakeAllSaved}
-          activeOpacity={0.9}
-          style={{
-            marginBottom: 20,
-            borderRadius: 16,
-            overflow: "hidden",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 8,
-            elevation: 5,
-          }}
-        >
-          <LinearGradient
-            colors={["#22c55e", "#16a34a"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
+      {/* Content */}
+      <ScrollView
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Take all saved button */}
+        {totalSavedQuestions > 0 && (
+          <TouchableOpacity
+            onPress={handleTakeAllSaved}
+            activeOpacity={0.7}
             style={{
+              marginBottom: 20,
+              backgroundColor: "#10B981",
+              borderRadius: 16,
+              padding: 16,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              paddingVertical: 14,
-              borderRadius: 16,
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 3,
             }}
           >
-            <RotateCcw size={18} color="#fff" style={{ marginRight: 6 }} />
-            <Text
+            <RotateCcw size={20} color="#ffffff" style={{ marginRight: 8 }} />
+            <Text style={{ color: "#ffffff", fontWeight: "bold", fontSize: 16 }}>
+              Practice All ({totalSavedQuestions} questions)
+            </Text>
+          </TouchableOpacity>
+        )}
+
+        {/* Quiz List */}
+        {filteredQuizzes.length > 0 ? (
+          filteredQuizzes.map((quiz) => (
+            <TouchableOpacity
+              key={quiz.id}
+              onPress={() => handleQuizClick(quiz.id)}
+              activeOpacity={0.7}
               style={{
-                color: "#fff",
-                fontWeight: "600",
-                fontSize: 16,
+                marginBottom: 16,
+                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                borderRadius: 16,
+                padding: 16,
+                borderLeftWidth: 4,
+                borderLeftColor: "#EC4899",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
               }}
             >
-              Take all saved questions ({totalSavedQuestions})
-            </Text>
-          </LinearGradient>
-        </TouchableOpacity>
-      )}
+              {/* Title and Icon */}
+              <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
+                <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
+                  <Heart size={24} color="#EC4899" fill="#EC4899" style={{ marginRight: 12 }} />
+                  <Text
+                    style={{
+                      fontSize: 16,
+                      fontWeight: "bold",
+                      color: isDark ? "#ffffff" : "#1f2937",
+                      flex: 1,
+                    }}
+                    numberOfLines={2}
+                  >
+                    {quiz.title}
+                  </Text>
+                </View>
+              </View>
 
-      {/* List */}
-      {filteredQuizzes.length > 0 ? (
-        <FlatList
-          data={filteredQuizzes}
-          renderItem={renderQuizItem}
-          keyExtractor={(item) => item.id}
-          contentContainerStyle={{ paddingBottom: 40 }}
-        />
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            marginTop: 60,
-          }}
-        >
-          <Heart size={48} color={subTextColor} />
-          <Text
-            style={{
-              marginTop: 12,
-              fontSize: 17,
-              fontWeight: "600",
-              color: subTextColor,
-            }}
-          >
-            {searchTerm ? "No quizzes found" : "No saved questions yet"}
-          </Text>
-          <Text
-            style={{
-              color: subTextColor,
-              textAlign: "center",
-              marginTop: 4,
-              paddingHorizontal: 16,
-            }}
-          >
-            {searchTerm
-              ? "No results match your search."
-              : "Save questions while taking tests for quick access later."}
-          </Text>
-        </View>
-      )}
-    </SafeAreaView>
+              {/* Stats */}
+              <Text style={{ fontSize: 14, color: isDark ? "#94a3b8" : "#6b7280", marginLeft: 36 }}>
+                {quiz.savedCount} saved question{quiz.savedCount > 1 ? 's' : ''}
+              </Text>
+            </TouchableOpacity>
+          ))
+        ) : (
+          <View style={{ alignItems: "center", justifyContent: "center", marginTop: 48 }}>
+            <Heart size={40} color={isDark ? "#9ca3af" : "#6b7280"} />
+            <Text style={{ fontSize: 16, color: isDark ? "#9ca3af" : "#6b7280", marginTop: 8, textAlign: "center" }}>
+              {searchTerm ? `No questions found matching "${searchTerm}"` : "No saved questions yet"}
+            </Text>
+            {!searchTerm && (
+              <Text style={{ fontSize: 14, color: isDark ? "#6b7280" : "#9ca3af", marginTop: 4, textAlign: "center", paddingHorizontal: 32 }}>
+                Save questions while taking tests for quick access later
+              </Text>
+            )}
+          </View>
+        )}
+      </ScrollView>
+    </View>
   );
 }

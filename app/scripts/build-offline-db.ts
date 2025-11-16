@@ -3,6 +3,9 @@ import path from "path";
 import sqlite3 from "sqlite3";
 import axios from "axios";
 import pLimit from "p-limit";
+import { fetchRenderedLessonHtml } from "./render-lesson-html";
+//npx ts-node scripts/build-offline-db.ts
+
 
 const API_BASE_URL = "https://www.satlearner.com";
 
@@ -64,6 +67,7 @@ async function main() {
       id TEXT PRIMARY KEY,
       title TEXT NOT NULL,
       content TEXT,
+      renderedHtml TEXT,
       videoUrl TEXT,
       youTubeVideoUrl TEXT,
       description TEXT,
@@ -129,6 +133,7 @@ async function main() {
       lessonId TEXT NOT NULL,
       completed INTEGER DEFAULT 0,
       synced INTEGER DEFAULT 0,
+      updatedAt TEXT DEFAULT (datetime('now')),
       FOREIGN KEY (lessonId) REFERENCES lessons(id) ON DELETE CASCADE
     )`);
 
@@ -183,13 +188,25 @@ async function main() {
 
     // Insert lessons & sections
     for (const l of c.lessons) {
+      // Fetch and render lesson HTML
+      console.log(`🎨 Rendering lesson: ${l.title} (${l.id})...`);
+      const rendered = await fetchRenderedLessonHtml(c.id, l.id);
+      const renderedHtml = rendered?.combinedHtml || null;
+
+      if (rendered) {
+        console.log(`✅ Successfully rendered HTML for ${l.title}`);
+      } else {
+        console.warn(`⚠️ Failed to render HTML for ${l.title}, will use WebView fallback`);
+      }
+
       await new Promise<void>((resolve, reject) => {
         db.run(
-          `INSERT OR REPLACE INTO lessons VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          `INSERT OR REPLACE INTO lessons VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
             l.id,
             l.title,
             l.content,
+            renderedHtml,
             l.videoUrl,
             l.youTubeVideoUrl,
             l.description,

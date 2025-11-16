@@ -1,29 +1,25 @@
 import { useEffect, useState } from "react";
-import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ScrollView,
   Text,
   View,
   TouchableOpacity,
-  TextInput,
-  ActivityIndicator,
-  useColorScheme,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
 import {
-  Target,
   Trophy,
-  BookOpen,
-  BookCheck,
+  Clock,
+  CheckCircle2,
   ArrowLeft,
   Lock,
+  Target,
+  Calendar,
 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useQuizDatabase } from "@/lib/db/quiz";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 
 type Quiz = {
   id: string;
@@ -40,19 +36,11 @@ export default function TestsByTopicScreen() {
   const router = useRouter();
   const { token, user } = useAuth();
   const [quizzes, setQuizzes] = useState<Quiz[]>([]);
-  const [filtered, setFiltered] = useState<Quiz[]>([]);
-  const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const { fetchExamsLocal } = useQuizDatabase();
-
-  const bgColor = isDark ? "#0f172a" : "#f8fafc";
-  const inputBg = isDark ? "#1e293b" : "#ffffff";
-  const inputBorder = isDark ? "#334155" : "#e5e7eb";
-  const textColor = isDark ? "#f1f5f9" : "#1f2937";
-  const subTextColor = isDark ? "#cbd5e1" : "#6b7280";
 
   useEffect(() => {
     if (!token) router.push("/login");
@@ -65,7 +53,6 @@ export default function TestsByTopicScreen() {
         const res = await fetchExamsLocal();
         if (res.success) {
           setQuizzes(res.quizzes);
-          setFiltered(res.quizzes);
         } else {
           console.warn("Failed to load quizzes:", res.error);
         }
@@ -78,37 +65,9 @@ export default function TestsByTopicScreen() {
     loadQuizzes();
   }, []);
 
-  useEffect(() => {
-    setFiltered(
-      quizzes.filter((q) =>
-        q.title.toLowerCase().includes(search.toLowerCase())
-      )
-    );
-  }, [search, quizzes]);
-
   if (loading) {
-    return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: bgColor,
-        }}
-      >
-        <ActivityIndicator size="large" color="#22d3ee" />
-      </SafeAreaView>
-    );
+    return <GraduationCap3DLoader />;
   }
-
-  const getProgressGradient = (p: number): [string, string] => {
-    // subtle muted gradients
-    if (p >= 80)
-      return isDark ? ["#34d399", "#10b981"] : ["#2ed08b", "#0ea972"]; // green
-    if (p >= 60)
-      return isDark ? ["#fbbf24", "#f59e0b"] : ["#f9b81f", "#f4970b"];
-    return isDark ? ["#1e293b", "#273449"] : ["#f1f5f9", "#e2e8f0"];
-  };
 
   const handlePress = (quizId: string, isLocked: boolean) => {
     if (isLocked) {
@@ -116,171 +75,225 @@ export default function TestsByTopicScreen() {
       return;
     }
     router.push(`/tests/exams/${quizId}` as any);
-  }
+  };
+
+  const getScoreColor = (score: number) => {
+    if (score >= 650) return "#10B981"; // Green
+    if (score >= 550) return "#EAB308"; // Yellow
+    if (score >= 450) return "#F59E0B"; // Orange
+    return "#EF4444"; // Red
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+  };
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: bgColor,
-        paddingBottom: 20,
-        paddingTop: 8,
-      }}
-    >
+    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
       {/* Header */}
-      <LinearGradient
-        colors={["#3b82f6", "#2563eb"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{
-          borderRadius: 16,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 5,
-          marginBottom: 16,
-          alignSelf: "flex-start",
-          marginLeft: 12,
-        }}
-      >
+      <View style={{
+        paddingTop: insets.top + 12,
+        paddingBottom: 16,
+        paddingHorizontal: 16,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+      }}>
+        {/* Back Button */}
         <TouchableOpacity
-          onPress={() => router.push("/tests")}
+          onPress={() => router.back()}
           style={{
             flexDirection: "row",
             alignItems: "center",
+            marginBottom: 16,
+            alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            borderRadius: 12,
           }}
+          activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
-            Back to Exams{" "}
+          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+            Back
           </Text>
         </TouchableOpacity>
-      </LinearGradient>
 
+        {/* Title */}
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 8 }}>
+          SAT Math Exams
+        </Text>
+        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+          Full-length practice tests with 44 questions
+        </Text>
+      </View>
+
+      {/* Content */}
       <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 30 }}
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Page Heading */}
-        <View style={{ marginBottom: 8 }}>
-          <Text
-            style={{
-              fontSize: 28,
-              fontWeight: "800",
-              color: isDark ? "#60a5fa" : "#2563eb",
-              marginBottom: 4,
-            }}
-          >
-            SAT Math Exam
-          </Text>
-          <Text
-            style={{
-              color: subTextColor,
-              fontSize: 15,
-              marginBottom: 8,
-            }}
-          >
-            Here you can take the full test version of the SAT Math exam. It
-            includes 44 questions and is timed, so try to complete it as if it
-            were the real test!
-          </Text>
-        </View>
-        {filtered.length ? (
-          filtered.map((quiz, index) => {
-            const gradientColors = getProgressGradient(quiz.progress);
-            const itemTextColor = quiz.progress >= 60 ? "#ffffff" : textColor;
-
-            const isLocked = !user?.isPro && index > 1 || false;
+        {quizzes.length ? (
+          quizzes.map((quiz, index) => {
+            const isLocked = !user?.isPro && index > 1;
+            const scoreColor = quiz.score ? getScoreColor(quiz.score) : isDark ? "#9ca3af" : "#6b7280";
+            const hasAttempt = quiz.attemptCount > 0;
 
             return (
               <TouchableOpacity
                 key={quiz.id}
                 onPress={() => handlePress(quiz.id, isLocked)}
+                activeOpacity={0.7}
                 style={{
-                  marginBottom: 16,
+                  marginBottom: 20,
+                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
                   borderRadius: 16,
-                  overflow: "hidden",
+                  padding: 20,
+                  borderLeftWidth: 4,
+                  borderLeftColor: hasAttempt ? scoreColor : "#06B6D4",
                   shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 4 },
+                  shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,
                   shadowRadius: 8,
-                  elevation: 5,
+                  elevation: 3,
                 }}
               >
-                <LinearGradient
-                  colors={gradientColors}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 16,
-                    borderRadius: 16,
-                  }}
-                >
-                  <BookCheck
-                    size={28}
-                    color={itemTextColor}
-                    style={{ marginRight: 12 }}
-                  />
+                {/* Title and Lock */}
+                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 16 }}>
                   <View style={{ flex: 1 }}>
-                    <View className="flex flex-row items-center justify-between">
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontWeight: "600",
-                          color: itemTextColor,
-                          marginBottom: 4,
-                        }}
-                      >
-                        {quiz.title}
-                      </Text>
-                      {isLocked && <Lock size={16} color="#2563eb" style={{ marginLeft: 8 }} />}
-                    </View>
-                    <View
+                    <Text
                       style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
+                        fontSize: 18,
+                        fontWeight: "bold",
+                        color: isDark ? "#ffffff" : "#1f2937",
+                        marginBottom: 4,
                       }}
                     >
-                      <Text style={{ fontSize: 14, color: itemTextColor }}>
-                        Questions: {quiz.questionCount}
+                      {quiz.title}
+                    </Text>
+                    {hasAttempt && (
+                      <Text style={{ fontSize: 12, color: isDark ? "#9ca3af" : "#6b7280" }}>
+                        {quiz.attemptCount} attempt{quiz.attemptCount > 1 ? 's' : ''}
                       </Text>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          fontWeight: "600",
-                          color: itemTextColor,
-                        }}
-                      >
-                        {quiz.progress}%
+                    )}
+                  </View>
+                  {isLocked && (
+                    <Lock size={20} color="#2563eb" style={{ marginLeft: 12 }} />
+                  )}
+                </View>
+
+                {/* Stats Grid */}
+                {hasAttempt ? (
+                  <>
+                    {/* SAT Score */}
+                    <View style={{
+                      backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                      borderRadius: 12,
+                      padding: 16,
+                      marginBottom: 12,
+                      borderWidth: 1,
+                      borderColor: scoreColor,
+                    }}>
+                      <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
+                        <Trophy size={20} color={scoreColor} style={{ marginRight: 8 }} />
+                        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", fontWeight: "600" }}>
+                          SAT Score
+                        </Text>
+                      </View>
+                      <Text style={{ fontSize: 32, fontWeight: "bold", color: scoreColor }}>
+                        {quiz.score}
+                      </Text>
+                      <Text style={{ fontSize: 12, color: isDark ? "#6b7280" : "#9ca3af", marginTop: 4 }}>
+                        out of 800
                       </Text>
                     </View>
+
+                    {/* Stats Row */}
+                    <View style={{ flexDirection: "row", gap: 12, marginBottom: 12 }}>
+                      {/* Correct Answers */}
+                      <View style={{
+                        flex: 1,
+                        backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                        borderRadius: 12,
+                        padding: 12,
+                      }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 6 }}>
+                          <CheckCircle2 size={16} color="#10B981" style={{ marginRight: 6 }} />
+                          <Text style={{ fontSize: 12, color: isDark ? "#9ca3af" : "#6b7280" }}>
+                            Correct
+                          </Text>
+                        </View>
+                        <Text style={{ fontSize: 20, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937" }}>
+                          {Math.round((quiz.progress / 100) * quiz.questionCount)}
+                        </Text>
+                        <Text style={{ fontSize: 11, color: isDark ? "#6b7280" : "#9ca3af" }}>
+                          of {quiz.questionCount}
+                        </Text>
+                      </View>
+
+                      {/* Accuracy */}
+                      <View style={{
+                        flex: 1,
+                        backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                        borderRadius: 12,
+                        padding: 12,
+                      }}>
+                        <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 6 }}>
+                          <Target size={16} color="#06B6D4" style={{ marginRight: 6 }} />
+                          <Text style={{ fontSize: 12, color: isDark ? "#9ca3af" : "#6b7280" }}>
+                            Accuracy
+                          </Text>
+                        </View>
+                        <Text style={{ fontSize: 20, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937" }}>
+                          {quiz.progress}%
+                        </Text>
+                        <Text style={{ fontSize: 11, color: isDark ? "#6b7280" : "#9ca3af" }}>
+                          {quiz.progress >= 80 ? 'Excellent' : quiz.progress >= 60 ? 'Good' : 'Practice'}
+                        </Text>
+                      </View>
+                    </View>
+
+                    {/* Last Attempt */}
+                    {quiz.lastAttempt && (
+                      <View style={{ flexDirection: "row", alignItems: "center", paddingTop: 12, borderTopWidth: 1, borderTopColor: isDark ? "#334155" : "#e5e7eb" }}>
+                        <Calendar size={14} color={isDark ? "#9ca3af" : "#6b7280"} style={{ marginRight: 6 }} />
+                        <Text style={{ fontSize: 12, color: isDark ? "#9ca3af" : "#6b7280" }}>
+                          Last attempt: {formatDate(quiz.lastAttempt)}
+                        </Text>
+                      </View>
+                    )}
+                  </>
+                ) : (
+                  <View style={{
+                    backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                    borderRadius: 12,
+                    padding: 16,
+                    alignItems: "center",
+                  }}>
+                    <Clock size={32} color={isDark ? "#06B6D4" : "#0891B2"} style={{ marginBottom: 12 }} />
+                    <Text style={{ fontSize: 16, fontWeight: "600", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 4 }}>
+                      Not Started
+                    </Text>
+                    <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", textAlign: "center" }}>
+                      {quiz.questionCount} questions · ~70 minutes
+                    </Text>
                   </View>
-                </LinearGradient>
+                )}
               </TouchableOpacity>
             );
           })
         ) : (
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: 50,
-            }}
-          >
-            <BookOpen size={40} color={subTextColor} />
-            <Text style={{ fontSize: 16, color: subTextColor, marginTop: 8 }}>
-              {search ? "No topics found" : "No available topics"}
+          <View style={{ alignItems: "center", justifyContent: "center", marginTop: 48 }}>
+            <Target size={40} color={isDark ? "#9ca3af" : "#6b7280"} />
+            <Text style={{ fontSize: 16, color: isDark ? "#9ca3af" : "#6b7280", marginTop: 8, textAlign: "center" }}>
+              No exams available
             </Text>
           </View>
         )}
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

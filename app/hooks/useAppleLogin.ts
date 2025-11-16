@@ -42,7 +42,7 @@ export async function handleAppleLogin({
         loadUserInBackground({token:data.token, setUser, forceSync: true});
         router.replace(safeReturnUrl as any);
       } else {
-        Toast.show({ type: "error", text1: "Apple вхід не вдався" });
+        Toast.show({ type: "error", text1: "Apple login failed" });
       }
     }
   } catch (e: any) {
@@ -52,8 +52,8 @@ export async function handleAppleLogin({
       console.error("[Apple Login Error]", e);
       Toast.show({
         type: "error",
-        text1: "Apple вхід не вдався",
-        text2: e.message || "Помилка",
+        text1: "Apple login failed",
+        text2: e.message || "Error",
       });
     }
   }

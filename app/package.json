@@ -78,8 +78,10 @@
   },
   "devDependencies": {
     "@babel/core": "^7.25.2",
+    "@types/cheerio": "^0.22.35",
     "@types/react": "19.1.10",
     "@types/sqlite3": "^3.1.11",
+    "cheerio": "^1.1.2",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~10.0.0",
     "prettier-plugin-tailwindcss": "^0.5.14",

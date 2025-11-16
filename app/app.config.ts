@@ -14,11 +14,12 @@ const config: ExpoConfig = {
     supportsTablet: true,
     bundleIdentifier: "com.hrynchuk.satprepapp",
     buildNumber: "1",
-    icon: {
-      light: "./assets/images/ios-light.png",
-      dark: "./assets/images/ios-dark.png",
-      tinted: "./assets/images/ios-tinted.png",
-    },
+    icon: "./assets/images/ios-light.png",
+    // {
+    //   light: "./assets/images/ios-light.png",
+    //   dark: "./assets/images/ios-dark.png",
+    //   tinted: "./assets/images/ios-tinted.png",
+    // },
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -45,14 +46,10 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "./assets/images/splash-icon-dark.png",
+        image: "./assets/images/splash-icon-light.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#f8fafc",
-        dark: {
-          image: "./assets/images/splash-icon-light.png",
-          backgroundColor: "#0f172a",
-        },
+        backgroundColor: "#06b6d4",
       },
     ],
     "expo-secure-store",
@@ -81,13 +78,9 @@ const config: ExpoConfig = {
   },
 
   splash: {
-    image: "./assets/images/splash-icon-dark.png",
+    image: "./assets/images/splash-icon-light.png",
     resizeMode: "contain",
-    backgroundColor: "#f8fafc",
-    dark: {
-      image: "./assets/images/splash-icon-light.png",
-      backgroundColor: "#0f172a", 
-    },
+    backgroundColor: "#06b6d4",
   },
 };
 

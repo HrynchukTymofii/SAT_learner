@@ -6,18 +6,16 @@ import {
   ScrollView,
   Platform,
 } from "react-native";
-import { useColorScheme } from "nativewind";
 import { useState, useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
-import { ArrowLeft, User } from "lucide-react-native";
-import TopBlur from "@/components/ui/TobBlur";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { ArrowLeft } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
 import { updateUser } from "@/lib/api/user";
 import Toast from "react-native-toast-message";
-import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
 import DateTimePicker from "@react-native-community/datetimepicker";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 const passionsList = [
   "Science",
@@ -49,30 +47,18 @@ const steps = [
     key: "satDate",
   },
   { type: "avatar", title: "Pick an avatar", key: "avatar" },
-  {
-    type: "select",
-    title: "Most difficult part for you?",
-    options: ["Math", "Reading", "Writing", "Time management"],
-    key: "difficulty",
-  },
   { type: "passionSelect", title: "What's your passion?", key: "passion" },
 ];
 
 export default function EditProfileScreen() {
   const router = useRouter();
   const { token, user, setUser } = useAuth();
-  const { colorScheme } = useColorScheme() as {
-    colorScheme: "light" | "dark";
-    setColorScheme: any;
-  };
+  const insets = useSafeAreaInsets();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [showDatePicker, setShowDatePicker] = useState(false);
-
-  const inputBg = colorScheme === "dark" ? "#1e293b" : "#f1f5f9";
-  const inputText = colorScheme === "dark" ? "#f1f5f9" : "#1f2937";
-  const placeholderText = colorScheme === "dark" ? "#9ca3af" : "#6b7280";
-  const sectionTitle = colorScheme === "dark" ? "#f1f5f9" : "#1f2937";
 
   // Load stored answers
   useEffect(() => {
@@ -110,65 +96,59 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <SafeAreaView className="flex-1 bg-[#f8fafc] dark:bg-[#0f172a]">
-      {colorScheme !== "dark" && <TopBlur />}
-
-      {/* Back Button */}
-     <LinearGradient
-        colors={["#3b82f6", "#2563eb"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{
-          borderRadius: 16,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 5,
-          alignSelf: "flex-start",
-          marginLeft: 8,
-          marginVertical: 12
-        }}
-      >
+    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+      {/* Header */}
+      <View style={{
+        paddingTop: insets.top + 12,
+        paddingBottom: 16,
+        paddingHorizontal: 16,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        borderBottomWidth: 1,
+        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+      }}>
+        {/* Back Button */}
         <TouchableOpacity
-          onPress={() => router.push("/profile")}
+          onPress={() => router.back()}
           style={{
             flexDirection: "row",
             alignItems: "center",
+            marginBottom: 16,
+            alignSelf: "flex-start",
             paddingHorizontal: 12,
-            paddingVertical: 6,
+            paddingVertical: 8,
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            borderRadius: 12,
           }}
+          activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
+          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
             Back
           </Text>
         </TouchableOpacity>
-      </LinearGradient>
 
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 12 }}
-      >
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "800",
-            color: colorScheme === "dark" ? "#60a5fa" : "#2563eb",
-            marginBottom: 16,
-          }}
-        >
+        {/* Title */}
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 4 }}>
           Edit Profile
         </Text>
+        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+          Update your account information
+        </Text>
+      </View>
 
+      {/* Content */}
+      <ScrollView
+        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
+        showsVerticalScrollIndicator={false}
+      >
         {steps.map((step) => (
-          <View key={step.key} className="mb-6">
+          <View key={step.key} style={{ marginBottom: 20 }}>
             <Text
               style={{
                 fontSize: 16,
                 fontWeight: "600",
-                color: sectionTitle,
-                marginBottom: 6,
+                color: isDark ? "#ffffff" : "#1f2937",
+                marginBottom: 8,
               }}
             >
               {step.title}
@@ -177,17 +157,20 @@ export default function EditProfileScreen() {
             {/* Text Input */}
             {step.type === "text" && (
               <TextInput
-                className="rounded-xl px-3 py-2 text-base"
                 placeholder="Enter..."
                 value={answers[step.key]}
                 onChangeText={(text) => handleAnswer(step.key, text)}
                 style={{
-                  backgroundColor: inputBg,
-                  color: inputText,
-                  borderColor: colorScheme === "dark" ? "#334155" : "#e2e8f0",
+                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  color: isDark ? "#ffffff" : "#1f2937",
+                  borderColor: isDark ? "#334155" : "#e5e7eb",
                   borderWidth: 1,
+                  borderRadius: 12,
+                  paddingHorizontal: 16,
+                  paddingVertical: 12,
+                  fontSize: 16,
                 }}
-                placeholderTextColor={placeholderText}
+                placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
               />
             )}
 
@@ -195,30 +178,34 @@ export default function EditProfileScreen() {
             {step.type === "select" && (
               <View
                 style={{
-                  backgroundColor: inputBg,
-                  borderRadius: 16,
+                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  borderRadius: 12,
                   padding: 12,
+                  borderWidth: 1,
+                  borderColor: isDark ? "#334155" : "#e5e7eb",
                 }}
               >
                 {step.options?.map((option) => (
                   <TouchableOpacity
                     key={option}
                     style={{
-                      paddingVertical: 8,
-                      paddingHorizontal: 12,
-                      borderRadius: 12,
-                      marginBottom: 6,
+                      paddingVertical: 12,
+                      paddingHorizontal: 16,
+                      borderRadius: 8,
+                      marginBottom: 8,
                       backgroundColor:
                         answers[step.key] === option
-                          ? "#3b82f6"
+                          ? "#06B6D4"
                           : "transparent",
                     }}
                     onPress={() => handleAnswer(step.key, option)}
+                    activeOpacity={0.7}
                   >
                     <Text
                       style={{
                         color:
-                          answers[step.key] === option ? "#fff" : inputText,
+                          answers[step.key] === option ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                        fontWeight: answers[step.key] === option ? "600" : "400",
                       }}
                     >
                       {option}
@@ -230,14 +217,21 @@ export default function EditProfileScreen() {
 
             {/* Avatar Picker */}
             {step.type === "avatar" && (
-              <View className="flex-row items-center gap-8 mb-2">
+              <View style={{ flexDirection: "row", alignItems: "center", gap: 16 }}>
                 {["👩‍🎓", "🧑‍🎓", "🎓"].map((emoji) => (
                   <TouchableOpacity
                     key={emoji}
-                    className={`p-4 px-5 rounded-full border-2 ${answers[step.key] === emoji ? "border-yellow-400 bg-white/30" : "border-white/40"}`}
+                    style={{
+                      padding: 16,
+                      borderRadius: 16,
+                      borderWidth: 3,
+                      borderColor: answers[step.key] === emoji ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
+                      backgroundColor: answers[step.key] === emoji ? "#06B6D410" : (isDark ? "#1e293b" : "#ffffff"),
+                    }}
                     onPress={() => handleAnswer(step.key, emoji)}
+                    activeOpacity={0.7}
                   >
-                    <Text style={{ fontSize: 36 }}>{emoji}</Text>
+                    <Text style={{ fontSize: 40 }}>{emoji}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -245,12 +239,22 @@ export default function EditProfileScreen() {
 
             {/* Date Picker */}
             {step.type === "timepicker" && (
-              <View className="items-center">
+              <View>
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(true)}
-                  className="bg-white/20 border border-white/30 p-4 rounded-xl mb-4"
+                  style={{
+                    backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                    borderWidth: 1,
+                    borderColor: isDark ? "#334155" : "#e5e7eb",
+                    padding: 16,
+                    borderRadius: 12,
+                  }}
+                  activeOpacity={0.7}
                 >
-                  <Text className="text-white text-center">
+                  <Text style={{
+                    color: answers[step.key] ? (isDark ? "#ffffff" : "#1f2937") : (isDark ? "#6b7280" : "#9ca3af"),
+                    fontSize: 16,
+                  }}>
                     {answers[step.key]
                       ? `📅 ${answers[step.key]}`
                       : "Select your exam date"}
@@ -277,23 +281,26 @@ export default function EditProfileScreen() {
 
             {/* Passion Input */}
             {step.type === "passionSelect" && (
-              <View className="flex flex-wrap flex-row justify-center gap-3 mb-6">
+              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
                 {passionsList.map((p) => (
                   <TouchableOpacity
                     key={p}
                     onPress={() => handleAnswer(step.key, p)}
-                    className={`px-4 py-2 rounded-full ${
-                      answers[step.key] === p
-                        ? "bg-white"
-                        : "bg-white/20 border border-white/30"
-                    }`}
+                    style={{
+                      paddingHorizontal: 16,
+                      paddingVertical: 8,
+                      borderRadius: 20,
+                      backgroundColor: answers[step.key] === p ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
+                      borderWidth: 1,
+                      borderColor: answers[step.key] === p ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
+                    }}
+                    activeOpacity={0.7}
                   >
                     <Text
-                      className={`${
-                        answers[step.key] === p
-                          ? "text-blue-600 font-bold"
-                          : "text-white"
-                      }`}
+                      style={{
+                        color: answers[step.key] === p ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                        fontWeight: answers[step.key] === p ? "600" : "400",
+                      }}
                     >
                       {p}
                     </Text>
@@ -305,28 +312,27 @@ export default function EditProfileScreen() {
         ))}
 
         {/* Save Button */}
-        <LinearGradient
-          colors={["#3b82f6", "#2563eb"]}
-          start={[0, 0]}
-          end={[1, 1]}
-          style={{ borderRadius: 16, overflow: "hidden" }}
+        <TouchableOpacity
+          onPress={handleSave}
+          style={{
+            backgroundColor: "#06B6D4",
+            borderRadius: 12,
+            paddingVertical: 16,
+            alignItems: "center",
+            marginTop: 8,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.1,
+            shadowRadius: 4,
+            elevation: 3,
+          }}
+          activeOpacity={0.8}
         >
-          <TouchableOpacity
-            onPress={handleSave}
-            style={{
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-              paddingVertical: 12,
-            }}
-            activeOpacity={0.9}
-          >
-            <Text style={{ color: "#fff", fontWeight: "600", fontSize: 16 }}>
-              Save Changes
-            </Text>
-          </TouchableOpacity>
-        </LinearGradient>
+          <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 16 }}>
+            Save Changes
+          </Text>
+        </TouchableOpacity>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }

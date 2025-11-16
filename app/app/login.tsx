@@ -8,29 +8,25 @@ import {
   KeyboardAvoidingView,
   Platform,
   Image,
+  ActivityIndicator,
 } from "react-native";
-import Constants from "expo-constants";
-import { useAuth, UserType } from "../context/AuthContext";
-import { LinearGradient } from "expo-linear-gradient";
+import { useAuth } from "../context/AuthContext";
 import { router } from "expo-router";
-import { makeRedirectUri } from "expo-auth-session";
 import { useSearchParams } from "expo-router/build/hooks";
 import Toast from "react-native-toast-message";
-import { MotiView, MotiText } from "moti";
 import * as SecureStore from "expo-secure-store";
-
 import {
   GoogleSignin,
   isErrorWithCode,
   isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { getUserData } from "@/lib/api/user";
-import { ArrowLeft, Home } from "lucide-react-native";
+import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
 import { AppleLoginButton } from "@/components/AppleLoginButton";
 import { handleAppleLogin } from "@/hooks/useAppleLogin";
 import { useLoadUserInBackground } from "@/lib/user";
 
+// Configure Google Sign-In
 GoogleSignin.configure({
   webClientId:
     "329617813146-lmmck18chg6mfgci5i4iddtialht09ij.apps.googleusercontent.com",
@@ -40,41 +36,37 @@ GoogleSignin.configure({
     "329617813146-3o5aq7gfvejqoi3mudiar02tl4urhivu.apps.googleusercontent.com",
 });
 
-export default function LoginRegisterScreen() {
+export default function AuthScreen() {
   const params = useSearchParams();
-  const [tab, setTab] = useState<"login" | "register">("login");
+  const [mode, setMode] = useState<"login" | "register">("login");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
+  const [agreeToTerms, setAgreeToTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [googleLoading, setGoogleLoading] = useState(false);
   const { setToken, setUser } = useAuth();
-  const {loadUserInBackground} = useLoadUserInBackground()
-
-  useEffect(() => {
-    const requestedTab = params.get("tab");
-    if (requestedTab === "register" || requestedTab === "login") {
-      setTab(requestedTab);
-    }
-  }, []);
+  const { loadUserInBackground } = useLoadUserInBackground();
 
   const returnUrl = params.get("returnUrl");
-
   const safeReturnUrl =
     typeof returnUrl === "string" && returnUrl.startsWith("/")
       ? returnUrl
       : "/";
 
-  const { webClientId } = Constants.expoConfig?.extra || {};
-
-  const redirectUri = makeRedirectUri();
-
+  // Check if initial mode is set via params
   useEffect(() => {
-    GoogleSignin.configure({ webClientId });
+    const tab = params.get("tab");
+    if (tab === "register" || tab === "login") {
+      setMode(tab);
+    }
   }, []);
 
+  // Load name from onboarding data for register mode
   useEffect(() => {
     const loadOnboardingData = async () => {
-      if (tab === "register") {
+      if (mode === "register") {
         try {
           const stored = await SecureStore.getItemAsync("onboardingAnswers");
           if (stored) {
@@ -94,9 +86,11 @@ export default function LoginRegisterScreen() {
       }
     };
     loadOnboardingData();
-  }, [tab]);
+  }, [mode]);
 
-  const handleGoogleLogin = async () => {
+  const handleGoogleAuth = async () => {
+    if (googleLoading) return;
+    setGoogleLoading(true);
     try {
       await GoogleSignin.hasPlayServices();
       const response = await GoogleSignin.signIn();
@@ -114,19 +108,25 @@ export default function LoginRegisterScreen() {
           const data = await res.json();
           if (data.token) {
             setToken(data.token);
-            const onboarding = await SecureStore.getItemAsync("onboardingCompleted");
+            const onboarding = await SecureStore.getItemAsync(
+              "onboardingCompleted"
+            );
             if (onboarding !== "true") {
               await SecureStore.setItemAsync("onboardingCompleted", "true");
             }
             Toast.show({
               type: "success",
-              text1: "Login successful",
-              text2: "Welcome back!",
+              text1: mode === "login" ? "Login successful" : "Sign up successful",
+              text2: mode === "login" ? "Welcome back!" : "Welcome to SAT Math Learner!",
               position: "top",
               visibilityTime: 700,
             });
             router.replace(safeReturnUrl as any);
-            loadUserInBackground({ token: data.token, setUser, forceSync: true });
+            loadUserInBackground({
+              token: data.token,
+              setUser,
+              forceSync: true,
+            });
           } else {
             Toast.show({
               type: "error",
@@ -141,7 +141,7 @@ export default function LoginRegisterScreen() {
       if (isErrorWithCode(err)) {
         switch (err.code) {
           case statusCodes.IN_PROGRESS:
-            Toast.show({ type: "info", text1: "Google login in progress" });
+            Toast.show({ type: "info", text1: "Google authentication in progress" });
             break;
           case statusCodes.PLAY_SERVICES_NOT_AVAILABLE:
             Toast.show({
@@ -152,46 +152,55 @@ export default function LoginRegisterScreen() {
           default:
             Toast.show({
               type: "error",
-              text1: "Google login failed",
+              text1: "Google authentication failed",
               text2: err.message || "Error",
             });
         }
       }
+    } finally {
+      setGoogleLoading(false);
     }
   };
 
   const handleEmailAuth = async () => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const passwordRegex = /^.{4,}$/;
+    if (loading) return;
 
+    // Validation for register mode
+    if (mode === "register" && !agreeToTerms) {
+      Toast.show({
+        type: "error",
+        text1: "Terms & Conditions",
+        text2: "Please agree to the Terms & Conditions",
+      });
+      return;
+    }
+
+    setLoading(true);
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       Toast.show({
         type: "error",
         text1: "Invalid email",
         text2: "Please enter a valid email address",
       });
+      setLoading(false);
       return;
     }
 
-    if (!passwordRegex.test(password)) {
+    if (password.length < 4) {
       Toast.show({
         type: "error",
         text1: "Invalid password",
-        text2: "Password must contain at least 4 digits",
+        text2: "Password must be at least 4 characters",
       });
+      setLoading(false);
       return;
     }
 
-    if (tab === "register" && password !== confirm) {
-      Toast.show({
-        type: "error",
-        text1: "Error",
-        text2: "Passwords do not match",
-      });
-      return;
-    }
     try {
-      if (tab === "register") {
+      // Register first if in register mode
+      if (mode === "register") {
         const registerRes = await fetch(
           `https://www.satlearner.com/api/auth/register`,
           {
@@ -200,6 +209,7 @@ export default function LoginRegisterScreen() {
             body: JSON.stringify({ name, email, password }),
           }
         );
+
         if (!registerRes.ok) {
           const errText = await registerRes.text();
           Toast.show({
@@ -207,9 +217,12 @@ export default function LoginRegisterScreen() {
             text1: "Registration failed",
             text2: errText,
           });
+          setLoading(false);
           return;
         }
       }
+
+      // Login
       const loginRes = await fetch(
         "https://www.satlearner.com/api/auth/login",
         {
@@ -218,6 +231,7 @@ export default function LoginRegisterScreen() {
           body: JSON.stringify({ email, password }),
         }
       );
+
       if (!loginRes.ok) {
         const errData = await loginRes.json().catch(() => ({}));
         const errText = errData.error || "Unknown error";
@@ -231,11 +245,11 @@ export default function LoginRegisterScreen() {
         } else {
           Toast.show({
             type: "error",
-            text1: "Login failed",
+            text1: mode === "login" ? "Login failed" : "Authentication failed",
             text2: errText,
           });
         }
-
+        setLoading(false);
         return;
       }
 
@@ -243,10 +257,20 @@ export default function LoginRegisterScreen() {
       if (data.token) {
         await setToken(data.token);
 
-        const onboarding = await SecureStore.getItemAsync("onboardingCompleted");
+        const onboarding = await SecureStore.getItemAsync(
+          "onboardingCompleted"
+        );
         if (onboarding !== "true") {
           await SecureStore.setItemAsync("onboardingCompleted", "true");
         }
+
+        Toast.show({
+          type: "success",
+          text1: mode === "login" ? "Login successful" : "Registration successful",
+          text2: mode === "login" ? "Welcome back!" : "Welcome to SAT Math Learner!",
+          position: "top",
+          visibilityTime: 700,
+        });
 
         router.replace(safeReturnUrl as any);
         loadUserInBackground({ token: data.token, setUser, forceSync: true });
@@ -263,187 +287,210 @@ export default function LoginRegisterScreen() {
         text1: "Error",
         text2: err.message || "Something went wrong",
       });
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
     <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "padding"}
-      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      className="flex-1 bg-white dark:bg-gray-900"
     >
-      {/* Full-screen background gradient */}
-      <LinearGradient
-        colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{ flex: 1 }}
+      <ScrollView
+        contentContainerStyle={{ flexGrow: 1 }}
+        keyboardShouldPersistTaps="handled"
+        bounces={false}
       >
-        <ScrollView
-          contentContainerStyle={{
-            flexGrow: 1,
-            justifyContent: "center",
-            paddingBottom: 40,
-          }}
-          keyboardShouldPersistTaps="handled"
-        >
-          <View className="absolute top-12 left-6 z-10 flex-row items-center gap-4">
-            <TouchableOpacity
-              onPress={() => router.push("/")}
-              activeOpacity={0.8}
-              className="flex-row items-center bg-white/20 px-4 py-2 rounded-full border border-white/30"
-            >
-              <ArrowLeft size={16} color="white" />
-              <Text className="text-white ml-2 font-medium">Back to Home</Text>
-            </TouchableOpacity>
-          </View>
-          {/* Header text */}
-          <MotiView
-            className="px-6 pt-8 pb-6"
-            from={{ opacity: 0, translateY: -20 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 700 }}
+        {/* Header with Back Button */}
+        <View className="pt-12 pl-6 pb-6">
+          <TouchableOpacity
+            onPress={() => router.back()}
+            activeOpacity={0.7}
+            className="mb-6"
           >
-            <MotiText className="text-white text-4xl font-extrabold text-center mb-2">
-              {tab === "login" ? "Welcome Back" : "Create Account"}
-            </MotiText>
-            <Text className="text-white/80 text-center text-sm">
-              {tab === "login"
-                ? "Log in to continue your learning"
-                : "Sign up to start preparing"}
-            </Text>
-          </MotiView>
-          {/* Form Card (Glass style) */}
-          <MotiView
-            from={{ opacity: 0, translateY: 40 }}
-            animate={{ opacity: 1, translateY: 0 }}
-            transition={{ type: "timing", duration: 600, delay: 300 }}
-            className="mx-4 p-6 rounded-3xl bg-[#3b82f6]/80 backdrop-blur-md shadow-lg"
-          >
-            {/* Toggle */}
-            <View className="flex-row bg-white/20 rounded-2xl overflow-hidden mb-5">
-              {["login", "register"].map((mode) => {
-                const active = tab === mode;
-                return (
-                  <TouchableOpacity
-                    key={mode}
-                    onPress={() => setTab(mode as any)}
-                    className="flex-1 py-3 relative items-center justify-center"
-                  >
-                    {active && (
-                      <LinearGradient
-                        colors={["#f59e0b", "#fbbf24"]}
-                        start={{ x: 0, y: 0 }}
-                        end={{ x: 1, y: 1 }}
-                        style={{
-                          position: "absolute",
-                          top: 0,
-                          right: 0,
-                          bottom: 0,
-                          left: 0,
-                          borderRadius: 16, // rounded-2xl
-                        }}
-                      />
-                    )}
-                    <Text
-                      className={`font-semibold text-lg ${
-                        active ? "text-white" : "text-white/70"
-                      }`}
-                    >
-                      {mode === "login" ? "Login" : "Register"}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+            <ArrowLeft size={24} color="#06B6D4" />
+          </TouchableOpacity>
 
-            {/* Email */}
-            <View className="mb-4">
-              <Text className="text-white/90 mb-1">Email</Text>
+          <Text className="text-4xl font-bold text-gray-900 dark:text-white">
+            {mode === "login" ? "Welcome Back! 👋" : "Start Your Journey ✨"}
+          </Text>
+          <Text className="text-gray-600 dark:text-gray-300 mt-3 pr-6 leading-6">
+            {mode === "login"
+              ? "Continue your SAT Math preparation and ace your exam"
+              : "Join thousands of students mastering SAT Math. Sign up to get started"}
+          </Text>
+        </View>
+
+        {/* Form Container */}
+        <View className="px-6 flex-1">
+          {/* Email Input */}
+          <View className="mb-4">
+            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Email</Text>
+            <View className="flex-row items-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2">
+              <Mail size={20} color="#06B6D4" />
               <TextInput
-                className="rounded-2xl px-4 py-3 bg-white/20 text-white"
-                placeholder="Enter your email"
-                placeholderTextColor="rgba(255,255,255,0.7)"
+                className="flex-1 ml-3 text-gray-900 dark:text-white"
+                placeholder="Your email"
+                placeholderTextColor="#9CA3AF"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
                 autoCapitalize="none"
+                autoCorrect={false}
               />
             </View>
+          </View>
 
-            {/* Password */}
-            <View className="mb-4">
-              <Text className="text-white/90 mb-1">Password</Text>
+          {/* Password Input */}
+          <View className="mb-4">
+            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Password</Text>
+            <View className="flex-row items-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2">
+              <Lock size={20} color="#06B6D4" />
               <TextInput
-                className="rounded-2xl px-4 py-3 bg-white/20 text-white"
-                placeholder="Enter your password"
-                placeholderTextColor="rgba(255,255,255,0.7)"
-                secureTextEntry
+                className="flex-1 ml-3 text-gray-900 dark:text-white"
+                placeholder="Your password"
+                placeholderTextColor="#9CA3AF"
+                secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
               />
-            </View>
-
-            {/* Confirm */}
-            {tab === "register" && (
-              <View className="mb-6">
-                <Text className="text-white/90 mb-1">Confirm Password</Text>
-                <TextInput
-                  className="rounded-2xl px-4 py-3 bg-white/20 text-white"
-                  placeholder="Confirm password"
-                  placeholderTextColor="rgba(255,255,255,0.7)"
-                  secureTextEntry
-                  value={confirm}
-                  onChangeText={setConfirm}
-                />
-              </View>
-            )}
-
-            {/* Submit */}
-            <TouchableOpacity
-              onPress={handleEmailAuth}
-              className="rounded-2xl overflow-hidden shadow-lg mt-2"
-            >
-              <LinearGradient
-                colors={["#f59e0b", "#fbbf24"]}
-                start={[0, 0]}
-                end={[1, 1]}
-                style={{ paddingVertical: 12 }}
+              <TouchableOpacity
+                onPress={() => setShowPassword(!showPassword)}
+                activeOpacity={0.7}
               >
-                <Text className="text-center text-white font-semibold text-base">
-                  {tab === "login" ? "Login" : "Register"}
+                {showPassword ? (
+                  <EyeOff size={20} color="#06B6D4" />
+                ) : (
+                  <Eye size={20} color="#06B6D4" />
+                )}
+              </TouchableOpacity>
+            </View>
+          </View>
+
+          {/* Remember Me & Forgot Password (Login Mode) */}
+          {/* {mode === "login" && (
+            <View className="flex-row justify-between items-center mb-6">
+              <TouchableOpacity
+                onPress={() => {
+                }}
+                activeOpacity={0.7}
+              >
+                <Text className="text-cyan-500 font-medium">
+                  Forgot Password?
                 </Text>
-              </LinearGradient>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+          )} */}
 
-            {/* Divider */}
-            <Text className="text-white/70 text-center my-5">or</Text>
+          {/* Terms & Conditions (Register Mode) */}
+          {mode === "register" && (
+            <View className="flex-row items-start mb-6">
+              <TouchableOpacity
+                onPress={() => setAgreeToTerms(!agreeToTerms)}
+                activeOpacity={0.7}
+                className="mr-3 mt-0.5"
+              >
+                <View
+                  className={`w-5 h-5 rounded border-2 items-center justify-center ${
+                    agreeToTerms
+                      ? "bg-cyan-500 border-cyan-500"
+                      : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
+                  }`}
+                >
+                  {agreeToTerms && <Text className="text-white text-xs">✓</Text>}
+                </View>
+              </TouchableOpacity>
+              <Text className="flex-1 text-gray-700 dark:text-gray-300 text-sm">
+                I agree to SAT Math Learner{" "}
+                <Text className="text-cyan-500 dark:text-cyan-400 font-medium">
+                  Terms & Conditions
+                </Text>
+                .
+              </Text>
+            </View>
+          )}
 
-            {/* Google */}
+          {/* Submit Button */}
+          <TouchableOpacity
+            onPress={handleEmailAuth}
+            disabled={loading}
+            activeOpacity={0.8}
+            className="bg-cyan-500 rounded-full py-4 items-center justify-center mb-6"
+          >
+            {loading ? (
+              <ActivityIndicator color="#ffffff" />
+            ) : (
+              <Text className="text-white font-semibold text-base">
+                {mode === "login" ? "Sign in" : "Sign up"}
+              </Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Divider */}
+          <View className="flex-row items-center mb-6">
+            <View className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+            <Text className="mx-4 text-gray-500 dark:text-gray-400">or continue with</Text>
+            <View className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+          </View>
+
+          {/* Social Login Buttons */}
+          <View className="flex-row justify-center items-center gap-x-8 mb-6">
             <TouchableOpacity
-              onPress={handleGoogleLogin}
-              className="flex-row items-center justify-center rounded-2xl bg-white/15 py-3 border border-white/30"
+              onPress={handleGoogleAuth}
+              disabled={googleLoading}
+              activeOpacity={0.7}
+              className="w-28 h-16 rounded-full border border-gray-200 dark:border-gray-700 items-center justify-center bg-white dark:bg-gray-800"
             >
-              <Image
-                source={require("@/assets/images/google-logo.webp")}
-                style={{ width: 20, height: 20, marginRight: 8 }}
-              />
-              <Text className="text-white">Continue with Google</Text>
+              {googleLoading ? (
+                <ActivityIndicator size="small" color="#06B6D4" />
+              ) : (
+                <Image
+                  source={require("@/assets/images/google-logo.webp")}
+                  style={{ width: 24, height: 24 }}
+                />
+              )}
             </TouchableOpacity>
 
-            <AppleLoginButton
-              onLogin={() =>
-                handleAppleLogin({
-                  setToken,
-                  setUser,
-                  router,
-                  safeReturnUrl,
-                  loadUserInBackground
-                })
-              }
-            />
-          </MotiView>
-        </ScrollView>
-      </LinearGradient>
+            {Platform.OS === 'ios' && (
+              <TouchableOpacity
+                onPress={() =>
+                  handleAppleLogin({
+                    setToken,
+                    setUser,
+                    router,
+                    safeReturnUrl,
+                    loadUserInBackground,
+                  })
+                }
+                activeOpacity={0.7}
+                className="w-28 h-16 rounded-full border border-gray-200 dark:border-gray-700 items-center justify-center bg-white dark:bg-gray-800"
+              >
+                <Image
+                  source={require("@/assets/images/apple-logo.png")}
+                  style={{ width: 24, height: 24 }}
+                />
+              </TouchableOpacity>
+            )}
+          </View>
+          {/* Toggle to other mode */}
+          <View className="flex-row justify-center items-center mt-auto mb-24">
+            <Text className="text-gray-600 dark:text-gray-400">
+              {mode === "login"
+                ? "Don't have an account? "
+                : "Already have an account? "}
+            </Text>
+            <TouchableOpacity
+              onPress={() => setMode(mode === "login" ? "register" : "login")}
+              activeOpacity={0.7}
+            >
+              <Text className="text-cyan-500 dark:text-cyan-400 font-medium">
+                {mode === "login" ? "Sign up" : "Sign in"}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }

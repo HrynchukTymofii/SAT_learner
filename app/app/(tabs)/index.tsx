@@ -1,536 +1,503 @@
-import { useEffect, useRef, useMemo, useState, useCallback } from "react";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
-import { ScrollView, Text, View, TouchableOpacity, ActivityIndicator, Image, StyleSheet } from "react-native";
-import { useFocusEffect, useRouter } from "expo-router";
-import { fetchCourse, fetchCourseWithProgress } from "@/lib/api/course";
-import { useAuth } from "@/context/AuthContext";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  useColorScheme,
+} from "react-native";
+import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
-import Svg, { Circle, Defs, Stop, LinearGradient as LinearGradientSvg } from "react-native-svg";
-import TopBlur from "@/components/ui/TobBlur";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { BookCheck, BookOpen, BookOpenCheck, Lock, Pencil } from "lucide-react-native";
-import { ChapterWithItems, useCourseDatabase } from "@/lib/db/course";
-import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
+import {
+  MoreVertical,
+  CheckCircle2,
+  Circle,
+  Calendar,
+} from "lucide-react-native";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import { useAuth } from "@/context/AuthContext";
+import { useCourseDatabase } from "@/lib/db/course";
+import { useSQLiteContext } from "expo-sqlite";
 
-GoogleSignin.configure({
-  webClientId: "329617813146-lmmck18chg6mfgci5i4iddtialht09ij.apps.googleusercontent.com",
-  scopes: ["profile", "email"],
-  offlineAccess: true,
-  forceCodeForRefreshToken: false,
-  iosClientId: "329617813146-3o5aq7gfvejqoi3mudiar02tl4urhivu.apps.googleusercontent.com",
-});
+interface RecentChapter {
+  id: string;
+  title: string;
+  progress: number;
+  color: string;
+}
 
-export default function HomeScreen() {
-  const router = useRouter();
-  const insets = useSafeAreaInsets();
+interface Task {
+  id: string;
+  title: string;
+  completed: boolean;
+  type: "flashcard" | "explanation" | "exercise";
+}
+
+export default function ExploreScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const {user} = useAuth()
+  const insets = useSafeAreaInsets();
+  const db = useSQLiteContext();
+  const { getRecentChapters } = useCourseDatabase();
 
-  const { token, user } = useAuth();
-  const { getFullCourse, getFullCourseWithProgress } = useCourseDatabase();
+  // State
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [recentChapters, setRecentChapters] = useState<RecentChapter[]>([]);
+  const [isLoadingChapters, setIsLoadingChapters] = useState(true);
 
-  const [loading, setLoading] = useState(true);
-  const [course, setCourse] = useState<ChapterWithItems[]>([]);
-  const scrollRef = useRef<ScrollView>(null);
+  const [todayTasks, setTodayTasks] = useState<Task[]>([
+    {
+      id: "1",
+      title: 'Learn 20 flashcards in "Cell Biology"',
+      completed: false,
+      type: "flashcard",
+    },
+    {
+      id: "2",
+      title: 'Read the explanation in "Genetics"',
+      completed: false,
+      type: "explanation",
+    },
+    {
+      id: "3",
+      title: 'Complete 10 exercises in "Chemistry"',
+      completed: false,
+      type: "exercise",
+    },
+  ]);
 
-  // Load course
+  // Load recent chapters on page focus
   useFocusEffect(
-    useCallback(() => {
-      let isActive = true;
-
-      const load = async () => {
-        setLoading(true);
-        let res;
-        if (!token) {
-          res = await getFullCourse();
-        } else {
-          res = await getFullCourseWithProgress();
-        }
-
-        if (!isActive) return;
-
-        //console.log(res.chapters![2].items[2]);
-        //console.log(res.chapters![2].items[3]);
-
-        if (res.success && res.chapters) {
-          setCourse(res.chapters);
-          setTimeout(() => {
-            const firstUnfinishedIndex = findFirstUnfinishedIndex(res.chapters!);
-            if (scrollRef.current && firstUnfinishedIndex >= 0) {
-              scrollRef.current.scrollTo({ y: firstUnfinishedIndex * 80, animated: true });
-            }
-          }, 300);
-        }
-
-        setLoading(false);
-      };
-
-      load();
-
-      return () => {
-        isActive = false;
-      };
-    }, [token]) // you can keep token if needed for DB queries
+    React.useCallback(() => {
+      loadRecentChapters();
+    }, [])
   );
 
-  // useEffect(() => {
-  //   console.log("🧠 Course mounted");
-
-  //   return () => {
-  //     console.log("🧹 Course unmounted");
-  //   };
-  // }, []);
-
-
-  // --- Helpers ---
-  const findFirstUnfinishedIndex = (chapters: ChapterWithItems[]) => {
-    let index = 0;
-    for (const chapter of chapters) {
-      for (const item of chapter.items) {
-        if (item.type === "lesson" && !item.progress?.length) return index;
-        if (item.type === "quiz" && !item.results?.length) return index;
-        index++;
-      }
+  const loadRecentChapters = async () => {
+    setIsLoadingChapters(true);
+    const result = await getRecentChapters();
+    if (result.success && result.chapters) {
+      // Assign colors to chapters
+      const colors = ["#10b981", "#ef4444", "#3b82f6", "#f59e0b", "#8b5cf6"];
+      const chaptersWithColors = result.chapters.map((chapter, index) => ({
+        id: chapter.id,
+        title: chapter.title,
+        progress: chapter.progress,
+        color: colors[index % colors.length],
+      }));
+      setRecentChapters(chaptersWithColors);
     }
-    return -1;
+    setIsLoadingChapters(false);
   };
 
-  const calculateCourseProgress = () => {
-    let total = 0;
-    let completed = 0;
-    for (const chapter of course) {
-      for (const item of chapter.items) {
-        total++;
-        if ((item.type === "lesson" && item.progress?.length) || (item.type === "quiz" && item.results?.length)) {
-          completed++;
-        }
-      }
+  // Get week dates around selected date
+  const getWeekDates = () => {
+    const dates = [];
+    const start = new Date(selectedDate);
+    start.setDate(start.getDate() - 2); // 2 days before
+
+    for (let i = 0; i < 5; i++) {
+      const date = new Date(start);
+      date.setDate(start.getDate() + i);
+      dates.push(date);
     }
-    return total ? Math.round((completed / total) * 100) : 0;
+    return dates;
   };
 
-  if (loading) {
+  const weekDates = getWeekDates();
+
+  // Format date helpers
+  const formatDay = (date: Date) => {
+    return date.getDate();
+  };
+
+  const formatDayName = (date: Date) => {
+    return date.toLocaleDateString("en-US", { weekday: "short" });
+  };
+
+  const isToday = (date: Date) => {
+    const today = new Date();
     return (
-      <GraduationCap3DLoader />
+      date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear()
     );
-  }
+  };
 
-  const courseProgress = calculateCourseProgress();
-  const radius = 50;
-  const strokeWidth = 10;
-  const circumference = 2 * Math.PI * radius;
-  const progressOffset = circumference - (circumference * courseProgress) / 100;
+  const isSameDay = (date1: Date, date2: Date) => {
+    return (
+      date1.getDate() === date2.getDate() &&
+      date1.getMonth() === date2.getMonth() &&
+      date1.getFullYear() === date2.getFullYear()
+    );
+  };
+
+  // Toggle task completion
+  const toggleTask = (taskId: string) => {
+    setTodayTasks((prev) =>
+      prev.map((task) =>
+        task.id === taskId ? { ...task, completed: !task.completed } : task
+      )
+    );
+  };
+
+  // Calculate completed tasks
+  const completedTasks = todayTasks.filter((task) => task.completed).length;
+  const totalTasks = todayTasks.length;
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? "#0f172a" : "#f8fafc" }} edges={['bottom']}>
-      {/* Header */}
-      {token ? (
-        <View style={{
-          paddingTop: insets.top + 8,
-          paddingBottom: 12,
-          paddingHorizontal: 16,
-          borderBottomLeftRadius: 32,
-          borderBottomRightRadius: 32,
-          backgroundColor: isDark ? "#0f172a" : "#f8fafc",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 5 },
-          shadowOpacity: 0.1,
-          shadowRadius: 12,
-          elevation: 5,
-          overflow: "hidden",
-          alignItems: "center",
-        }}>
-          <LinearGradient
-            colors={["#2563eb", "#1e40af"]} //"#6366F1", "#8B5CF6", "#22d3ee
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={StyleSheet.absoluteFill}
-          />
-          <Text style={{ fontSize: 22, fontWeight: "bold", color: "#fff", marginBottom: 16, textAlign: "center" }}>
-            {course.length ? "SAT Math Course" : ""}
-          </Text>
+    <SafeAreaView className={`flex-1 ${isDark ? "bg-gray-900" : "bg-gray-50"}`} edges={['bottom']}>
+      <ScrollView
+        className="flex-1"
+        showsVerticalScrollIndicator={false}
+      >
+        {/* Header */}
+        <View
+            style={{ paddingTop: insets.top + 16 }}
+          className={`px-6 ${
+            isDark ? "bg-gray-900" : "bg-white"
+          } border-b ${isDark ? "border-gray-800" : "border-gray-100"}`}
+        >
+          <View className="flex-row items-center justify-between mb-4">
+            <TouchableOpacity activeOpacity={0.7}>
+              <Image
+                source={isDark ? require("@/assets/images/splash-icon-light.png") : require("@/assets/images/splash-icon-dark.png")}
+                style={{ width: 32, height: 32 }}
+                resizeMode="contain"
+              />
+            </TouchableOpacity>
 
-          <View style={{ marginBottom: 16, justifyContent: "center", alignItems: "center" }}>
-            <Svg width={radius * 2 + strokeWidth} height={radius * 2 + strokeWidth}>
-              <Circle cx={radius + strokeWidth / 2} cy={radius + strokeWidth / 2} r={radius} stroke={isDark ? "#334155" : "#e5e7eb"} strokeWidth={strokeWidth} fill="none" />
-              <Defs>
-                <LinearGradientSvg id="grad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
-                  <Stop offset="0%" stopColor="#6366F1" />
-                  <Stop offset="50%" stopColor="#8B5CF6" />
-                  <Stop offset="100%" stopColor="#22d3ee" />
-                </LinearGradientSvg>
-              </Defs>
-              <Circle cx={radius + strokeWidth / 2} cy={radius + strokeWidth / 2} r={radius} stroke="url(#grad)" strokeWidth={strokeWidth} strokeDasharray={circumference} strokeDashoffset={progressOffset} strokeLinecap="round" fill="none" />
-            </Svg>
-            <Text style={{ position: "absolute", color: "#fff", fontSize: 18, fontWeight: "bold" }}>{courseProgress}%</Text>
+            <Text
+              className={`text-2xl font-bold ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Explore
+            </Text>
+
+            <TouchableOpacity activeOpacity={0.7}>
+              <MoreVertical
+                size={24}
+                color={isDark ? "#ffffff" : "#000000"} 
+              />
+            </TouchableOpacity>
           </View>
         </View>
-      ) : (
-        <View style={{ overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 12, elevation: 5 }}>
-          <Image source={require('@/assets/images/satCourseImg.jpg')} style={{ width: "100%", height: 250, resizeMode: "cover" }} />
-        </View>
-      )}
 
-      {/* Course list */}
-      <ScrollView ref={scrollRef} contentContainerStyle={{ padding: 16, paddingBottom: 34 }} showsVerticalScrollIndicator={false}>
-        {course.map((chapter, cIndex) => {
-          const chapterItems = chapter.items.map(i => ({ ...i, chapterId: chapter.id }));
-          const isLocked = !user?.isPro && cIndex > 1;
-          return (
-            <View key={cIndex} style={{ marginBottom: 12 }}>
-              <Text style={{ fontSize: 18, fontWeight: "600", color: isDark ? "#f1f5f9" : "#1f2937", marginBottom: 12 }}>
-                {chapter.title}
+        <View className="px-6">
+          {/* Premium Upgrade Banner */}
+          {user && !user.isPro && <LinearGradient
+            colors={["#06B6D4", "#0891B2"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+            className="mt-6 rounded-3xl p-6 overflow-hidden"
+          >
+            <View className="flex-row items-center justify-between">
+              <View className="flex-1">
+                <Text className="text-white text-xl font-bold mb-1">
+                  Upgrade Premium!
+                </Text>
+                <Text className="text-white/90 text-sm mb-4">
+                  Enjoy all the benefits
+                </Text>
+                <TouchableOpacity
+                  activeOpacity={0.8}
+                  className="bg-white rounded-full px-6 py-2 self-start"
+                  onPress={() => router.push("/payment")}
+                >
+                  <Text className="text-cyan-500 font-semibold">Upgrade</Text>
+                </TouchableOpacity>
+              </View>
+              <View className="ml-4">
+                <Image
+                    source={require("@/assets/images/golden_cap.png")}
+                    style={{ width: 108, height: 108 }}
+                    resizeMode="contain"
+                />
+              </View>
+            </View>
+          </LinearGradient>}
+
+          {/* Recent Chapters */}
+          <View className="mt-8">
+            <View className="flex-row items-center justify-between mb-4">
+              <Text
+                className={`text-xl font-bold ${
+                  isDark ? "text-white" : "text-gray-900"
+                }`}
+              >
+                Recent Chapters
               </Text>
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => router.push("/(tabs)/course" as any)}
+              >
+                <Text className="text-cyan-500 font-semibold">
+                  View All →
+                </Text>
+              </TouchableOpacity>
+            </View>
 
-              {chapterItems.map((item) => {
-                const flatItems = course.flatMap(ch => ch.items.map(i => ({ ...i, chapterId: ch.id })));
-                const globalIndex = flatItems.findIndex(i => i.id === item.id && i.type === item.type);
-                const gradientColors: [string, string, ...string[]] =
-                  item.type === "lesson"
-                    ? item.progress?.length
-                      ? ["#6366F1", "#8B5CF6"]
-                      : ["#E5E7EB", "#F3F4F6"]
-                    : item.results?.length
-                      ? ["#10B981", "#059669"]
-                      : ["#D1FAE5", "#A7F3D0"];
-                const textCol = item.type === "lesson" ? (item.progress?.length ? "#fff" : "#1f2937") : item.results?.length ? "#fff" : "#1f2937";
+            {isLoadingChapters ? (
+              <View className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl p-8 items-center`}>
+                <Text className={`${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                  Loading chapters...
+                </Text>
+              </View>
+            ) : recentChapters.length === 0 ? (
+              <View className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl p-8 items-center`}>
+                <Text className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+                  No chapters started yet
+                </Text>
+                <Text className={`text-sm text-center mb-4 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                  Start learning to see your recent progress here
+                </Text>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => router.push("/(tabs)/course" as any)}
+                  className="bg-cyan-500 rounded-full px-6 py-2"
+                >
+                  <Text className="text-white font-semibold">Browse Chapters</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="-mx-6 px-6"
+              >
+                {recentChapters.map((chapter) => (
+                  <TouchableOpacity
+                    key={chapter.id}
+                    activeOpacity={0.7}
+                    onPress={() => router.push(`/course/${chapter.id}` as any)}
+                    className={`mr-4 ${
+                      isDark ? "bg-gray-800" : "bg-white"
+                    } rounded-2xl p-4 w-72 border-l-4`}
+                    style={{ borderLeftColor: chapter.color }}
+                  >
+                    {/* Title and Progress */}
+                    <View className="flex-row items-start justify-between mb-3">
+                      <Text
+                        className={`text-lg font-bold flex-1 ${
+                          isDark ? "text-white" : "text-gray-900"
+                        }`}
+                      >
+                        {chapter.title}
+                      </Text>
+                      <View className="ml-2">
+                        <View className="relative items-center justify-center">
+                          <Text
+                            className="text-lg font-bold"
+                            style={{ color: chapter.color }}
+                          >
+                            {chapter.progress}%
+                          </Text>
+                        </View>
+                      </View>
+                    </View>
+
+                    {/* Progress Bar */}
+                    <View className={`h-2 rounded-full mb-4 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}>
+                      <View
+                        className="h-2 rounded-full"
+                        style={{
+                          width: `${chapter.progress}%`,
+                          backgroundColor: chapter.color,
+                        }}
+                      />
+                    </View>
+
+                    {/* Continue Button */}
+                    <View
+                      className="items-center justify-center py-2 rounded-xl"
+                      style={{ backgroundColor: `${chapter.color}20` }}
+                    >
+                      <Text
+                        className="font-semibold"
+                        style={{ color: chapter.color }}
+                      >
+                        Continue Learning
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                ))}
+                <View className="w-6"/>
+              </ScrollView>
+            )}
+          </View>
+
+          {/* Week Calendar */}
+          <View className="mt-8">
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              className="-mx-6 px-6"
+            >
+              {weekDates.map((date, index) => {
+                const selected = isSameDay(date, selectedDate);
+                const today = isToday(date);
 
                 return (
                   <TouchableOpacity
-                    key={`${item.type}-${item.id}`}
-                    onPress={() => {
-                      if (isLocked) {
-                        router.push("/payment");
-                        return;
-                      }
-                      router.push({
-                        pathname: `/course/${item.chapterId}/${item.type}/${item.id}` as any,
-                        params: { allItems: JSON.stringify(flatItems), currentIndex: globalIndex },
-                      })
-                    }}
+                    key={index}
+                    activeOpacity={0.7}
+                    onPress={() => setSelectedDate(date)}
+                    className={`items-center justify-center mr-4 py-4 px-5 rounded-2xl ${
+                      selected
+                        ? "bg-cyan-500"
+                        : isDark
+                        ? "bg-gray-800"
+                        : "bg-white"
+                    }`}
                     style={{
-                      borderRadius: 14,
-                      marginBottom: 16,
-                      overflow: "hidden",
-                      shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 4 },
-                      shadowOpacity: 0.1,
-                      shadowRadius: 8,
-                      elevation: 5,
+                      borderBottomWidth: today ? 3 : 0,
+                      borderBottomColor: "#06B6D4",
                     }}
                   >
-                    <LinearGradient colors={gradientColors} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', padding: 16, paddingVertical: 10, borderRadius: 14 }}>
-                      <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1}}>
-                        <View style={{ marginRight: 12 }}>
-                          {item.type === 'lesson'
-                            ? item.progress?.length
-                              ? <BookOpenCheck size={28} color={textCol} />
-                              : <BookOpen size={28} color={textCol} />
-                            : item.results?.length
-                              ? <BookCheck size={28} color={textCol} />
-                              : <Pencil size={28} color={textCol} />}
-                        </View>
-                        <Text style={{ color: textCol, fontSize: 16, fontWeight: "600", flexShrink: 1 }}         numberOfLines={1}      // limit to single line
-                          ellipsizeMode="tail">{item.title}</Text>
-                      </View>
-                      {isLocked && <Lock size={16} color="#2563eb" style={{ marginLeft: 8 }} />}
-                    </LinearGradient>
+                    <Text
+                      className={`text-3xl font-bold mb-1 ${
+                        selected
+                          ? "text-white"
+                          : isDark
+                          ? "text-white"
+                          : "text-gray-900"
+                      }`}
+                    >
+                      {formatDay(date)}
+                    </Text>
+                    <Text
+                      className={`text-sm ${
+                        selected
+                          ? "text-white"
+                          : isDark
+                          ? "text-gray-400"
+                          : "text-gray-600"
+                      }`}
+                    >
+                      {formatDayName(date)}
+                    </Text>
                   </TouchableOpacity>
                 );
               })}
-            </View>
-          );
-        })}
+
+              {/* Calendar Button */}
+              <TouchableOpacity
+                activeOpacity={0.7}
+                onPress={() => router.push("/calendar" as any)}
+                className={`items-center justify-center py-4 px-5 rounded-2xl mr-12 ${
+                  isDark ? "bg-gray-800" : "bg-white"
+                }`}
+                style={{
+                  borderWidth: 2,
+                  borderColor: "#06B6D4",
+                  borderStyle: "dashed",
+                }}
+              >
+                <Calendar size={32} color="#06B6D4" />
+                <Text
+                  className={`text-sm mt-2 font-semibold ${
+                    isDark ? "text-cyan-400" : "text-cyan-600"
+                  }`}
+                >
+                  View All
+                </Text>
+              </TouchableOpacity>
+            </ScrollView>
+          </View>
+
+          {/* Today's Study Plan */}
+          <View className="mt-8 mb-16">
+            <Text
+              className={`text-xl font-bold mb-4 ${
+                isDark ? "text-white" : "text-gray-900"
+              }`}
+            >
+              Your study plan today ({completedTasks}/{totalTasks})
+            </Text>
+
+            {todayTasks.map((task, index) => (
+              <View key={task.id} className="flex-row items-start mb-6">
+                {/* Timeline */}
+                <View className="items-center mr-4">
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => toggleTask(task.id)}
+                  >
+                    {task.completed ? (
+                      <CheckCircle2 size={24} color="#06B6D4" fill="#06B6D4" />
+                    ) : (
+                      <Circle size={24} color="#06B6D4" />
+                    )}
+                  </TouchableOpacity>
+                  {index < todayTasks.length - 1 && (
+                    <View className="w-0.5 h-16 bg-cyan-500/30 mt-2" />
+                  )}
+                </View>
+
+                {/* Task Content */}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={() => toggleTask(task.id)}
+                  className={`flex-1 ${
+                    isDark ? "bg-gray-800" : "bg-white"
+                  } rounded-2xl p-4 flex-row items-center`}
+                >
+                  <View className="mr-3">
+                    {task.type === "flashcard" && (
+                      <View className="w-10 h-10 bg-cyan-500/10 rounded-xl items-center justify-center">
+                        <Text className="text-2xl">📇</Text>
+                      </View>
+                    )}
+                    {task.type === "explanation" && (
+                      <View className="w-10 h-10 bg-cyan-500/10 rounded-xl items-center justify-center">
+                        <Text className="text-2xl">📄</Text>
+                      </View>
+                    )}
+                    {task.type === "exercise" && (
+                      <View className="w-10 h-10 bg-cyan-500/10 rounded-xl items-center justify-center">
+                        <Text className="text-2xl">✏️</Text>
+                      </View>
+                    )}
+                  </View>
+                  <Text
+                    className={`flex-1 ${
+                      task.completed
+                        ? isDark
+                          ? "text-gray-500 line-through"
+                          : "text-gray-400 line-through"
+                        : isDark
+                        ? "text-white"
+                        : "text-gray-900"
+                    } font-medium`}
+                  >
+                    {task.title}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+            ))}
+          </View>
+        </View>
       </ScrollView>
+
+      {/* Floating Action Button (Alternative to bottom nav) */}
+      {/* <TouchableOpacity
+        activeOpacity={0.8}
+        className="absolute bottom-32 right-6 bg-cyan-500 w-14 h-14 rounded-full items-center justify-center shadow-lg z-10"
+        style={{
+          shadowColor: "#06B6D4",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 8,
+        }}
+        onPress={() => router.push("/")}
+      >
+        <Text className="text-2xl">🤖</Text>
+      </TouchableOpacity>  */}
     </SafeAreaView>
   );
 }
-
-// type CourseItem = {
-//   id: string;
-//   title: string;
-//   type: "lesson" | "quiz";
-//   chapterId: string;
-//   progress?: any[];
-//   results?: any[];
-// };
-
-// export default function HomeScreen() {
-//   const router = useRouter();
-//   const [loading, setLoading] = useState(true);
-//   const [course, setCourse] = useState<any>(null);
-//   const scrollRef = useRef<ScrollView>(null);
-//   const { token } = useAuth();
-//   const insets = useSafeAreaInsets();
-//   const colorScheme = useColorScheme();
-//   const { getFullCourseWithProgress,getFullCourse } = useCourseDatabase();
-
-//   const isDark = colorScheme === "dark";
-
-//   const bgColor = isDark ? "#0f172a" : "#f8fafc";
-//   const textColor = isDark ? "#f1f5f9" : "#1f2937";
-//   const subTextColor = isDark ? "#cbd5e1" : "#6b7280";
-
-//   useEffect(() => {
-//     const load = async () => {
-//       setLoading(true);
-//       let res;
-//       if (!token) {
-//         res = await getFullCourse();
-//         //({ success, data } = await fetchCourse());
-//       } else {
-//         res = await getFullCourseWithProgress();
-//         //({ success, data } = await fetchCourseWithProgress(token));
-//       }
-
-//       if (res.success  && res.chapters) {
-//         setCourse(res.chapters);
-//         setTimeout(() => {
-//           const firstUnfinishedIndex = findFirstUnfinishedIndex(res.chapters);
-//           if (scrollRef.current && firstUnfinishedIndex >= 0) {
-//             scrollRef.current.scrollTo({ y: firstUnfinishedIndex * 160, animated: true });
-//           }
-//         }, 300);
-//       }
-//       setLoading(false);
-//     };
-//     load();
-//   }, [token]);
-
-//   const findFirstUnfinishedIndex = (chapters: ChapterWithItems[]) => {
-//     if (!Array.isArray(chapters)) return -1;
-
-//     let index = 0;
-
-//     for (const chapter of chapters) {
-//       for (const item of chapter.items) {
-//         if (item.type === "lesson") {
-//           if (!item.progress?.length) return index;
-//         } else if (item.type === "quiz") {
-//           if (!item.results?.length) return index;
-//         }
-//         index++;
-//       }
-//     }
-
-//     return -1;
-//   };
-
-
-//   // const findFirstUnfinishedIndex = (course: any) => {
-//   //   let index = 0;
-//   //   for (const chapter of course.chapters) {
-//   //     for (const lesson of chapter.lessons) {
-//   //       if (!lesson.progress?.length) return index;
-//   //       index++;
-//   //     }
-//   //     for (const quiz of chapter.quizzes) {
-//   //       if (!quiz.results?.length) return index;
-//   //       index++;
-//   //     }
-//   //   }
-//   //   return -1;
-//   // };
-
-//   const calculateCourseProgress = () => {
-//     if (!course) return 0;
-//     let total = 0;
-//     let completed = 0;
-//     for (const chapter of course.chapters) {
-//       for (const lesson of chapter.lessons) {
-//         total++;
-//         if (lesson.progress?.length) completed++;
-//       }
-//       for (const quiz of chapter.quizzes) {
-//         total++;
-//         if (quiz.results?.length) completed++;
-//       }
-//     }
-//     return total ? Math.round((completed / total) * 100) : 0;
-//   };
-
-//   const allItems = useMemo(() => {
-//     if (!course) return [];
-//     return course.chapters.flatMap((chapter: any) => [
-//       ...(chapter.lessons || []).map((l: any) => ({ ...l, type: "lesson", chapterId: chapter.id })),
-//       ...(chapter.quizzes || []).map((q: any) => ({ ...q, type: "quiz", chapterId: chapter.id })),
-//     ]);
-//   }, [course]);
-
-//   if (loading) {
-//     return (
-//       <SafeAreaView style={{ flex: 1, backgroundColor: bgColor, justifyContent: "center", alignItems: "center" }}>
-//         <ActivityIndicator size="large" color="#22d3ee" />
-//       </SafeAreaView>
-//     );
-//   }
-
-//   const courseProgress = calculateCourseProgress();
-//   const radius = 50;
-//   const strokeWidth = 10;
-//   const circumference = 2 * Math.PI * radius;
-//   const progressOffset = circumference - (circumference * courseProgress) / 100;
-
-//   return (
-//     <SafeAreaView style={{ flex: 1, backgroundColor: bgColor }} edges={['bottom']}>
-//       {/* <TopBlur /> */}
-
-//       {token ? (
-//         <View
-//           style={{
-//             paddingTop: insets.top + 8,
-//             paddingBottom: 12,
-//             paddingHorizontal: 16,
-//             borderBottomLeftRadius: 32,
-//             borderBottomRightRadius: 32,
-//             backgroundColor: isDark ? "#0f172a" : "#f8fafc",
-//             shadowColor: "#000",
-//             shadowOffset: { width: 0, height: 5 },
-//             shadowOpacity: 0.1,
-//             shadowRadius: 12,
-//             elevation: 5,
-//             overflow: "hidden",
-//             alignItems: "center",
-//           }}
-//         >
-//           <LinearGradient
-//             colors={["#6366F1", "#8B5CF6", "#22d3ee"]}
-//             start={{ x: 0, y: 0 }}
-//             end={{ x: 1, y: 1 }}
-//             style={StyleSheet.absoluteFill}
-//           />
-
-//           <Text style={{ fontSize: 22, fontWeight: "bold", color: "#fff", marginBottom: 16, textAlign: "center" }}>
-//             {course?.title}
-//           </Text>
-
-//           <View style={{ marginBottom: 16, justifyContent: "center", alignItems: "center" }}>
-//             <Svg width={radius * 2 + strokeWidth} height={radius * 2 + strokeWidth}>
-//               <Circle
-//                 cx={radius + strokeWidth / 2}
-//                 cy={radius + strokeWidth / 2}
-//                 r={radius}
-//                 stroke={isDark ? "#334155" : "#e5e7eb"}
-//                 strokeWidth={strokeWidth}
-//                 fill="none"
-//               />
-//               <Defs>
-//                 <LinearGradientSvg id="grad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
-//                   <Stop offset="0%" stopColor="#6366F1" />
-//                   <Stop offset="50%" stopColor="#8B5CF6" />
-//                   <Stop offset="100%" stopColor="#22d3ee" />
-//                 </LinearGradientSvg>
-//               </Defs>
-//               <Circle
-//                 cx={radius + strokeWidth / 2}
-//                 cy={radius + strokeWidth / 2}
-//                 r={radius}
-//                 stroke="url(#grad)"
-//                 strokeWidth={strokeWidth}
-//                 strokeDasharray={circumference}
-//                 strokeDashoffset={progressOffset}
-//                 strokeLinecap="round"
-//                 fill="none"
-//               />
-//             </Svg>
-//             <Text style={{ position: "absolute", color: "#fff", fontSize: 18, fontWeight: "bold" }}>
-//               {courseProgress}%
-//             </Text>
-//           </View>
-//         </View>
-//       ) : (
-//         <View style={{ overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 12, elevation: 5 }}>
-//           <Image
-//             source={require('@/assets/images/satCourseImg.jpg')}
-//             style={{ width: "100%", height: 250, resizeMode: "cover" }}
-//           />
-//         </View>
-//       )}
-
-//       <ScrollView
-//         ref={scrollRef}
-//         contentContainerStyle={{ padding: 16, paddingBottom: 34 }}
-//         showsVerticalScrollIndicator={false}
-//       >
-//         {course?.chapters?.map((chapter: any, cIndex: number) => {
-//           const chapterItems = allItems.filter((i: CourseItem) => i.chapterId === chapter.id);
-
-//           return (
-//             <View key={cIndex} style={{ marginBottom: 12 }}>
-//               <Text style={{ fontSize: 18, fontWeight: "600", color: textColor, marginBottom: 12 }}>
-//                 {chapter.title}
-//               </Text>
-
-//               {chapterItems.map((item: CourseItem) => {
-//                 const globalIndex = allItems.findIndex(
-//                   (i: CourseItem) => i.id === item.id && i.type === item.type
-//                 );
-
-//                 const gradientColors: [string, string, ...string[]] =
-//                   item.type === "lesson"
-//                     ? item.progress?.length
-//                       ? ["#6366F1", "#8B5CF6"] // completed lesson
-//                       : ["#E5E7EB", "#F3F4F6"] // incomplete lesson
-//                     : item.results?.length
-//                     ? ["#10B981", "#059669"] // completed quiz
-//                     : ["#D1FAE5", "#A7F3D0"];
-
-//                 const textCol =
-//                   item.type === "lesson"
-//                     ? item.progress?.length
-//                       ? "#fff"
-//                       : "#1f2937"
-//                     : item.results?.length
-//                     ? "#fff"
-//                     : "#1f2937";
-
-//                 return (
-//                   <TouchableOpacity
-//                     key={`${item.type}-${item.id}`}
-//                     onPress={() =>
-//                       router.push({
-//                         pathname: `/course/${item.chapterId}/${item.type}/${item.id}` as any,
-//                         params: { allItems: JSON.stringify(allItems), currentIndex: globalIndex },
-//                       })
-//                     }
-//                     style={{
-//                       borderRadius: 14,
-//                       marginBottom: 16,
-//                       overflow: "hidden",
-//                       shadowColor: "#000",
-//                       shadowOffset: { width: 0, height: 4 },
-//                       shadowOpacity: 0.1,
-//                       shadowRadius: 8,
-//                       elevation: 5,
-//                     }}
-//                   >
-//                     <LinearGradient
-//                       colors={gradientColors}
-//                       start={{ x: 0, y: 0 }}
-//                       end={{ x: 1, y: 1 }}
-//                       style={{ flexDirection: 'row', alignItems: 'center', padding: 16, paddingVertical: 10, borderRadius: 14 }}
-//                     >
-//                       <View className="mr-4">
-//                         {item.type === 'lesson'
-//                           ? item.progress?.length
-//                             ? <BookOpenCheck size={28} color={textCol} />
-//                             : <BookOpen size={28} color={textCol} />
-//                           : item.results?.length
-//                           ? <BookCheck size={28} color={textCol} />
-//                           : <Pencil size={28} color={textCol} />}
-//                       </View>
-//                       <Text style={{ color: textCol, fontSize: 16, fontWeight: "600" }}>
-//                         {item.title}
-//                       </Text>
-//                     </LinearGradient>
-//                   </TouchableOpacity>
-//                 );
-//               })}
-//             </View>
-//           );
-//         })}
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// }
