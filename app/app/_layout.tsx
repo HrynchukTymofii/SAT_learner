@@ -12,6 +12,7 @@ import "../global.css";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import Toast from "react-native-toast-message";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
+import { TourProvider } from "@/context/TourContext";
 import { Suspense, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { SQLiteProvider } from "expo-sqlite";
@@ -26,7 +27,8 @@ import Purchases, {LOG_LEVEL} from "react-native-purchases"
 import { AppState, Platform } from "react-native";
 import { useLoadUserInBackground } from "@/lib/user";
 import { processOfflineQueue } from "@/lib/offlineQueue";
-import { upgradeToPro } from "@/lib/api/user";
+import { upgradeToPro, removePro } from "@/lib/api/user";
+import { scheduleDailyStudyReminder } from "@/lib/notifications";
 
 
 configureReanimatedLogger({
@@ -48,37 +50,82 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
         setIsOffline(true);
         return;
       }
-      
 
       setIsOffline(false);
-      await loadUserInBackground({ token, setUser });  //forceSync: true,
+      await loadUserInBackground({ token, setUser });
       await processOfflineQueue(token);
 
-       if (user && !user.isPro) {
-        const customerInfo = await Purchases.getCustomerInfo();
+      if (user) {
+        try {
+          // Get RevenueCat customer info
+          const customerInfo = await Purchases.getCustomerInfo();
 
-        const activePro = customerInfo.entitlements.active["PRO for year"];
-        console.log(activePro)
+          // Check for yearly PRO
+          const proForYear = customerInfo.entitlements.all["PRO Yearly"];
 
-        if (activePro) {
-          const plan =
-            activePro.productIdentifier === "test_year"
-              ? "$rc_annual"
-              : null;
-          
-          if (!plan) {
-            console.warn("Unknown productIdentifier:", activePro.productIdentifier);
-            return;
+          // Check for monthly PRO
+          const proForMonth = customerInfo.entitlements.all["PRO Monthly"];
+
+          let shouldHavePro = false;
+          let plan: string | null = null;
+
+          // Priority 1: Check for yearly PRO
+          if (proForYear && proForYear.latestPurchaseDate) {
+            const purchaseDate = new Date(proForYear.latestPurchaseDate);
+            const today = new Date();
+
+            // Calculate expiration: purchase date + 1 year + 1 day
+            const expirationDate = new Date(purchaseDate);
+            expirationDate.setFullYear(expirationDate.getFullYear() + 1);
+            expirationDate.setDate(expirationDate.getDate() + 1);
+
+            // Check if still valid
+            if (today < expirationDate) {
+              shouldHavePro = true;
+              plan = "$rc_annual";
+            }
+          }
+          // Priority 2: Check for monthly PRO
+          else if (proForMonth && proForMonth.latestPurchaseDate) {
+            const purchaseDate = new Date(proForMonth.latestPurchaseDate);
+            const today = new Date();
+
+            // Calculate expiration: purchase date + 1 month + 1 day
+            const expirationDate = new Date(purchaseDate);
+            expirationDate.setMonth(expirationDate.getMonth() + 1);
+            expirationDate.setDate(expirationDate.getDate() + 1);
+
+            // Check if still valid
+            if (today < expirationDate) {
+              shouldHavePro = true;
+              plan = "$rc_monthly";
+            }
           }
 
-          const res = await upgradeToPro(token, plan);
+          // Now sync with backend and local state
+          if (shouldHavePro && plan) {
+            // User should have PRO based on RevenueCat
+            if (!user.isPro) {
+              // Try to sync to backend
+              const res = await upgradeToPro(token, plan);
 
-          if (res.success) {
-            if(user) setUser({ ...user, isPro: true });
-            console.log("User upgraded to PRO via RevenueCat sync");
+              if (res.success) {
+                setUser({ ...user, isPro: true });
+                console.log("✅ User upgraded to PRO via RevenueCat sync");
+              } else {
+                console.warn("❌ Failed to sync PRO status:", res.error);
+              }
+            }
           } else {
-            console.warn("Failed to sync PRO status:", res.error);
+            // User should NOT have PRO
+            if (user.isPro) {
+              console.log("⚠️ PRO expired, removing access");
+              setUser({ ...user, isPro: false });
+              await removePro(token);
+            }
           }
+        } catch (err) {
+          console.warn("Failed to sync PRO status", err);
         }
       }
     } catch (err) {
@@ -113,6 +160,20 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
     }
   }, []);
 
+  // Setup daily study reminder notification
+  useEffect(() => {
+    const setupNotifications = async () => {
+      try {
+        await scheduleDailyStudyReminder();
+        console.log("Daily study reminder scheduled successfully");
+      } catch (error) {
+        console.error("Failed to schedule daily reminder:", error);
+      }
+    };
+
+    setupNotifications();
+  }, []);
+
   return <>{children}</>;
 }
 
@@ -140,21 +201,22 @@ export default function RootLayout() {
   }, [onboardingDone]);
 
   // Wait until we know the onboarding status + fonts loaded
-  if (!loaded || onboardingDone === null) return null;
+  if (!loaded || onboardingDone === null) return <CustomPreloadScreen />;
 
   // Otherwise show the normal app
   return (
     <AuthProvider>
-      <Suspense fallback={<CustomPreloadScreen />}>
-        <SQLiteProvider
-          databaseName="satprep.db"
-          assetSource={{ assetId: require("@/assets/databases/satprep.db") }}
-          useSuspense
-        >
-          <AppSyncWrapper>
-            <ThemeProvider
-              value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-            >
+      <TourProvider>
+        <Suspense fallback={<CustomPreloadScreen />}>
+          <SQLiteProvider
+            databaseName="satprep.db"
+            assetSource={{ assetId: require("@/assets/databases/satprep.db") }}
+            useSuspense
+          >
+            <AppSyncWrapper>
+              <ThemeProvider
+                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
+              >
               <Stack screenOptions={{ headerShown: false }}>
                 {/* Main tabs */}
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
@@ -164,6 +226,7 @@ export default function RootLayout() {
                 <Stack.Screen name="login" options={{ headerShown: false }} />
                 <Stack.Screen name="register" options={{ headerShown: false }} />
                 <Stack.Screen name="auth" options={{ headerShown: false }} />
+                <Stack.Screen name="selling-onboarding" options={{ headerShown: false }} />
 
                 {/* Profile & Settings */}
                 <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
@@ -191,6 +254,7 @@ export default function RootLayout() {
           </AppSyncWrapper>
         </SQLiteProvider>
       </Suspense>
+      </TourProvider>
     </AuthProvider>
   );
 }

@@ -1,10 +1,9 @@
 import React from "react";
-import { View, Text, Pressable } from "react-native";
+import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
-import { Button } from "@/~/components/ui/button";
-import { cn } from "@/lib/utils";
 import { useRouter } from "expo-router";
-import { LinearGradient } from "expo-linear-gradient";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 interface QuestionBottomNavProps {
   pageType: string;
@@ -42,66 +41,112 @@ export default function QuestionBottomNav({
   handleExamAnswerSelect,
 }: QuestionBottomNavProps) {
   const router = useRouter();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
+  const insets = useSafeAreaInsets();
+
   if (isCompleted) {
     return (
-      <View className="flex items-center mt-4 px-3">
-        <Pressable
+      <View
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: isDark ? "#111827" : "#ffffff",
+          paddingTop: 16,
+          paddingBottom: insets.bottom + 16,
+          paddingHorizontal: 16,
+          borderTopWidth: 1,
+          borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 10,
+        }}
+      >
+        <TouchableOpacity
           onPress={() => router.back()}
-          className="w-full rounded-2xl overflow-hidden shadow-md shadow-blue-400/30"
+          activeOpacity={0.7}
+          style={{
+            width: "100%",
+            backgroundColor: "#06B6D4",
+            paddingVertical: 16,
+            borderRadius: 12,
+            flexDirection: "row",
+            justifyContent: "center",
+            alignItems: "center",
+            shadowColor: "#06B6D4",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.3,
+            shadowRadius: 8,
+            elevation: 4,
+          }}
         >
-          <LinearGradient
-            colors={["#3b82f6", "#2563eb"]}
-            start={[0, 0]}
-            end={[1, 1]}
-            style={{
-              paddingVertical: 12,
-              borderRadius: 16,
-              flexDirection: "row",
-              justifyContent: "center",
-              alignItems: "center",
-            }}
-          >
-            <Text className="text-white font-semibold text-base">
-              Finish Review
-            </Text>
-          </LinearGradient>
-        </Pressable>
+          <Text style={{ color: "#ffffff", fontWeight: "700", fontSize: 16 }}>
+            Finish Review
+          </Text>
+        </TouchableOpacity>
       </View>
     );
   }
 
   // === Normal bottom nav ===
   return (
-    <View className="flex flex-row justify-between items-center my-4 px-3 ">
+    <View
+      style={{
+        position: "absolute",
+        bottom: 0,
+        left: 0,
+        right: 0,
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+        paddingTop: 16,
+        paddingBottom: insets.bottom + 16,
+        paddingHorizontal: 16,
+        borderTopWidth: 1,
+        borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: -4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 10,
+        flexDirection: "row",
+        justifyContent: "space-between",
+        alignItems: "center",
+      }}
+    >
       {/* Previous */}
-      <Pressable
+      <TouchableOpacity
         onPress={previousQuestion}
         disabled={currentQuestionIndex === 0}
-        className={cn(
-          "rounded-2xl overflow-hidden shadow-md shadow-blue-400/30",
-          currentQuestionIndex === 0 && "opacity-50"
-        )}
+        activeOpacity={0.7}
+        style={{
+          backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+          paddingHorizontal: 20,
+          paddingVertical: 12,
+          borderRadius: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          opacity: currentQuestionIndex === 0 ? 0.4 : 1,
+          borderWidth: 1,
+          borderColor: isDark ? "#374155" : "#e5e7eb",
+        }}
       >
-        <LinearGradient
-          colors={["#3b82f6", "#2563eb"]}
-          start={[0, 0]}
-          end={[1, 1]}
+        <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+        <Text
           style={{
-            paddingHorizontal: 16,
-            paddingVertical: 8,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 16,
+            color: isDark ? "#06B6D4" : "#0891B2",
+            fontWeight: "600",
+            marginLeft: 8,
           }}
         >
-          <ArrowLeft size={18} color="#fff" />
-          <Text className="text-white font-semibold ml-2">Previous</Text>
-        </LinearGradient>
-      </Pressable>
+          Previous
+        </Text>
+      </TouchableOpacity>
 
       {/* Next / Answer / Finish */}
-      <Pressable
+      <TouchableOpacity
         disabled={isSubmitting}
         onPress={() => {
           if (pageType === "exam") {
@@ -111,43 +156,53 @@ export default function QuestionBottomNav({
           }
           handleNextQuestion();
         }}
-        className="rounded-2xl overflow-hidden shadow-md shadow-blue-400/30"
+        activeOpacity={0.7}
+        style={{
+          backgroundColor: isSubmitting
+            ? isDark
+              ? "#334155"
+              : "#d1d5db"
+            : "#06B6D4",
+          paddingHorizontal: 24,
+          paddingVertical: 12,
+          borderRadius: 12,
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          shadowColor: isSubmitting ? "#000" : "#06B6D4",
+          shadowOffset: { width: 0, height: 4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 8,
+          elevation: 4,
+        }}
       >
-        <LinearGradient
-          colors={["#3b82f6", "#2563eb"]}
-          start={[0, 0]}
-          end={[1, 1]}
-          style={{
-            paddingHorizontal: 20,
-            paddingVertical: 8,
-            flexDirection: "row",
-            alignItems: "center",
-            justifyContent: "center",
-            borderRadius: 16,
-          }}
-        >
-          {isSubmitting ? (
-            <Text className="text-white font-semibold">Saving...</Text>
-          ) : (
-            <>
-              <Text className="text-white font-semibold mr-2">
-                {getNextButtonLabel({
-                  pageType,
-                  currentQuestionIndex,
-                  questions,
-                  selectedAnswers,
-                  answeredQuestions,
-                  enableFinishSaved,
-                })}
-              </Text>
-              {!(
-                pageType === "exam" &&
-                selectedAnswers[questions[currentQuestionIndex].id]?.[0]
-              ) && <ArrowRight size={18} color="#fff" />}
-            </>
-          )}
-        </LinearGradient>
-      </Pressable>
+        {isSubmitting ? (
+          <ActivityIndicator size="small" color="#fff" />
+        ) : (
+          <>
+            <Text
+              style={{
+                color: "#ffffff",
+                fontWeight: "700",
+                marginRight: 8,
+              }}
+            >
+              {getNextButtonLabel({
+                pageType,
+                currentQuestionIndex,
+                questions,
+                selectedAnswers,
+                answeredQuestions,
+                enableFinishSaved,
+              })}
+            </Text>
+            {!(
+              pageType === "exam" &&
+              selectedAnswers[questions[currentQuestionIndex].id]?.[0]
+            ) && <ArrowRight size={18} color="#fff" />}
+          </>
+        )}
+      </TouchableOpacity>
     </View>
   );
 }

@@ -64,7 +64,7 @@ export default function LessonScreen() {
       if (!currentItem?.id) return;
       const html = await getLessonRenderedHtml(currentItem.id);
       setLocalHtml(html);
-      console.log(`📄 Loaded local HTML for lesson ${currentItem.id}:`, html ? "✅ Found" : "❌ Not found");
+      //console.log(`📄 Loaded local HTML for lesson ${currentItem.id}:`, html ? "✅ Found" : "❌ Not found");
     };
     loadLocalHtml();
   }, [currentItem?.id]);
@@ -258,24 +258,31 @@ export default function LessonScreen() {
           )}
           <AutoHeightWebView
             source={
-              localHtml
-                ? // Use local pre-rendered HTML
-                  { html: localHtml }
-                : // Fallback to online URL
+              // localHtml
+              //   ? // Use local pre-rendered HTML
+              //     { html: localHtml }
+              //   : // Fallback to online URL
                   {
                     uri: `https://www.satlearner.com/expo-course/${currentItem?.chapterId}/lessons/${currentItem?.id}`,
                   }
             }
             viewportContent="width=device-width, user-scalable=no"
             scalesPageToFit={true}
-            style={{ width: containerWidth  || "100%" }}
+            style={{ width: containerWidth || "100%", padding: 8 }}
             scrollEnabled={false}
-            customScript={
-              // Send theme to WebView when it loads
-              isDark
-                ? `window.postMessage(JSON.stringify({type: 'setTheme', theme: 'dark'}));`
-                : `window.postMessage(JSON.stringify({type: 'setTheme', theme: 'light'}));`
-            }
+            customStyle={
+            isDark
+              ? `html, body { margin:0; background-color: #1e293b; color: #f5f5f4;} .expo-content {background-color: #1e293b; color: #f5f5f4; padding: 8px } .expo-content blockquote {
+        --blockquote-bg-color: #b7c1cf !important;
+      }`
+              : ""
+          }
+            // customScript={
+            //   // Send theme to WebView when it loads
+            //   isDark
+            //     ? `window.postMessage(JSON.stringify({type: 'setTheme', theme: 'dark'}));`
+            //     : `window.postMessage(JSON.stringify({type: 'setTheme', theme: 'light'}));`
+            // }
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
           />

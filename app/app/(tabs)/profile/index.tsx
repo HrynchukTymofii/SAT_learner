@@ -5,6 +5,8 @@ import {
   ScrollView,
   Image,
   TouchableOpacity,
+  Platform,
+  Linking,
 } from "react-native";
 import { useAuth, UserType } from "@/context/AuthContext";
 import { MaterialIcons } from "@expo/vector-icons";
@@ -21,6 +23,7 @@ import {
   User,
   Target,
   Crown,
+  ThumbsUp,
 } from "lucide-react-native";
 import { useRouter } from "expo-router";
 import { getUserData } from "@/lib/api/user";
@@ -28,6 +31,7 @@ import Toast from "react-native-toast-message";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
+import * as StoreReview from "expo-store-review";
 import { useCourseDatabase } from "@/lib/db/course";
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 import { ContactDialog } from "@/components/modals/ContactDialog";
@@ -345,6 +349,40 @@ export default function ProfileScreen() {
       position: "top",
       visibilityTime: 700,
     });
+  };
+
+  const handleRateUs = async () => {
+    try {
+      // First, check if in-app review is available
+      const isAvailable = await StoreReview.isAvailableAsync();
+
+      if (isAvailable) {
+        // 🎯 Request in-app review (native popup)
+        await StoreReview.requestReview();
+        return;
+      }
+
+      // Fallback → open store page manually if in-app review not supported
+      if (Platform.OS === "ios") {
+        const appStoreLink = "itms-apps://itunes.apple.com/app/6751187640";
+        const webLink = "https://apps.apple.com/app/id6751187640";
+
+        Linking.openURL(appStoreLink).catch(() => Linking.openURL(webLink));
+      } else if (Platform.OS === "android") {
+        const playStoreLink = "market://details?id=com.hrynchuk.pdrtests";
+        const webLink = "https://play.google.com/store/apps/details?id=com.hrynchuk.satprep";
+
+        Linking.openURL(playStoreLink).catch(() => Linking.openURL(webLink));
+      }
+    } catch (error) {
+      console.error("Rate app error:", error);
+      Toast.show({
+        type: "error",
+        text1: "Failed to open app rating",
+        position: "top",
+        visibilityTime: 1000,
+      });
+    }
   };
 
   if (loading) return <GraduationCap3DLoader />;
@@ -819,6 +857,8 @@ export default function ProfileScreen() {
               marginBottom: 12,
               flexDirection: "row",
               alignItems: "center",
+              borderLeftWidth: 4,
+              borderLeftColor: "#10B981",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -831,13 +871,13 @@ export default function ProfileScreen() {
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                backgroundColor: isDark ? "#0e7490" : "#cffafe",
+                backgroundColor: isDark ? "#334155" : "#f3f4f6",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 12,
               }}
             >
-              <BookOpen size={20} color="#06B6D4" />
+              <BookOpen size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
             </View>
             <View style={{ flex: 1 }}>
               <Text
@@ -875,6 +915,8 @@ export default function ProfileScreen() {
               marginBottom: 12,
               flexDirection: "row",
               alignItems: "center",
+              borderLeftWidth: 4,
+              borderLeftColor: "#8B5CF6",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -887,13 +929,13 @@ export default function ProfileScreen() {
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                backgroundColor: isDark ? "#4c1d95" : "#ede9fe",
+                backgroundColor: isDark ? "#334155" : "#f3f4f6",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 12,
               }}
             >
-              <User size={20} color="#8B5CF6" />
+              <User size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
             </View>
             <Text
               style={{
@@ -921,6 +963,8 @@ export default function ProfileScreen() {
               marginBottom: 12,
               flexDirection: "row",
               alignItems: "center",
+              borderLeftWidth: 4,
+              borderLeftColor: "#8B5CF6",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -933,13 +977,13 @@ export default function ProfileScreen() {
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                backgroundColor: isDark ? "#064e3b" : "#d1fae5",
+                backgroundColor: isDark ? "#334155" : "#f3f4f6",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 12,
               }}
             >
-              <Settings size={20} color="#10B981" />
+              <Settings size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
             </View>
             <Text
               style={{
@@ -967,6 +1011,8 @@ export default function ProfileScreen() {
               marginBottom: 12,
               flexDirection: "row",
               alignItems: "center",
+              borderLeftWidth: 4,
+              borderLeftColor: "#06B6D4",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -979,13 +1025,13 @@ export default function ProfileScreen() {
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                backgroundColor: isDark ? "#78350f" : "#fef3c7",
+                backgroundColor: isDark ? "#334155" : "#f3f4f6",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 12,
               }}
             >
-              <Mails size={20} color="#F59E0B" />
+              <Mails size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
             </View>
             <Text
               style={{
@@ -1005,13 +1051,16 @@ export default function ProfileScreen() {
           </TouchableOpacity>
 
           <TouchableOpacity
-            onPress={handleLogout}
+            onPress={handleRateUs}
             style={{
               backgroundColor: isDark ? "#1e293b" : "#ffffff",
               borderRadius: 16,
               padding: 10,
+              marginBottom: 12,
               flexDirection: "row",
               alignItems: "center",
+              borderLeftWidth: 4,
+              borderLeftColor: "#06B6D4",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -1024,13 +1073,60 @@ export default function ProfileScreen() {
                 width: 40,
                 height: 40,
                 borderRadius: 12,
-                backgroundColor: isDark ? "#7f1d1d" : "#fee2e2",
+                backgroundColor: isDark ? "#334155" : "#f3f4f6",
                 alignItems: "center",
                 justifyContent: "center",
                 marginRight: 12,
               }}
             >
-              <LogOut size={20} color="#ef4444" />
+              <ThumbsUp size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+            </View>
+            <Text
+              style={{
+                flex: 1,
+                fontSize: 15,
+                fontWeight: "500",
+                color: isDark ? "#ffffff" : "#1f2937",
+              }}
+            >
+              Rate Us
+            </Text>
+            <MaterialIcons
+              name="arrow-forward-ios"
+              size={18}
+              color={isDark ? "#64748b" : "#94a3b8"}
+            />
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={handleLogout}
+            style={{
+              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              borderRadius: 16,
+              padding: 10,
+              flexDirection: "row",
+              alignItems: "center",
+              borderLeftWidth: 4,
+              borderLeftColor: "#ef4444",
+              shadowColor: "#000",
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 8,
+              elevation: 3,
+            }}
+          >
+            <View
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: 12,
+                backgroundColor: isDark ? "#334155" : "#f3f4f6",
+                alignItems: "center",
+                justifyContent: "center",
+                marginRight: 12,
+              }}
+            >
+              <LogOut size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
             </View>
             <Text
               style={{

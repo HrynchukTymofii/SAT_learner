@@ -1,24 +1,38 @@
 import { View, Text } from "react-native";
 import { AlertTriangle } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function TimeAlert() {
-  return (
-    <View className=" rounded-2xl overflow-hidden shadow-md">
-      <LinearGradient
-        colors={["#fee2e2", "#fca5a5"]} 
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{ padding: 12 }}
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
-      >
-        <View className="flex-row items-center gap-2">
-          <AlertTriangle size={20} color="#ef4444" />
-          <Text className="font-semibold text-red-500 ">
-            Less than 5 minutes remaining!
-          </Text>
-        </View>
-      </LinearGradient>
+  return (
+    <View
+      style={{
+        backgroundColor: isDark ? "#450a0a" : "#fee2e2",
+        borderRadius: 12,
+        padding: 16,
+        borderLeftWidth: 4,
+        borderLeftColor: "#ef4444",
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 4,
+        elevation: 2,
+      }}
+    >
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+        <AlertTriangle size={20} color="#ef4444" />
+        <Text
+          style={{
+            fontWeight: "600",
+            color: "#ef4444",
+            fontSize: 14,
+          }}
+        >
+          Less than 5 minutes remaining!
+        </Text>
+      </View>
     </View>
   );
 }

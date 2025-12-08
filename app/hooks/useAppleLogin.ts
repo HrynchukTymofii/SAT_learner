@@ -1,5 +1,6 @@
 import { UserType } from "@/context/AuthContext";
 import * as AppleAuthentication from "expo-apple-authentication";
+import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
 
 export async function handleAppleLogin({
@@ -27,8 +28,8 @@ export async function handleAppleLogin({
       const res = await fetch("https://www.satlearner.com/api/auth/apple", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ 
-          id_token: credential.identityToken, 
+        body: JSON.stringify({
+          id_token: credential.identityToken,
           name: credential.fullName
             ? `${credential.fullName.givenName ?? ""} ${credential.fullName.familyName ?? ""}`.trim()
             : null,
@@ -40,7 +41,19 @@ export async function handleAppleLogin({
       if (data.token) {
         setToken(data.token);
         loadUserInBackground({token:data.token, setUser, forceSync: true});
-        router.replace(safeReturnUrl as any);
+
+        // Check if this is first login and user should see selling onboarding
+        const sellingOnboardingCompleted = await SecureStore.getItemAsync(
+          "sellingOnboardingCompleted"
+        );
+        const isFirstLogin = data.isNewUser || sellingOnboardingCompleted !== "true";
+
+        // Navigate to selling onboarding if first time, else go to safe return URL
+        if (isFirstLogin) {
+          router.replace("/selling-onboarding" as any);
+        } else {
+          router.replace(safeReturnUrl as any);
+        }
       } else {
         Toast.show({ type: "error", text1: "Apple login failed" });
       }

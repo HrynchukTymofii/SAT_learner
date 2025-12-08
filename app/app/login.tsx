@@ -114,6 +114,13 @@ export default function AuthScreen() {
             if (onboarding !== "true") {
               await SecureStore.setItemAsync("onboardingCompleted", "true");
             }
+
+            // Check if this is first login and user should see selling onboarding
+            const sellingOnboardingCompleted = await SecureStore.getItemAsync(
+              "sellingOnboardingCompleted"
+            );
+            const isFirstLogin = mode === "register" || sellingOnboardingCompleted !== "true";
+
             Toast.show({
               type: "success",
               text1: mode === "login" ? "Login successful" : "Sign up successful",
@@ -121,12 +128,20 @@ export default function AuthScreen() {
               position: "top",
               visibilityTime: 700,
             });
-            router.replace(safeReturnUrl as any);
+
+            // Load user data in background
             loadUserInBackground({
               token: data.token,
               setUser,
               forceSync: true,
             });
+
+            // Navigate to selling onboarding if first time, else go to safe return URL
+            if (isFirstLogin) {
+              router.replace("/selling-onboarding" as any);
+            } else {
+              router.replace(safeReturnUrl as any);
+            }
           } else {
             Toast.show({
               type: "error",
@@ -264,6 +279,12 @@ export default function AuthScreen() {
           await SecureStore.setItemAsync("onboardingCompleted", "true");
         }
 
+        // Check if this is first login and user should see selling onboarding
+        const sellingOnboardingCompleted = await SecureStore.getItemAsync(
+          "sellingOnboardingCompleted"
+        );
+        const isFirstLogin = mode === "register" || sellingOnboardingCompleted !== "true";
+
         Toast.show({
           type: "success",
           text1: mode === "login" ? "Login successful" : "Registration successful",
@@ -272,8 +293,15 @@ export default function AuthScreen() {
           visibilityTime: 700,
         });
 
-        router.replace(safeReturnUrl as any);
+        // Load user data in background
         loadUserInBackground({ token: data.token, setUser, forceSync: true });
+
+        // Navigate to selling onboarding if first time, else go to safe return URL
+        if (isFirstLogin) {
+          router.replace("/selling-onboarding" as any);
+        } else {
+          router.replace(safeReturnUrl as any);
+        }
       } else {
         Toast.show({
           type: "error",

@@ -8,8 +8,9 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { ArrowLeft, ChevronLeft, ChevronRight, Calendar as CalendarIcon, AlertCircle } from "lucide-react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import * as SecureStore from "expo-secure-store";
+import { getAllPlanDates, getTaskCount } from "@/lib/studyPlanStorage";
 
 export default function CalendarScreen() {
   const router = useRouter();
@@ -20,11 +21,37 @@ export default function CalendarScreen() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [satDate, setSatDate] = useState<string | null>(null);
+  const [planDates, setPlanDates] = useState<string[]>([]);
+  const [taskCounts, setTaskCounts] = useState<Map<string, { total: number; completed: number }>>(new Map());
 
   // Load SAT date from SecureStore
   useEffect(() => {
     loadSatDate();
   }, []);
+
+  // Load plan dates when screen is focused or month changes
+  useFocusEffect(
+    React.useCallback(() => {
+      loadPlanDates();
+    }, [currentMonth])
+  );
+
+  const loadPlanDates = async () => {
+    try {
+      const dates = await getAllPlanDates();
+      setPlanDates(dates);
+
+      // Load task counts for visible dates in current month
+      const counts = new Map<string, { total: number; completed: number }>();
+      for (const dateKey of dates) {
+        const count = await getTaskCount(dateKey);
+        counts.set(dateKey, count);
+      }
+      setTaskCounts(counts);
+    } catch (error) {
+      console.error("Failed to load plan dates:", error);
+    }
+  };
 
   const loadSatDate = async () => {
     try {
@@ -106,6 +133,11 @@ export default function CalendarScreen() {
       const isSATDay = isSatDate(date);
       const isSelected = selectedDate && isSameDay(date, selectedDate);
 
+      // Check if this date has tasks
+      const dateKey = date.toISOString().split("T")[0];
+      const taskCount = taskCounts.get(dateKey);
+      const hasTasks = taskCount && taskCount.total > 0;
+
       days.push(
         <TouchableOpacity
           key={day}
@@ -139,8 +171,25 @@ export default function CalendarScreen() {
           >
             {day}
           </Text>
-            {isSATDay && (
-            <View style={{ position: "absolute", top: 3, right: 3, width: 6, height: 6, borderRadius: 3, backgroundColor: "#ffffff" }} />
+          {hasTasks && !isSATDay && (
+            <View
+              style={{
+                position: "absolute",
+                top: 1,
+                right: 1,
+                minWidth: 16,
+                height: 16,
+                borderRadius: 8,
+                backgroundColor: isSelected ? "#ffffff" : "#06B6D4",
+                justifyContent: "center",
+                alignItems: "center",
+                paddingHorizontal: 4,
+              }}
+            >
+              <Text style={{ fontSize: 10, fontWeight: "700", color: isSelected ? "#06B6D4" : "#ffffff" }}>
+                {taskCount!.total}
+              </Text>
+            </View>
           )}
         </TouchableOpacity>
       );

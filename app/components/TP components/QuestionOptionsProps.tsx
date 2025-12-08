@@ -1,9 +1,8 @@
 import React from "react";
 import { Animated, Pressable, Text, View } from "react-native";
 import { CheckCircle, XCircle } from "lucide-react-native";
-import { cn } from "@/lib/utils";
 import { Question } from "@/types";
-import AutoHeightWebView from "react-native-autoheight-webview";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 interface QuestionOptionsProps {
   currentQuestion: Question;
@@ -21,6 +20,8 @@ const QuestionOptions = ({
   handleAnswerSelect,
 }: QuestionOptionsProps) => {
   const [scale] = React.useState(new Animated.Value(1));
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const handlePressIn = () => {
     Animated.spring(scale, {
@@ -37,32 +38,215 @@ const QuestionOptions = ({
     }).start();
   };
 
+  // Check if all options are short (10 characters or less)
+  const allOptionsShort = currentQuestion.options.every(
+    (option) => option.length <= 10
+  );
+
+  // If all options are short, display in 2 columns
+  if (allOptionsShort) {
+    return (
+      <View style={{ gap: 16, paddingHorizontal: 8 }}>
+        <View style={{ flexDirection: "row", gap: 12 }}>
+          {/* Left column */}
+          <View style={{ flex: 1, gap: 12 }}>
+            {currentQuestion.options
+              .filter((_, index) => index % 2 === 0)
+              .map((option, idx) => {
+                const index = idx * 2;
+                const isSelected =
+                  selectedAnswers[currentQuestion.id]?.includes(option) || false;
+                const isCorrectOption = currentQuestion.answers.includes(option);
+
+                let bgColor, borderColor, borderWidth;
+
+                if (!isAnswered) {
+                  bgColor = isSelected
+                    ? (isDark ? "#1e293b" : "#ffffff")
+                    : (isDark ? "#1e293b" : "#ffffff");
+                  borderColor = isSelected ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb");
+                  borderWidth = isSelected ? 2 : 1;
+                } else if (isCorrectOption) {
+                  bgColor = isDark ? "#14532d" : "#dcfce7";
+                  borderColor = "#22c55e";
+                  borderWidth = 2;
+                } else if (isSelected) {
+                  bgColor = isDark ? "#450a0a" : "#fee2e2";
+                  borderColor = "#ef4444";
+                  borderWidth = 2;
+                } else {
+                  bgColor = isDark ? "#1e293b" : "#ffffff";
+                  borderColor = isDark ? "#334155" : "#e5e7eb";
+                  borderWidth = 1;
+                }
+
+                return (
+                  <Animated.View key={index} style={{ transform: [{ scale }] }}>
+                    <Pressable
+                      onPress={() => !isAnswered && handleAnswerSelect(option)}
+                      onPressIn={handlePressIn}
+                      onPressOut={handlePressOut}
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingVertical: 12,
+                        paddingHorizontal: 12,
+                        borderRadius: 12,
+                        borderWidth,
+                        borderColor,
+                        backgroundColor: bgColor,
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 2,
+                      }}
+                    >
+                      {isAnswered && isCorrectOption && (
+                        <CheckCircle
+                          size={20}
+                          color="#22c55e"
+                          style={{ position: "absolute", top: 8, right: 8 }}
+                        />
+                      )}
+                      {isAnswered && !isCorrectOption && isSelected && (
+                        <XCircle
+                          size={20}
+                          color="#ef4444"
+                          style={{ position: "absolute", top: 8, right: 8 }}
+                        />
+                      )}
+                      <Text
+                        style={{
+                          color: isDark ? "#ffffff" : "#1f2937",
+                          fontWeight: "400",
+                          fontSize: 18,
+                        }}
+                      >
+                        {option}
+                      </Text>
+                    </Pressable>
+                  </Animated.View>
+                );
+              })}
+          </View>
+
+          {/* Right column */}
+          <View style={{ flex: 1, gap: 12 }}>
+            {currentQuestion.options
+              .filter((_, index) => index % 2 === 1)
+              .map((option, idx) => {
+                const index = idx * 2 + 1;
+                const isSelected =
+                  selectedAnswers[currentQuestion.id]?.includes(option) || false;
+                const isCorrectOption = currentQuestion.answers.includes(option);
+
+                let bgColor, borderColor, borderWidth;
+
+                if (!isAnswered) {
+                  bgColor = isSelected
+                    ? (isDark ? "#1e293b" : "#ffffff")
+                    : (isDark ? "#1e293b" : "#ffffff");
+                  borderColor = isSelected ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb");
+                  borderWidth = isSelected ? 2 : 1;
+                } else if (isCorrectOption) {
+                  bgColor = isDark ? "#14532d" : "#dcfce7";
+                  borderColor = "#22c55e";
+                  borderWidth = 2;
+                } else if (isSelected) {
+                  bgColor = isDark ? "#450a0a" : "#fee2e2";
+                  borderColor = "#ef4444";
+                  borderWidth = 2;
+                } else {
+                  bgColor = isDark ? "#1e293b" : "#ffffff";
+                  borderColor = isDark ? "#334155" : "#e5e7eb";
+                  borderWidth = 1;
+                }
+
+                return (
+                  <Animated.View key={index} style={{ transform: [{ scale }] }}>
+                    <Pressable
+                      onPress={() => !isAnswered && handleAnswerSelect(option)}
+                      onPressIn={handlePressIn}
+                      onPressOut={handlePressOut}
+                      style={{
+                        alignItems: "center",
+                        justifyContent: "center",
+                        paddingVertical: 12,
+                        paddingHorizontal: 12,
+                        borderRadius: 12,
+                        borderWidth,
+                        borderColor,
+                        backgroundColor: bgColor,
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 4,
+                        elevation: 2,
+                      }}
+                    >
+                      {isAnswered && isCorrectOption && (
+                        <CheckCircle
+                          size={20}
+                          color="#22c55e"
+                          style={{ position: "absolute", top: 8, right: 8 }}
+                        />
+                      )}
+                      {isAnswered && !isCorrectOption && isSelected && (
+                        <XCircle
+                          size={20}
+                          color="#ef4444"
+                          style={{ position: "absolute", top: 8, right: 8 }}
+                        />
+                      )}
+                      <Text
+                        style={{
+                          color: isDark ? "#ffffff" : "#1f2937",
+                          fontWeight: "400",
+                          fontSize: 18,
+                        }}
+                      >
+                        {option}
+                      </Text>
+                    </Pressable>
+                  </Animated.View>
+                );
+              })}
+          </View>
+        </View>
+      </View>
+    );
+  }
+
+  // Default single column layout for longer options
   return (
-    <View className="gap-y-4 px-2">
+    <View style={{ gap: 16, paddingHorizontal: 8 }}>
       {currentQuestion.options.map((option, index) => {
         const isSelected =
           selectedAnswers[currentQuestion.id]?.includes(option) || false;
         const isCorrectOption = currentQuestion.answers.includes(option);
 
-        const bgColor = !isAnswered
-          ? isSelected
-            ? "bg-blue-50 dark:bg-blue-900"
-            : "bg-white dark:bg-slate-950"
-          : isCorrectOption
-          ? "bg-green-100 dark:bg-green-900"
-          : isSelected
-          ? "bg-red-100 dark:bg-red-900"
-          : "bg-white dark:bg-slate-950";
+        let bgColor, borderColor, borderWidth;
 
-        const borderColor = !isAnswered
-          ? isSelected
-            ? "border-blue-300 dark:border-blue-600"
-            : "border-slate-300 dark:border-slate-700"
-          : isCorrectOption
-          ? "border-green-400 dark:border-green-500"
-          : isSelected
-          ? "border-red-400 dark:border-red-600"
-          : "border-slate-300 dark:border-slate-700";
+        if (!isAnswered) {
+          bgColor = isSelected
+            ? (isDark ? "#1e293b" : "#ffffff")
+            : (isDark ? "#1e293b" : "#ffffff");
+          borderColor = isSelected ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb");
+          borderWidth = isSelected ? 2 : 1;
+        } else if (isCorrectOption) {
+          bgColor = isDark ? "#14532d" : "#dcfce7";
+          borderColor = "#22c55e";
+          borderWidth = 2;
+        } else if (isSelected) {
+          bgColor = isDark ? "#450a0a" : "#fee2e2";
+          borderColor = "#ef4444";
+          borderWidth = 2;
+        } else {
+          bgColor = isDark ? "#1e293b" : "#ffffff";
+          borderColor = isDark ? "#334155" : "#e5e7eb";
+          borderWidth = 1;
+        }
 
         return (
           <Animated.View key={index} style={{ transform: [{ scale }] }}>
@@ -70,20 +254,36 @@ const QuestionOptions = ({
               onPress={() => !isAnswered && handleAnswerSelect(option)}
               onPressIn={handlePressIn}
               onPressOut={handlePressOut}
-              className={cn(
-                "flex-row items-center gap-x-3 py-4 px-4 rounded-2xl border shadow-lg",
-                bgColor,
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 12,
+                paddingVertical: 12,
+                paddingHorizontal: 16,
+                borderRadius: 12,
+                borderWidth,
                 borderColor,
-                pageType !== "saved" && !isAnswered && "hover:bg-gray-100 dark:hover:bg-gray-700"
-              )}
+                backgroundColor: bgColor,
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2,
+              }}
             >
               {isAnswered && isCorrectOption && (
-                <CheckCircle size={20} color="#16a34a" />
+                <CheckCircle size={20} color="#22c55e" />
               )}
               {isAnswered && !isCorrectOption && isSelected && (
-                <XCircle size={20} color="#dc2626" />
+                <XCircle size={20} color="#ef4444" />
               )}
-              <Text className="flex-1 text-black dark:text-white font-medium text-base">
+              <Text style={{
+                flex: 1,
+                color: isDark ? "#ffffff" : "#1f2937",
+                fontWeight: "500",
+                fontSize: 15,
+                lineHeight: 22,
+              }}>
                 {option}
               </Text>
             </Pressable>

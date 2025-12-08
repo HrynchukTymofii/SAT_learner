@@ -3,11 +3,11 @@ import {
   Modal,
   View,
   Text,
-  Pressable,
+  TouchableOpacity,
   ActivityIndicator,
 } from "react-native";
-import { Trash2, RotateCcw } from "lucide-react-native";
-import { LinearGradient } from "expo-linear-gradient";
+import { RotateCcw, X } from "lucide-react-native";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 interface ResetTestDialogProps {
   isOpen: boolean;
@@ -23,6 +23,8 @@ export const ResetTestDialog = ({
   testTitle,
 }: ResetTestDialogProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const handleConfirm = async () => {
     setIsLoading(true);
@@ -43,70 +45,154 @@ export const ResetTestDialog = ({
       transparent
       onRequestClose={onClose}
     >
-      <View className="flex-1 justify-center items-center bg-black/60 px-4">
-        <View className="bg-white dark:bg-[#0f172a] p-6 rounded-2xl w-full max-w-md shadow-lg shadow-black/30">
-          {/* Header */}
-          <View className="flex-row items-center justify-center mb-4">
-            <Trash2 size={24} color="#dc2626" />
-            <Text className="text-xl font-extrabold text-red-600 dark:text-red-400 ml-2">
-              Clear Results?
-            </Text>
-          </View>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          alignItems: "center",
+          backgroundColor: "rgba(0, 0, 0, 0.6)",
+          paddingHorizontal: 16,
+        }}
+      >
+        <View
+          style={{
+            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            padding: 16,
+            borderRadius: 16,
+            width: "100%",
+            maxWidth: 600,
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 6 },
+            shadowOpacity: 0.15,
+            shadowRadius: 12,
+            elevation: 8,
+          }}
+        >
+          {/* Close Button */}
+          <TouchableOpacity
+            onPress={onClose}
+            style={{
+              position: "absolute",
+              top: 16,
+              right: 16,
+              zIndex: 10,
+              padding: 8,
+              backgroundColor: isDark ? "#334155" : "#f3f4f6",
+              borderRadius: 8,
+            }}
+            activeOpacity={0.7}
+          >
+            <X size={20} color={isDark ? "#ffffff" : "#1f2937"} />
+          </TouchableOpacity>
+
+          {/* Title */}
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "700",
+              marginBottom: 20,
+              color: isDark ? "#ffffff" : "#1f2937",
+              paddingLeft: 8,
+            }}
+          >
+            Reset Test?
+          </Text>
 
           {/* Description */}
-          <Text className="text-gray-700 dark:text-gray-200 text-base text-center mb-5">
-            You’ve already taken{" "}
-            <Text className="text-black dark:text-white font-semibold">
-              “{testTitle}”
-            </Text>
-            . Do you want to delete your previous results and start over?
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 16,
+              lineHeight: 24,
+              color: isDark ? "#9ca3af" : "#6b7280",
+              marginBottom: 8,
+            }}
+          >
+            You've already completed
+          </Text>
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 16,
+              fontWeight: "700",
+              color: isDark ? "#ffffff" : "#1f2937",
+              marginBottom: 8,
+            }}
+          >
+            "{testTitle}"
+          </Text>
+          <Text
+            style={{
+              textAlign: "center",
+              fontSize: 16,
+              lineHeight: 24,
+              color: isDark ? "#9ca3af" : "#6b7280",
+              marginBottom: 24,
+            }}
+          >
+            Reset your results and start fresh?
           </Text>
 
           {/* Buttons */}
-          <View className="flex-row gap-3">
-            {/* Cancel */}
-            <Pressable
+          <View style={{ flexDirection: "row", gap: 12 }}>
+            {/* Cancel Button */}
+            <TouchableOpacity
               onPress={onClose}
               disabled={isLoading}
-              className="flex-1 rounded-2xl bg-blue-50 border border-blue-500 py-3 items-center justify-center shadow-sm"
+              style={{
+                flex: 1,
+                paddingVertical: 14,
+                borderRadius: 12,
+                alignItems: "center",
+                backgroundColor: isDark ? "#334155" : "#f3f4f6",
+                borderWidth: 1,
+                borderColor: isDark ? "#334155" : "#e5e7eb",
+              }}
+              activeOpacity={0.7}
             >
-              <Text className="text-blue-600 dark:text-blue-400 font-semibold">
-                Cancel
-              </Text>
-            </Pressable>
-
-            {/* Confirm */}
-            <Pressable
-              disabled={isLoading}
-              onPress={handleConfirm}
-              className={`flex-1 rounded-2xl  shadow-md shadow-blue-400/30 ${
-                isLoading ? "opacity-70" : ""
-              }`}
-            >
-              <LinearGradient
-                colors={["#3b82f6", "#2563eb"]}
-                start={[0, 0]}
-                end={[1, 1]}
+              <Text
                 style={{
-                  paddingVertical: 12, // py-3
-                  borderRadius: 16, // rounded-2xl
-                  flexDirection: "row", // flex-row
-                  justifyContent: "center",
-                  alignItems: "center",
+                  color: isDark ? "#ffffff" : "#1f2937",
+                  fontWeight: "600",
+                  fontSize: 16,
                 }}
               >
-                {isLoading ? (
-                  <ActivityIndicator color="#fff" />
-                ) : (
-                  <>
-                    <RotateCcw size={16} color="#fff" />
-                    <Text className="text-white font-semibold ml-2">
-                      Reset
-                    </Text>
-                  </>
-                )}
-              </LinearGradient>
-            </Pressable>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+
+            {/* Confirm Button */}
+            <TouchableOpacity
+              disabled={isLoading}
+              onPress={handleConfirm}
+              style={{
+                flex: 1,
+                paddingVertical: 14,
+                borderRadius: 12,
+                alignItems: "center",
+                backgroundColor: isLoading ? (isDark ? "#334155" : "#d1d5db") : "#06B6D4",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: isLoading ? 0 : 0.1,
+                shadowRadius: 4,
+                elevation: isLoading ? 0 : 3,
+              }}
+              activeOpacity={0.8}
+            >
+              {isLoading ? (
+                <ActivityIndicator color="#ffffff" />
+              ) : (
+                <Text
+                  style={{
+                    color: isLoading ? (isDark ? "#9ca3af" : "#6b7280") : "#ffffff",
+                    fontWeight: "600",
+                    fontSize: 16,
+                  }}
+                >
+                  Reset Test
+                </Text>
+              )}
+            </TouchableOpacity>
           </View>
         </View>
       </View>

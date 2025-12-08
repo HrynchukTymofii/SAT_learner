@@ -41,6 +41,8 @@ export interface Question {
   options: string[];
   answers: string[];
   explanation?: string;
+  hint?: string;
+  hintImageUrl?: string;
   isSaved: boolean;
   isLiked: boolean;
   isDisliked: boolean;

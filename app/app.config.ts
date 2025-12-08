@@ -33,6 +33,17 @@ const config: ExpoConfig = {
       backgroundColor: "#ffffff",
     },
     edgeToEdgeEnabled: true,
+    permissions: [
+      "android.permission.POST_NOTIFICATIONS",
+      "android.permission.SCHEDULE_EXACT_ALARM",
+    ],
+  },
+
+  notification: {
+    icon: "./assets/images/icon.png",
+    color: "#06b6d4",
+    androidMode: "default",
+    androidCollapsedTitle: "SAT Prep Reminder",
   },
 
   web: {
@@ -49,10 +60,18 @@ const config: ExpoConfig = {
         image: "./assets/images/splash-icon-light.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#06b6d4",
+        backgroundColor: "#111827",
       },
     ],
     "expo-secure-store",
+    [
+      "expo-notifications",
+      {
+        icon: "./assets/images/icon.png",
+        color: "#111827",
+        sounds: ["./assets/sounds/notification.wav"],
+      },
+    ],
     [
       "@react-native-google-signin/google-signin",
       {
@@ -80,7 +99,7 @@ const config: ExpoConfig = {
   splash: {
     image: "./assets/images/splash-icon-light.png",
     resizeMode: "contain",
-    backgroundColor: "#06b6d4",
+    backgroundColor: "#111827",
   },
 };
 

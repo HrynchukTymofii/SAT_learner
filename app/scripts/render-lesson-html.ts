@@ -4,7 +4,6 @@
  */
 
 import axios from "axios";
-import * as cheerio from "cheerio";
 
 const API_BASE_URL = "https://www.satlearner.com";
 
@@ -15,81 +14,184 @@ interface LessonHtmlResult {
 }
 
 /**
- * Fetches a lesson page from the website and extracts the rendered HTML + CSS
+ * Converts TipTap JSON content to HTML
+ */
+function tiptapToHtml(content: any): string {
+  if (!content || !content.content) return "";
+
+  let html = "";
+
+  for (const node of content.content) {
+    html += renderNode(node);
+  }
+
+  return html;
+}
+
+function renderNode(node: any): string {
+  if (!node || !node.type) return "";
+
+  switch (node.type) {
+    case "paragraph":
+      const pContent = node.content?.map(renderNode).join("") || "";
+      return `<p>${pContent}</p>`;
+
+    case "heading":
+      const level = node.attrs?.level || 1;
+      const hContent = node.content?.map(renderNode).join("") || "";
+      return `<h${level}>${hContent}</h${level}>`;
+
+    case "text":
+      return renderText(node);
+
+    case "bulletList":
+      const ulContent = node.content?.map(renderNode).join("") || "";
+      return `<ul>${ulContent}</ul>`;
+
+    case "orderedList":
+      const olContent = node.content?.map(renderNode).join("") || "";
+      return `<ol>${olContent}</ol>`;
+
+    case "listItem":
+      const liContent = node.content?.map(renderNode).join("") || "";
+      return `<li>${liContent}</li>`;
+
+    case "blockquote":
+      const bqContent = node.content?.map(renderNode).join("") || "";
+      return `<blockquote>${bqContent}</blockquote>`;
+
+    case "codeBlock":
+      const codeContent = node.content?.map((n: any) => n.text || "").join("") || "";
+      return `<pre><code>${escapeHtml(codeContent)}</code></pre>`;
+
+    case "inlineMath":
+      const latex = node.attrs?.latex || "";
+      return `<span class="math-inline">$${escapeHtml(latex)}$</span>`;
+
+    case "image":
+      const src = node.attrs?.src || "";
+      const alt = node.attrs?.alt || "";
+      return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />`;
+
+    case "hardBreak":
+      return "<br>";
+
+    default:
+      return "";
+  }
+}
+
+function renderText(node: any): string {
+  let text = escapeHtml(node.text || "");
+  const marks = node.marks || [];
+
+  for (const mark of marks) {
+    switch (mark.type) {
+      case "bold":
+        text = `<strong>${text}</strong>`;
+        break;
+      case "italic":
+        text = `<em>${text}</em>`;
+        break;
+      case "underline":
+        text = `<u>${text}</u>`;
+        break;
+      case "strike":
+        text = `<s>${text}</s>`;
+        break;
+      case "code":
+        text = `<code>${text}</code>`;
+        break;
+      case "link":
+        const href = mark.attrs?.href || "#";
+        text = `<a href="${escapeHtml(href)}">${text}</a>`;
+        break;
+      case "highlight":
+        const color = mark.attrs?.color || "#fef08a";
+        text = `<mark style="background-color: ${escapeHtml(color)}">${text}</mark>`;
+        break;
+      case "textStyle":
+        const styles: string[] = [];
+        if (mark.attrs?.color) styles.push(`color: ${escapeHtml(mark.attrs.color)}`);
+        if (mark.attrs?.fontSize) styles.push(`font-size: ${escapeHtml(mark.attrs.fontSize)}`);
+        if (mark.attrs?.fontFamily) styles.push(`font-family: ${escapeHtml(mark.attrs.fontFamily)}`);
+        if (styles.length > 0) {
+          text = `<span style="${styles.join("; ")}">${text}</span>`;
+        }
+        break;
+    }
+  }
+
+  return text;
+}
+
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
+/**
+ * Fetches lesson content from API and renders TipTap JSON to HTML
  */
 export async function fetchRenderedLessonHtml(
   chapterId: string,
-  lessonId: string
+  lessonId: string,
+  lessonContent?: any
 ): Promise<LessonHtmlResult | null> {
   try {
-    // Use the new export API endpoint that returns complete HTML
-    const url = `${API_BASE_URL}/api/export/lesson/${chapterId}/${lessonId}`;
-    console.log(`📄 Fetching rendered HTML for lesson ${lessonId}...`);
+    // If lesson content is provided, use it directly
+    let contentJson = lessonContent;
 
-    const response = await axios.get(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0 (compatible; SATLearner/1.0)",
-      },
-    });
+    // Otherwise, fetch it from the API
+    if (!contentJson) {
+      console.log(`📡 Fetching lesson content for ${lessonId}...`);
+      const url = `${API_BASE_URL}/api/user/course/chapters`;
+      const response = await axios.get(url);
 
-    const completeHtml = response.data;
-    //console.log(completeHtml)
+      // Find the chapter and lesson
+      const chapter = response.data.find((c: any) => c.id === chapterId);
+      if (!chapter) {
+        console.error(`❌ Chapter ${chapterId} not found`);
+        return null;
+      }
 
-    // The API returns a complete HTML document, so we can use it directly
-    return {
-      html: completeHtml, // Full HTML for display
-      css: "", // CSS is already embedded in the HTML
-      combinedHtml: completeHtml, // Same as html
-    };
-  } catch (error) {
-    console.error(`❌ Failed to fetch lesson ${lessonId}:`, error);
+      const lesson = chapter.lessons?.find((l: any) => l.id === lessonId);
+      if (!lesson || !lesson.content) {
+        console.error(`❌ Lesson ${lessonId} not found or has no content`);
+        return null;
+      }
 
-    // Fallback to old method if the new API endpoint doesn't work
-    try {
-      console.log(`⚠️  Trying fallback method for lesson ${lessonId}...`);
-      const url = `${API_BASE_URL}/expo-course/${chapterId}/lessons/${lessonId}`;
+      contentJson = lesson.content;
+    }
 
-      const response = await axios.get(url, {
-        headers: {
-          "User-Agent": "Mozilla/5.0 (compatible; SATLearner/1.0)",
-        },
-      });
+    // Parse content if it's a string
+    const content = typeof contentJson === "string" ? JSON.parse(contentJson) : contentJson;
 
-      const html = response.data;
-      const $ = cheerio.load(html);
+    // Convert TipTap JSON to HTML
+    const contentHtml = tiptapToHtml(content);
 
-      // Extract the lesson content
-      const contentHtml = $(".expo-content").html() || $("body").html() || "";
-
-      // Extract inline styles
-      const inlineStyles: string[] = [];
-      $("style").each((_, el) => {
-        inlineStyles.push($(el).html() || "");
-      });
-
-      // Extract linked stylesheets content (if needed)
-      const linkedStyles: string[] = [];
-      $('link[rel="stylesheet"]').each((_, el) => {
-        const href = $(el).attr("href");
-        if (href) {
-          linkedStyles.push(`/* Stylesheet: ${href} */`);
-        }
-      });
-
-      const combinedCss = [...inlineStyles, ...linkedStyles].join("\n\n");
-
-      // Create a self-contained HTML document
-      const combinedHtml = createSelfContainedHtml(contentHtml, combinedCss);
-
-      return {
-        html: contentHtml,
-        css: combinedCss,
-        combinedHtml,
-      };
-    } catch (fallbackError) {
-      console.error(`❌ Fallback also failed for lesson ${lessonId}:`, fallbackError);
+    if (!contentHtml) {
+      console.warn(`⚠️ No HTML content generated for lesson ${lessonId}`);
       return null;
     }
+
+    // Create a self-contained HTML document
+    const combinedHtml = createSelfContainedHtml(contentHtml, "");
+
+    return {
+      html: contentHtml,
+      css: "",
+      combinedHtml,
+    };
+  } catch (error) {
+    console.error(`❌ Failed to render lesson ${lessonId}:`, error);
+    return null;
   }
 }
 
@@ -299,7 +401,7 @@ function createSelfContainedHtml(content: string, css: string): string {
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
 </head>
 <body>
-  <div class="expo-content">
+  <div class="expo-content p-4">
     ${content}
   </div>
 

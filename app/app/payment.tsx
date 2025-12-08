@@ -6,6 +6,9 @@ import {
   View,
   Text,
   Platform,
+  Dimensions,
+  // Animated,
+  Modal,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -13,19 +16,19 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import { useAuth } from "@/context/AuthContext";
 import { upgradeToPro } from "@/lib/api/user";
+import { LinearGradient } from "expo-linear-gradient";
 import {
   X,
   Check,
   Sparkles,
-  Trophy,
-  Target,
-  TrendingUp,
-  Users,
-  Shield,
-  Zap,
-  Clock
+  GraduationCap,
+  BookOpen,
+  Award,
+  Star
 } from "lucide-react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
+
+const { width } = Dimensions.get('window');
 
 export default function PaywallScreen() {
   const router = useRouter();
@@ -40,15 +43,47 @@ export default function PaywallScreen() {
   });
   const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("yearly");
   const [loading, setLoading] = useState(false);
+  const [showUpsellModal, setShowUpsellModal] = useState(false);
+  // const [spinsLeft, setSpinsLeft] = useState(3);
+  // const [currentDiscount, setCurrentDiscount] = useState(0);
+  // const [finalDiscount, setFinalDiscount] = useState(0);
+  // const rotateAnim = useRef(new Animated.Value(0)).current;
+  // const currentRotationRef = useRef(0);
+  // const discountCardAnim = useRef(new Animated.Value(0)).current;
+
+  // useEffect(() => {
+  //   // Initialize discount card animation to 1 if there's already a discount
+  //   if (finalDiscount > 0) {
+  //     discountCardAnim.setValue(1);
+  //   }
+  // }, [finalDiscount]);
 
   useEffect(() => {
     const fetchOfferings = async () => {
       try {
         const offerings = await Purchases.getOfferings();
-        const allPackages = offerings.current?.availablePackages || [];
 
-        const monthly = allPackages.find(pkg => pkg.identifier.includes("monthly"));
-        const yearly = allPackages.find(pkg => pkg.identifier.includes("yearly") || pkg.identifier.includes("annual"));
+        // Try to get packages from all offerings
+        let allPackages = offerings.current?.availablePackages || [];
+
+        // Combine packages from all offerings if needed
+        if (allPackages.length < 2) {
+          Object.values(offerings.all).forEach((offering: any) => {
+            if (offering.availablePackages) {
+              allPackages = [...allPackages, ...offering.availablePackages];
+            }
+          });
+        }
+
+        const monthly = allPackages.find(pkg =>
+          pkg.identifier.toLowerCase().includes("monthly") ||
+          pkg.identifier.toLowerCase().includes("month")
+        );
+        const yearly = allPackages.find(pkg =>
+          pkg.identifier.toLowerCase().includes("yearly") ||
+          pkg.identifier.toLowerCase().includes("annual") ||
+          pkg.identifier.toLowerCase().includes("year")
+        );
 
         setPackages({ monthly: monthly || null, yearly: yearly || null });
       } catch (e) {
@@ -102,419 +137,476 @@ export default function PaywallScreen() {
   };
 
   const features = [
-    { icon: Sparkles, text: "Unlimited access to 400+ SAT practice questions", highlight: true },
-    { icon: Trophy, text: "Full-length practice exams with real SAT scoring" },
-    { icon: Target, text: "Personalized wrong answer review & improvement tracking" },
-    { icon: TrendingUp, text: "Advanced progress analytics & score predictions" },
-    { icon: Zap, text: "Instant explanations for every question" },
-    { icon: Clock, text: "Study at your own pace, anytime, anywhere" },
+    { text: "Unlimited access to 400+ SAT practice questions" },
+    { text: "Full-length practice exams with real SAT scoring" },
+    { text: "Personalized wrong answer review & improvement tracking" },
+    { text: "Instant explanations for every question" },
+    { text: "Study at your own pace, anytime, anywhere" },
   ];
 
-  const socialProof = [
-    { stat: "12,847", label: "Students using PRO" },
-    { stat: "94%", label: "Improved their score" },
-    { stat: "1520+", label: "Average PRO score" },
-  ];
+  const handleBackPress = () => {
+    setShowUpsellModal(true);
+  };
+
+  // const spinRoulette = () => {
+  //   if (spinsLeft <= 0) return;
+
+  //   // Define which discounts are available for each spin
+  //   let availableDiscounts: number[];
+  //   if (spinsLeft === 3) {
+  //     // First spin: 5, 10, or 15
+  //     availableDiscounts = [5, 10, 15];
+  //   } else if (spinsLeft === 2) {
+  //     // Second spin: 20, 25, or 30
+  //     availableDiscounts = [20, 25, 30];
+  //   } else {
+  //     // Third spin: 5, 10, 15, or 20
+  //     availableDiscounts = [5, 10, 15, 20];
+  //   }
+
+  //   const randomDiscount = availableDiscounts[Math.floor(Math.random() * availableDiscounts.length)];
+
+  //   // Calculate the target rotation to land on the selected discount
+  //   // Segments are positioned at: 5%=0°, 10%=60°, 15%=120°, 20%=180°, 25%=240°, 30%=300°
+  //   const discountAngles: { [key: number]: number } = {
+  //     5: 0,
+  //     10: 60,
+  //     15: 120,
+  //     20: 180,
+  //     25: 240,
+  //     30: 300,
+  //   };
+
+  //   const targetAngle = discountAngles[randomDiscount];
+  //   const currentRotation = currentRotationRef.current;
+
+  //   // Add 3-4 full rotations (1080-1440 degrees) plus the target angle
+  //   const fullRotations = 1080 + Math.floor(Math.random() * 360);
+  //   const finalRotation = currentRotation + fullRotations + (360 - targetAngle);
+
+  //   Animated.timing(rotateAnim, {
+  //     toValue: finalRotation,
+  //     duration: 2000,
+  //     useNativeDriver: true,
+  //   }).start(() => {
+  //     currentRotationRef.current = finalRotation;
+  //     setCurrentDiscount(randomDiscount);
+
+  //     const newBestDiscount = Math.max(finalDiscount, randomDiscount);
+  //     if (newBestDiscount > finalDiscount) {
+  //       // Animate the discount card when it updates
+  //       discountCardAnim.setValue(0);
+  //       Animated.spring(discountCardAnim, {
+  //         toValue: 1,
+  //         useNativeDriver: true,
+  //         tension: 50,
+  //         friction: 7,
+  //       }).start();
+  //     }
+
+  //     setFinalDiscount(newBestDiscount);
+  //     setSpinsLeft(spinsLeft - 1);
+  //   });
+  // };
+
+  const acceptUpsellOffer = async () => {
+    setShowUpsellModal(false);
+    await handleSubscribe();
+  };
 
   return (
     <View style={{ flex: 1, backgroundColor: isDark ? "#0f172a" : "#ffffff" }}>
-      {/* Header */}
-      {/* <View style={{
-        paddingTop: insets.top + 12,
-        paddingBottom: 16,
-        paddingHorizontal: 16,
-        backgroundColor: isDark ? "#0f172a" : "#ffffff",
-        borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
-      }}>
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={{
-            alignSelf: "flex-end",
-            padding: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
-            borderRadius: 8,
-          }}
-          activeOpacity={0.7}
-        >
-          <X size={20} color={isDark ? "#ffffff" : "#1f2937"} />
-        </TouchableOpacity>
-      </View> */}
-
       <ScrollView
-        contentContainerStyle={{ paddingTop: insets.top, paddingBottom: 190 }}
+        contentContainerStyle={{ paddingBottom: 150 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* Hero Section */}
-        <View style={{ paddingHorizontal: 20, paddingTop: 20, paddingBottom: 32 }}>
-          {/* Limited Time Badge */}
-          <View style={{
-            alignSelf: "center",
-            backgroundColor: "#EF4444",
-            paddingHorizontal: 16,
-            paddingVertical: 8,
-            borderRadius: 20,
-            marginBottom: 20,
-          }}>
-            <Text style={{ color: "#ffffff", fontWeight: "700", fontSize: 12 }}>
-              🔥 LIMITED TIME: 50% OFF YEARLY PLAN
-            </Text>
+        {/* Header with SAT Theme Gradient */}
+        <LinearGradient
+          colors={['#06B6D4', '#0891B2', '#0e7490']}
+          style={{
+            height: 150,
+            position: 'relative',
+            overflow: 'hidden',
+          }}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          {/* Decorative Elements */}
+          <View style={{ position: 'absolute', top: 40, left: 30 }}>
+            <Star size={12} color="#FCD34D" fill="#FCD34D" />
+          </View>
+          <View style={{ position: 'absolute', top: 40, right: 60 }}>
+            <Star size={8} color="#FCD34D" fill="#FCD34D" />
+          </View>
+          <View style={{ position: 'absolute', bottom: 20, left: width * 0.65 }}>
+            <Star size={12} color="#FCD34D" fill="#FCD34D" />
+          </View>
+          <View style={{ position: 'absolute', bottom: 30, left: 50 }}>
+            <Star size={10} color="#FCD34D" fill="#FCD34D" />
           </View>
 
-          {/* Main Headline */}
+          {/* Floating Icons */}
+          <View style={{
+            position: 'absolute',
+            top: 50,
+            left: 70,
+            backgroundColor: 'rgba(255,255,255,0.15)',
+            borderRadius: 40,
+            width: 48,
+            height: 48,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <BookOpen size={24} color="#FFF" />
+          </View>
+
+          <View style={{
+            position: 'absolute',
+            bottom: 35,
+            right: 65,
+            backgroundColor: 'rgba(255,255,255,0.15)',
+            borderRadius: 40,
+            width: 48,
+            height: 48,
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}>
+            <Award size={22} color="#FFF" />
+          </View>
+
+          {/* Central Graduation Cap */}
+          <View style={{
+            position: 'absolute',
+            top: 60,
+            left: width / 2 - 40,
+            alignItems: 'center',
+          }}>
+            <View style={{
+              width: 80,
+              height: 80,
+              backgroundColor: '#FFF',
+              borderRadius: 40,
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 4 },
+              shadowOpacity: 0.2,
+              shadowRadius: 8,
+              elevation: 5,
+            }}>
+              <GraduationCap size={42} color="#06B6D4" />
+            </View>
+          </View>
+
+          {/* Close Button */}
+          <TouchableOpacity
+            // onPress={handleBackPress}
+            onPress={() => router.back()}
+            style={{
+              position: 'absolute',
+              top: insets.top + 12,
+              right: 20,
+              width: 40,
+              height: 40,
+              borderRadius: 20,
+              backgroundColor: '#FFF',
+              justifyContent: 'center',
+              alignItems: 'center',
+              shadowColor: '#000',
+              shadowOffset: { width: 0, height: 2 },
+              shadowOpacity: 0.1,
+              shadowRadius: 4,
+              elevation: 3,
+            }}
+          >
+            <X size={22} color="#000" />
+          </TouchableOpacity>
+        </LinearGradient>
+
+        {/* Content */}
+        <View style={{ paddingHorizontal: 24 }}>
+          {/* PRO Badge */}
+          <View style={{
+            alignSelf: 'flex-start',
+            flexDirection: 'row',
+            alignItems: 'center',
+            backgroundColor: '#06B6D4',
+            paddingHorizontal: 12,
+            paddingVertical: 6,
+            borderRadius: 20,
+            marginTop: 24,
+            marginBottom: 16,
+          }}>
+            <Sparkles size={14} color="#FFF" style={{ marginRight: 4 }} />
+            <Text style={{ color: '#FFF', fontSize: 14, fontWeight: '700' }}>PRO</Text>
+          </View>
+
+          {/* Title */}
           <Text style={{
             fontSize: 32,
-            fontWeight: "800",
-            color: isDark ? "#ffffff" : "#1f2937",
-            textAlign: "center",
-            marginBottom: 12,
+            fontWeight: '700',
+            color: isDark ? '#ffffff' : '#1f2937',
+            marginBottom: 24,
             lineHeight: 38,
           }}>
-            Get Your Dream SAT Score
+            Unlock Your Full{'\n'}SAT Potential
           </Text>
 
-          <Text style={{
+          {/* <Text style={{
             fontSize: 16,
-            color: isDark ? "#9ca3af" : "#6b7280",
-            textAlign: "center",
+            color: isDark ? '#9ca3af' : '#6b7280',
             marginBottom: 24,
             lineHeight: 24,
           }}>
-            Join thousands of students who've boosted their scores by 200+ points with our proven system
-          </Text>
+            Join thousands of students achieving their dream scores with unlimited practice
+          </Text> */}
 
-          {/* Social Proof Stats */}
-          <View style={{ flexDirection: "row", gap: 12, marginBottom: 32 }}>
-            {socialProof.map((item, idx) => (
+          {/* Features List */}
+          <View style={{ marginBottom: 28 }}>
+            {features.map((feature, idx) => (
               <View key={idx} style={{
-                flex: 1,
-                backgroundColor: isDark ? "#1e293b" : "#f9fafb",
-                borderRadius: 12,
-                padding: 12,
-                alignItems: "center",
-                borderWidth: 1,
-                borderColor: isDark ? "#334155" : "#e5e7eb",
+                flexDirection: 'row',
+                alignItems: 'flex-start',
+                marginBottom: 18,
               }}>
-                <Text style={{
-                  fontSize: 20,
-                  fontWeight: "800",
-                  color: "#06B6D4",
-                  marginBottom: 4,
+                <View style={{
+                  backgroundColor: '#06B6D4',
+                  borderRadius: 6,
+                  padding: 4,
+                  marginRight: 12,
+                  marginTop: 2,
                 }}>
-                  {item.stat}
-                </Text>
+                  <Check size={16} color="#FFF" />
+                </View>
                 <Text style={{
-                  fontSize: 11,
-                  color: isDark ? "#9ca3af" : "#6b7280",
-                  textAlign: "center",
+                  flex: 1,
+                  fontSize: 16,
+                  color: isDark ? '#ffffff' : '#1f2937',
+                  lineHeight: 24,
                 }}>
-                  {item.label}
+                  {feature.text}
                 </Text>
               </View>
             ))}
           </View>
 
-          {/* Plan Selection */}
-          <Text style={{
-            fontSize: 18,
-            fontWeight: "700",
-            color: isDark ? "#ffffff" : "#1f2937",
-            marginBottom: 16,
-          }}>
-            Choose Your Plan
-          </Text>
-
-          {/* Yearly Plan */}
-          <TouchableOpacity
-            onPress={() => setSelectedPlan("yearly")}
-            activeOpacity={0.7}
-            style={{
-              backgroundColor: selectedPlan === "yearly" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
-              borderRadius: 16,
-              padding: 20,
-              marginBottom: 12,
-              borderWidth: 3,
-              borderColor: selectedPlan === "yearly" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
-              position: "relative",
-            }}
-          >
-            {selectedPlan === "yearly" && (
+          {/* Pricing Container */}
+          <View style={{ marginBottom: 24 }}>
+            {!packages.yearly && !packages.monthly ? (
               <View style={{
-                position: "absolute",
+                padding: 40,
+                alignItems: 'center',
+              }}>
+                <ActivityIndicator size="large" color="#06B6D4" />
+                <Text style={{
+                  marginTop: 12,
+                  fontSize: 14,
+                  color: isDark ? '#9ca3af' : '#6b7280',
+                }}>
+                  Loading plans...
+                </Text>
+              </View>
+            ) : (
+              <>
+            {/* Annual Plan */}
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: 20,
+                borderRadius: 16,
+                borderWidth: selectedPlan === 'yearly' ? 3 : 2,
+                borderColor: selectedPlan === 'yearly' ? '#06B6D4' : (isDark ? '#334155' : '#e5e7eb'),
+                backgroundColor: isDark ? '#1e293b' : '#FFF',
+                marginBottom: packages.monthly ? 16 : 0,
+                position: 'relative',
+                paddingTop: packages.monthly ? 30 : 20,
+              }}
+              onPress={() => setSelectedPlan('yearly')}
+              activeOpacity={0.7}
+              disabled={!packages.yearly}
+            >
+              {/* POPULAR Badge - only show if there's a monthly option */}
+              {packages.monthly && (
+              <View style={{
+                position: 'absolute',
                 top: -12,
-                right: 20,
-                backgroundColor: "#10B981",
+                left: 16,
+                backgroundColor: '#FCD34D',
                 paddingHorizontal: 12,
                 paddingVertical: 4,
                 borderRadius: 12,
               }}>
-                <Text style={{ color: "#ffffff", fontWeight: "700", fontSize: 11 }}>
-                  BEST VALUE
+                <Text style={{
+                  fontSize: 11,
+                  fontWeight: '700',
+                  color: '#1f2937',
+                  letterSpacing: 0.5,
+                }}>
+                  POPULAR
                 </Text>
               </View>
-            )}
+              )}
 
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <View>
-                <Text style={{
-                  fontSize: 20,
-                  fontWeight: "800",
-                  color: selectedPlan === "yearly" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
-                }}>
-                  Yearly Plan
-                </Text>
-                <Text style={{
-                  fontSize: 14,
-                  color: selectedPlan === "yearly" ? "#ffffff" : (isDark ? "#9ca3af" : "#6b7280"),
-                  marginTop: 4,
-                }}>
-                  Save $30 vs monthly
-                </Text>
-              </View>
-              <View style={{ alignItems: "flex-end" }}>
-                <Text style={{
-                  fontSize: 32,
-                  fontWeight: "800",
-                  color: selectedPlan === "yearly" ? "#ffffff" : "#06B6D4",
-                }}>
-                  $30
-                </Text>
-                <Text style={{
-                  fontSize: 14,
-                  textDecorationLine: "line-through",
-                  color: selectedPlan === "yearly" ? "rgba(255,255,255,0.7)" : (isDark ? "#6b7280" : "#9ca3af"),
-                }}>
-                  $60
-                </Text>
-                <Text style={{
-                  fontSize: 12,
-                  color: selectedPlan === "yearly" ? "#ffffff" : (isDark ? "#9ca3af" : "#6b7280"),
-                }}>
-                  $2.50/month
-                </Text>
-              </View>
-            </View>
-
-            <View style={{
-              backgroundColor: selectedPlan === "yearly" ? "rgba(255,255,255,0.2)" : (isDark ? "#0f172a" : "#f9fafb"),
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderRadius: 8,
-            }}>
-              <Text style={{
-                fontSize: 13,
-                fontWeight: "600",
-                color: selectedPlan === "yearly" ? "#ffffff" : "#10B981",
-                textAlign: "center",
+              {/* Discount Badge - only show if there's a monthly option */}
+              {packages.monthly && packages.yearly && (
+              <View style={{
+                position: 'absolute',
+                top: -12,
+                right: 16,
+                backgroundColor: '#10B981',
+                paddingHorizontal: 12,
+                paddingVertical: 4,
+                borderRadius: 12,
               }}>
-                ✓ One year of unlimited access
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Monthly Plan */}
-          <TouchableOpacity
-            onPress={() => setSelectedPlan("monthly")}
-            activeOpacity={0.7}
-            style={{
-              backgroundColor: selectedPlan === "monthly" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
-              borderRadius: 16,
-              padding: 20,
-              borderWidth: 3,
-              borderColor: selectedPlan === "monthly" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
-              <View>
                 <Text style={{
-                  fontSize: 20,
-                  fontWeight: "800",
-                  color: selectedPlan === "monthly" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                  fontSize: 11,
+                  fontWeight: '700',
+                  color: '#FFF',
+                  letterSpacing: 0.5,
                 }}>
-                  Monthly Plan
-                </Text>
-                <Text style={{
-                  fontSize: 14,
-                  color: selectedPlan === "monthly" ? "#ffffff" : (isDark ? "#9ca3af" : "#6b7280"),
-                  marginTop: 4,
-                }}>
-                  Flexible month-to-month
+                  SAVE {Math.round(((packages.monthly.product.price - (packages.yearly.product.price / 12)) / packages.monthly.product.price) * 100)}%
                 </Text>
               </View>
-              <View style={{ alignItems: "flex-end" }}>
+              )}
+
+              <View style={{ flex: 1 }}>
                 <Text style={{
-                  fontSize: 32,
-                  fontWeight: "800",
-                  color: selectedPlan === "monthly" ? "#ffffff" : "#06B6D4",
+                  fontSize: 18,
+                  fontWeight: '600',
+                  color: isDark ? '#ffffff' : '#1f2937',
+                  marginBottom: 4,
                 }}>
-                  $5
+                  Annual
                 </Text>
-                <Text style={{
-                  fontSize: 12,
-                  color: selectedPlan === "monthly" ? "#ffffff" : (isDark ? "#9ca3af" : "#6b7280"),
-                }}>
-                  per month
-                </Text>
+                {packages.yearly && (
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                    {packages.yearly.product.introPrice && (
+                      <Text style={{
+                        fontSize: 14,
+                        color: isDark ? '#6b7280' : '#9ca3af',
+                        textDecorationLine: 'line-through',
+                      }}>
+                        {packages.yearly.product.priceString}
+                      </Text>
+                    )}
+                    <Text style={{
+                      fontSize: 14,
+                      fontWeight: '700',
+                      color: isDark ? '#ffffff' : '#1f2937',
+                    }}>
+                      {packages.yearly.product.introPrice?.priceString || packages.yearly.product.priceString}
+                    </Text>
+                  </View>
+                )}
               </View>
-            </View>
 
-            <View style={{
-              backgroundColor: selectedPlan === "monthly" ? "rgba(255,255,255,0.2)" : (isDark ? "#0f172a" : "#f9fafb"),
-              paddingHorizontal: 12,
-              paddingVertical: 8,
-              borderRadius: 8,
-            }}>
-              <Text style={{
-                fontSize: 13,
-                fontWeight: "600",
-                color: selectedPlan === "monthly" ? "#ffffff" : (isDark ? "#9ca3af" : "#6b7280"),
-                textAlign: "center",
-              }}>
-                Cancel anytime
-              </Text>
-            </View>
-          </TouchableOpacity>
-
-          {/* Features List */}
-          <Text style={{
-            fontSize: 18,
-            fontWeight: "700",
-            color: isDark ? "#ffffff" : "#1f2937",
-            marginTop: 32,
-            marginBottom: 16,
-          }}>
-            Everything Included
-          </Text>
-
-          {features.map((feature, idx) => {
-            const Icon = feature.icon;
-            return (
-              <View
-                key={idx}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 16,
-                  backgroundColor: feature.highlight ? (isDark ? "#1e293b" : "#f0fdfa") : "transparent",
-                  padding: feature.highlight ? 12 : 0,
-                  borderRadius: 12,
-                  borderWidth: feature.highlight ? 1 : 0,
-                  borderColor: feature.highlight ? "#06B6D4" : "transparent",
-                }}
-              >
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                {packages.yearly && packages.monthly && (
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: isDark ? '#ffffff' : '#1f2937',
+                  }}>
+                    {new Intl.NumberFormat(undefined, {
+                      style: 'currency',
+                      currency: packages.yearly.product.currencyCode,
+                    }).format(packages.yearly.product.price / 12)} / MO
+                  </Text>
+                )}
+                {packages.monthly && (
                 <View style={{
-                  backgroundColor: "#06B6D4",
-                  borderRadius: 8,
-                  padding: 8,
-                  marginRight: 12,
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  borderWidth: 2,
+                  borderColor: selectedPlan === 'yearly' ? '#06B6D4' : (isDark ? '#6b7280' : '#d1d5db'),
+                  backgroundColor: selectedPlan === 'yearly' ? '#06B6D4' : 'transparent',
+                  justifyContent: 'center',
+                  alignItems: 'center',
                 }}>
-                  <Icon size={20} color="#ffffff" />
+                  {selectedPlan === 'yearly' && (
+                    <Check size={16} color="#FFF" />
+                  )}
                 </View>
-                <Text
-                  style={{
-                    flex: 1,
-                    fontSize: 15,
-                    color: isDark ? "#ffffff" : "#1f2937",
-                    fontWeight: feature.highlight ? "600" : "400",
-                  }}
-                >
-                  {feature.text}
-                </Text>
+                )}
               </View>
-            );
-          })}
+            </TouchableOpacity>
 
-          {/* Guarantees */}
-          <View style={{
-            backgroundColor: isDark ? "#1e293b" : "#f9fafb",
-            borderRadius: 16,
-            padding: 20,
-            marginTop: 24,
-            borderWidth: 1,
-            borderColor: isDark ? "#334155" : "#e5e7eb",
-          }}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16 }}>
-              <Shield size={24} color="#10B981" style={{ marginRight: 12 }} />
-              <Text style={{
-                fontSize: 18,
-                fontWeight: "700",
-                color: isDark ? "#ffffff" : "#1f2937",
-              }}>
-                Our Promise to You
-              </Text>
-            </View>
+            {/* Monthly Plan */}
+            {packages.monthly && (
+            <TouchableOpacity
+              style={{
+                flexDirection: 'row',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                padding: 20,
+                borderRadius: 16,
+                borderWidth: selectedPlan === 'monthly' ? 3 : 2,
+                borderColor: selectedPlan === 'monthly' ? '#06B6D4' : (isDark ? '#334155' : '#e5e7eb'),
+                backgroundColor: isDark ? '#1e293b' : '#FFF',
+              }}
+              onPress={() => setSelectedPlan('monthly')}
+              activeOpacity={0.7}
+            >
+              <View style={{ flex: 1 }}>
+                <Text style={{
+                  fontSize: 18,
+                  fontWeight: '600',
+                  color: isDark ? '#ffffff' : '#1f2937',
+                }}>
+                  Monthly
+                </Text>
+              </View>
 
-            <View style={{ gap: 12 }}>
-              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-                <Check size={16} color="#10B981" style={{ marginRight: 8, marginTop: 2 }} />
-                <Text style={{ flex: 1, fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", lineHeight: 20 }}>
-                  <Text style={{ fontWeight: "600", color: isDark ? "#ffffff" : "#1f2937" }}>Score Improvement Guarantee:</Text> 95% of our PRO users improve their SAT score by 150+ points
-                </Text>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+                {packages.monthly && (
+                  <Text style={{
+                    fontSize: 16,
+                    fontWeight: '600',
+                    color: isDark ? '#ffffff' : '#1f2937',
+                  }}>
+                    {packages.monthly.product.priceString} / MO
+                  </Text>
+                )}
+                <View style={{
+                  width: 24,
+                  height: 24,
+                  borderRadius: 12,
+                  borderWidth: 2,
+                  borderColor: selectedPlan === 'monthly' ? '#06B6D4' : (isDark ? '#6b7280' : '#d1d5db'),
+                  backgroundColor: selectedPlan === 'monthly' ? '#06B6D4' : 'transparent',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                }}>
+                  {selectedPlan === 'monthly' && (
+                    <Check size={16} color="#FFF" />
+                  )}
+                </View>
               </View>
-              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-                <Check size={16} color="#10B981" style={{ marginRight: 8, marginTop: 2 }} />
-                <Text style={{ flex: 1, fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", lineHeight: 20 }}>
-                  <Text style={{ fontWeight: "600", color: isDark ? "#ffffff" : "#1f2937" }}>Money-Back Guarantee:</Text> Not satisfied? Get a full refund within 30 days, no questions asked
-                </Text>
-              </View>
-              <View style={{ flexDirection: "row", alignItems: "flex-start" }}>
-                <Check size={16} color="#10B981" style={{ marginRight: 8, marginTop: 2 }} />
-                <Text style={{ flex: 1, fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", lineHeight: 20 }}>
-                  <Text style={{ fontWeight: "600", color: isDark ? "#ffffff" : "#1f2937" }}>Secure Payment:</Text> Protected by {Platform.OS === "android" ? "Google Play" : "Apple"} - Your data is 100% safe
-                </Text>
-              </View>
-            </View>
+            </TouchableOpacity>
+            )}
+            </>
+            )}
           </View>
 
-          {/* Testimonial */}
-          <View style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
-            borderRadius: 16,
-            padding: 20,
-            marginTop: 20,
-            borderLeftWidth: 4,
-            borderLeftColor: "#06B6D4",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 3,
-          }}>
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-              <Users size={20} color="#06B6D4" style={{ marginRight: 8 }} />
-              <Text style={{ fontSize: 14, fontWeight: "600", color: isDark ? "#06B6D4" : "#0891B2" }}>
-                Student Success Story
-              </Text>
-            </View>
-            <Text style={{
-              fontSize: 15,
-              color: isDark ? "#ffffff" : "#1f2937",
-              fontStyle: "italic",
-              marginBottom: 12,
-              lineHeight: 22,
-            }}>
-              "I went from 1250 to 1480 in just 3 months! The personalized practice and instant feedback made all the difference. Best investment I made for my college future."
-            </Text>
-            <Text style={{ fontSize: 13, fontWeight: "600", color: isDark ? "#9ca3af" : "#6b7280" }}>
-              - Sarah M., admitted to UCLA
-            </Text>
-          </View>
         </View>
       </ScrollView>
 
-      {/* Fixed Bottom CTA */}
+      {/* Fixed Bottom CTA Button */}
       <View style={{
-        position: "absolute",
+        position: 'absolute',
         bottom: 0,
         left: 0,
         right: 0,
-        paddingBottom: insets.bottom + 16,
-        paddingTop: 16,
+        backgroundColor: isDark ? '#0f172a' : '#ffffff',
         paddingHorizontal: 20,
-        backgroundColor: isDark ? "#0f172a" : "#ffffff",
+        paddingTop: 12,
+        paddingBottom: insets.bottom + 12,
         borderTopWidth: 1,
-        borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
-        shadowColor: "#000",
+        borderTopColor: isDark ? '#1f2937' : '#e5e7eb',
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.1,
         shadowRadius: 8,
@@ -524,46 +616,336 @@ export default function PaywallScreen() {
           onPress={handleSubscribe}
           disabled={loading || (!packages.monthly && !packages.yearly)}
           style={{
-            backgroundColor: loading ? (isDark ? "#334155" : "#d1d5db") : "#06B6D4",
             borderRadius: 16,
-            paddingVertical: 18,
-            alignItems: "center",
-            shadowColor: "#06B6D4",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 8,
-            elevation: 5,
+            overflow: 'hidden',
+            marginBottom: 8,
           }}
           activeOpacity={0.8}
         >
-          {loading ? (
-            <ActivityIndicator color="#ffffff" />
-          ) : (
-            <>
+          <LinearGradient
+            colors={loading ? ['#9ca3af', '#9ca3af'] : ['#06B6D4', '#0891B2']}
+            style={{
+              paddingVertical: 16,
+              alignItems: 'center',
+            }}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            {loading ? (
+              <ActivityIndicator color="#FFF" />
+            ) : (
               <Text style={{
-                color: "#ffffff",
                 fontSize: 18,
-                fontWeight: "800",
-                marginBottom: 4,
+                fontWeight: '700',
+                color: '#FFF',
               }}>
-                Start Your Journey to 1600 →
+                Start Learning Now
               </Text>
-              <Text style={{ color: "#ffffff", fontSize: 13, opacity: 0.9 }}>
-                {selectedPlan === "yearly" ? "$30/year • Save $30" : "$5/month • Cancel anytime"}
-              </Text>
-            </>
-          )}
+            )}
+          </LinearGradient>
         </TouchableOpacity>
 
+        {/* Trial Info */}
         <Text style={{
-          fontSize: 11,
-          color: isDark ? "#6b7280" : "#9ca3af",
-          textAlign: "center",
-          marginTop: 12,
+          fontSize: 12,
+          color: isDark ? '#6b7280' : '#9ca3af',
+          textAlign: 'center',
+          lineHeight: 16,
         }}>
-          Instant access • Cancel anytime • 30-day money-back guarantee
+          {selectedPlan === 'yearly'
+            ? `${packages.yearly?.product.priceString || ''}/year${packages.yearly?.product.introPrice ? ' • Save ' + Math.round((1 - (packages.yearly.product.introPrice.price / packages.yearly.product.price)) * 100) + '%' : ''}`
+            : `${packages.monthly?.product.priceString || ''}/month`
+          } • Cancel in {Platform.OS === 'ios' ? 'App Store' : 'Google Play'}
         </Text>
       </View>
+
+      {/* Upsell Roulette Modal */}
+      {/* <Modal
+        visible={showUpsellModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowUpsellModal(false)}
+      >
+        <View style={{
+          flex: 1,
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 24,
+        }}>
+          <View style={{
+            backgroundColor: isDark ? '#1e293b' : '#FFF',
+            borderRadius: 24,
+            padding: 24,
+            width: '100%',
+            maxWidth: 400,
+            alignItems: 'center',
+          }}>
+            <Text style={{
+              fontSize: 28,
+              fontWeight: '700',
+              color: isDark ? '#ffffff' : '#1f2937',
+              marginBottom: 8,
+              textAlign: 'center',
+            }}>
+              Wait! Don't Go Yet! 🎰
+            </Text> */}
+
+            {/* <Text style={{
+              fontSize: 16,
+              color: isDark ? '#9ca3af' : '#6b7280',
+              marginBottom: 24,
+              textAlign: 'center',
+            }}>
+              Spin the wheel for an exclusive discount!
+            </Text> */}
+
+            {/* Roulette Wheel */}
+            {/* <View style={{ width: '100%', alignItems: 'center', marginBottom: 24 }}> */}
+              {/* Pointer at top */}
+              {/* <View style={{
+                position: 'absolute',
+                top: -12,
+                zIndex: 10,
+                width: 0,
+                height: 0,
+                backgroundColor: 'transparent',
+                borderStyle: 'solid',
+                borderLeftWidth: 12,
+                borderRightWidth: 12,
+                borderTopWidth: 18,
+                borderLeftColor: 'transparent',
+                borderRightColor: 'transparent',
+                borderTopColor: '#EF4444',
+              }} /> */}
+
+              {/* <Animated.View style={{
+                width: 300,
+                height: 300,
+                borderRadius: 150,
+                borderWidth: 8,
+                borderColor: '#FCD34D',
+                overflow: 'hidden',
+                transform: [{ rotate: rotateAnim.interpolate({
+                  inputRange: [0, 360],
+                  outputRange: ['0deg', '360deg'],
+                })}],
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.3,
+                shadowRadius: 8,
+                elevation: 8,
+              }}> */}
+                {/* Wheel segments */}
+                {/* {[
+                  { discount: 5, color: '#EF4444' },
+                  { discount: 10, color: '#F59E0B' },
+                  { discount: 15, color: '#10B981' },
+                  { discount: 20, color: '#3B82F6' },
+                  { discount: 25, color: '#8B5CF6' },
+                  { discount: 30, color: '#EC4899' },
+                ].map((segment, idx) => {
+                  const rotation = idx * 60;
+
+                  return (
+                    <View
+                      key={idx}
+                      style={{
+                        position: 'absolute',
+                        width: '100%',
+                        height: '100%',
+                        top: 0,
+                        left: 0,
+                        transform: [{ rotate: `${rotation}deg` }],
+                      }}
+                    >
+                      {/* Colored segment - triangle wedge */}
+                      {/* <View style={{
+                        position: 'absolute',
+                        top: 0,
+                        left: '50%',
+                        width: 0,
+                        height: 0,
+                        backgroundColor: 'transparent',
+                        borderStyle: 'solid',
+                        borderLeftWidth: 86.6,
+                        borderRightWidth: 86.6,
+                        borderTopWidth: 150,
+                        borderLeftColor: 'transparent',
+                        borderRightColor: 'transparent',
+                        borderTopColor: segment.color,
+                        transform: [{ translateX: -86.6 }],
+                      }} /> */}
+
+                      {/* Text label */}
+                      {/* <View style={{
+                        position: 'absolute',
+                        top: 20,
+                        left: '50%',
+                        transform: [{ translateX: -30 }],
+                        width: 60,
+                        alignItems: 'center',
+                      }}>
+                        <Text style={{
+                          fontSize: 28,
+                          fontWeight: '800',
+                          color: '#FFF',
+                          textShadowColor: 'rgba(0, 0, 0, 0.5)',
+                          textShadowOffset: { width: 0, height: 2 },
+                          textShadowRadius: 3,
+                        }}>
+                          {segment.discount}%
+                        </Text>
+                      </View>
+                    </View>
+                  );
+                })} */}
+
+                {/* Center circle */}
+                {/* <View style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  width: 100,
+                  height: 100,
+                  borderRadius: 50,
+                  backgroundColor: isDark ? '#1e293b' : '#FFF',
+                  borderWidth: 5,
+                  borderColor: '#FCD34D',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  shadowColor: '#000',
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.3,
+                  shadowRadius: 4,
+                  elevation: 5,
+                  transform: [{ translateX: -50 }, { translateY: -50 }],
+                }}>
+                  {currentDiscount > 0 && (
+                    <Text style={{
+                      fontSize: 26,
+                      fontWeight: '800',
+                      color: '#10B981',
+                    }}>
+                      {currentDiscount}%
+                    </Text>
+                  )}
+                </View>
+              </Animated.View>
+            </View> */}
+
+            {/* Spins Left */}
+            {/* <Text style={{
+              fontSize: 14,
+              color: isDark ? '#9ca3af' : '#6b7280',
+              marginBottom: 16,
+            }}>
+              {spinsLeft > 0 ? `${spinsLeft} spin${spinsLeft > 1 ? 's' : ''} remaining` : 'No spins left'}
+            </Text> */}
+
+            {/* Best Discount Achieved */}
+            {/* {finalDiscount > 0 && (
+              <Animated.View style={{
+                backgroundColor: '#FCD34D',
+                paddingHorizontal: 16,
+                paddingVertical: 8,
+                borderRadius: 12,
+                marginBottom: 16,
+                opacity: discountCardAnim,
+                transform: [{
+                  scale: discountCardAnim.interpolate({
+                    inputRange: [0, 1],
+                    outputRange: [0.8, 1],
+                  })
+                }],
+              }}>
+                <Text style={{
+                  fontSize: 16,
+                  fontWeight: '700',
+                  color: '#1f2937',
+                }}>
+                  Best Discount: {finalDiscount}% OFF!
+                </Text>
+              </Animated.View>
+            )} */}
+
+            {/* Spin Button */}
+            {/* {spinsLeft > 0 ? (
+              <TouchableOpacity
+                onPress={spinRoulette}
+                style={{
+                  width: '100%',
+                  marginBottom: 12,
+                }}
+              >
+                <LinearGradient
+                  colors={['#FCD34D', '#F59E0B']}
+                  style={{
+                    paddingVertical: 16,
+                    borderRadius: 16,
+                    alignItems: 'center',
+                  }}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={{
+                    fontSize: 18,
+                    fontWeight: '700',
+                    color: '#1f2937',
+                  }}>
+                    Spin the Wheel! 🎯
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            ) : (
+              <TouchableOpacity
+                onPress={acceptUpsellOffer}
+                style={{
+                  width: '100%',
+                  marginBottom: 12,
+                }}
+              >
+                <LinearGradient
+                  colors={['#06B6D4', '#0891B2']}
+                  style={{
+                    paddingVertical: 16,
+                    borderRadius: 16,
+                    alignItems: 'center',
+                  }}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 0 }}
+                >
+                  <Text style={{
+                    fontSize: 18,
+                    fontWeight: '700',
+                    color: '#FFF',
+                  }}>
+                    Claim {finalDiscount}% Discount!
+                  </Text>
+                </LinearGradient>
+              </TouchableOpacity>
+            )} */}
+
+            {/* No Thanks Button */}
+            {/* <TouchableOpacity
+              onPress={() => {
+                setShowUpsellModal(false);
+                router.back();
+              }}
+              style={{
+                paddingVertical: 12,
+              }}
+            >
+              <Text style={{
+                fontSize: 14,
+                color: isDark ? '#9ca3af' : '#6b7280',
+              }}>
+                No thanks, I'll pass
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal> */}
     </View>
   );
 }

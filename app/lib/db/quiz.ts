@@ -55,6 +55,8 @@ export function useQuizDatabase() {
     options: string;
     answers: string;
     note: string | null;
+    hint: string | null;
+    hintImageUrl: string | null;
     likes: number;
     dislikes: number;
   };
@@ -87,7 +89,8 @@ export function useQuizDatabase() {
           SELECT q.id AS quizId, q.title, q.position AS quizPosition, q.isPublished,
                   qq.id AS questionId, qq.question AS questionText, qq.questionImageUrl,
                   qq.position AS questionPosition,
-                  qq.imageHeight, qq.options, qq.answers, qq.note, qq.likes, qq.dislikes, qq.localImagePath, c.title AS chapterTitle
+                  qq.imageHeight, qq.options, qq.answers, qq.note, qq.hint, qq.hintImageUrl,
+                  qq.likes, qq.dislikes, qq.localImagePath, c.title AS chapterTitle
           FROM quizzes q
           JOIN quiz_questions qq ON qq.quizId = q.id
           JOIN chapters c ON q.chapterId = c.id
@@ -146,13 +149,15 @@ export function useQuizDatabase() {
         const userData = userQuestionMap[q.questionId] || {};
         return {
           id: q.questionId,
-          position: q.questionPosition, 
+          position: q.questionPosition,
           question: q.questionText,
           imageHeight: q.imageHeight,
           questionImageUrl: q.localImagePath || q.questionImageUrl,
           options: JSON.parse(q.options),
           answers: JSON.parse(q.answers),
           explanation: q.note ?? "",
+          hint: q.hint ?? undefined,
+          hintImageUrl: q.hintImageUrl ?? undefined,
           likes: q.likes,
           dislikes: q.dislikes,
           isSaved: userData.isSaved || false,
@@ -527,6 +532,7 @@ export function useQuizDatabase() {
         ? await db.getAllAsync<any>(`
             SELECT q.id, q.question, q.options, q.answers, q.quizId, q.questionImageUrl,
                   q.localImagePath, q.imageHeight, q.position, q.note AS explanation,
+                  q.hint, q.hintImageUrl,
                   q.likes, q.dislikes, quiz.title AS quizTitle, chapter.title AS chapterTitle,
                   uq.saved, uq.liked, uq.disliked
             FROM user_quiz_questions uq
@@ -539,6 +545,7 @@ export function useQuizDatabase() {
         : await db.getAllAsync<any>(`
             SELECT q.id, q.question, q.options, q.answers, q.quizId, q.questionImageUrl,
                   q.localImagePath, q.imageHeight, q.position, q.note AS explanation,
+                  q.hint, q.hintImageUrl,
                   q.likes, q.dislikes, quiz.title AS quizTitle, chapter.title AS chapterTitle,
                   uq.saved, uq.liked, uq.disliked
             FROM user_quiz_questions uq
@@ -562,6 +569,8 @@ export function useQuizDatabase() {
         imageHeight: q.imageHeight ?? 200,
         position: q.position,
         explanation: q.explanation,
+        hint: q.hint ?? undefined,
+        hintImageUrl: q.hintImageUrl ?? undefined,
         likes: q.likes ?? 0,
         dislikes: q.dislikes ?? 0,
         isSaved: Boolean(q.saved),
@@ -613,7 +622,8 @@ export function useQuizDatabase() {
           // Fetch question details
           const questionRows = await db.getAllAsync<any>(`
             SELECT q.id, q.question, q.options, q.answers, q.questionImageUrl, q.localImagePath,
-                  q.imageHeight, q.position, q.note AS explanation, q.likes, q.dislikes,
+                  q.imageHeight, q.position, q.note AS explanation, q.hint, q.hintImageUrl,
+                  q.likes, q.dislikes,
                   quiz.title AS quizTitle, chapter.title AS chapterTitle
             FROM quiz_questions q
             JOIN quizzes quiz ON q.quizId = quiz.id
@@ -641,6 +651,8 @@ export function useQuizDatabase() {
               imageHeight: q.imageHeight ?? 200,
               position: q.position,
               explanation: q.explanation,
+              hint: q.hint ?? undefined,
+              hintImageUrl: q.hintImageUrl ?? undefined,
               likes: q.likes ?? 0,
               dislikes: q.dislikes ?? 0,
               quizTitle: q.quizTitle,

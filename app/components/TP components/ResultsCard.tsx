@@ -4,14 +4,11 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   Platform,
 } from "react-native";
-import { LinearGradient } from "expo-linear-gradient";
 import Animated, { SlideInDown, SlideOutDown } from "react-native-reanimated";
 import { useRouter } from "expo-router";
-import { CheckCircle, AlertTriangle, ArrowLeft } from "lucide-react-native";
-import { Button } from "@/~/components/ui/button";
+import { CheckCircle, AlertTriangle, ArrowLeft, RotateCcw } from "lucide-react-native";
 
 interface ResultsCardProps {
   results: {
@@ -106,58 +103,55 @@ export default function ResultsModal({
         left: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: isDark ? "#0f172a" : "#f8fafc",
+        backgroundColor: isDark ? "#111827" : "#f9fafb",
         zIndex: 9999,
         paddingTop: 46,
       }}
     >
       {/* Header */}
-      <LinearGradient
-        colors={["#3b82f6", "#2563eb"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{
-          borderRadius: 16,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 5,
-          marginHorizontal: 12,
-          marginRight: "auto",
-          marginBottom: 16,
-        }}
-      >
+      <View style={{ paddingHorizontal: 16, marginBottom: 16 }}>
         <TouchableOpacity
           onPress={() => {setShowResults(false);}}
+          activeOpacity={0.7}
           style={{
             flexDirection: "row",
             alignItems: "center",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 12,
+            alignSelf: "flex-start",
+            borderWidth: 1,
+            borderColor: isDark ? "#374155" : "#e5e7eb",
           }}
         >
-          <ArrowLeft size={18} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
+          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <Text style={{
+            color: isDark ? "#06B6D4" : "#0891B2",
+            fontWeight: "600",
+            marginLeft: 8,
+          }}>
             Back to questions
           </Text>
         </TouchableOpacity>
-      </LinearGradient>
+      </View>
 
       <ScrollView
         contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 40 }}
       >
         {/* Results Card */}
-        <LinearGradient
-          colors={getGradientColors(results.percentage, isDark)}
-          start={[0, 0]}
-          end={[1, 0]}
+        <View
           style={{
-            padding: 28,
+            backgroundColor: results.passed ? "#22c55e" : "#f59e0b",
+            padding: 32,
             borderRadius: 16,
             marginBottom: 24,
             alignItems: "center",
+            shadowColor: "#000",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 12,
+            elevation: 6,
           }}
         >
           {results.passed ? (
@@ -175,7 +169,7 @@ export default function ResultsModal({
               fontSize: 26,
               fontWeight: "800",
               color: "#fff",
-              marginBottom: 4,
+              marginBottom: 8,
               textAlign: "center",
             }}
           >
@@ -186,14 +180,14 @@ export default function ResultsModal({
             style={{
               fontSize: 15,
               color: "#fff",
-              opacity: 0.9,
+              opacity: 0.95,
               textAlign: "center",
-              lineHeight: 20,
+              lineHeight: 22,
             }}
           >
             {getResultDescription(results.percentage, pageType)}
           </Text>
-        </LinearGradient>
+        </View>
 
         {/* Result Numbers */}
         <View
@@ -236,112 +230,62 @@ export default function ResultsModal({
         </View>
 
         {/* Buttons */}
-        {/* Buttons */}
-        <View
-          style={{ flexDirection: "column", gap: 12, marginHorizontal: 12 }}
-        >
+        <View style={{ flexDirection: "column", gap: 12 }}>
           {/* Back Button */}
-          <LinearGradient
-            colors={["#3b82f6", "#2563eb"]}
-            start={[0, 0]}
-            end={[1, 1]}
+          <TouchableOpacity
+            onPress={() => handleBack(false)}
+            activeOpacity={0.7}
             style={{
-              borderRadius: 16,
-              overflow: "hidden",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.15,
-              shadowRadius: 8,
-              elevation: 5,
-              marginBottom: 12,
+              backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+              flexDirection: "row",
+              alignItems: "center",
+              justifyContent: "center",
+              paddingVertical: 16,
+              borderRadius: 12,
+              borderWidth: 1,
+              borderColor: isDark ? "#374155" : "#e5e7eb",
             }}
           >
-            <TouchableOpacity
-              onPress={() => handleBack(false)}
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                paddingVertical: 12,
-              }}
-            >
-              <ArrowLeft size={18} color="#fff" style={{ marginRight: 6 }} />
-              <Text style={{ color: "#fff", fontWeight: "600" }}>
-                {backUrl === "/" ? "Back to Course" : "Back to Topics"}
-              </Text>
-            </TouchableOpacity>
-          </LinearGradient>
-
-          {/* TODO */}
-          {/* Next Topic Button chooses from all quizzes including the theory*/}
-          {/* {nextTopicUrl && pageType === "topic" && (
-            <LinearGradient
-              colors={["#3b82f6", "#2563eb"]}
-              start={[0, 0]}
-              end={[1, 1]}
-              style={{
-                borderRadius: 16,
-                overflow: "hidden",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
-                shadowRadius: 8,
-                elevation: 5,
-                marginBottom: 12,
-              }}
-            >
-              <TouchableOpacity
-                onPress={() => { console.log(nextTopicUrl) ;Platform.OS == "android" ? router.replace(nextTopicUrl as any) : router.push(nextTopicUrl as any)}}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingVertical: 12,
-                }}
-              >
-                <Text style={{ color: "#fff", fontWeight: "600" }}>
-                  Go to Next Activity
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
-          )} */}
+            <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} style={{ marginRight: 8 }} />
+            <Text style={{
+              color: isDark ? "#06B6D4" : "#0891B2",
+              fontWeight: "700",
+              fontSize: 16,
+            }}>
+              {backUrl === "/" ? "Back to Course" : "Back to Topics"}
+            </Text>
+          </TouchableOpacity>
 
           {/* Retake Quiz Button */}
           {pageType !== "wrong" && (
-            <LinearGradient
-              colors={["#3b82f6", "#2563eb"]}
-              start={[0, 0]}
-              end={[1, 1]}
+            <TouchableOpacity
+              onPress={() => {
+                handleRetakeQuiz();
+              }}
+              activeOpacity={0.7}
               style={{
-                borderRadius: 16,
-                overflow: "hidden",
-                shadowColor: "#000",
+                backgroundColor: "#06B6D4",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                paddingVertical: 16,
+                borderRadius: 12,
+                shadowColor: "#06B6D4",
                 shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.15,
+                shadowOpacity: 0.3,
                 shadowRadius: 8,
-                elevation: 5,
-                marginBottom: 12,
+                elevation: 4,
               }}
             >
-              <TouchableOpacity
-                onPress={() => {
-                  // if (["saved", "exam"].includes(pageType))
-                    handleRetakeQuiz();
-                  // if (!["exam"].includes(pageType))
-                  //   setIsResetDialogOpen(true);
-                }}
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  paddingVertical: 12,
-                }}
-              >
-                <Text style={{ color: "#fff", fontWeight: "600" }}>
-                  Retake Quiz
-                </Text>
-              </TouchableOpacity>
-            </LinearGradient>
+              <RotateCcw size={18} color="#fff" style={{ marginRight: 8 }} />
+              <Text style={{
+                color: "#fff",
+                fontWeight: "700",
+                fontSize: 16,
+              }}>
+                Retake Quiz
+              </Text>
+            </TouchableOpacity>
           )}
         </View>
       </ScrollView>

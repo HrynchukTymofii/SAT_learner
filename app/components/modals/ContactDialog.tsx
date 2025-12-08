@@ -4,15 +4,22 @@ import { sendMessage } from "@/lib/api/user";
 import { useRoute } from "@react-navigation/native";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { X, AlertCircle, Bug, HelpCircle } from "lucide-react-native";
+import { X } from "lucide-react-native";
 
 interface ContactDialogProps {
   isOpen: boolean;
   onClose: () => void;
   isDark: boolean;
+  contextData?: {
+    questionId?: string;
+    quizId?: string;
+    lessonId?: string;
+    chapterId?: string;
+    [key: string]: any;
+  };
 }
 
-export function ContactDialog({ isOpen, onClose, isDark }: ContactDialogProps) {
+export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactDialogProps) {
   const [topic, setTopic] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -39,8 +46,15 @@ export function ContactDialog({ isOpen, onClose, isDark }: ContactDialogProps) {
 
     try {
       const currentRouteName = route.name;
-      const isDarkMessage = `${message}\n\n---\nPage: mobile-app ${currentRouteName}`;
-      const success = await sendMessage(token, topic, isDarkMessage);
+      let contextInfo = `\n\n---\nPage: mobile-app ${currentRouteName}`;
+
+      // Add context data if available
+      if (contextData && Object.keys(contextData).length > 0) {
+        contextInfo += `\nContext: ${JSON.stringify(contextData, null, 2)}`;
+      }
+
+      const fullMessage = `${message}${contextInfo}`;
+      const success = await sendMessage(token, topic, fullMessage);
 
       if (!success) throw new Error("Failed to send message");
 
@@ -103,65 +117,79 @@ export function ContactDialog({ isOpen, onClose, isDark }: ContactDialogProps) {
           </Text>
 
           {/* Topic Selection */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={{
-              fontSize: 14,
-              fontWeight: "600",
-              color: isDark ? "#ffffff" : "#1f2937",
-              marginBottom: 8,
-              paddingLeft: 8
-            }}>
-              Select Topic
-            </Text>
-            <View
+          <Text style={{
+            fontSize: 14,
+            color: isDark ? "#9ca3af" : "#6b7280",
+            marginBottom: 8,
+            paddingLeft: 8
+          }}>
+            Select a topic:
+          </Text>
+          <View style={{
+            flexDirection: "row",
+            gap: 8,
+            marginBottom: 16,
+            flexWrap: "wrap",
+          }}>
+            <TouchableOpacity
+              onPress={() => setTopic("mistake")}
               style={{
-                backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                paddingHorizontal: 16,
+                paddingVertical: 12,
                 borderRadius: 12,
-                borderWidth: 1,
-                borderColor: isDark ? "#334155" : "#e5e7eb",
-                padding: 8,
+                borderWidth: 2,
+                borderColor: topic === "mistake" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
+                backgroundColor: topic === "mistake" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
               }}
+              activeOpacity={0.7}
             >
-              {[
-                { label: "Test mistake", value: "mistake", icon: AlertCircle },
-                { label: "System issue", value: "problem", icon: Bug },
-                { label: "Other", value: "other", icon: HelpCircle },
-              ].map((option) => {
-                const Icon = option.icon;
-                const isSelected = topic === option.value;
-                return (
-                  <TouchableOpacity
-                    key={option.value}
-                    onPress={() => setTopic(option.value)}
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      paddingVertical: 12,
-                      paddingHorizontal: 12,
-                      borderRadius: 8,
-                      marginBottom: 4,
-                      backgroundColor: isSelected ? "#06B6D4" : "transparent",
-                    }}
-                    activeOpacity={0.7}
-                  >
-                    <Icon
-                      size={20}
-                      color={isSelected ? "#ffffff" : (isDark ? "#9ca3af" : "#6b7280")}
-                      style={{ marginRight: 12 }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        color: isSelected ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
-                        fontWeight: isSelected ? "600" : "400",
-                      }}
-                    >
-                      {option.label}
-                    </Text>
-                  </TouchableOpacity>
-                );
-              })}
-            </View>
+              <Text style={{
+                fontWeight: "600",
+                color: topic === "mistake" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+              }}>
+                Test Error
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setTopic("problem")}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 12,
+                borderWidth: 2,
+                borderColor: topic === "problem" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
+                backgroundColor: topic === "problem" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={{
+                fontWeight: "600",
+                color: topic === "problem" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+              }}>
+                System Issue
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => setTopic("other")}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 12,
+                borderWidth: 2,
+                borderColor: topic === "other" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
+                backgroundColor: topic === "other" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={{
+                fontWeight: "600",
+                color: topic === "other" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+              }}>
+                Other
+              </Text>
+            </TouchableOpacity>
           </View>
 
           {/* Message Input */}

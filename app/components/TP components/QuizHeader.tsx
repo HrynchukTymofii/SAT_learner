@@ -1,13 +1,13 @@
-import { View, Text } from "react-native";
+import { View, Text, TouchableOpacity } from "react-native";
 import { ArrowLeft, Clock, RotateCcw } from "lucide-react-native";
-import { Button } from "@/~/components/ui/button";
 import QuestionNumberScroller from "./QuestionNumberScroller";
 import TimeAlert from "./TimeAlert";
 import { Question } from "@/types";
-import { cn } from "@/lib/utils";
 import { useEffect, useImperativeHandle, useState } from "react";
 import Toast from "react-native-toast-message";
-import { LinearGradient } from "expo-linear-gradient";
+import { useColorScheme } from "@/hooks/useColorScheme";
+import { TourTooltip } from "@/components/Tour/TourTooltip";
+import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
 
 export interface QuizHeaderRef {
   startExam: () => void;
@@ -27,6 +27,13 @@ interface QuizHeaderProps {
   handleBack: (needSave?: boolean) => void;
   submitQuizResults: () => void;
   ref?: React.Ref<QuizHeaderRef>;
+  // Tour props
+  tourActive?: boolean;
+  currentStep?: number;
+  handleTourNext?: () => void;
+  handleTourPrev?: () => void;
+  skipTour?: () => void;
+  isNumbersQuiz?: boolean;
 }
 
 export default function QuizHeader({
@@ -42,6 +49,12 @@ export default function QuizHeader({
   handleBack,
   submitQuizResults,
   ref,
+  tourActive = false,
+  currentStep = 0,
+  handleTourNext = () => {},
+  handleTourPrev = () => {},
+  skipTour = () => {},
+  isNumbersQuiz = false,
 }: QuizHeaderProps) {
   const [timeSpent, setTimeSpent] = useState(0);
   const [startTime, setStartTime] = useState<number>(0);
@@ -102,59 +115,106 @@ export default function QuizHeader({
   };
 
   const timeRemaining = Math.max(0, timeLimit - timeSpent);
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   return (
-    <View className="flex flex-col gap-y-4 mt-2 px-3">
+    <View style={{ flexDirection: "column", gap: 8, marginTop: 8, paddingHorizontal: 12 }}>
       {/* Top Header */}
-      <View className="flex flex-row w-full items-center justify-between">
-        {/* Back Button with gradient */}
-        <LinearGradient
-          colors={["#3b82f6", "#2563eb"]}
-          start={[0, 0]}
-          end={[1, 1]}
+      <View style={{ flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-between" }}>
+        {/* Back Button */}
+        <TouchableOpacity
+          onPress={() => handleBack()}
+          activeOpacity={0.7}
           style={{
-            borderRadius: 16,
-            overflow: "hidden",
-            shadowColor: "#60a5fa",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.3,
-            shadowRadius: 4,
-            elevation: 4, // Android shadow
+            flexDirection: "row",
+            alignItems: "center",
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: isDark ? "#374155" : "#e5e7eb",
           }}
         >
-          <Button
-            onPress={() => handleBack()}
-            className="flex-row items-center bg-transparent px-3 py-2"
-          >
-            <ArrowLeft size={18} color="#fff" />
-            <Text className="text-white font-semibold ml-2">
-              {getBackButtonText()}
-            </Text>
-          </Button>
-        </LinearGradient>
+          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <Text style={{
+            color: isDark ? "#06B6D4" : "#0891B2",
+            fontWeight: "600",
+            marginLeft: 8,
+            fontSize: 14
+          }}>
+            {getBackButtonText()}
+          </Text>
+        </TouchableOpacity>
 
         {/* Reset or Timer */}
         {pageType !== "wrong" &&
           pageType !== "exam" &&
           Object.keys(answeredQuestions).length > 0 && (
-            <Button
-              onPress={toggleResetDialog}
-              className="rounded-xl border border-blue-300/30 dark:border-blue-700/40 bg-white/80 dark:bg-[#1e293b] shadow-sm"
-            >
-              <RotateCcw size={20} color={currentIconColor || "#2563eb"} />
-            </Button>
+            tourActive && currentStep === TOUR_STEPS.RESTART_TEST && isNumbersQuiz ? (
+              <TourTooltip
+                visible={true}
+                onNext={handleTourNext}
+                onPrev={handleTourPrev}
+                onSkip={skipTour}
+                onClose={() => {}}
+                title={getTourStepInfo(TOUR_STEPS.RESTART_TEST).title}
+                content={getTourStepInfo(TOUR_STEPS.RESTART_TEST).content}
+                stepNumber={TOUR_STEPS.RESTART_TEST + 1}
+                totalSteps={TOTAL_TOUR_STEPS}
+                placement="bottom"
+              >
+                <TouchableOpacity
+                  onPress={toggleResetDialog}
+                  activeOpacity={0.7}
+                  style={{
+                    backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                    padding: 10,
+                    borderRadius: 12,
+                    borderWidth: 1,
+                    borderColor: isDark ? "#374155" : "#e5e7eb",
+                  }}
+                >
+                  <RotateCcw size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+                </TouchableOpacity>
+              </TourTooltip>
+            ) : (
+              <TouchableOpacity
+                onPress={toggleResetDialog}
+                activeOpacity={0.7}
+                style={{
+                  backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                  padding: 10,
+                  borderRadius: 12,
+                  borderWidth: 1,
+                  borderColor: isDark ? "#374155" : "#e5e7eb",
+                }}
+              >
+                <RotateCcw size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+              </TouchableOpacity>
+            )
           )}
 
         {pageType === "exam" && (
-          <View className="flex-row items-center gap-2 bg-white/90 dark:bg-[#1e293b] px-3 py-1.5 rounded-xl shadow-sm border border-blue-200/40 dark:border-blue-800/40">
-            <Clock size={20} color="#2563eb" />
-            <Text
-              className={cn(
-                "font-mono text-lg font-semibold",
-                timeRemaining < 300 ? "text-red-600" : "text-blue-600",
-                "dark:text-blue-400"
-              )}
-            >
+          <View style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 8,
+            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            paddingHorizontal: 12,
+            paddingVertical: 8,
+            borderRadius: 12,
+            borderWidth: 1,
+            borderColor: timeRemaining < 300 ? "#ef4444" : (isDark ? "#374155" : "#e5e7eb"),
+          }}>
+            <Clock size={20} color={timeRemaining < 300 ? "#ef4444" : "#06B6D4"} />
+            <Text style={{
+              fontFamily: "monospace",
+              fontSize: 16,
+              fontWeight: "600",
+              color: timeRemaining < 300 ? "#ef4444" : (isDark ? "#06B6D4" : "#0891B2"),
+            }}>
               {formatTime(timeRemaining)}
             </Text>
           </View>
@@ -162,7 +222,7 @@ export default function QuizHeader({
       </View>
 
       {/* Question Number Scroller */}
-      <QuestionNumberScroller
+      {/* <QuestionNumberScroller
         questions={questions}
         answeredQuestions={answeredQuestions}
         currentQuestionIndex={currentQuestionIndex}
@@ -170,7 +230,7 @@ export default function QuizHeader({
         maxFreeIndex={maxFreeIndex}
         setCurrentQuestionIndex={setCurrentQuestionIndex}
         setIsProModalOpen={setIsProModalOpen}
-      />
+      /> */}
 
       {/* Alert for last 5 minutes */}
       {pageType === "exam" && timeRemaining < 300 && <TimeAlert />}

@@ -6,6 +6,141 @@ import pLimit from "p-limit";
 import { fetchRenderedLessonHtml } from "./render-lesson-html";
 //npx ts-node scripts/build-offline-db.ts
 
+// TipTap to HTML converter for quiz content (question, explanation, hint)
+function tiptapToHtml(content: any): string {
+  if (!content) return "";
+
+  // If it's already a string, return it
+  if (typeof content === "string") {
+    try {
+      const parsed = JSON.parse(content);
+      return convertTiptapNodes(parsed);
+    } catch {
+      return content; // Return as-is if not JSON
+    }
+  }
+
+  return convertTiptapNodes(content);
+}
+
+function convertTiptapNodes(content: any): string {
+  if (!content || !content.content) return "";
+
+  let html = "";
+  for (const node of content.content) {
+    html += renderNode(node);
+  }
+  return html;
+}
+
+function renderNode(node: any): string {
+  if (!node || !node.type) return "";
+
+  switch (node.type) {
+    case "paragraph":
+      const pContent = node.content?.map(renderNode).join("") || "";
+      return `<p>${pContent}</p>`;
+
+    case "heading":
+      const level = node.attrs?.level || 1;
+      const hContent = node.content?.map(renderNode).join("") || "";
+      return `<h${level}>${hContent}</h${level}>`;
+
+    case "text":
+      return renderText(node);
+
+    case "bulletList":
+      const ulContent = node.content?.map(renderNode).join("") || "";
+      return `<ul>${ulContent}</ul>`;
+
+    case "orderedList":
+      const olContent = node.content?.map(renderNode).join("") || "";
+      return `<ol>${olContent}</ol>`;
+
+    case "listItem":
+      const liContent = node.content?.map(renderNode).join("") || "";
+      return `<li>${liContent}</li>`;
+
+    case "blockquote":
+      const bqContent = node.content?.map(renderNode).join("") || "";
+      return `<blockquote>${bqContent}</blockquote>`;
+
+    case "codeBlock":
+      const codeContent = node.content?.map((n: any) => n.text || "").join("") || "";
+      return `<pre><code>${escapeHtml(codeContent)}</code></pre>`;
+
+    case "inlineMath":
+      const latex = node.attrs?.latex || "";
+      return `<span class="math-inline">$${escapeHtml(latex)}$</span>`;
+
+    case "image":
+      const src = node.attrs?.src || "";
+      const alt = node.attrs?.alt || "";
+      return `<img src="${escapeHtml(src)}" alt="${escapeHtml(alt)}" />`;
+
+    case "hardBreak":
+      return "<br>";
+
+    default:
+      return "";
+  }
+}
+
+function renderText(node: any): string {
+  let text = escapeHtml(node.text || "");
+  const marks = node.marks || [];
+
+  for (const mark of marks) {
+    switch (mark.type) {
+      case "bold":
+        text = `<strong>${text}</strong>`;
+        break;
+      case "italic":
+        text = `<em>${text}</em>`;
+        break;
+      case "underline":
+        text = `<u>${text}</u>`;
+        break;
+      case "strike":
+        text = `<s>${text}</s>`;
+        break;
+      case "code":
+        text = `<code>${text}</code>`;
+        break;
+      case "link":
+        const href = mark.attrs?.href || "#";
+        text = `<a href="${escapeHtml(href)}">${text}</a>`;
+        break;
+      case "highlight":
+        const color = mark.attrs?.color || "#fef08a";
+        text = `<mark style="background-color: ${escapeHtml(color)}">${text}</mark>`;
+        break;
+      case "textStyle":
+        const styles: string[] = [];
+        if (mark.attrs?.color) styles.push(`color: ${escapeHtml(mark.attrs.color)}`);
+        if (mark.attrs?.fontSize) styles.push(`font-size: ${escapeHtml(mark.attrs.fontSize)}`);
+        if (mark.attrs?.fontFamily) styles.push(`font-family: ${escapeHtml(mark.attrs.fontFamily)}`);
+        if (styles.length > 0) {
+          text = `<span style="${styles.join("; ")}">${text}</span>`;
+        }
+        break;
+    }
+  }
+
+  return text;
+}
+
+function escapeHtml(text: string): string {
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+  return text.replace(/[&<>"']/g, (m) => map[m]);
+}
+
 
 const API_BASE_URL = "https://www.satlearner.com";
 
@@ -190,7 +325,7 @@ async function main() {
     for (const l of c.lessons) {
       // Fetch and render lesson HTML
       console.log(`🎨 Rendering lesson: ${l.title} (${l.id})...`);
-      const rendered = await fetchRenderedLessonHtml(c.id, l.id);
+      const rendered = await fetchRenderedLessonHtml(c.id, l.id, l.content);
       const renderedHtml = rendered?.combinedHtml || null;
 
       if (rendered) {
@@ -276,7 +411,21 @@ async function main() {
     )
   );
 
-  // 4️⃣ Insert quiz questions
+  // 4️⃣ Convert TipTap to HTML and insert quiz questions
+  console.log("🔄 Converting TipTap content to HTML...");
+  const withHtmlContent = withLocalImages.map((qq) => {
+    const questionHtml = tiptapToHtml(qq.question);
+    const hintHtml = qq.hint ? tiptapToHtml(qq.hint) : "";
+    const noteHtml = qq.note ? tiptapToHtml(qq.note) : "";
+
+    return {
+      ...qq,
+      questionHtml,
+      hintHtml,
+      noteHtml,
+    };
+  });
+
   db.serialize(() => {
     const stmt = db.prepare(
       `INSERT OR REPLACE INTO quiz_questions
@@ -284,21 +433,21 @@ async function main() {
      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
 
-    for (const qq of withLocalImages) {
+    for (const qq of withHtmlContent) {
       stmt.run(
         qq.id,
-        qq.question,
+        qq.questionHtml, // Convert question to HTML
         qq.questionType || "",
         qq.questionImageUrl || "",
         qq.localImagePath || "",
         qq.imageHeight || 200,
         JSON.stringify(qq.options || []),
         JSON.stringify(qq.answers || []),
-        qq.hint || "",
+        qq.hintHtml, // Convert hint to HTML
         qq.points || 1,
         qq.position || 0,
         qq.hintImageUrl || "",
-        qq.note || "",
+        qq.noteHtml, // Convert note (explanation) to HTML
         qq.likes || 0,
         qq.dislikes || 0,
         qq.quizId,
@@ -308,6 +457,8 @@ async function main() {
 
     stmt.finalize();
   });
+
+  console.log("✅ Converted all quiz content to HTML");
 
   db.close();
   console.log("✅ Offline DB built at:", DB_FILE);

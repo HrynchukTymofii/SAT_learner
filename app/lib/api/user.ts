@@ -63,6 +63,28 @@ export const upgradeToPro = async (token: string, plan: string) => {
   }
 };
 
+export const removePro = async (token: string) => {
+  try {
+    const res = await api.post(
+      "/user/remove-pro",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    return { success: true, user: res.data };
+  } catch (error: any) {
+    console.error("❌ removePro error:", error.response?.data || error.message);
+    return {
+      success: false,
+      error: error.response?.data?.error || "Failed to remove PRO status",
+    };
+  }
+};
+
 
 
 

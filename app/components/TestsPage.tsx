@@ -1,38 +1,36 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import { ResetTestDialog } from "./modals/ResetTestDialog";
 import Toast from "react-native-toast-message";
 import {
-  ActivityIndicator,
-  Animated,
+  Animated, 
   BackHandler,
   Dimensions,
   Platform,
   ScrollView,
   Text,
-  useWindowDimensions,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { resetQuiz, submitQuizAnswers, updateUserPoints } from "@/lib/api/quiz";
-import TopBlur from "./ui/TobBlur";
-import BottomBlur from "./ui/BottomBlur";
 import { useColorScheme } from "nativewind";
 import { useQuizDatabase } from "@/lib/db/quiz";
 import { useAuth } from "@/context/AuthContext";
 import { enqueueOfflineAction } from "@/lib/offlineQueue";
-import { GetPremiumModal } from "./modals/GetPremiumModal";
+import { HintModal } from "./modals/HintModal";
+import { wrapHtmlContent } from "@/lib/htmlWrapper";
 import { Question } from "@/types";
 import QuizHeader, { QuizHeaderRef } from "./TP components/QuizHeader";
 import QuestionToggles from "./TP components/QuestionToggles";
 import QuestionOptions from "./TP components/QuestionOptionsProps";
 import QuestionBottomNav from "./TP components/QuestionBottomNav";
-import ResultsCard from "./TP components/ResultsCard";
 import QuestionImage from "./QuestionImage";
 import AutoHeightWebView from "react-native-autoheight-webview";
 import GraduationCap3DLoader from "./ui/GraduationCapLoader";
 import ResultsModal from "./TP components/ResultsCard";
-import { useFocusEffect } from "@react-navigation/native";
+import { useTour } from "@/context/TourContext";
+import { TourTooltip } from "./Tour/TourTooltip";
+import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
 
 interface LatestResult {
   score: number;
@@ -98,12 +96,29 @@ const TestsPage = ({
 
   const { resetQuizLocal, submitQuizAnswersLocal } = useQuizDatabase();
   const [isProModalOpen, setIsProModalOpen] = useState(false);
+  const [isHintModalOpen, setIsHintModalOpen] = useState(false);
 
   const [questions, setQuestions] = useState(quiz.questions);
   const answeredQuestionsRef = useRef(answeredQuestions);
   const selectedAnswersRef = useRef(selectedAnswers);
 
-  const { width: containerWidth } = useWindowDimensions();
+  // Tour
+  const { tourActive, currentStep, setCurrentStep, endTour, skipTour, numbersQuizId } = useTour();
+  const isNumbersQuiz = quiz.id === numbersQuizId;
+
+  const handleTourNext = () => {
+    if (currentStep === TOTAL_TOUR_STEPS - 1) {
+      endTour();
+    } else {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleTourPrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   const isSubmittingRef = useRef(false);
   const hasStartedExamRef = useRef(false);
@@ -729,7 +744,7 @@ const TestsPage = ({
   const hideLoader = () => {
     Animated.timing(fadeAnim, {
       toValue: 0,
-      duration: 500, // fade-out duration
+      duration: 200, // faster fade-out for local content
       useNativeDriver: true,
     }).start(() => {
       setWebViewLoading(false);
@@ -792,10 +807,9 @@ const TestsPage = ({
   }
   return (
     <SafeAreaView
-      className="flex-1 bg-[#f8fafc] dark:bg-[#0f172a]"
+      style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}
       edges={["top", "bottom"]}
     >
-      {!isDark && <TopBlur />}
       <ResetTestDialog
         key={wasReseted ? "reset-1" : "reset-0"}
         isOpen={isResetDialogOpen}
@@ -808,11 +822,12 @@ const TestsPage = ({
           flexGrow: 1,
           minHeight: screenHeight,
           alignItems: "center",
-          padding: 8,
+          paddingHorizontal: 4,
+          paddingBottom: 80,
         }}
         showsVerticalScrollIndicator={false}
       >
-        <View className="py-2 pt-1 max-w-4xl gap-y-2">
+        <View style={{ paddingVertical: 8, width: "100%", maxWidth: 800 }}>
           <QuizHeader
             quizTitle={quiz.title}
             currentQuestionIndex={currentQuestionIndex}
@@ -827,26 +842,64 @@ const TestsPage = ({
             handleBack={handleBack}
             submitQuizResults={submitQuizResults}
             ref={quizHeaderRef}
+            tourActive={tourActive}
+            currentStep={currentStep}
+            handleTourNext={handleTourNext}
+            handleTourPrev={handleTourPrev}
+            skipTour={skipTour}
+            isNumbersQuiz={isNumbersQuiz}
           />
 
-          {/* Question */}
-          <View className="flex flex-row justify-between items-center px-3 mt-3">
-            <Text
+          {/* Question Counter */}
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+              paddingHorizontal: 12,
+              marginTop: 12,
+            }}
+          >
+            <View
               style={{
-                fontSize: 22,
-                fontWeight: "700",
-                color: isDark ? "#f1f5f9" : "#1f2937",
+                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                paddingHorizontal: 16,
+                paddingVertical: 10,
+                borderRadius: 12,
+                borderLeftWidth: 2,
+                borderLeftColor: "#06B6D4",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 4,
+                elevation: 2,
               }}
-              className="border border-blue-600 rounded-xl px-4 py-1"
             >
-              Question {currentQuestionIndex + 1} of {questions.length}
-            </Text>
+              <Text
+                style={{
+                  fontSize: 16,
+                  fontWeight: "700",
+                  color: isDark ? "#ffffff" : "#1f2937",
+                }}
+              >
+                Question {currentQuestionIndex + 1} of {questions.length}
+              </Text>
+            </View>
             <QuestionToggles
               currentQuestion={currentQuestion}
               currentQuestionIndex={currentQuestionIndex}
               currentIconColor={currentIconColor}
               token={token}
+              chapterId={quiz.chapterId}
+              quizId={quiz.id}
               setQuestions={setQuestions}
+              onHintPress={() => setIsHintModalOpen(true)}
+              tourActive={tourActive}
+              currentStep={currentStep}
+              handleTourNext={handleTourNext}
+              handleTourPrev={handleTourPrev}
+              skipTour={skipTour}
+              isNumbersQuiz={isNumbersQuiz}
             />
           </View>
 
@@ -861,7 +914,7 @@ const TestsPage = ({
                   bottom: 0,
                   justifyContent: "center",
                   alignItems: "center",
-                  backgroundColor: isDark ? "#0f172a" : "#f8fafc",
+                  backgroundColor: isDark ? "#111827" : "#f9fafb",
                   zIndex: 100,
                   opacity: fadeAnim,
                 }}
@@ -873,27 +926,16 @@ const TestsPage = ({
             <AutoHeightWebView
               //key={`question-${currentQuestion.id}`}
               source={{
-                uri: `https://www.satlearner.com/expo-course/${quiz.chapterId}/quizzes/${quiz.id}/question/${currentQuestion.id}`,
+                html: wrapHtmlContent(currentQuestion.question || "", { isDark }),
               }}
               style={{
-                width: containerWidth || "100%",
+                width: "100%",
                 minHeight: 10,
-                marginBottom: 4,
-                //opacity: webViewLoading ? 0 : 1, // fade-in animation
               }}
               scrollEnabled={false}
-              customStyle={
-                isDark
-                  ? `html, body { margin:0;} .expo-content {background-color: #0f172a; color: #f5f5f4;}`
-                  : ""
-              }
-              onLoadStart={() => setWebViewLoading(true)}
               onLoadEnd={() => {
-                setTimeout(() => {
-                  hideLoader();
-                }, 500); // 300ms delay
+                hideLoader();
               }}
-              //onSizeUpdated={({ height }: { height: number }) => setWebViewHeight(height)}
             />
             {currentQuestion.questionImageUrl && (
               <QuestionImage
@@ -902,79 +944,113 @@ const TestsPage = ({
               />
             )}
 
-            <QuestionOptions
-              currentQuestion={currentQuestion}
-              selectedAnswers={selectedAnswers}
-              isAnswered={isAnswered}
-              pageType={pageType}
-              handleAnswerSelect={handleAnswerSelect}
-            />
+            {/* {tourActive && currentStep === TOUR_STEPS.ANSWER_QUESTION && isNumbersQuiz ? (
+              <TourTooltip
+                visible={true}
+                onNext={handleTourNext}
+                onPrev={handleTourPrev}
+                onSkip={skipTour}
+                onClose={() => {}}
+                title={getTourStepInfo(TOUR_STEPS.ANSWER_QUESTION).title}
+                content={getTourStepInfo(TOUR_STEPS.ANSWER_QUESTION).content}
+                stepNumber={TOUR_STEPS.ANSWER_QUESTION + 1}
+                totalSteps={TOTAL_TOUR_STEPS}
+                placement="bottom"
+              >
+                <QuestionOptions
+                  currentQuestion={currentQuestion}
+                  selectedAnswers={selectedAnswers}
+                  isAnswered={isAnswered}
+                  pageType={pageType}
+                  handleAnswerSelect={handleAnswerSelect}
+                />
+              </TourTooltip>
+            ) : ( */}
+              <QuestionOptions
+                currentQuestion={currentQuestion}
+                selectedAnswers={selectedAnswers}
+                isAnswered={isAnswered}
+                pageType={pageType}
+                handleAnswerSelect={handleAnswerSelect}
+              />
+            {/* )} */}
 
             {/* Explanation */}
             {isAnswered && currentQuestion.explanation && (
-              <View className="rounded-3xl mt-4 gap-1">
+              <View
+                style={{
+                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  borderRadius: 16,
+                  padding: 4,
+                  marginTop: 16,
+                  marginBottom: 16,
+                  borderLeftWidth: 4,
+                  borderLeftColor: "#8B5CF6",
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 3,
+                }}
+              >
                 <Text
                   style={{
-                    fontSize: 22,
-                    fontWeight: "700",
-                    color: isDark ? "#f1f5f9" : "#1f2937",
+                    fontSize: 20,
+                    fontWeight: "800",
+                    color: isDark ? "#ffffff" : "#1f2937",
+                    padding: 12
                   }}
-                  className="border border-blue-600 rounded-xl px-4 py-1 ml-2 mr-auto"
                 >
                   Explanation
                 </Text>
                 <AutoHeightWebView
-                  //key={`explanation-currentQuestion.id`}
+                  //key={`explanation-${currentQuestion.id}`}
                   source={{
-                    uri: `https://www.satlearner.com/expo-course/${quiz.chapterId}/quizzes/${quiz.id}/question/${currentQuestion.id}/explanation`,
+                    html: wrapHtmlContent(currentQuestion.explanation || "", { isDark }),
                   }}
                   style={{
-                    width: containerWidth || "100%",
-                    minHeight: 100,
-                    marginBottom: 8,
-                    // opacity: webViewLoading ? 0 : 1,
+                    width: "100%",
+                    minHeight: 10,
                   }}
                   scrollEnabled={false}
-                  customStyle={
-                    isDark
-                      ? `html, body { margin:0;} .expo-content {background-color: #0f172a; color: #f5f5f4;}`
-                      : ``
-                  }
-                  onLoadStart={() => setWebViewLoading(true)}
-                  onLoadEnd={() => {
-                    setTimeout(() => {
-                      hideLoader();
-                    }, 500); // 300ms delay
-                  }}
                 />
               </View>
             )}
-
-            <QuestionBottomNav
-              pageType={pageType}
-              currentQuestionIndex={currentQuestionIndex}
-              questions={questions}
-              isCompleted={isCompleated}
-              isConfirmedAS={isConfirmedAS}
-              selectedAnswers={selectedAnswers}
-              answeredQuestions={answeredQuestions}
-              enableFinishSaved={enableFinishSaved}
-              isSubmitting={isSubmitting}
-              currentIconColor={currentIconColor}
-              currentQuestionId={currentQuestion.id}
-              previousQuestion={previousQuestion}
-              handleNextQuestion={handleNextQuestion}
-              setIsConfirmedAS={setIsConfirmedAS}
-              handleExamAnswerSelect={handleExamAnswerSelect}
-            />
           </View>
         </View>
       </ScrollView>
+
+      {/* Fixed Bottom Navigation */}
+      <QuestionBottomNav
+        pageType={pageType}
+        currentQuestionIndex={currentQuestionIndex}
+        questions={questions}
+        isCompleted={isCompleated}
+        isConfirmedAS={isConfirmedAS}
+        selectedAnswers={selectedAnswers}
+        answeredQuestions={answeredQuestions}
+        enableFinishSaved={enableFinishSaved}
+        isSubmitting={isSubmitting}
+        currentIconColor={currentIconColor}
+        currentQuestionId={currentQuestion.id}
+        previousQuestion={previousQuestion}
+        handleNextQuestion={handleNextQuestion}
+        setIsConfirmedAS={setIsConfirmedAS}
+        handleExamAnswerSelect={handleExamAnswerSelect}
+      />
+
+      {/* Hint Modal */}
+      <HintModal
+        isOpen={isHintModalOpen}
+        onClose={() => setIsHintModalOpen(false)}
+        hint={currentQuestion.hint}
+        hintImageUrl={currentQuestion.hintImageUrl}
+      />
+
       {/* <GetPremiumModal
         isOpen={isProModalOpen}
         onClose={() => setIsProModalOpen(false)}
       /> */}
-      <BottomBlur />
     </SafeAreaView>
   );
 };

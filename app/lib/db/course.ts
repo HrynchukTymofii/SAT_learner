@@ -24,6 +24,11 @@ export type CourseItem = {
   type: "lesson" | "quiz";
   chapterId: string;
   position: number;
+  isFree: boolean; // Whether this item is free for non-PRO users
+  points?: number; // for lessons
+  maxScore?: number; // for quizzes
+  questionCount?: number; // for quizzes - number of questions
+  videoUrl?: string; // for lessons
   progress?: {
     id: string;
     completed: boolean;
@@ -76,12 +81,14 @@ export function useCourseDatabase() {
           [chapterId]
         )) as CourseItem[];
 
-        const lessonItems: CourseItem[] = lessons.map((l) => ({
+        const lessonItems: CourseItem[] = lessons.map((l: any) => ({
           id: l.id,
           title: l.title,
           type: "lesson",
           chapterId: l.chapterId,
           position: l.position,
+          isFree: !!l.isFree,
+          points: l.points ?? 0,
           progress: [], // no progress info
         }));
 
@@ -96,12 +103,14 @@ export function useCourseDatabase() {
           [chapterId]
         )) as CourseItem[];
 
-        const quizItems: CourseItem[] = quizzes.map((q) => ({
+        const quizItems: CourseItem[] = quizzes.map((q: any) => ({
           id: q.id,
           title: q.title,
           type: "quiz",
           chapterId: q.chapterId,
           position: q.position,
+          isFree: !!q.isFree,
+          maxScore: q.maxScore ?? 0,
           results: [], // no result info
         }));
 
@@ -159,12 +168,14 @@ export function useCourseDatabase() {
           [chapterId]
         )) as (CourseItem & { progressId?: string; completed?: number })[];
 
-        const lessonItems: CourseItem[] = lessons.map((l) => ({
+        const lessonItems: CourseItem[] = lessons.map((l: any) => ({
           id: l.id,
           title: l.title,
           type: "lesson",
           chapterId: l.chapterId,
           position: l.position,
+          isFree: !!l.isFree,
+          points: l.points ?? 0,
           progress: l.progressId
             ? [{ id: l.progressId, completed: !!l.completed }]
             : [],
@@ -187,12 +198,14 @@ export function useCourseDatabase() {
           attemptCount?: number;
         })[];
 
-        const quizItems: CourseItem[] = quizzes.map((q) => ({
+        const quizItems: CourseItem[] = quizzes.map((q: any) => ({
           id: q.id,
           title: q.title,
           type: "quiz",
           chapterId: q.chapterId,
           position: q.position,
+          isFree: !!q.isFree,
+          maxScore: q.maxScore ?? 0,
           results: q.resultId
             ? [
                 {
@@ -235,8 +248,21 @@ export function useCourseDatabase() {
         `
       ) as CompletedLessonsRow[];
 
+      // Check if any completed lesson has a video
+      const videoRows = await db.getAllAsync(
+        `
+        SELECT COUNT(*) as hasVideoCount
+        FROM lesson_progress lp
+        JOIN lessons l ON lp.lessonId = l.id
+        WHERE lp.completed = 1
+        AND (l.videoUrl IS NOT NULL AND l.videoUrl != '')
+        `
+      ) as { hasVideoCount: number }[];
+
       const count = rows?.[0]?.completedCount ?? 0;
-      return { success: true, count };
+      const hasVideoLessons = (videoRows?.[0]?.hasVideoCount ?? 0) > 0;
+
+      return { success: true, count, hasVideoLessons };
     } catch (err) {
       console.error("❌ Failed to get completed lessons count:", err);
       return { success: false, error: "Failed to count completed lessons" };
@@ -351,12 +377,15 @@ export function useCourseDatabase() {
         [chapterId]
       )) as (CourseItem & { progressId?: string; completed?: number })[];
 
-      const lessonItems: CourseItem[] = lessons.map((l) => ({
+      const lessonItems: CourseItem[] = lessons.map((l: any) => ({
         id: l.id,
         title: l.title,
         type: "lesson",
         chapterId: l.chapterId,
         position: l.position,
+        isFree: !!l.isFree,
+        points: l.points ?? 0,
+        videoUrl: l.videoUrl,
         progress: l.progressId
           ? [{ id: l.progressId, completed: !!l.completed }]
           : [],
@@ -375,21 +404,27 @@ export function useCourseDatabase() {
       )) as (CourseItem & {
         resultId?: string;
         score?: number;
+        maxScore: number;
+        totalQuestions?: number;
         completed?: number;
         attemptCount?: number;
       })[];
 
-      const quizItems: CourseItem[] = quizzes.map((q) => ({
+      const quizItems: CourseItem[] = quizzes.map((q: any) => ({
         id: q.id,
         title: q.title,
         type: "quiz",
         chapterId: q.chapterId,
         position: q.position,
+        isFree: !!q.isFree,
+        maxScore: q.maxScore ?? 0,
+        questionCount: q.totalQuestions ?? 0,
         results: q.resultId
           ? [
               {
                 id: q.resultId,
                 score: q.score ?? 0,
+                maxScore: q.maxScore,
                 completed: !!q.completed,
                 attemptCount: q.attemptCount ?? 0,
               },
@@ -475,36 +510,54 @@ export function useCourseDatabase() {
         return { success: true, chapters: [] };
       }
 
-      // Calculate progress for each chapter 
+      // Calculate progress for each chapter based on points
       const chaptersWithProgress = await Promise.all(
         recentChapters.map(async (chapter) => {
-          // Get total items (lessons + quizzes) in this chapter
-          const totalItems = await db.getFirstAsync<{ total: number }>(
+          // Get total points from lessons in this chapter
+          const lessonPointsResult = await db.getFirstAsync<{ totalPoints: number }>(
             `
-            SELECT
-              (SELECT COUNT(*) FROM lessons WHERE chapterId = ?) +
-              (SELECT COUNT(*) FROM quizzes WHERE chapterId = ?) as total
+            SELECT COALESCE(SUM(points), 0) as totalPoints
+            FROM lessons
+            WHERE chapterId = ?
             `,
-            [chapter.chapterId, chapter.chapterId]
+            [chapter.chapterId]
           );
 
-          // Get completed items in this chapter
-          const completedItems = await db.getFirstAsync<{ completed: number }>(
+          // Get earned points from completed lessons
+          const earnedLessonPointsResult = await db.getFirstAsync<{ earnedPoints: number }>(
             `
-            SELECT
-              (SELECT COUNT(*) FROM lesson_progress lp
-               JOIN lessons l ON lp.lessonId = l.id
-               WHERE l.chapterId = ? AND lp.completed = 1) +
-              (SELECT COUNT(*) FROM quiz_results qr
-               JOIN quizzes q ON qr.quizId = q.id
-               WHERE q.chapterId = ? AND qr.completed = 1) as completed
+            SELECT COALESCE(SUM(l.points), 0) as earnedPoints
+            FROM lessons l
+            JOIN lesson_progress lp ON lp.lessonId = l.id
+            WHERE l.chapterId = ? AND lp.completed = 1
             `,
-            [chapter.chapterId, chapter.chapterId]
+            [chapter.chapterId]
           );
 
-          const total = totalItems?.total ?? 1;
-          const completed = completedItems?.completed ?? 0;
-          const progress = Math.round((completed / total) * 100);
+          // Get total max scores from quizzes in this chapter
+          const quizMaxScoreResult = await db.getFirstAsync<{ totalMaxScore: number }>(
+            `
+            SELECT COALESCE(SUM(maxScore), 0) as totalMaxScore
+            FROM quizzes
+            WHERE chapterId = ?
+            `,
+            [chapter.chapterId]
+          );
+
+          // Get earned points from quiz results
+          const earnedQuizPointsResult = await db.getFirstAsync<{ earnedPoints: number }>(
+            `
+            SELECT COALESCE(SUM(qr.score), 0) as earnedPoints
+            FROM quizzes q
+            JOIN quiz_results qr ON qr.quizId = q.id
+            WHERE q.chapterId = ? AND qr.completed = 1
+            `,
+            [chapter.chapterId]
+          );
+
+          const totalPoints = (lessonPointsResult?.totalPoints ?? 0) + (quizMaxScoreResult?.totalMaxScore ?? 0);
+          const earnedPoints = (earnedLessonPointsResult?.earnedPoints ?? 0) + (earnedQuizPointsResult?.earnedPoints ?? 0);
+          const progress = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
 
           return {
             id: chapter.chapterId,

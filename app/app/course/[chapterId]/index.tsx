@@ -15,12 +15,16 @@ import {
   Trophy,
   Lock,
   CheckCircle2,
+  Play,
 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useCourseDatabase } from "@/lib/db/course";
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 import Svg, { Path, Circle } from "react-native-svg";
+import { useTour } from "@/context/TourContext";
+import { TourTooltip } from "@/components/Tour/TourTooltip";
+import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
 
 const SCREEN_WIDTH = Dimensions.get('window').width;
 const CARD_WIDTH = SCREEN_WIDTH * 0.7; // 70% of screen width
@@ -32,10 +36,13 @@ type Item = {
   id: string;
   type: "lesson" | "quiz";
   title: string;
+  isFree: boolean;
   progress?: any[];
   results?: any[];
   position: number;
   chapterId: string;
+  videoUrl?: string;
+  questionCount?: number;
 };
 
 export default function ChapterScreen() {
@@ -49,6 +56,9 @@ export default function ChapterScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const { getChapterItems } = useCourseDatabase();
+
+  // Tour
+  const { tourActive, currentStep, setCurrentStep, endTour, skipTour, numbersQuizId } = useTour();
 
   useEffect(() => {
     const loadChapter = async () => {
@@ -67,6 +77,37 @@ export default function ChapterScreen() {
     };
     loadChapter();
   }, [chapterId]);
+
+  const handleTourNext = () => {
+    // Special handling for ENTER_QUIZ step - navigate to quiz when clicking Next
+    if (currentStep === TOUR_STEPS.ENTER_QUIZ && numbersQuizId) {
+      const quizIndex = items.findIndex(item => item.id === numbersQuizId);
+      if (quizIndex !== -1) {
+        const flatItems = items.map(i => ({ ...i, chapterId }));
+        setCurrentStep(currentStep + 1); // Move to next step first
+        router.push({
+          pathname: `/course/${chapterId}/quiz/${numbersQuizId}` as any,
+          params: {
+            allItems: JSON.stringify(flatItems),
+            currentIndex: quizIndex
+          },
+        });
+        return;
+      }
+    }
+
+    if (currentStep === TOTAL_TOUR_STEPS - 1) {
+      endTour();
+    } else {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleTourPrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
 
   if (loading) {
     return <GraduationCap3DLoader />;
@@ -98,9 +139,9 @@ export default function ChapterScreen() {
     const pathColor = (fromCompleted && toCompleted) ? "#06B6D4" : (isDark ? "#374151" : "#d1d5db");
 
     const startX = from.x + CARD_WIDTH / 2;
-    const startY = from.y + 60; // Bottom of card
+    const startY = from.y + 60;
     const endX = to.x + CARD_WIDTH / 2;
-    const endY = to.y; // Top of card
+    const endY = to.y;
 
     // If both items are on the same side (both lessons or both quizzes)
     if (from.isLeft === to.isLeft) {
@@ -136,12 +177,13 @@ export default function ChapterScreen() {
   };
 
   const handleItemPress = (item: Item, index: number) => {
-    // Check if previous items are completed
-    if (index > 0) {
-      const prevCompleted = items.slice(0, index).every(i => isCompleted(i));
-      if (!prevCompleted && !user?.isPro) {
-        return; // Can't access if previous not completed
-      }
+    // Check if item is locked (not free and user is not PRO)
+    const itemWithFreeFlag = items[index] as Item & { isFree?: boolean };
+    const isItemLocked = !user?.isPro && !itemWithFreeFlag.isFree;
+
+    if (isItemLocked) {
+      router.push("/payment");
+      return;
     }
 
     const flatItems = items.map(i => ({ ...i, chapterId }));
@@ -222,44 +264,43 @@ export default function ChapterScreen() {
           {items.map((item, index) => {
             const completed = isCompleted(item);
             const pos = getItemPosition(index);
-            const isLocked = index > 0 && !items.slice(0, index).every(i => isCompleted(i)) && !user?.isPro;
+            const isLocked = !user?.isPro && !item.isFree;
             const isLesson = item.type === "lesson";
 
             // Get quiz progress percentage
             const quizProgress = !isLesson && item.results && item.results.length > 0
-              ? Math.round((item.results[0].score / 100) * 100) // Assuming score is percentage
+              ? Math.round((item.results[0].score / item.results[0].maxScore) * 100) // Assuming score is percentage
               : null;
 
-            return (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => handleItemPress(item, index)}
-                activeOpacity={isLocked ? 1 : 0.7}
-                style={{
-                  position: "absolute",
-                  left: pos.x,
-                  top: pos.y,
-                  width: CARD_WIDTH,
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
-                  borderRadius: 16,
-                  padding: 16,
-                  borderLeftWidth: 4,
-                  borderLeftColor: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 3,
-                  opacity: isLocked ? 0.5 : 1,
-                }}
-              >
+            // Determine if this item should show a tooltip
+            const firstLesson = items.find(i => i.type === "lesson");
+            const firstQuiz = items.find(i => i.type === "quiz");
+            const isFirstLesson = item.id === firstLesson?.id;
+            const isFirstQuiz = item.id === firstQuiz?.id;
+
+            const showLessonTooltip = tourActive && currentStep === TOUR_STEPS.LESSONS_SECTION && isFirstLesson;
+            const showQuizTooltip = tourActive && currentStep === TOUR_STEPS.ENTER_QUIZ && item.id === numbersQuizId; 
+
+            const tooltipVisible = showLessonTooltip || showQuizTooltip;
+
+            let tooltipInfo = null;
+            if (showLessonTooltip) tooltipInfo = getTourStepInfo(TOUR_STEPS.LESSONS_SECTION);
+            if (showQuizTooltip) tooltipInfo = getTourStepInfo(TOUR_STEPS.ENTER_QUIZ);
+
+            // Render card content
+            const cardContent = (
+              <>
                 {/* Header: Icon, Lock, and Progress */}
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     {completed ? (
                       <CheckCircle2 size={24} color="#10B981" />
                     ) : isLesson ? (
-                      <BookOpen size={24} color={isDark ? "#06B6D4" : "#0891B2"} />
+                      (item.videoUrl) ? (
+                        <Play size={24} color={isDark ? "#06B6D4" : "#0891B2"} fill={isDark ? "#06B6D4" : "#0891B2"} />
+                      ) : (
+                        <BookOpen size={24} color={isDark ? "#06B6D4" : "#0891B2"} />
+                      )
                     ) : (
                       <Trophy size={24} color={isDark ? "#8B5CF6" : "#7C3AED"} />
                     )}
@@ -291,22 +332,112 @@ export default function ChapterScreen() {
                   {item.title}
                 </Text>
 
-                {/* Type Badge */}
-                <View style={{
-                  alignSelf: "flex-start",
-                  paddingHorizontal: 8,
-                  paddingVertical: 4,
-                  borderRadius: 8,
-                  backgroundColor: completed ? "#10B98110" : (isLesson ? "#06B6D410" : "#8B5CF610"),
-                }}>
-                  <Text style={{
-                    fontSize: 11,
-                    fontWeight: "600",
-                    color: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
+                {/* Type Badge and Question Count */}
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  <View style={{
+                    paddingHorizontal: 8,
+                    paddingVertical: 4,
+                    borderRadius: 8,
+                    backgroundColor: completed ? "#10B98110" : (isLesson ? "#06B6D410" : "#8B5CF610"),
                   }}>
-                    {item.type.toUpperCase()}
-                  </Text>
+                    <Text style={{
+                      fontSize: 11,
+                      fontWeight: "600",
+                      color: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
+                    }}>
+                      {item.type.toUpperCase()}
+                    </Text>
+                  </View>
+
+                  {/* Question count for quizzes */}
+                  {!isLesson && item.questionCount !== undefined && item.questionCount > 0 && (
+                    <Text style={{
+                      fontSize: 11,
+                      fontWeight: "500",
+                      color: isDark ? "#9ca3af" : "#6b7280",
+                    }}>
+                      • {item.questionCount} {item.questionCount === 1 ? 'question' : 'questions'}
+                    </Text>
+                  )}
                 </View>
+              </>
+            );
+
+            // Wrap with tooltip if needed
+            if (tooltipVisible && tooltipInfo) {
+              return (
+                <View
+                  key={item.id}
+                  style={{
+                    position: "absolute",
+                    left: pos.x,
+                    top: pos.y,
+                    width: CARD_WIDTH,
+                    zIndex: 1000,
+                  }}
+                >
+                  <TourTooltip
+                    visible={tooltipVisible}
+                    onNext={handleTourNext}
+                    onPrev={handleTourPrev}
+                    onSkip={skipTour}
+                    onClose={() => {}}
+                    title={tooltipInfo.title}
+                    content={tooltipInfo.content}
+                    stepNumber={currentStep + 1}
+                    totalSteps={TOTAL_TOUR_STEPS}
+                    placement="bottom"
+                  >
+                    <TouchableOpacity
+                      onPress={() => handleItemPress(item, index)}
+                      activeOpacity={isLocked ? 1 : 0.7}
+                      style={{
+                        width: CARD_WIDTH,
+                        backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                        borderRadius: 16,
+                        padding: 16,
+                        borderLeftWidth: 4,
+                        borderLeftColor: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
+                        shadowColor: "#000",
+                        shadowOffset: { width: 0, height: 2 },
+                        shadowOpacity: 0.1,
+                        shadowRadius: 8,
+                        elevation: 3,
+                        opacity: isLocked ? 0.5 : 1,
+                      }}
+                    >
+                      {cardContent}
+                    </TouchableOpacity>
+                  </TourTooltip>
+                </View>
+              );
+            }
+
+            // Normal card without tooltip
+            return (
+              <TouchableOpacity
+                key={item.id}
+                onPress={() => handleItemPress(item, index)}
+                activeOpacity={isLocked ? 1 : 0.7}
+                style={{
+                  position: "absolute",
+                  left: pos.x,
+                  top: pos.y,
+                  width: CARD_WIDTH,
+                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  borderRadius: 16,
+                  padding: 16,
+                  borderLeftWidth: 4,
+                  borderLeftColor: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
+                  shadowColor: "#000",
+                  shadowOffset: { width: 0, height: 2 },
+                  shadowOpacity: 0.1,
+                  shadowRadius: 8,
+                  elevation: 3,
+                  opacity: isLocked ? 0.5 : 1,
+                }}
+              >
+                {cardContent}
               </TouchableOpacity>
             );
           })}

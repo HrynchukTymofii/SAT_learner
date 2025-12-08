@@ -6,6 +6,7 @@ import {
   ScrollView,
   Image,
   useColorScheme,
+  StyleSheet,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
@@ -14,11 +15,47 @@ import {
   CheckCircle2,
   Circle,
   Calendar,
+  Edit3,
 } from "lucide-react-native";
-import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 import { useCourseDatabase } from "@/lib/db/course";
-import { useSQLiteContext } from "expo-sqlite";
+import {
+  getStudyPlan,
+  getDefaultPlanSuggestion,
+  saveStudyPlan,
+  formatDateKey,
+  getTaskCount,
+  Task as StudyTask,
+} from "@/lib/studyPlanStorage";
+import * as SecureStore from "expo-secure-store";
+import { useTour } from "@/context/TourContext";
+import { TourTooltip } from "@/components/Tour/TourTooltip";
+import {
+  TOUR_STEPS,
+  TOTAL_TOUR_STEPS,
+  getTourStepInfo,
+} from "@/constants/tourSteps";
+
+/**
+ * ExploreScreen (Index/Home Tab)
+ *
+ * This is the main landing screen that displays:
+ * - User's study plan for the day with task tracking
+ * - Recent chapters with progress indicators
+ * - SAT date countdown
+ * - Weekly task overview calendar
+ * - Tour tooltip for STUDY_PLAN step
+ *
+ * Features:
+ * - Dynamic theme support (dark/light mode)
+ * - Loads data on focus using useFocusEffect
+ * - Integrates with tour system for onboarding
+ * - Displays personalized study recommendations
+ */
 
 interface RecentChapter {
   id: string;
@@ -31,48 +68,64 @@ interface Task {
   id: string;
   title: string;
   completed: boolean;
-  type: "flashcard" | "explanation" | "exercise";
+  type: "lesson" | "quiz" | "review" | null;
 }
 
 export default function ExploreScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-  const {user} = useAuth()
+  const { user } = useAuth();
   const insets = useSafeAreaInsets();
-  const db = useSQLiteContext();
   const { getRecentChapters } = useCourseDatabase();
 
+  // Tour
+  const { tourActive, currentStep, setCurrentStep, endTour, skipTour } =
+    useTour();
+
   // State
-  const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [recentChapters, setRecentChapters] = useState<RecentChapter[]>([]);
   const [isLoadingChapters, setIsLoadingChapters] = useState(true);
+  const [todayTasks, setTodayTasks] = useState<Task[]>([]);
+  const [hasCustomPlan, setHasCustomPlan] = useState(false);
+  const [isLoadingPlan, setIsLoadingPlan] = useState(true);
+  const [satDate, setSatDate] = useState<string | null>(null);
+  const [weekTaskCounts, setWeekTaskCounts] = useState<Map<string, number>>(
+    new Map()
+  );
 
-  const [todayTasks, setTodayTasks] = useState<Task[]>([
-    {
-      id: "1",
-      title: 'Learn 20 flashcards in "Cell Biology"',
-      completed: false,
-      type: "flashcard",
-    },
-    {
-      id: "2",
-      title: 'Read the explanation in "Genetics"',
-      completed: false,
-      type: "explanation",
-    },
-    {
-      id: "3",
-      title: 'Complete 10 exercises in "Chemistry"',
-      completed: false,
-      type: "exercise",
-    },
-  ]);
+  // Tour navigation
+  React.useEffect(() => {
+    if (tourActive && currentStep === TOUR_STEPS.COURSE_TAB) {
+      // Use setTimeout to avoid setState during render
+      setTimeout(() => {
+        router.push("/(tabs)/course");
+      }, 100);
+    }
+  }, [tourActive, currentStep]);
 
-  // Load recent chapters on page focus
+  const handleTourNext = () => {
+    if (currentStep === TOTAL_TOUR_STEPS - 1) {
+      endTour();
+    } else {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleTourPrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+    
+  };
+
+  // Load recent chapters and study plan on page focus
   useFocusEffect(
     React.useCallback(() => {
       loadRecentChapters();
+      loadTodayPlan();
+      loadSatDate();
+      loadWeekTaskCounts();
     }, [])
   );
 
@@ -91,6 +144,82 @@ export default function ExploreScreen() {
       setRecentChapters(chaptersWithColors);
     }
     setIsLoadingChapters(false);
+  };
+
+  const info = getTourStepInfo(TOUR_STEPS.STUDY_PLAN);
+
+  const loadTodayPlan = async () => {
+    setIsLoadingPlan(true);
+    try {
+      const today = new Date();
+      const plan = await getStudyPlan(today);
+
+      if (plan && plan.tasks && plan.tasks.length > 0) {
+        // User has a custom plan for today
+        setHasCustomPlan(true);
+        const tasks: Task[] = plan.tasks.map((task: StudyTask) => ({
+          id: task.id,
+          title: task.text,
+          completed: task.completed,
+          type: task.type || "lesson",
+        }));
+        setTodayTasks(tasks);
+      } else {
+        // No custom plan, use default suggestions
+        setHasCustomPlan(false);
+        const defaultTasks = getDefaultPlanSuggestion();
+        const tasks: Task[] = defaultTasks.map((task: StudyTask) => ({
+          id: task.id,
+          title: task.text,
+          completed: task.completed,
+          type: task.type || "lesson",
+        }));
+        setTodayTasks(tasks);
+      }
+    } catch (error) {
+      console.error("Failed to load today's plan:", error);
+      // Fallback to default plan
+      setHasCustomPlan(false);
+      const defaultTasks = getDefaultPlanSuggestion();
+      const tasks: Task[] = defaultTasks.map((task: StudyTask) => ({
+        id: task.id,
+        title: task.text,
+        completed: task.completed,
+        type: task.type || "lesson",
+      }));
+      setTodayTasks(tasks);
+    } finally {
+      setIsLoadingPlan(false);
+    }
+  };
+
+  const loadSatDate = async () => {
+    try {
+      const stored = await SecureStore.getItemAsync("onboardingAnswers");
+      if (stored) {
+        const answers = JSON.parse(stored);
+        setSatDate(answers.satDate || null);
+      }
+    } catch (error) {
+      console.error("Failed to load SAT date:", error);
+    }
+  };
+
+  const loadWeekTaskCounts = async () => {
+    try {
+      const dates = getWeekDates();
+      const counts = new Map<string, number>();
+
+      for (const date of dates) {
+        const dateKey = formatDateKey(date);
+        const taskCount = await getTaskCount(dateKey);
+        counts.set(dateKey, taskCount.total);
+      }
+
+      setWeekTaskCounts(counts);
+    } catch (error) {
+      console.error("Failed to load week task counts:", error);
+    }
   };
 
   // Get week dates around selected date
@@ -136,12 +265,35 @@ export default function ExploreScreen() {
   };
 
   // Toggle task completion
-  const toggleTask = (taskId: string) => {
-    setTodayTasks((prev) =>
-      prev.map((task) =>
-        task.id === taskId ? { ...task, completed: !task.completed } : task
-      )
+  const toggleTask = async (taskId: string) => {
+    const updatedTasks = todayTasks.map((task) =>
+      task.id === taskId ? { ...task, completed: !task.completed } : task
     );
+    setTodayTasks(updatedTasks);
+
+    // Save to storage (convert default plan to custom plan if needed)
+    try {
+      const today = new Date();
+      const plan = await getStudyPlan(today);
+      const tasksToSave: StudyTask[] = updatedTasks.map((task) => ({
+        id: task.id,
+        text: task.title,
+        completed: task.completed,
+        type: task.type,
+      }));
+
+      await saveStudyPlan(today, {
+        goals: plan?.goals || "",
+        tasks: tasksToSave,
+      });
+
+      // If this was a default plan, now it's custom
+      if (!hasCustomPlan) {
+        setHasCustomPlan(true);
+      }
+    } catch (error) {
+      console.error("Failed to save task update:", error);
+    }
   };
 
   // Calculate completed tasks
@@ -149,85 +301,100 @@ export default function ExploreScreen() {
   const totalTasks = todayTasks.length;
 
   return (
-    <SafeAreaView className={`flex-1 ${isDark ? "bg-gray-900" : "bg-gray-50"}`} edges={['bottom']}>
+    <SafeAreaView
+      style={[
+        styles.container,
+        { backgroundColor: isDark ? "#111827" : "#f9fafb" },
+      ]}
+      edges={["bottom"]}
+    >
       <ScrollView
-        className="flex-1"
+        style={styles.scrollView}
         showsVerticalScrollIndicator={false}
       >
         {/* Header */}
         <View
-            style={{ paddingTop: insets.top + 16 }}
-          className={`px-6 ${
-            isDark ? "bg-gray-900" : "bg-white"
-          } border-b ${isDark ? "border-gray-800" : "border-gray-100"}`}
+          style={[
+            styles.header,
+            {
+              paddingTop: insets.top + 16,
+              backgroundColor: isDark ? "#111827" : "#ffffff",
+              borderBottomColor: isDark ? "#1f2937" : "#f3f4f6",
+            },
+          ]}
         >
-          <View className="flex-row items-center justify-between mb-4">
-            <TouchableOpacity activeOpacity={0.7}>
+          <View style={styles.headerRow}>
+            {/* <TouchableOpacity activeOpacity={0.7}>
               <Image
-                source={isDark ? require("@/assets/images/splash-icon-light.png") : require("@/assets/images/splash-icon-dark.png")}
-                style={{ width: 32, height: 32 }}
+                source={
+                  isDark
+                    ? require("@/assets/images/splash-icon-light.png")
+                    : require("@/assets/images/splash-icon-dark.png")
+                }
+                style={styles.headerLogo}
                 resizeMode="contain"
               />
-            </TouchableOpacity>
+            </TouchableOpacity> */}
 
             <Text
-              className={`text-2xl font-bold ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}
+              style={[
+                styles.headerTitle,
+                { color: isDark ? "#ffffff" : "#1f2937" },
+              ]}
             >
               Explore
             </Text>
 
-            <TouchableOpacity activeOpacity={0.7}>
-              <MoreVertical
-                size={24}
-                color={isDark ? "#ffffff" : "#000000"} 
-              />
-            </TouchableOpacity>
+            {/* <TouchableOpacity activeOpacity={0.7}>
+              <MoreVertical size={24} color={isDark ? "#ffffff" : "#000000"} />
+            </TouchableOpacity> */}
           </View>
         </View>
 
-        <View className="px-6">
+        <View style={styles.contentContainer}>
           {/* Premium Upgrade Banner */}
-          {user && !user.isPro && <LinearGradient
-            colors={["#06B6D4", "#0891B2"]}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 0 }}
-            className="mt-6 rounded-3xl p-6 overflow-hidden"
-          >
-            <View className="flex-row items-center justify-between">
-              <View className="flex-1">
-                <Text className="text-white text-xl font-bold mb-1">
-                  Upgrade Premium!
-                </Text>
-                <Text className="text-white/90 text-sm mb-4">
-                  Enjoy all the benefits
-                </Text>
-                <TouchableOpacity
-                  activeOpacity={0.8}
-                  className="bg-white rounded-full px-6 py-2 self-start"
-                  onPress={() => router.push("/payment")}
-                >
-                  <Text className="text-cyan-500 font-semibold">Upgrade</Text>
-                </TouchableOpacity>
-              </View>
-              <View className="ml-4">
-                <Image
+          {user && !user.isPro && (
+            <LinearGradient
+              colors={["#06B6D4", "#0891B2"]}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 0 }}
+              style={styles.premiumBanner}
+            >
+              <View style={styles.premiumBannerRow}>
+                <View style={styles.premiumBannerContent}>
+                  <Text style={styles.premiumBannerTitle}>
+                    Upgrade Premium!
+                  </Text>
+                  <Text style={styles.premiumBannerSubtitle}>
+                    Enjoy all the benefits
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.8}
+                    style={styles.premiumBannerButton}
+                    onPress={() => router.push("/payment")}
+                  >
+                    <Text style={styles.premiumBannerButtonText}>Upgrade</Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={styles.premiumBannerImage}>
+                  <Image
                     source={require("@/assets/images/golden_cap.png")}
-                    style={{ width: 108, height: 108 }}
+                    style={styles.goldenCapImage}
                     resizeMode="contain"
-                />
+                  />
+                </View>
               </View>
-            </View>
-          </LinearGradient>}
+            </LinearGradient>
+          )}
 
           {/* Recent Chapters */}
-          <View className="mt-8">
-            <View className="flex-row items-center justify-between mb-4">
+          <View style={styles.sectionHeader}>
+            <View style={styles.sectionHeaderRow}>
               <Text
-                className={`text-xl font-bold ${
-                  isDark ? "text-white" : "text-gray-900"
-                }`}
+                style={[
+                  styles.sectionTitle,
+                  { color: isDark ? "#ffffff" : "#1f2937" },
+                ]}
               >
                 Recent Chapters
               </Text>
@@ -235,97 +402,136 @@ export default function ExploreScreen() {
                 activeOpacity={0.7}
                 onPress={() => router.push("/(tabs)/course" as any)}
               >
-                <Text className="text-cyan-500 font-semibold">
-                  View All →
-                </Text>
+                <Text style={styles.viewAllButton}>View All →</Text>
               </TouchableOpacity>
             </View>
 
             {isLoadingChapters ? (
-              <View className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl p-8 items-center`}>
-                <Text className={`${isDark ? "text-gray-400" : "text-gray-600"}`}>
+              <View
+                style={[
+                  styles.loadingContainer,
+                  { backgroundColor: isDark ? "#1f2937" : "#ffffff" },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.loadingText,
+                    { color: isDark ? "#9ca3af" : "#6b7280" },
+                  ]}
+                >
                   Loading chapters...
                 </Text>
               </View>
             ) : recentChapters.length === 0 ? (
-              <View className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl p-8 items-center`}>
-                <Text className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}>
+              <View
+                style={[
+                  styles.emptyContainer,
+                  { backgroundColor: isDark ? "#1f2937" : "#ffffff" },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.emptyTitle,
+                    { color: isDark ? "#ffffff" : "#1f2937" },
+                  ]}
+                >
                   No chapters started yet
                 </Text>
-                <Text className={`text-sm text-center mb-4 ${isDark ? "text-gray-400" : "text-gray-600"}`}>
+                <Text
+                  style={[
+                    styles.emptySubtitle,
+                    { color: isDark ? "#9ca3af" : "#6b7280" },
+                  ]}
+                >
                   Start learning to see your recent progress here
                 </Text>
                 <TouchableOpacity
                   activeOpacity={0.7}
                   onPress={() => router.push("/(tabs)/course" as any)}
-                  className="bg-cyan-500 rounded-full px-6 py-2"
+                  style={styles.emptyButton}
                 >
-                  <Text className="text-white font-semibold">Browse Chapters</Text>
+                  <Text style={styles.emptyButtonText}>Browse Chapters</Text>
                 </TouchableOpacity>
               </View>
             ) : (
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
-                className="-mx-6 px-6"
+                style={styles.chapterScrollView}
+                contentContainerStyle={{ paddingRight: 24 }}
               >
                 {recentChapters.map((chapter) => (
                   <TouchableOpacity
                     key={chapter.id}
                     activeOpacity={0.7}
                     onPress={() => router.push(`/course/${chapter.id}` as any)}
-                    className={`mr-4 ${
-                      isDark ? "bg-gray-800" : "bg-white"
-                    } rounded-2xl p-4 w-72 border-l-4`}
-                    style={{ borderLeftColor: chapter.color }}
+                    style={[
+                      styles.chapterCard,
+                      {
+                        backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                        borderLeftColor: chapter.color,
+                      },
+                    ]}
                   >
                     {/* Title and Progress */}
-                    <View className="flex-row items-start justify-between mb-3">
+                    <View style={styles.chapterCardHeader}>
                       <Text
-                        className={`text-lg font-bold flex-1 ${
-                          isDark ? "text-white" : "text-gray-900"
-                        }`}
+                        style={[
+                          styles.chapterTitle,
+                          { color: isDark ? "#ffffff" : "#1f2937" },
+                        ]}
                       >
                         {chapter.title}
                       </Text>
-                      <View className="ml-2">
-                        <View className="relative items-center justify-center">
-                          <Text
-                            className="text-lg font-bold"
-                            style={{ color: chapter.color }}
-                          >
-                            {chapter.progress}%
-                          </Text>
-                        </View>
+                      <View style={styles.chapterProgressContainer}>
+                        <Text
+                          style={[
+                            styles.chapterProgressText,
+                            { color: chapter.color },
+                          ]}
+                        >
+                          {chapter.progress}%
+                        </Text>
                       </View>
                     </View>
 
                     {/* Progress Bar */}
-                    <View className={`h-2 rounded-full mb-4 ${isDark ? "bg-gray-700" : "bg-gray-200"}`}>
+                    <View
+                      style={[
+                        styles.chapterProgressBar,
+                        { backgroundColor: isDark ? "#374151" : "#e5e7eb" },
+                      ]}
+                    >
                       <View
-                        className="h-2 rounded-full"
-                        style={{
-                          width: `${chapter.progress}%`,
-                          backgroundColor: chapter.color,
-                        }}
+                        style={[
+                          styles.chapterProgressFill,
+                          {
+                            width: `${chapter.progress}%`,
+                            backgroundColor: chapter.color,
+                          },
+                        ]}
                       />
                     </View>
 
                     {/* Continue Button */}
                     <View
-                      className="items-center justify-center py-2 rounded-xl"
-                      style={{ backgroundColor: `${chapter.color}20` }}
+                      style={[
+                        styles.chapterContinueButton,
+                        { backgroundColor: `${chapter.color}20` },
+                      ]}
                     >
                       <Text
-                        className="font-semibold"
-                        style={{ color: chapter.color }}
+                        style={[
+                          styles.chapterContinueButtonText,
+                          { color: chapter.color },
+                        ]}
                       >
                         Continue Learning
                       </Text>
                     </View>
                   </TouchableOpacity>
                 ))}
-                <View className="w-6"/>
+                <View style={styles.chapterScrollSpacer} />
               </ScrollView>
             )}
           </View>
@@ -340,46 +546,85 @@ export default function ExploreScreen() {
               {weekDates.map((date, index) => {
                 const selected = isSameDay(date, selectedDate);
                 const today = isToday(date);
+                const isSATDay = satDate && isSameDay(date, new Date(satDate));
+                const dateKey = formatDateKey(date);
+                const taskCount = weekTaskCounts.get(dateKey) || 0;
 
                 return (
                   <TouchableOpacity
                     key={index}
                     activeOpacity={0.7}
-                    onPress={() => setSelectedDate(date)}
+                    onPress={() => {
+                      const dateStr = formatDateKey(date);
+                      router.push(`/calendar/day/${dateStr}` as any);
+                    }}
                     className={`items-center justify-center mr-4 py-4 px-5 rounded-2xl ${
-                      selected
-                        ? "bg-cyan-500"
-                        : isDark
-                        ? "bg-gray-800"
-                        : "bg-white"
+                      isSATDay
+                        ? ""
+                        : selected
+                          ? "bg-cyan-500"
+                          : isDark
+                            ? "bg-gray-800"
+                            : "bg-white"
                     }`}
                     style={{
+                      backgroundColor: isSATDay
+                        ? "#f59e0b"
+                        : isDark
+                          ? "#1f2937"
+                          : "#fff",
                       borderBottomWidth: today ? 3 : 0,
                       borderBottomColor: "#06B6D4",
                     }}
                   >
                     <Text
                       className={`text-3xl font-bold mb-1 ${
-                        selected
+                        isSATDay || selected
                           ? "text-white"
                           : isDark
-                          ? "text-white"
-                          : "text-gray-900"
+                            ? "text-white"
+                            : "text-gray-900"
                       }`}
                     >
                       {formatDay(date)}
                     </Text>
                     <Text
                       className={`text-sm ${
-                        selected
+                        isSATDay || selected
                           ? "text-white"
                           : isDark
-                          ? "text-gray-400"
-                          : "text-gray-600"
+                            ? "text-gray-400"
+                            : "text-gray-600"
                       }`}
                     >
                       {formatDayName(date)}
                     </Text>
+                    {taskCount > 0 && !isSATDay && (
+                      <View
+                        style={{
+                          position: "absolute",
+                          top: 4,
+                          right: 4,
+                          minWidth: 16,
+                          height: 16,
+                          borderRadius: 8,
+                          backgroundColor: selected ? "#ffffff" : "#06B6D4",
+                          justifyContent: "center",
+                          alignItems: "center",
+                          paddingHorizontal: 4,
+                        }}
+                      >
+                        <Text
+                          style={{
+                            fontSize: 10,
+                            fontWeight: "700",
+                            color: selected ? "#06B6D4" : "#ffffff",
+                          }}
+                        >
+                          {taskCount}
+                        </Text>
+                      </View>
+                    )}
                   </TouchableOpacity>
                 );
               })}
@@ -410,76 +655,156 @@ export default function ExploreScreen() {
           </View>
 
           {/* Today's Study Plan */}
-          <View className="mt-8 mb-16">
-            <Text
-              className={`text-xl font-bold mb-4 ${
-                isDark ? "text-white" : "text-gray-900"
-              }`}
-            >
-              Your study plan today ({completedTasks}/{totalTasks})
-            </Text>
-
-            {todayTasks.map((task, index) => (
-              <View key={task.id} className="flex-row items-start mb-6">
-                {/* Timeline */}
-                <View className="items-center mr-4">
-                  <TouchableOpacity
-                    activeOpacity={0.7}
-                    onPress={() => toggleTask(task.id)}
-                  >
-                    {task.completed ? (
-                      <CheckCircle2 size={24} color="#06B6D4" fill="#06B6D4" />
-                    ) : (
-                      <Circle size={24} color="#06B6D4" />
-                    )}
-                  </TouchableOpacity>
-                  {index < todayTasks.length - 1 && (
-                    <View className="w-0.5 h-16 bg-cyan-500/30 mt-2" />
-                  )}
-                </View>
-
-                {/* Task Content */}
+          <TourTooltip
+            visible={tourActive && currentStep === TOUR_STEPS.STUDY_PLAN}
+            onNext={handleTourNext}
+            onPrev={handleTourPrev}
+            onSkip={skipTour}
+            onClose={() => {}}
+            title={info.title}
+            content={info.content}
+            stepNumber={TOUR_STEPS.STUDY_PLAN + 1}
+            totalSteps={TOTAL_TOUR_STEPS}
+            placement="top"
+          >
+            <View className="mt-8 mb-16">
+              <View className="flex-row items-center justify-between mb-4">
+                <Text
+                  className={`text-xl font-bold ${
+                    isDark ? "text-white" : "text-gray-900"
+                  }`}
+                >
+                  Your study plan today ({completedTasks}/{totalTasks})
+                </Text>
                 <TouchableOpacity
                   activeOpacity={0.7}
-                  onPress={() => toggleTask(task.id)}
-                  className={`flex-1 ${
-                    isDark ? "bg-gray-800" : "bg-white"
-                  } rounded-2xl p-4 flex-row items-center`}
+                  onPress={() => {
+                    const today = formatDateKey(new Date());
+                    router.push(`/calendar/day/${today}` as any);
+                  }}
+                  className="flex-row items-center"
                 >
-                  <View className="mr-3">
-                    {task.type === "flashcard" && (
-                      <View className="w-10 h-10 bg-cyan-500/10 rounded-xl items-center justify-center">
-                        <Text className="text-2xl">📇</Text>
-                      </View>
-                    )}
-                    {task.type === "explanation" && (
-                      <View className="w-10 h-10 bg-cyan-500/10 rounded-xl items-center justify-center">
-                        <Text className="text-2xl">📄</Text>
-                      </View>
-                    )}
-                    {task.type === "exercise" && (
-                      <View className="w-10 h-10 bg-cyan-500/10 rounded-xl items-center justify-center">
-                        <Text className="text-2xl">✏️</Text>
-                      </View>
-                    )}
-                  </View>
-                  <Text
-                    className={`flex-1 ${
-                      task.completed
-                        ? isDark
-                          ? "text-gray-500 line-through"
-                          : "text-gray-400 line-through"
-                        : isDark
-                        ? "text-white"
-                        : "text-gray-900"
-                    } font-medium`}
-                  >
-                    {task.title}
+                  <Edit3 size={16} color="#06B6D4" />
+                  <Text className="text-cyan-500 font-semibold ml-1 text-sm">
+                    {hasCustomPlan ? "Edit Plan" : "Create Plan"}
                   </Text>
                 </TouchableOpacity>
               </View>
-            ))}
-          </View>
+
+              {!hasCustomPlan && (
+                <View
+                  className={`mb-4 p-3 rounded-xl ${
+                    isDark ? "bg-cyan-500/10" : "bg-cyan-50"
+                  }`}
+                >
+                  <Text
+                    className={`text-sm ${
+                      isDark ? "text-cyan-400" : "text-cyan-700"
+                    }`}
+                  >
+                    This is a suggested plan. Tap "Create Plan" to customize
+                    your study goals for today.
+                  </Text>
+                </View>
+              )}
+
+              {isLoadingPlan ? (
+                <View
+                  className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl p-8 items-center`}
+                >
+                  <Text
+                    className={`${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Loading study plan...
+                  </Text>
+                </View>
+              ) : todayTasks.length === 0 ? (
+                <View
+                  className={`${isDark ? "bg-gray-800" : "bg-white"} rounded-2xl p-8 items-center`}
+                >
+                  <Text
+                    className={`text-lg font-semibold mb-2 ${isDark ? "text-white" : "text-gray-900"}`}
+                  >
+                    No plan for today
+                  </Text>
+                  <Text
+                    className={`text-sm text-center mb-4 ${isDark ? "text-gray-400" : "text-gray-600"}`}
+                  >
+                    Create a study plan to stay organized
+                  </Text>
+                  <TouchableOpacity
+                    activeOpacity={0.7}
+                    onPress={() => {
+                      const today = formatDateKey(new Date());
+                      router.push(`/calendar/day/${today}` as any);
+                    }}
+                    className="bg-cyan-500 rounded-full px-6 py-2"
+                  >
+                    <Text className="text-white font-semibold">
+                      Create Plan
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              ) : (
+                todayTasks.map((task, index) => (
+                  <View key={task.id} className="flex-row items-start mb-6">
+                    {/* Timeline */}
+                    <View className="items-center mr-4">
+                      <TouchableOpacity
+                        activeOpacity={0.7}
+                        onPress={() => toggleTask(task.id)}
+                      >
+                        {task.completed ? (
+                          <CheckCircle2 size={24} color="#06B6D4" />
+                        ) : (
+                          <Circle size={24} color="#06B6D4" />
+                        )}
+                      </TouchableOpacity>
+                      {index < todayTasks.length - 1 && (
+                        <View className="w-0.5 h-16 bg-cyan-500/30 mt-2" />
+                      )}
+                    </View>
+
+                    {/* Task Content */}
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      onPress={() => toggleTask(task.id)}
+                      className={`flex-1 ${
+                        isDark ? "bg-gray-800" : "bg-white"
+                      } rounded-2xl p-4 flex-row items-center`}
+                    >
+                      <View className="mr-3">
+                        <View className="w-10 h-10 bg-cyan-500/10 rounded-xl items-center justify-center">
+                          <Text className="text-2xl">
+                            {task.type === "lesson"
+                              ? "📚"
+                              : task.type === "quiz"
+                                ? "✏️"
+                                : task.type === "review"
+                                  ? "🔍"
+                                  : "📝"}
+                          </Text>
+                        </View>
+                      </View>
+                      <Text
+                        className={`flex-1 ${
+                          task.completed
+                            ? isDark
+                              ? "text-gray-500 line-through"
+                              : "text-gray-400 line-through"
+                            : isDark
+                              ? "text-white"
+                              : "text-gray-900"
+                        } font-medium`}
+                      >
+                        {task.title}
+                      </Text>
+                    </TouchableOpacity>
+                  </View>
+                ))
+              )}
+            </View>
+          </TourTooltip>
         </View>
       </ScrollView>
 
@@ -501,3 +826,332 @@ export default function ExploreScreen() {
     </SafeAreaView>
   );
 }
+
+/**
+ * StyleSheet for ExploreScreen
+ *
+ * Organized by sections:
+ * - Container & Layout styles
+ * - Header styles
+ * - Premium banner styles
+ * - Recent chapters styles
+ * - Calendar/Week view styles
+ * - Study plan styles
+ * - Task item styles
+ * - Common/Utility styles
+ */
+const styles = StyleSheet.create({
+  // Container & Layout
+  container: {
+    flex: 1,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  contentContainer: {
+    paddingHorizontal: 16,
+  },
+
+  // Header
+  header: {
+    paddingHorizontal: 24,
+    borderBottomWidth: 1,
+  },
+  headerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    marginBottom: 16,
+  },
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+  },
+  headerLogo: {
+    width: 32,
+    height: 32,
+  },
+
+  // Premium Banner
+  premiumBanner: {
+    marginTop: 24,
+    borderRadius: 24,
+    padding: 24,
+    overflow: "hidden",
+  },
+  premiumBannerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  premiumBannerContent: {
+    flex: 1,
+  },
+  premiumBannerTitle: {
+    color: "#ffffff",
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  premiumBannerSubtitle: {
+    color: "rgba(255, 255, 255, 0.9)",
+    fontSize: 14,
+    marginBottom: 16,
+  },
+  premiumBannerButton: {
+    backgroundColor: "#ffffff",
+    borderRadius: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+    alignSelf: "flex-start",
+  },
+  premiumBannerButtonText: {
+    color: "#06B6D4",
+    fontWeight: "600",
+  },
+  premiumBannerImage: {
+    marginLeft: 16,
+  },
+  goldenCapImage: {
+    width: 108,
+    height: 108,
+  },
+
+  // Section Headers
+  sectionHeader: {
+    marginTop: 32,
+  },
+  sectionHeaderRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  viewAllButton: {
+    color: "#06B6D4",
+    fontWeight: "600",
+  },
+
+  // Loading & Empty States
+  loadingContainer: {
+    borderRadius: 16,
+    padding: 32,
+    alignItems: "center",
+  },
+  loadingText: {
+    fontSize: 14,
+  },
+  emptyContainer: {
+    borderRadius: 16,
+    padding: 32,
+    alignItems: "center",
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: "600",
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    marginBottom: 16,
+  },
+  emptyButton: {
+    backgroundColor: "#06B6D4",
+    borderRadius: 20,
+    paddingHorizontal: 24,
+    paddingVertical: 8,
+  },
+  emptyButtonText: {
+    color: "#ffffff",
+    fontWeight: "600",
+  },
+
+  // Recent Chapters
+  chapterScrollView: {
+    marginLeft: -24,
+    marginRight: -24,
+    paddingLeft: 24,
+  },
+  chapterCard: {
+    marginRight: 16,
+    borderRadius: 16,
+    padding: 16,
+    width: 288,
+    borderLeftWidth: 4,
+  },
+  chapterCardHeader: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    justifyContent: "space-between",
+    marginBottom: 12,
+  },
+  chapterTitle: {
+    fontSize: 18,
+    fontWeight: "bold",
+    flex: 1,
+  },
+  chapterProgressContainer: {
+    marginLeft: 8,
+  },
+  chapterProgressText: {
+    fontSize: 18,
+    fontWeight: "bold",
+  },
+  chapterProgressBar: {
+    height: 8,
+    borderRadius: 4,
+    marginBottom: 16,
+  },
+  chapterProgressFill: {
+    height: 8,
+    borderRadius: 4,
+  },
+  chapterContinueButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 8,
+    borderRadius: 12,
+  },
+  chapterContinueButtonText: {
+    fontWeight: "600",
+  },
+  chapterScrollSpacer: {
+    width: 24,
+  },
+
+  // Calendar/Week View
+  weekScrollView: {
+    marginLeft: -24,
+    marginRight: -24,
+    paddingLeft: 24,
+  },
+  dayButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    marginRight: 16,
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+  },
+  dayNumber: {
+    fontSize: 28,
+    fontWeight: "bold",
+    marginBottom: 4,
+  },
+  dayName: {
+    fontSize: 14,
+  },
+  taskCountBadge: {
+    position: "absolute",
+    top: 4,
+    right: 4,
+    minWidth: 16,
+    height: 16,
+    borderRadius: 8,
+    justifyContent: "center",
+    alignItems: "center",
+    paddingHorizontal: 4,
+  },
+  taskCountText: {
+    fontSize: 10,
+    fontWeight: "700",
+  },
+  calendarButton: {
+    alignItems: "center",
+    justifyContent: "center",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 16,
+    marginRight: 48,
+    borderWidth: 2,
+    borderColor: "#06B6D4",
+    borderStyle: "dashed",
+  },
+  calendarButtonText: {
+    fontSize: 14,
+    marginTop: 8,
+    fontWeight: "600",
+  },
+
+  // Study Plan
+  studyPlanContainer: {
+    marginTop: 32,
+    marginBottom: 64,
+  },
+  studyPlanHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    marginBottom: 16,
+  },
+  studyPlanTitle: {
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  studyPlanEditButton: {
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  studyPlanEditText: {
+    color: "#06B6D4",
+    fontWeight: "600",
+    marginLeft: 4,
+    fontSize: 14,
+  },
+  studyPlanInfo: {
+    marginBottom: 16,
+    padding: 12,
+    borderRadius: 12,
+  },
+  studyPlanInfoText: {
+    fontSize: 14,
+  },
+
+  // Task Items
+  taskRow: {
+    flexDirection: "row",
+    alignItems: "flex-start",
+    marginBottom: 24,
+  },
+  taskTimelineContainer: {
+    alignItems: "center",
+    marginRight: 16,
+  },
+  taskTimelineLine: {
+    width: 2,
+    height: 64,
+    marginTop: 8,
+  },
+  taskContent: {
+    flex: 1,
+    borderRadius: 16,
+    padding: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  taskIconContainer: {
+    marginRight: 12,
+  },
+  taskIcon: {
+    width: 40,
+    height: 40,
+    borderRadius: 12,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  taskIconText: {
+    fontSize: 24,
+  },
+  taskTitle: {
+    flex: 1,
+    fontWeight: "500",
+  },
+  taskTitleCompleted: {
+    textDecorationLine: "line-through",
+  },
+});

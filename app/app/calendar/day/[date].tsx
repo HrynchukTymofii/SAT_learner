@@ -6,7 +6,6 @@ import {
   ScrollView,
   TextInput,
   useColorScheme,
-  Alert,
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
@@ -16,21 +15,11 @@ import {
   Trash2,
   CheckCircle2,
   Circle,
+  BookOpen,
 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import * as SecureStore from "expo-secure-store";
-
-interface Task {
-  id: string;
-  text: string;
-  completed: boolean;
-}
-
-interface LearningPlan {
-  date: string;
-  goals: string;
-  tasks: Task[];
-}
+import { getStudyPlan, saveStudyPlan, Task } from "@/lib/studyPlanStorage";
+import Toast from "react-native-toast-message";
 
 export default function DayPlanningScreen() {
   const router = useRouter();
@@ -44,6 +33,7 @@ export default function DayPlanningScreen() {
   const [goals, setGoals] = useState("");
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskText, setNewTaskText] = useState("");
+  const [newTaskType, setNewTaskType] = useState<"lesson" | "quiz" | "review" | null>(null);
   const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
@@ -56,10 +46,8 @@ export default function DayPlanningScreen() {
 
   const loadPlan = async (date: string) => {
     try {
-      const key = `learningPlan_${date}`;
-      const stored = await SecureStore.getItemAsync(key);
-      if (stored) {
-        const plan: LearningPlan = JSON.parse(stored);
+      const plan = await getStudyPlan(date);
+      if (plan) {
         setGoals(plan.goals || "");
         setTasks(plan.tasks || []);
       }
@@ -71,31 +59,73 @@ export default function DayPlanningScreen() {
   const savePlan = async () => {
     try {
       setIsSaving(true);
-      const plan: LearningPlan = {
-        date: dateParam,
+      const success = await saveStudyPlan(dateParam, {
         goals,
         tasks,
-      };
-      const key = `learningPlan_${dateParam}`;
-      await SecureStore.setItemAsync(key, JSON.stringify(plan));
-      Alert.alert("Success", "Your study plan has been saved!");
+      });
+
+      if (success) {
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: 'Your study plan has been saved!',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+      } else {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Failed to save your study plan. Please try again.',
+          position: 'top',
+          visibilityTime: 3000,
+        });
+      }
     } catch (error) {
       console.error("Failed to save plan:", error);
-      Alert.alert("Error", "Failed to save your study plan. Please try again.");
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to save your study plan. Please try again.',
+        position: 'top',
+        visibilityTime: 3000,
+      });
     } finally {
       setIsSaving(false);
     }
   };
 
   const addTask = () => {
-    if (newTaskText.trim()) {
+    const taskText = newTaskText.trim();
+    if (taskText) {
       const newTask: Task = {
         id: Date.now().toString(),
-        text: newTaskText.trim(),
+        text: taskText,
         completed: false,
+        type: newTaskType,
       };
       setTasks([...tasks, newTask]);
       setNewTaskText("");
+      setNewTaskType(null);
+    }
+  };
+
+  const handleTypeSelect = (type: "lesson" | "quiz" | "review") => {
+    setNewTaskType(type);
+
+    const suggestions = {
+      lesson: "Complete 1 lesson",
+      quiz: "Complete 1 quiz",
+      review: "Review previous topics"
+    };
+
+    const currentText = newTaskText.trim();
+
+    // Auto-fill if input is empty OR if it's one of the default suggestions
+    const isDefaultSuggestion = Object.values(suggestions).includes(currentText);
+
+    if (!currentText || isDefaultSuggestion) {
+      setNewTaskText(suggestions[type]);
     }
   };
 
@@ -265,7 +295,7 @@ export default function DayPlanningScreen() {
           <TextInput
             value={goals}
             onChangeText={setGoals}
-            placeholder="What do you want to achieve today? Add your study goals, notes, or reminders..."
+            placeholder="Set your SAT prep goals for today... e.g., 'Focus on Math concepts' or 'Review Reading strategies'"
             multiline
             numberOfLines={4}
             style={{
@@ -296,6 +326,87 @@ export default function DayPlanningScreen() {
             Task Checklist
           </Text>
 
+          {/* Task Type Selector */}
+          <View style={{ flexDirection: "row", marginBottom: 12, gap: 8 }}>
+            <TouchableOpacity
+              onPress={() => handleTypeSelect("lesson")}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
+                borderRadius: 10,
+                backgroundColor: newTaskType === "lesson" ? "#06B6D4" : isDark ? "#1e293b" : "#ffffff",
+                borderWidth: 1,
+                borderColor: newTaskType === "lesson" ? "#06B6D4" : isDark ? "#334155" : "#e5e7eb",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 16, marginRight: 6 }}>📚</Text>
+              <Text style={{
+                fontSize: 14,
+                fontWeight: newTaskType === "lesson" ? "600" : "400",
+                color: newTaskType === "lesson" ? "#ffffff" : isDark ? "#9ca3af" : "#6b7280"
+              }}>
+                Lesson
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleTypeSelect("quiz")}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
+                borderRadius: 10,
+                backgroundColor: newTaskType === "quiz" ? "#06B6D4" : isDark ? "#1e293b" : "#ffffff",
+                borderWidth: 1,
+                borderColor: newTaskType === "quiz" ? "#06B6D4" : isDark ? "#334155" : "#e5e7eb",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 16, marginRight: 6 }}>✏️</Text>
+              <Text style={{
+                fontSize: 14,
+                fontWeight: newTaskType === "quiz" ? "600" : "400",
+                color: newTaskType === "quiz" ? "#ffffff" : isDark ? "#9ca3af" : "#6b7280"
+              }}>
+                Quiz
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              onPress={() => handleTypeSelect("review")}
+              style={{
+                flex: 1,
+                paddingVertical: 10,
+                paddingHorizontal: 12,
+                borderRadius: 10,
+                backgroundColor: newTaskType === "review" ? "#06B6D4" : isDark ? "#1e293b" : "#ffffff",
+                borderWidth: 1,
+                borderColor: newTaskType === "review" ? "#06B6D4" : isDark ? "#334155" : "#e5e7eb",
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+              }}
+              activeOpacity={0.7}
+            >
+              <Text style={{ fontSize: 16, marginRight: 6 }}>🔍</Text>
+              <Text style={{
+                fontSize: 14,
+                fontWeight: newTaskType === "review" ? "600" : "400",
+                color: newTaskType === "review" ? "#ffffff" : isDark ? "#9ca3af" : "#6b7280"
+              }}>
+                Review
+              </Text>
+            </TouchableOpacity>
+          </View>
+
           {/* Add Task Input */}
           <View
             style={{
@@ -307,7 +418,7 @@ export default function DayPlanningScreen() {
             <TextInput
               value={newTaskText}
               onChangeText={setNewTaskText}
-              placeholder="Add a new task..."
+              placeholder="e.g., Complete Algebra lesson"
               onSubmitEditing={addTask}
               returnKeyType="done"
               style={{
@@ -352,6 +463,7 @@ export default function DayPlanningScreen() {
                 borderStyle: "dashed",
               }}
             >
+              <BookOpen size={32} color={isDark ? "#6b7280" : "#9ca3af"} style={{ marginBottom: 12 }} />
               <Text
                 style={{
                   fontSize: 14,
@@ -359,7 +471,7 @@ export default function DayPlanningScreen() {
                   textAlign: "center",
                 }}
               >
-                No tasks yet. Add your first task above!
+                No tasks yet. Add your first SAT prep task above!
               </Text>
             </View>
           ) : (
@@ -384,11 +496,18 @@ export default function DayPlanningScreen() {
                   activeOpacity={0.7}
                 >
                   {task.completed ? (
-                    <CheckCircle2 size={24} color="#06B6D4" fill="#06B6D4" />
+                    <CheckCircle2 size={24} color="#06B6D4" />
                   ) : (
                     <Circle size={24} color="#06B6D4" />
                   )}
                 </TouchableOpacity>
+
+                {/* Task Icon */}
+                <View style={{ marginRight: 12 }}>
+                  <Text style={{ fontSize: 20 }}>
+                    {task.type === "lesson" ? "📚" : task.type === "quiz" ? "✏️" : task.type === "review" ? "🔍" : "📝"}
+                  </Text>
+                </View>
 
                 {/* Task Text */}
                 <Text
@@ -473,6 +592,92 @@ export default function DayPlanningScreen() {
           </Text>
         </View>
       </ScrollView>
+      <Toast
+        config={{
+          success: (props) => (
+            <View
+              style={{
+                width: '90%',
+                backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                borderRadius: 12,
+                padding: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
+                borderLeftWidth: 4,
+                borderLeftColor: '#06B6D4',
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: '#06B6D420',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: 12,
+                }}
+              >
+                <Text style={{ fontSize: 20 }}>✓</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#ffffff' : '#1f2937', marginBottom: 2 }}>
+                  {props.text1}
+                </Text>
+                <Text style={{ fontSize: 14, color: isDark ? '#9ca3af' : '#6b7280' }}>
+                  {props.text2}
+                </Text>
+              </View>
+            </View>
+          ),
+          error: (props) => (
+            <View
+              style={{
+                width: '90%',
+                backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                borderRadius: 12,
+                padding: 16,
+                flexDirection: 'row',
+                alignItems: 'center',
+                shadowColor: '#000',
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
+                borderLeftWidth: 4,
+                borderLeftColor: '#ef4444',
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: '#ef444420',
+                  justifyContent: 'center',
+                  alignItems: 'center',
+                  marginRight: 12,
+                }}
+              >
+                <Text style={{ fontSize: 20 }}>✕</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#ffffff' : '#1f2937', marginBottom: 2 }}>
+                  {props.text1}
+                </Text>
+                <Text style={{ fontSize: 14, color: isDark ? '#9ca3af' : '#6b7280' }}>
+                  {props.text2}
+                </Text>
+              </View>
+            </View>
+          ),
+        }}
+      />
     </View>
   );
 }
