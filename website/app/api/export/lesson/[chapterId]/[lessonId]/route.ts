@@ -65,6 +65,7 @@ function generateCompleteHtml(content: string, title: string): string {
 
   try {
     const tiptapJson = JSON.parse(content);
+    console.log("✅ TipTap JSON parsed successfully");
 
     // Convert TipTap JSON to HTML using the same extensions as the editor
     htmlContent = generateHTML(tiptapJson, [
@@ -85,8 +86,13 @@ function generateCompleteHtml(content: string, title: string): string {
       }),
       Link.configure({ openOnClick: false }),
     ]);
+
+    console.log("✅ HTML generated successfully, length:", htmlContent.length);
+    console.log("First 200 chars:", htmlContent.substring(0, 200));
   } catch (error) {
-    console.error("Failed to parse TipTap JSON:", error);
+    console.error("❌ Failed to convert TipTap to HTML:", error);
+    console.error("Error details:", (error as Error).message);
+    console.error("Stack:", (error as Error).stack);
     // Fallback: use content as-is if it's not valid JSON
     htmlContent = content;
   }
@@ -401,12 +407,12 @@ function generateCompleteHtml(content: string, title: string): string {
     body.dark-mode mark {
       background-color: #854d0e;
     }
-  </style>
 
-  <!-- KaTeX for LaTeX rendering -->
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
-  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+    /* KaTeX inline math */
+    .katex { font-size: 1.1em; }
+    .katex-display { margin: 1em 0; text-align: center; }
+    body.dark-mode .katex { color: #f5f5f4; }
+  </style>
 </head>
 <body>
   <div class="expo-content">
@@ -416,21 +422,6 @@ function generateCompleteHtml(content: string, title: string): string {
   </div>
 
   <script>
-    // Auto-render LaTeX when page loads
-    document.addEventListener("DOMContentLoaded", function() {
-      if (window.renderMathInElement) {
-        renderMathInElement(document.body, {
-          delimiters: [
-            {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false},
-            {left: "\\\\[", right: "\\\\]", display: true},
-            {left: "\\\\(", right: "\\\\)", display: false}
-          ],
-          throwOnError: false
-        });
-      }
-    });
-
     // Listen for theme changes from React Native
     window.addEventListener('message', function(event) {
       try {

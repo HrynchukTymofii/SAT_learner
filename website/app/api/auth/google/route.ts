@@ -34,6 +34,7 @@ export async function POST(req: NextRequest) {
           name,
           platform: "SATecosystem",
           image: imageUrl,
+          isPro: true
         },
       });
     }

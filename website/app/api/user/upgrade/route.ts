@@ -57,6 +57,28 @@ export async function POST(req: NextRequest) {
   }
 }
 
+export async function PATCH(req: NextRequest) {
+  // Authenticate the user
+  const auth = await requireAuth(req);
+  if (auth instanceof NextResponse) return auth;
+  const { userId } = auth;
+
+  try {
+    await db.user.update({
+      where: { userId },
+      data: { isPro: false },
+    });
+
+    return NextResponse.json({ success: true});
+  } catch (error: any) {
+    console.error("❌ removePro error:", error);
+    return NextResponse.json(
+      { error: "Failed to remove PRO for user" },
+      { status: 500 }
+    );
+  }
+}
+
 
 // import { db } from "@/lib/db";
 // import { requireAuth } from "@/lib/expo-auth";
