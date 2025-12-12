@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const { plan } = body as { plan: string };
 
-    if (!plan || plan !== "$rc_annual" ) {
+    if (!plan || (plan !== "PRO Yearly" && plan !== "PRO Monthly")) {
       return NextResponse.json(
         { error: "Invalid plan type: " + plan },
         { status: 400 }
@@ -26,9 +26,12 @@ export async function POST(req: NextRequest) {
     const startAt = new Date();
     let endAt: Date | null = null;
 
-    if (plan === "$rc_annual") {
+    if (plan === "PRO Yearly") {
       endAt = new Date();
       endAt.setFullYear(endAt.getFullYear() + 1);
+    } else if (plan === "PRO Monthly") {
+      endAt = new Date();
+      endAt.setMonth(endAt.getMonth() + 1);
     }
 
     // Create the purchase
