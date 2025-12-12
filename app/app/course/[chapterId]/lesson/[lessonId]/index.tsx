@@ -132,8 +132,8 @@ export default function LessonScreen() {
       {/* Header */}
       <View
         style={{
-          paddingTop: insets.top + 12,
-          paddingBottom: 16,
+          paddingTop: insets.top + 8,
+          paddingBottom: 10,
           paddingHorizontal: 16,
           backgroundColor: isDark ? "#111827" : "#ffffff",
           borderBottomWidth: 1,
@@ -169,7 +169,7 @@ export default function LessonScreen() {
       </View>
 
       <KeyboardAwareScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingVertical: 16, paddingHorizontal: 4 }}
+        contentContainerStyle={{ flexGrow: 1, paddingVertical: 12, paddingHorizontal: 4 }}
         enableOnAndroid
         extraScrollHeight={0}
         keyboardOpeningTime={0}
@@ -177,32 +177,18 @@ export default function LessonScreen() {
         showsVerticalScrollIndicator={false}
       >
         {/* Lesson Title */}
-        <View
-          style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
-            borderRadius: 16,
-            padding: 20,
-            marginBottom: 16,
-            borderLeftWidth: 4,
-            borderLeftColor: "#06B6D4",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
+       
           <Text
             style={{
               fontSize: 24,
               fontWeight: "800",
               color: isDark ? "#ffffff" : "#1f2937",
               marginBottom: 8,
+              paddingHorizontal: 8
             }}
           >
             {currentItem?.title}
           </Text>
-        </View>
 
         {/* Video */}
         {player && (
@@ -232,11 +218,7 @@ export default function LessonScreen() {
           style={{
             borderRadius: 16,
             marginBottom: 16,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 3,
+            
             minHeight: 200,
             overflow:"hidden"
           }}
@@ -245,12 +227,12 @@ export default function LessonScreen() {
             <View
               style={{
                 position: "absolute",
+                width: "100%",
                 inset: 0,
                 justifyContent: "center",
                 alignItems: "center",
                 backgroundColor: isDark ? "#1e293b" : "#ffffff",
                 zIndex: 10,
-                borderRadius: 16,
               }}
             >
               <GraduationCapLoader />

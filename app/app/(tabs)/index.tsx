@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   View,
   Text,
@@ -11,7 +11,6 @@ import {
 import { router, useFocusEffect } from "expo-router";
 import { LinearGradient } from "expo-linear-gradient";
 import {
-  MoreVertical,
   CheckCircle2,
   Circle,
   Calendar,
@@ -96,8 +95,13 @@ export default function ExploreScreen() {
 
   // Tour navigation
   React.useEffect(() => {
-    if (tourActive && currentStep === TOUR_STEPS.COURSE_TAB) {
-      // Use setTimeout to avoid setState during render
+    if (tourActive && currentStep === TOUR_STEPS.TESTS_TAB) {
+      // Navigate to tests tab
+      setTimeout(() => {
+        router.push("/(tabs)/tests");
+      }, 100);
+    } else if (tourActive && currentStep === TOUR_STEPS.COURSE_TAB) {
+      // Navigate to course tab
       setTimeout(() => {
         router.push("/(tabs)/course");
       }, 100);
@@ -121,7 +125,7 @@ export default function ExploreScreen() {
 
   // Load recent chapters and study plan on page focus
   useFocusEffect(
-    React.useCallback(() => {
+    useCallback(() => {
       loadRecentChapters();
       loadTodayPlan();
       loadSatDate();
@@ -146,7 +150,7 @@ export default function ExploreScreen() {
     setIsLoadingChapters(false);
   };
 
-  const info = getTourStepInfo(TOUR_STEPS.STUDY_PLAN);
+  const info = getTourStepInfo(TOUR_STEPS.TOUR_INTRO);
 
   const loadTodayPlan = async () => {
     setIsLoadingPlan(true);
@@ -328,8 +332,8 @@ export default function ExploreScreen() {
               <Image
                 source={
                   isDark
-                    ? require("@/assets/images/splash-icon-light.png")
-                    : require("@/assets/images/splash-icon-dark.png")
+                    ? require("@/assets/images/splash-icon.png")
+                    : require("@/assets/images/splash-icon.png")
                 }
                 style={styles.headerLogo}
                 resizeMode="contain"
@@ -654,20 +658,41 @@ export default function ExploreScreen() {
             </ScrollView>
           </View>
 
+          {/* Tour Intro - Centered Dialog */}
+          {tourActive && currentStep === TOUR_STEPS.TOUR_INTRO && (
+            <View style={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              justifyContent: 'center',
+              alignItems: 'center',
+              zIndex: 1000,
+            }}>
+              <TourTooltip
+                visible={true}
+                onNext={handleTourNext}
+                onPrev={handleTourPrev}
+                onSkip={skipTour}
+                onClose={() => {}}
+                title={info.title}
+                content={info.content}
+                stepNumber={TOUR_STEPS.TOUR_INTRO + 1}
+                totalSteps={TOTAL_TOUR_STEPS}
+                placement="center"
+                nextButtonText="Let's Go!"
+                skipButtonText="No Thanks"
+                showSkipButton={true}
+                delayMs={600}
+              >
+                <View style={{ width: 1, height: 1 }} />
+              </TourTooltip>
+            </View>
+          )}
+
           {/* Today's Study Plan */}
-          <TourTooltip
-            visible={tourActive && currentStep === TOUR_STEPS.STUDY_PLAN}
-            onNext={handleTourNext}
-            onPrev={handleTourPrev}
-            onSkip={skipTour}
-            onClose={() => {}}
-            title={info.title}
-            content={info.content}
-            stepNumber={TOUR_STEPS.STUDY_PLAN + 1}
-            totalSteps={TOTAL_TOUR_STEPS}
-            placement="top"
-          >
-            <View className="mt-8 mb-16">
+          <View className="mt-8 mb-16">
               <View className="flex-row items-center justify-between mb-4">
                 <Text
                   className={`text-xl font-bold ${
@@ -804,8 +829,7 @@ export default function ExploreScreen() {
                 ))
               )}
             </View>
-          </TourTooltip>
-        </View>
+          </View>
       </ScrollView>
 
       {/* Floating Action Button (Alternative to bottom nav) */}

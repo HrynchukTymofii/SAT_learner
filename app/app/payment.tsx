@@ -101,8 +101,17 @@ export default function PaywallScreen() {
       setLoading(true);
       const { customerInfo } = await Purchases.purchasePackage(pkg);
 
-      if (customerInfo.entitlements.active["PRO"] || customerInfo.entitlements.active["PRO for year"]) {
-        const result = await upgradeToPro(token!, pkg.identifier);
+      // Check for PRO Yearly or PRO Monthly entitlements
+      if (customerInfo.entitlements.active["PRO Yearly"] || customerInfo.entitlements.active["PRO Monthly"]) {
+        // Determine plan name based on active entitlement
+        let planName = "PRO Yearly"; // default
+        if (customerInfo.entitlements.active["PRO Monthly"]) {
+          planName = "PRO Monthly";
+        } else if (customerInfo.entitlements.active["PRO Yearly"]) {
+          planName = "PRO Yearly";
+        }
+
+        const result = await upgradeToPro(token!, planName);
         if (result.success) {
           if (user) setUser({ ...user, isPro: true });
           Toast.show({

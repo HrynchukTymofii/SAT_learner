@@ -1,5 +1,5 @@
-import React, { ReactNode } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import React, { ReactNode, useEffect, useRef } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { X, ArrowRight, ArrowLeft } from 'lucide-react-native';
@@ -15,11 +15,14 @@ interface TourTooltipProps {
   stepNumber: number;
   totalSteps: number;
   placement?: 'top' | 'bottom' | 'left' | 'right' | 'center';
-  children: ReactNode;
+  children?: ReactNode;
   showPrev?: boolean;
   showNext?: boolean;
   isLastStep?: boolean;
   showSkipButton?: boolean;
+  nextButtonText?: string;
+  skipButtonText?: string;
+  delayMs?: number;
 }
 
 export const TourTooltip: React.FC<TourTooltipProps> = ({
@@ -38,17 +41,56 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
   showNext = true,
   isLastStep = false,
   showSkipButton = true,
+  nextButtonText,
+  skipButtonText = 'Skip Tour',
+  delayMs = 0,
 }) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
 
+  // Fade-in animation
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const [showContent, setShowContent] = React.useState(false);
+
+  useEffect(() => {
+    if (visible) {
+      // Reset animation
+      fadeAnim.setValue(0);
+      setShowContent(false);
+
+      // Delay before showing tooltip
+      const delayTimer = setTimeout(() => {
+        setShowContent(true);
+        // Start fade-in animation after delay
+        Animated.timing(fadeAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }).start();
+      }, delayMs);
+
+      return () => clearTimeout(delayTimer);
+    } else {
+      setShowContent(false);
+    }
+  }, [visible, fadeAnim, delayMs]);
+
   return (
     <Tooltip
-      isVisible={visible}
+      isVisible={visible && showContent}
       content={
-        <View style={[
+        <Animated.View style={[
           styles.tooltipContent,
-          { backgroundColor: isDark ? '#1e293b' : '#ffffff' }
+          {
+            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+            opacity: fadeAnim,
+            transform: [{
+              scale: fadeAnim.interpolate({
+                inputRange: [0, 1],
+                outputRange: [0.9, 1],
+              }),
+            }],
+          }
         ]}>
           {/* Header */}
           <View style={styles.header}>
@@ -92,7 +134,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                   styles.skipButtonText,
                   { color: isDark ? '#9ca3af' : '#6b7280' }
                 ]}>
-                  Skip Tour
+                  {skipButtonText}
                 </Text>
               </TouchableOpacity>
             )}
@@ -122,16 +164,16 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                   style={[styles.navButton, styles.nextButton]}
                 >
                   <Text style={styles.nextButtonText}>
-                    {isLastStep ? 'Finish' : 'Next'}
+                    {nextButtonText || (isLastStep ? 'Finish' : 'Next')}
                   </Text>
-                  {!isLastStep && (
+                  {!isLastStep && !nextButtonText && (
                     <ArrowRight size={16} color="#ffffff" />
                   )}
                 </TouchableOpacity>
               )}
             </View>
           </View>
-        </View>
+        </Animated.View>
       }
       placement={placement}
       onClose={onClose}

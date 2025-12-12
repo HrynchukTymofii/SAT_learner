@@ -199,11 +199,13 @@ function getDynamicAchievements({
   quizzesCount,
   averageSatScore,
   has100Quiz,
+  hasHighScore,
 }: {
   lessonsCount: number;
   quizzesCount: number;
   averageSatScore: number;
   has100Quiz: boolean;
+  hasHighScore: boolean;
 }) {
   return [
     {
@@ -217,9 +219,9 @@ function getDynamicAchievements({
     {
       id: 2,
       title: "High Scorer",
-      description: "Score 700+",
+      description: "Score 700+ on SAT exam",
       icon: Trophy,
-      unlocked: averageSatScore >= 700,
+      unlocked: hasHighScore,
       color: "amber",
     },
     {
@@ -254,18 +256,21 @@ export default function ProfileScreen() {
     getCompletedQuizzesCount,
     getAverageScoreByChapter,
     hasPerfectScoreInPublishedChapters,
+    hasHighSATScore,
   } = useCourseDatabase();
 
   const [lessonsCount, setLessonsCount] = useState(0);
   const [quizzesCount, setQuizzesCount] = useState(0);
   const [averageSatScore, setAverageSatScore] = useState(0);
   const [have100Quiz, setHave100Quiz] = useState(false);
+  const [hasHighScore, setHasHighScore] = useState(false);
   const [achievements, setAchievements] = useState(
     getDynamicAchievements({
       lessonsCount: 0,
       quizzesCount: 0,
       averageSatScore: 0,
       has100Quiz: false,
+      hasHighScore: false,
     })
   );
   const [loading, setLoading] = useState(true);
@@ -273,30 +278,32 @@ export default function ProfileScreen() {
 
   useEffect(() => {
     (async () => {
+      const SAT_EXAMS_CHAPTER_ID = "8d3703a4-41ce-46b0-a27c-e25c0a0702e2";
+
       const lessonsRes = await getCompletedLessonsCount();
       const quizzesRes = await getCompletedQuizzesCount();
-      const avgSatScpreRes = await getAverageScoreByChapter(
-        "8d3703a4-41ce-46b0-a27c-e25c0a0702e2"
-      );
+      const avgSatScoreRes = await getAverageScoreByChapter(SAT_EXAMS_CHAPTER_ID);
       const have100 = await hasPerfectScoreInPublishedChapters();
+      const highScoreRes = await hasHighSATScore(SAT_EXAMS_CHAPTER_ID);
 
-      const newLessonsCount = lessonsRes.success ? lessonsRes.count : 0;
-      const newQuizzesCount = quizzesRes.success ? quizzesRes.count : 0;
-      const newAverageScore = avgSatScpreRes.success
-        ? avgSatScpreRes.average
-        : 0;
+      const newLessonsCount = lessonsRes.success ? (lessonsRes.count ?? 0) : 0;
+      const newQuizzesCount = quizzesRes.success ? (quizzesRes.count ?? 0) : 0;
+      const newAverageScore = avgSatScoreRes.success ? (avgSatScoreRes.average ?? 0) : 0;
+      const newHasHighScore = highScoreRes.success ? (highScoreRes.hasHighScore ?? false) : false;
 
-      setLessonsCount(newLessonsCount!);
-      setQuizzesCount(newQuizzesCount!);
-      setAverageSatScore(newAverageScore!);
+      setLessonsCount(newLessonsCount);
+      setQuizzesCount(newQuizzesCount);
+      setAverageSatScore(newAverageScore);
       setHave100Quiz(have100.hasPerfectScore || false);
+      setHasHighScore(newHasHighScore);
 
       setAchievements(
         getDynamicAchievements({
-          lessonsCount: newLessonsCount!,
-          quizzesCount: newQuizzesCount!,
-          averageSatScore: newAverageScore!,
+          lessonsCount: newLessonsCount,
+          quizzesCount: newQuizzesCount,
+          averageSatScore: newAverageScore,
           has100Quiz: have100.hasPerfectScore || false,
+          hasHighScore: newHasHighScore,
         })
       );
     })();

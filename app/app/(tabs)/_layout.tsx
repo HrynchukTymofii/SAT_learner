@@ -4,12 +4,35 @@ import { View, StyleSheet } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { Home, ClipboardCheck, BookOpen, User } from 'lucide-react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context'; 
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useTour } from '@/context/TourContext';
+import { TourTooltip } from '@/components/Tour/TourTooltip';
+import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from '@/constants/tourSteps'; 
 
 export default function TabLayout() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
   const insets = useSafeAreaInsets();
+
+  // Tour
+  const { tourActive, currentStep, setCurrentStep, endTour, skipTour } = useTour();
+
+  const handleTourNext = () => {
+    if (currentStep === TOTAL_TOUR_STEPS - 1) {
+      endTour();
+    } else {
+      setCurrentStep(currentStep + 1);
+    }
+  };
+
+  const handleTourPrev = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
+  const testsInfo = getTourStepInfo(TOUR_STEPS.TESTS_TAB);
+  const courseInfo = getTourStepInfo(TOUR_STEPS.COURSE_TAB);
 
   return (
     <Tabs
@@ -78,18 +101,35 @@ export default function TabLayout() {
         options={{
           title: 'Tests',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[
-              styles.iconContainer,
-              focused && {
-                backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
-              }
-            ]}>
-              <ClipboardCheck
-                size={24}
-                color={color}
-                strokeWidth={focused ? 2.5 : 2}
-              />
-            </View>
+            <TourTooltip
+              visible={tourActive && currentStep === TOUR_STEPS.TESTS_TAB}
+              onNext={handleTourNext}
+              onPrev={handleTourPrev}
+              onSkip={skipTour}
+              onClose={() => {}}
+              title={testsInfo?.title || ''}
+              content={testsInfo?.content || ''}
+              stepNumber={TOUR_STEPS.TESTS_TAB + 1}
+              totalSteps={TOTAL_TOUR_STEPS}
+              placement="top"
+              nextButtonText="Next"
+              skipButtonText="Skip Tour"
+              showSkipButton={true}
+              delayMs={600}
+            >
+              <View style={[
+                styles.iconContainer,
+                focused && {
+                  backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
+                }
+              ]}>
+                <ClipboardCheck
+                  size={24}
+                  color={color}
+                  strokeWidth={focused ? 2.5 : 2}
+                />
+              </View>
+            </TourTooltip>
           ),
         }}
       />
@@ -98,18 +138,35 @@ export default function TabLayout() {
         options={{
           title: 'Course',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[
-              styles.iconContainer,
-              focused && {
-                backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
-              }
-            ]}>
-              <BookOpen
-                size={24}
-                color={color}
-                strokeWidth={focused ? 2.5 : 2}
-              />
-            </View>
+            <TourTooltip
+              visible={tourActive && currentStep === TOUR_STEPS.COURSE_TAB}
+              onNext={handleTourNext}
+              onPrev={handleTourPrev}
+              onSkip={skipTour}
+              onClose={() => {}}
+              title={courseInfo?.title || ''}
+              content={courseInfo?.content || ''}
+              stepNumber={TOUR_STEPS.COURSE_TAB + 1}
+              totalSteps={TOTAL_TOUR_STEPS}
+              placement="top"
+              nextButtonText="Next"
+              skipButtonText="Skip Tour"
+              showSkipButton={true}
+              delayMs={600}
+            >
+              <View style={[
+                styles.iconContainer,
+                focused && {
+                  backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
+                }
+              ]}>
+                <BookOpen
+                  size={24}
+                  color={color}
+                  strokeWidth={focused ? 2.5 : 2}
+                />
+              </View>
+            </TourTooltip>
           ),
         }}
       />

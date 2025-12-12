@@ -137,11 +137,11 @@ export default function AuthScreen() {
             });
 
             // Navigate to selling onboarding if first time, else go to safe return URL
-            if (isFirstLogin) {
-              router.replace("/selling-onboarding" as any);
-            } else {
+            // if (isFirstLogin) {
+            //   router.replace("/selling-onboarding" as any);
+            // } else {
               router.replace(safeReturnUrl as any);
-            }
+            // }
           } else {
             Toast.show({
               type: "error",
@@ -297,11 +297,11 @@ export default function AuthScreen() {
         loadUserInBackground({ token: data.token, setUser, forceSync: true });
 
         // Navigate to selling onboarding if first time, else go to safe return URL
-        if (isFirstLogin) {
-          router.replace("/selling-onboarding" as any);
-        } else {
+        // if (isFirstLogin) {
+        //   router.replace("/selling-onboarding" as any);
+        // } else {
           router.replace(safeReturnUrl as any);
-        }
+        // }
       } else {
         Toast.show({
           type: "error",

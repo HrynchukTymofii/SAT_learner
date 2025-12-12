@@ -250,16 +250,20 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
     // Auto-render LaTeX when page loads
     document.addEventListener("DOMContentLoaded", function() {
       if (window.renderMathInElement) {
-        renderMathInElement(document.body, {
-          delimiters: [
-            {left: "$$", right: "$$", display: true},
-            {left: "$", right: "$", display: false},
-            {left: "\\\\[", right: "\\\\]", display: true},
-            {left: "\\\\(", right: "\\\\)", display: false}
-          ],
-          throwOnError: false
-        });
-      }
+    // Select only elements with class math-inline or math-display
+    const mathElements = document.querySelectorAll(".math-inline, .math-display");
+    mathElements.forEach(el => {
+      renderMathInElement(el, {
+        delimiters: [
+          {left: "$$", right: "$$", display: true},
+          {left: "$", right: "$", display: false},
+          {left: "\\[", right: "\\]", display: true},
+          {left: "\\(", right: "\\)", display: false}
+        ],
+        throwOnError: false
+      });
+    });
+  }
     });
 
     // Listen for theme changes from React Native

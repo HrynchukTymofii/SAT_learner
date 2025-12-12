@@ -82,7 +82,7 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
             // Check if still valid
             if (today < expirationDate) {
               shouldHavePro = true;
-              plan = "$rc_annual";
+              plan = "PRO Yearly";
             }
           }
           // Priority 2: Check for monthly PRO
@@ -98,7 +98,7 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
             // Check if still valid
             if (today < expirationDate) {
               shouldHavePro = true;
-              plan = "$rc_monthly";
+              plan = "PRO Monthly";
             }
           }
 

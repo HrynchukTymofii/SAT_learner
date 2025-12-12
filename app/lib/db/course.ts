@@ -1,4 +1,5 @@
 import { useSQLiteContext } from "expo-sqlite";
+import { calculateSATScore } from "@/lib/utils";
 
 interface CompletedLessonsRow {
   completedCount: number;
@@ -287,25 +288,135 @@ export function useCourseDatabase() {
     }
   }
 
+  /**
+   * Calculate average SAT score for completed exams in a chapter (SAT exams only)
+   * Uses the calculateSATScore function to convert raw scores to SAT scaled scores
+   */
   async function getAverageScoreByChapter(chapterId: string) {
     try {
+      // Get all completed quiz results with their questions and answers
       const rows = (await db.getAllAsync(
         `
-        SELECT AVG(qr.score) as avgScore
+        SELECT qr.id as resultId, qr.answers, q.id as quizId, q.totalQuestions
         FROM quiz_results qr
         JOIN quizzes q ON qr.quizId = q.id
-        JOIN chapters c ON q.chapterId = c.id
         WHERE q.chapterId = ?
           AND qr.completed = 1
-          AND (c.isPublished = 0 OR c.isPublished = 0)
         `,
         [chapterId]
-      )) as AverageScoreRow[];
+      )) as { resultId: string; answers: string; quizId: string; totalQuestions: number }[];
 
-      return { success: true, average: rows?.[0]?.avgScore ?? 0 };
+      if (!rows || rows.length === 0) {
+        return { success: true, average: 0 };
+      }
+
+      // Calculate SAT score for each exam result
+      let totalSATScore = 0;
+      let validExamCount = 0;
+
+      for (const row of rows) {
+        try {
+          const userAnswers = JSON.parse(row.answers);
+
+          // Get all questions for this quiz to check correctness
+          const questions = await db.getAllAsync(
+            `SELECT id, answers FROM quiz_questions WHERE quizId = ?`,
+            [row.quizId]
+          ) as { id: string; answers: string }[];
+
+          // Count correct answers
+          let correctCount = 0;
+          for (const question of questions) {
+            const userAns = userAnswers[question.id] || [];
+            const correctAns = JSON.parse(question.answers);
+
+            // Check if answer is correct
+            const isCorrect = correctAns.length === userAns.length &&
+              correctAns.every((a: string) => userAns.includes(a));
+
+            if (isCorrect) correctCount++;
+          }
+
+          const totalQuestions = row.totalQuestions;
+          if (totalQuestions > 0) {
+            const satScore = calculateSATScore(correctCount, totalQuestions);
+            totalSATScore += satScore;
+            validExamCount++;
+          }
+        } catch (parseError) {
+          console.warn("Failed to parse answers for exam:", parseError);
+        }
+      }
+
+      const averageSATScore = validExamCount > 0 ? Math.round(totalSATScore / validExamCount) : 0;
+      return { success: true, average: averageSATScore };
     } catch (err) {
-      console.error("❌ Failed to get average score for chapter:", err);
-      return { success: false, error: "Failed to calculate average score" };
+      console.error("❌ Failed to get average SAT score for chapter:", err);
+      return { success: false, error: "Failed to calculate average SAT score" };
+    }
+  }
+
+  /**
+   * Check if user has at least one completed exam with SAT score >= 700
+   */
+  async function hasHighSATScore(chapterId: string) {
+    try {
+      // Get all completed quiz results with their questions and answers
+      const rows = (await db.getAllAsync(
+        `
+        SELECT qr.id as resultId, qr.answers, q.id as quizId, q.totalQuestions
+        FROM quiz_results qr
+        JOIN quizzes q ON qr.quizId = q.id
+        WHERE q.chapterId = ?
+          AND qr.completed = 1
+        `,
+        [chapterId]
+      )) as { resultId: string; answers: string; quizId: string; totalQuestions: number }[];
+
+      if (!rows || rows.length === 0) {
+        return { success: true, hasHighScore: false };
+      }
+
+      // Check if any exam has SAT score >= 700
+      for (const row of rows) {
+        try {
+          const userAnswers = JSON.parse(row.answers);
+
+          // Get all questions for this quiz to check correctness
+          const questions = await db.getAllAsync(
+            `SELECT id, answers FROM quiz_questions WHERE quizId = ?`,
+            [row.quizId]
+          ) as { id: string; answers: string }[];
+
+          // Count correct answers
+          let correctCount = 0;
+          for (const question of questions) {
+            const userAns = userAnswers[question.id] || [];
+            const correctAns = JSON.parse(question.answers);
+
+            // Check if answer is correct
+            const isCorrect = correctAns.length === userAns.length &&
+              correctAns.every((a: string) => userAns.includes(a));
+
+            if (isCorrect) correctCount++;
+          }
+
+          const totalQuestions = row.totalQuestions;
+          if (totalQuestions > 0) {
+            const satScore = calculateSATScore(correctCount, totalQuestions);
+            if (satScore >= 700) {
+              return { success: true, hasHighScore: true };
+            }
+          }
+        } catch (parseError) {
+          console.warn("Failed to parse answers for exam:", parseError);
+        }
+      }
+
+      return { success: true, hasHighScore: false };
+    } catch (err) {
+      console.error("❌ Failed to check high SAT score:", err);
+      return { success: false, error: "Failed to check high SAT score" };
     }
   }
 
@@ -576,5 +687,5 @@ export function useCourseDatabase() {
     }
   }
 
-  return { getCompletedLessonsCount, hasPerfectScoreInPublishedChapters, getCompletedQuizzesCount, getAverageScoreByChapter, getFullCourse, getFullCourseWithProgress, getChapterItems, getRecentChapters }
+  return { getCompletedLessonsCount, hasPerfectScoreInPublishedChapters, getCompletedQuizzesCount, getAverageScoreByChapter, hasHighSATScore, getFullCourse, getFullCourseWithProgress, getChapterItems, getRecentChapters }
 }

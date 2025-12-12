@@ -64,6 +64,9 @@ const QuestionImage = ({ uri, height = 200 }: QuestionImageProps) => {
             borderRadius: 8,
           }}
           contentFit="contain"
+          // Only apply tintColor if you want to convert ONLY black to white
+          // This converts all black pixels to white, preserving other colors
+          // Remove this line if you want to keep images as-is in dark mode
           tintColor={isDark ? '#FFFFFF' : undefined}
           accessibilityLabel="Фото до питання"
         />

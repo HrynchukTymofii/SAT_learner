@@ -87,9 +87,9 @@ export function useQuizDatabase() {
       const rows = await db.getAllAsync(
         `
           SELECT q.id AS quizId, q.title, q.position AS quizPosition, q.isPublished,
-                  qq.id AS questionId, qq.question AS questionText, qq.questionImageUrl,
+                  qq.id AS questionId, qq.question AS questionText, qq.questionType, qq.questionImageUrl,
                   qq.position AS questionPosition,
-                  qq.imageHeight, qq.options, qq.answers, qq.note, qq.hint, qq.hintImageUrl,
+                  qq.imageHeight, qq.options, qq.answers, qq.note, qq.hint, qq.hintImageUrl, qq.localHintImagePath,
                   qq.likes, qq.dislikes, qq.localImagePath, c.title AS chapterTitle
           FROM quizzes q
           JOIN quiz_questions qq ON qq.quizId = q.id
@@ -151,13 +151,14 @@ export function useQuizDatabase() {
           id: q.questionId,
           position: q.questionPosition,
           question: q.questionText,
+          questionType: q.questionType,
           imageHeight: q.imageHeight,
           questionImageUrl: q.localImagePath || q.questionImageUrl,
           options: JSON.parse(q.options),
           answers: JSON.parse(q.answers),
           explanation: q.note ?? "",
           hint: q.hint ?? undefined,
-          hintImageUrl: q.hintImageUrl ?? undefined,
+          hintImageUrl: (q.localHintImagePath || q.hintImageUrl) ?? undefined,
           likes: q.likes,
           dislikes: q.dislikes,
           isSaved: userData.isSaved || false,
@@ -285,10 +286,10 @@ export function useQuizDatabase() {
           c.title AS chapterTitle,
           c.position AS chapterPosition,
           (SELECT COUNT(*) FROM quiz_questions WHERE quizId = q.id) AS questionCount,
-          (SELECT score FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS score,
-          (SELECT completed FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS completed,
-          (SELECT attemptCount FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS attemptCount,
-          (SELECT updatedAt FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS lastAttempt
+          (SELECT score FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS score,
+          (SELECT completed FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS completed,
+          (SELECT attemptCount FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS attemptCount,
+          (SELECT updatedAt FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS lastAttempt
         FROM quizzes q
         JOIN chapters c ON q.chapterId = c.id
         WHERE q.isPublished = 1 AND c.isPublished = 1  
@@ -324,16 +325,16 @@ export function useQuizDatabase() {
 
       const rows = await db.getAllAsync(
         `
-       SELECT 
-        q.id, 
-        q.title, 
-        q.maxScore, 
+       SELECT
+        q.id,
+        q.title,
+        q.maxScore,
         q.position AS quizPosition,
         (SELECT COUNT(*) FROM quiz_questions WHERE quizId = q.id) AS questionCount,
-        (SELECT score FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS score,
-        (SELECT completed FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS completed,
-        (SELECT attemptCount FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS attemptCount,
-        (SELECT updatedAt FROM quiz_results WHERE quizId = q.id ORDER BY id DESC LIMIT 1) AS lastAttempt
+        (SELECT score FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS score,
+        (SELECT completed FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS completed,
+        (SELECT attemptCount FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS attemptCount,
+        (SELECT updatedAt FROM quiz_results WHERE quizId = q.id ORDER BY updatedAt DESC LIMIT 1) AS lastAttempt
       FROM quizzes q
       WHERE q.chapterId = ?
       ORDER BY q.position ASC
@@ -530,9 +531,9 @@ export function useQuizDatabase() {
     try {
       const rows = quizId === "all"
         ? await db.getAllAsync<any>(`
-            SELECT q.id, q.question, q.options, q.answers, q.quizId, q.questionImageUrl,
+            SELECT q.id, q.question, q.questionType, q.options, q.answers, q.quizId, q.questionImageUrl,
                   q.localImagePath, q.imageHeight, q.position, q.note AS explanation,
-                  q.hint, q.hintImageUrl,
+                  q.hint, q.hintImageUrl, q.localHintImagePath,
                   q.likes, q.dislikes, quiz.title AS quizTitle, chapter.title AS chapterTitle,
                   uq.saved, uq.liked, uq.disliked
             FROM user_quiz_questions uq
@@ -543,9 +544,9 @@ export function useQuizDatabase() {
             ORDER BY chapter.position ASC, quiz.position ASC, q.position ASC
         `)
         : await db.getAllAsync<any>(`
-            SELECT q.id, q.question, q.options, q.answers, q.quizId, q.questionImageUrl,
+            SELECT q.id, q.question, q.questionType, q.options, q.answers, q.quizId, q.questionImageUrl,
                   q.localImagePath, q.imageHeight, q.position, q.note AS explanation,
-                  q.hint, q.hintImageUrl,
+                  q.hint, q.hintImageUrl, q.localHintImagePath,
                   q.likes, q.dislikes, quiz.title AS quizTitle, chapter.title AS chapterTitle,
                   uq.saved, uq.liked, uq.disliked
             FROM user_quiz_questions uq
@@ -563,6 +564,7 @@ export function useQuizDatabase() {
       const questions = rows.map((q) => ({
         id: q.id,
         question: q.question,
+        questionType: q.questionType,
         options: q.options ? JSON.parse(q.options) : [],
         answers: q.answers ? JSON.parse(q.answers) : [],
         questionImageUrl: q.localImagePath || q.questionImageUrl,
@@ -570,7 +572,7 @@ export function useQuizDatabase() {
         position: q.position,
         explanation: q.explanation,
         hint: q.hint ?? undefined,
-        hintImageUrl: q.hintImageUrl ?? undefined,
+        hintImageUrl: (q.localHintImagePath || q.hintImageUrl) ?? undefined,
         likes: q.likes ?? 0,
         dislikes: q.dislikes ?? 0,
         isSaved: Boolean(q.saved),
@@ -621,8 +623,8 @@ export function useQuizDatabase() {
         for (const questionId of questionIds) {
           // Fetch question details
           const questionRows = await db.getAllAsync<any>(`
-            SELECT q.id, q.question, q.options, q.answers, q.questionImageUrl, q.localImagePath,
-                  q.imageHeight, q.position, q.note AS explanation, q.hint, q.hintImageUrl,
+            SELECT q.id, q.question, q.questionType, q.options, q.answers, q.questionImageUrl, q.localImagePath,
+                  q.imageHeight, q.position, q.note AS explanation, q.hint, q.hintImageUrl, q.localHintImagePath,
                   q.likes, q.dislikes,
                   quiz.title AS quizTitle, chapter.title AS chapterTitle
             FROM quiz_questions q
@@ -645,6 +647,7 @@ export function useQuizDatabase() {
             wrongMap.set(q.id, {
               id: q.id,
               question: q.question,
+              questionType: q.questionType,
               options: q.options ? JSON.parse(q.options) : [],
               answers: correctAnswers,
               questionImageUrl: q.localImagePath || q.questionImageUrl,
@@ -652,7 +655,7 @@ export function useQuizDatabase() {
               position: q.position,
               explanation: q.explanation,
               hint: q.hint ?? undefined,
-              hintImageUrl: q.hintImageUrl ?? undefined,
+              hintImageUrl: (q.localHintImagePath || q.hintImageUrl) ?? undefined,
               likes: q.likes ?? 0,
               dislikes: q.dislikes ?? 0,
               quizTitle: q.quizTitle,
@@ -747,7 +750,7 @@ export function useQuizDatabase() {
     try {
       if (method === "POST") {
         const existing = await db.getFirstAsync(
-          `SELECT * FROM quiz_results WHERE quizId = ? ORDER BY id DESC LIMIT 1`,
+          `SELECT * FROM quiz_results WHERE quizId = ? ORDER BY updatedAt DESC LIMIT 1`,
           [quizId]
         );
 
@@ -788,17 +791,18 @@ export function useQuizDatabase() {
       if (method === "POST") {
         // Create new quiz result
         const quizResultId = Crypto.randomUUID();
+        const now = new Date().toISOString();
         await db.runAsync(
-          `INSERT INTO quiz_results (id, quizId, answers, score, completed, attemptCount)
-          VALUES (?, ?, ?, ?, ?, ?)`,
-          [quizResultId, quizId, JSON.stringify(answers), totalScore, totalScore > 0 ? 1 : 0, 1]
+          `INSERT INTO quiz_results (id, quizId, answers, score, completed, attemptCount, createdAt, updatedAt)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+          [quizResultId, quizId, JSON.stringify(answers), totalScore, totalScore > 0 ? 1 : 0, 1, now, now]
         );
 
         return { totalScore, questionResults, quizResult: { id: quizResultId, answers, score: totalScore } };
       } else {
         // PATCH: update existing result
         const existingResult = await db.getFirstAsync<any>(
-          `SELECT * FROM quiz_results WHERE quizId = ? ORDER BY id DESC LIMIT 1`,
+          `SELECT * FROM quiz_results WHERE quizId = ? ORDER BY updatedAt DESC LIMIT 1`,
           [quizId]
         );
 
@@ -808,11 +812,12 @@ export function useQuizDatabase() {
 
         const previousScore = existingResult.score ?? 0;
         const pointsToAdd = Math.max(0, totalScore - previousScore);
+        const now = new Date().toISOString();
 
         await db.runAsync(
-          `UPDATE quiz_results SET answers = ?, score = ?, completed = ?, attemptCount = attemptCount + 1, updatedAt = CURRENT_TIMESTAMP
+          `UPDATE quiz_results SET answers = ?, score = ?, completed = ?, attemptCount = attemptCount + 1, updatedAt = ?
           WHERE id = ?`,
-          [JSON.stringify(answers), totalScore, totalScore > 0 ? 1 : 0, existingResult.id]
+          [JSON.stringify(answers), totalScore, totalScore > 0 ? 1 : 0, now, existingResult.id]
         );
 
         return { totalScore, questionResults, quizResult: { ...existingResult, answers, score: totalScore } };
@@ -865,8 +870,8 @@ export function useQuizDatabase() {
             // Insert new question
             await db.runAsync(
               `INSERT INTO quiz_questions
-              (id, question, questionType, questionImageUrl, localImagePath, imageHeight, options, answers, hint, points, position, hintImageUrl, note, likes, dislikes, quizId)
-              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+              (id, question, questionType, questionImageUrl, localImagePath, imageHeight, options, answers, hint, points, position, hintImageUrl, localHintImagePath, note, likes, dislikes, quizId)
+              VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
               [
                 q.id,
                 q.question,
@@ -880,6 +885,7 @@ export function useQuizDatabase() {
                 q.points || 1,
                 q.position || 0,
                 q.hintImageUrl || "",
+                q.localHintImagePath || "",
                 q.note || "",
                 q.likes || 0,
                 q.dislikes || 0,
@@ -927,5 +933,27 @@ export function useQuizDatabase() {
 
 
 
-  return { fetchLocalQuizTimestamps, applyAllQuizUpdatesLocally, submitQuizAnswersLocal, resetQuizLocal, fetchWrongQuizzesLocal, fetchSavedQuizzesLocal, fetchWrongQuestionsLocal, fetchSavedQuestionsLocal,  fetchQuizzesByTopicLocal, fetchQuizByIdLocal, fetchExamsLocal} 
+  /**
+   * Fetches saved quiz answers from quiz_results table
+   * @param quizId - The ID of the quiz
+   * @returns The saved answers or null if not found
+   */
+  async function fetchSavedQuizAnswersLocal(quizId: string): Promise<Record<string, string[]> | null> {
+    try {
+      const result = await db.getFirstAsync<{ answers: string }>(
+        `SELECT answers FROM quiz_results WHERE quizId = ? ORDER BY updatedAt DESC LIMIT 1`,
+        [quizId]
+      );
+
+      if (result && result.answers) {
+        return JSON.parse(result.answers);
+      }
+      return null;
+    } catch (error) {
+      console.error("❌ Failed to fetch saved quiz answers:", error);
+      return null;
+    }
+  }
+
+  return { fetchLocalQuizTimestamps, applyAllQuizUpdatesLocally, submitQuizAnswersLocal, resetQuizLocal, fetchWrongQuizzesLocal, fetchSavedQuizzesLocal, fetchWrongQuestionsLocal, fetchSavedQuestionsLocal,  fetchQuizzesByTopicLocal, fetchQuizByIdLocal, fetchExamsLocal, fetchSavedQuizAnswersLocal}
 }

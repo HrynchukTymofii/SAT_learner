@@ -21,6 +21,7 @@ export default function CustomPreloadScreen() {
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  console.log('PreloadScreen')
 
   useEffect(() => {
     // Fade animation for text
@@ -135,7 +136,7 @@ export default function CustomPreloadScreen() {
             }}
           >
             <Image
-              source={require("@/assets/images/icon.png")}
+              source={require("@/assets/images/splash-icon-white.png")}
               style={{ width: 140, height: 140, borderRadius: 70 }}
               resizeMode="contain"
             />

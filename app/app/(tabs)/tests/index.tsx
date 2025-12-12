@@ -24,13 +24,6 @@ import {
 import { useAuth } from "@/context/AuthContext";
 import { LoginRequiredModal } from "@/components/modals/LoginRequiredModal";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { useTour } from "@/context/TourContext";
-import { TourTooltip } from "@/components/Tour/TourTooltip";
-import {
-  TOUR_STEPS,
-  TOTAL_TOUR_STEPS,
-  getTourStepInfo,
-} from "@/constants/tourSteps";
 
 export default function QuizzesPage() {
   const router = useRouter();
@@ -40,24 +33,6 @@ export default function QuizzesPage() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [showPremiumModal, setShowPremiumModal] = useState(false);
   const { token, user } = useAuth();
-
-  // Tour
-  const { tourActive, currentStep, setCurrentStep, endTour, skipTour } =
-    useTour();
-
-  const handleTourNext = () => {
-    if (currentStep === TOTAL_TOUR_STEPS - 1) {
-      endTour();
-    } else {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const handleTourPrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
-  };
 
   const handleModeSelect = (mode: string) => {
     if (mode === "exam") {
@@ -100,12 +75,12 @@ export default function QuizzesPage() {
     {
       id: "exam",
       title: "Full SAT Test",
-      description: "Complete 60-minute practice test with real SAT conditions",
+      description: "Complete 70-minute practice test with real SAT conditions",
       icon: GraduationCap,
       isFree: true,
       color: "#06B6D4",
       badge: "Free",
-      stats: "60 min • 44 questions",
+      stats: "70 min • 44 questions",
     },
     // {
     //   id: "learn_by_topics",
@@ -182,240 +157,113 @@ export default function QuizzesPage() {
         showsVerticalScrollIndicator={false}
       >
         {/* Featured Test Card */}
-        {tourActive && currentStep === TOUR_STEPS.EXAMS ? (
-          <TourTooltip
-            visible={true}
-            onNext={handleTourNext}
-            onPrev={handleTourPrev}
-            onSkip={skipTour}
-            onClose={() => {}}
-            title={getTourStepInfo(TOUR_STEPS.EXAMS).title}
-            content={getTourStepInfo(TOUR_STEPS.EXAMS).content}
-            stepNumber={TOUR_STEPS.EXAMS + 1}
-            totalSteps={TOTAL_TOUR_STEPS}
-            placement="bottom"
+        <TouchableOpacity
+          activeOpacity={0.7}
+          onPress={() => handleModeSelect("exam")}
+          style={{
+            marginBottom: 24,
+            borderRadius: 20,
+            overflow: "hidden",
+            shadowColor: "#06B6D4",
+            shadowOffset: { width: 0, height: 4 },
+            shadowOpacity: 0.2,
+            shadowRadius: 12,
+            elevation: 8,
+          }}
+        >
+          <LinearGradient
+            colors={["#06B6D4", "#0891B2"]}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+            style={{ padding: 24 }}
           >
-            <TouchableOpacity
-              activeOpacity={0.7}
-              onPress={() => handleModeSelect("exam")}
+            <View
               style={{
-                marginBottom: 24,
-                borderRadius: 20,
-                overflow: "hidden",
-                shadowColor: "#06B6D4",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.2,
-                shadowRadius: 12,
-                elevation: 8,
+                flexDirection: "row",
+                alignItems: "center",
+                marginBottom: 12,
               }}
             >
-              <LinearGradient
-                colors={["#06B6D4", "#0891B2"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{ padding: 24 }}
+              <View
+                style={{
+                  width: 48,
+                  height: 48,
+                  borderRadius: 12,
+                  backgroundColor: "rgba(255,255,255,0.2)",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  marginRight: 16,
+                }}
               >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 12,
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 12,
-                      backgroundColor: "rgba(255,255,255,0.2)",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginRight: 16,
-                    }}
-                  >
-                    <GraduationCap size={28} color="#ffffff" />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontSize: 24,
-                        fontWeight: "bold",
-                        color: "#ffffff",
-                      }}
-                    >
-                      Full SAT Test
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        color: "rgba(255,255,255,0.9)",
-                        marginTop: 2,
-                      }}
-                    >
-                      60 min • 44 questions
-                    </Text>
-                  </View>
-                  {!user?.isPro && (
-                    <View
-                      style={{
-                        backgroundColor: "rgba(255,255,255,0.25)",
-                        paddingHorizontal: 12,
-                        paddingVertical: 6,
-                        borderRadius: 12,
-                      }}
-                    >
-                      <Text
-                        style={{
-                          color: "#ffffff",
-                          fontSize: 12,
-                          fontWeight: "600",
-                        }}
-                      >
-                        Free
-                      </Text>
-                    </View>
-                  )}
-                </View>
+                <GraduationCap size={28} color="#ffffff" />
+              </View>
+              <View style={{ flex: 1 }}>
                 <Text
                   style={{
-                    fontSize: 15,
-                    color: "rgba(255,255,255,0.95)",
-                    marginBottom: 16,
+                    fontSize: 24,
+                    fontWeight: "bold",
+                    color: "#ffffff",
                   }}
                 >
-                  Complete practice test with real SAT conditions. Track your
-                  time and get instant results.
+                  Full SAT Test
                 </Text>
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: "rgba(255,255,255,0.9)",
+                    marginTop: 2,
+                  }}
+                >
+                  70 min • 44 questions
+                </Text>
+              </View>
+              {!user?.isPro && (
                 <View
                   style={{
-                    backgroundColor: "#ffffff",
-                    paddingVertical: 14,
+                    backgroundColor: "rgba(255,255,255,0.25)",
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
                     borderRadius: 12,
-                    alignItems: "center",
                   }}
                 >
                   <Text
                     style={{
-                      color: "#06B6D4",
-                      fontSize: 16,
+                      color: "#ffffff",
+                      fontSize: 12,
                       fontWeight: "600",
                     }}
                   >
-                    Start Full Test
+                    Free
                   </Text>
                 </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          </TourTooltip>
-        ) : (
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() => handleModeSelect("exam")}
-            style={{
-              marginBottom: 24,
-              borderRadius: 20,
-              overflow: "hidden",
-              shadowColor: "#06B6D4",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.2,
-              shadowRadius: 12,
-              elevation: 8,
-            }}
-          >
-            <LinearGradient
-              colors={["#06B6D4", "#0891B2"]}
-              start={{ x: 0, y: 0 }}
-              end={{ x: 1, y: 1 }}
-              style={{ padding: 24 }}
+              )}
+            </View>
+            <Text
+              style={{
+                fontSize: 15,
+                color: "rgba(255,255,255,0.95)",
+                marginBottom: 16,
+              }}
             >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <View
-                  style={{
-                    width: 48,
-                    height: 48,
-                    borderRadius: 12,
-                    backgroundColor: "rgba(255,255,255,0.2)",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: 16,
-                  }}
-                >
-                  <GraduationCap size={28} color="#ffffff" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text
-                    style={{
-                      fontSize: 24,
-                      fontWeight: "bold",
-                      color: "#ffffff",
-                    }}
-                  >
-                    Full SAT Test
-                  </Text>
-                  <Text
-                    style={{
-                      fontSize: 12,
-                      color: "rgba(255,255,255,0.9)",
-                      marginTop: 2,
-                    }}
-                  >
-                    60 min • 44 questions
-                  </Text>
-                </View>
-                {!user?.isPro && (
-                  <View
-                    style={{
-                      backgroundColor: "rgba(255,255,255,0.25)",
-                      paddingHorizontal: 12,
-                      paddingVertical: 6,
-                      borderRadius: 12,
-                    }}
-                  >
-                    <Text
-                      style={{
-                        color: "#ffffff",
-                        fontSize: 12,
-                        fontWeight: "600",
-                      }}
-                    >
-                      Free
-                    </Text>
-                  </View>
-                )}
-              </View>
+              Complete practice test with real SAT conditions. Track your time
+              and get instant results.
+            </Text>
+            <View
+              style={{
+                backgroundColor: "#ffffff",
+                paddingVertical: 14,
+                borderRadius: 12,
+                alignItems: "center",
+              }}
+            >
               <Text
-                style={{
-                  fontSize: 15,
-                  color: "rgba(255,255,255,0.95)",
-                  marginBottom: 16,
-                }}
+                style={{ color: "#06B6D4", fontSize: 16, fontWeight: "600" }}
               >
-                Complete practice test with real SAT conditions. Track your time
-                and get instant results.
+                Start Full Test
               </Text>
-              <View
-                style={{
-                  backgroundColor: "#ffffff",
-                  paddingVertical: 14,
-                  borderRadius: 12,
-                  alignItems: "center",
-                }}
-              >
-                <Text
-                  style={{ color: "#06B6D4", fontSize: 16, fontWeight: "600" }}
-                >
-                  Start Full Test
-                </Text>
-              </View>
-            </LinearGradient>
-          </TouchableOpacity>
-        )}
+            </View>
+          </LinearGradient>
+        </TouchableOpacity>
 
         {/* Practice Modes Grid */}
         <Text
@@ -432,11 +280,6 @@ export default function QuizzesPage() {
         {modes.slice(1).map((mode, index) => {
           const Icon = mode.icon;
           const isLocked = !mode.isFree && !user?.isPro;
-
-          const showIncorrectTooltip =
-            tourActive &&
-            currentStep === TOUR_STEPS.INCORRECT_ANSWERS &&
-            mode.id === "wrong";
 
           const modeCard = (
             <TouchableOpacity
@@ -578,177 +421,6 @@ export default function QuizzesPage() {
               </View>
             </TouchableOpacity>
           );
-
-          // Wrap with tooltip if needed
-          if (showIncorrectTooltip) {
-            return (
-              <View
-                key={mode.id}
-                style={{
-                  width: Dimensions.get("window").width - 32,
-                }}
-              >
-                <TourTooltip
-                  visible={true}
-                  onNext={handleTourNext}
-                  onPrev={handleTourPrev}
-                  onSkip={skipTour}
-                  onClose={() => {}}
-                  title={getTourStepInfo(TOUR_STEPS.INCORRECT_ANSWERS).title}
-                  content={
-                    getTourStepInfo(TOUR_STEPS.INCORRECT_ANSWERS).content
-                  }
-                  stepNumber={TOUR_STEPS.INCORRECT_ANSWERS + 1}
-                  totalSteps={TOTAL_TOUR_STEPS}
-                  placement="top"
-                >
-                  <TouchableOpacity
-                    key={mode.id}
-                    activeOpacity={0.7}
-                    onPress={() => handleModeSelect(mode.id)}
-                    style={{
-                      backgroundColor: isDark ? "#1e293b" : "#ffffff",
-                      borderRadius: 16,
-                      padding: 20,
-                      borderLeftWidth: 4,
-                      borderLeftColor: mode.color,
-                      shadowColor: "#000",
-                      shadowOffset: { width: 0, height: 2 },
-                      shadowOpacity: 0.1,
-                      shadowRadius: 8,
-                      elevation: 3,
-                    }}
-                  >
-                    <View
-                      style={{ flexDirection: "row", alignItems: "flex-start" }}
-                    >
-                      {/* Icon */}
-                      <View
-                        style={{
-                          width: 48,
-                          height: 48,
-                          borderRadius: 12,
-                          backgroundColor: isDark ? "#334155" : "#f3f4f6",
-                          alignItems: "center",
-                          justifyContent: "center",
-                          marginRight: 16,
-                        }}
-                      >
-                        <Icon size={24} color={mode.color} />
-                      </View>
-
-                      {/* Content */}
-                      <View style={{ flex: 1 }}>
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginBottom: 6,
-                          }}
-                        >
-                          <Text
-                            style={{
-                              fontSize: 18,
-                              fontWeight: "bold",
-                              color: isDark ? "#ffffff" : "#1f2937",
-                              flex: 1,
-                            }}
-                          >
-                            {mode.title}
-                          </Text>
-                          {isLocked && (
-                            <View
-                              style={{
-                                flexDirection: "row",
-                                alignItems: "center",
-                                backgroundColor: isDark ? "#312e81" : "#ede9fe",
-                                paddingHorizontal: 10,
-                                paddingVertical: 4,
-                                borderRadius: 8,
-                              }}
-                            >
-                              <Lock
-                                size={12}
-                                color={isDark ? "#a78bfa" : "#7c3aed"}
-                              />
-                              <Text
-                                style={{
-                                  marginLeft: 4,
-                                  fontSize: 11,
-                                  fontWeight: "600",
-                                  color: isDark ? "#a78bfa" : "#7c3aed",
-                                }}
-                              >
-                                PRO
-                              </Text>
-                            </View>
-                          )}
-                          {!isLocked && mode.isFree && !user?.isPro && (
-                            <View
-                              style={{
-                                backgroundColor: isDark ? "#064e3b" : "#d1fae5",
-                                paddingHorizontal: 10,
-                                paddingVertical: 4,
-                                borderRadius: 8,
-                              }}
-                            >
-                              <Text
-                                style={{
-                                  fontSize: 11,
-                                  fontWeight: "600",
-                                  color: isDark ? "#34d399" : "#059669",
-                                }}
-                              >
-                                Free
-                              </Text>
-                            </View>
-                          )}
-                        </View>
-
-                        <Text
-                          style={{
-                            fontSize: 14,
-                            color: isDark ? "#94a3b8" : "#6b7280",
-                            marginBottom: 12,
-                            lineHeight: 20,
-                          }}
-                        >
-                          {mode.description}
-                        </Text>
-
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            paddingHorizontal: 12,
-                            paddingVertical: 6,
-                            backgroundColor: isDark ? "#334155" : "#f3f4f6",
-                            borderRadius: 8,
-                            alignSelf: "flex-start",
-                          }}
-                        >
-                          <Zap
-                            size={12}
-                            color={isDark ? "#94a3b8" : "#6b7280"}
-                          />
-                          <Text
-                            style={{
-                              marginLeft: 6,
-                              fontSize: 12,
-                              color: isDark ? "#94a3b8" : "#6b7280",
-                              fontWeight: "500",
-                            }}
-                          >
-                            {mode.stats}
-                          </Text>
-                        </View>
-                      </View>
-                    </View>
-                  </TouchableOpacity>
-                </TourTooltip>
-              </View>
-            );
-          }
 
           return (
             <View

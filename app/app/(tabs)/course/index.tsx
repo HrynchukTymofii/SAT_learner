@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   TextInput,
   StyleSheet,
+  Dimensions,
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
@@ -69,6 +70,8 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
+  const SCREEN_WIDTH = Dimensions.get('window').width;
+  const CHAPTER_CARD_WIDTH = SCREEN_WIDTH - 32; 
 
   const { token, user } = useAuth();
   const { getFullCourse, getFullCourseWithProgress } = useCourseDatabase();
@@ -145,16 +148,12 @@ export default function HomeScreen() {
   // }, []);
 
   useEffect(() => {
-    if (tourActive) {
-      if (currentStep === TOUR_STEPS.INCORRECT_ANSWERS) {
-        router.push("/(tabs)/tests");
-      }
-    }
+    // Don't auto-navigate - let the user see the tooltip first
   }, [tourActive, currentStep]);
 
   const handleTourNext = () => {
-    // Special handling for COURSE_TAB step - navigate to Numbers chapter when clicking Next
-    if (currentStep === TOUR_STEPS.COURSE_TAB) {
+    // Special handling for CHOOSE_TOPIC step - navigate to Numbers chapter when clicking Next
+    if (currentStep === TOUR_STEPS.CHOOSE_TOPIC) {
       const numbersChapter = course.find((ch) =>
         ch.title.toLowerCase().includes("number")
       );
@@ -236,7 +235,7 @@ export default function HomeScreen() {
   const circumference = 2 * Math.PI * radius;
   const progressOffset = circumference - (circumference * courseProgress) / 100;
 
-  const info = getTourStepInfo(TOUR_STEPS.COURSE_TAB);
+  const chooseTopicInfo = getTourStepInfo(TOUR_STEPS.CHOOSE_TOPIC);
 
   return (
     <View style={[styles.container, { backgroundColor: isDark ? "#111827" : "#f9fafb" }]}>
@@ -377,32 +376,41 @@ export default function HomeScreen() {
                     {isLocked && (
                       <Lock size={16} color="#2563eb" style={styles.lockIcon} />
                     )}
-                    <TouchableOpacity activeOpacity={0.7}>
+                    {/* <TouchableOpacity activeOpacity={0.7}>
                       <MoreVertical size={20} color={isDark ? "#94a3b8" : "#6b7280"} />
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
                   </View>
                 </View>
               </TouchableOpacity>
             );
 
             // Wrap with tooltip if this is the first chapter and tour is active
-            if (cIndex === 0 && tourActive && currentStep === TOUR_STEPS.COURSE_TAB) {
+            if (cIndex === 0 && tourActive && currentStep === TOUR_STEPS.CHOOSE_TOPIC) {
               return (
-                <TourTooltip
+            
+                  <TourTooltip
                   key={999}
-                  visible={true}
-                  onNext={handleTourNext}
-                  onPrev={handleTourPrev}
-                  onSkip={skipTour}
-                  onClose={() => {}}
-                  title={info.title}
-                  content={info.content}
-                  stepNumber={TOUR_STEPS.COURSE_TAB + 1}
-                  totalSteps={TOTAL_TOUR_STEPS}
-                  placement="bottom"
-                >
-                  {chapterCard}
-                </TourTooltip>
+                    visible={true}
+                    onNext={handleTourNext}
+                    onPrev={handleTourPrev}
+                    onSkip={skipTour}
+                    onClose={() => {}}
+                    title={chooseTopicInfo?.title || ''}
+                    content={chooseTopicInfo?.content || ''}
+                    stepNumber={TOUR_STEPS.CHOOSE_TOPIC + 1}
+                    totalSteps={TOTAL_TOUR_STEPS}
+                    placement="bottom"
+                    nextButtonText="Next"
+                    skipButtonText="Skip Tour"
+                    showSkipButton={true}
+                  >
+                    <View style={{
+                    width: CHAPTER_CARD_WIDTH,
+                    paddingHorizontal: 0,
+                  }}>
+                    {chapterCard}
+                    </View>
+                  </TourTooltip>
               );
             }
 

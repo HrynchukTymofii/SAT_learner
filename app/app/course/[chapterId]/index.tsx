@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import {
   ScrollView,
@@ -7,7 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
 } from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
 import {
   ArrowLeft,
   BookOpen,
@@ -44,7 +44,7 @@ type Item = {
   videoUrl?: string;
   questionCount?: number;
 };
-
+ 
 export default function ChapterScreen() {
   const router = useRouter();
   const { chapterId } = useLocalSearchParams();
@@ -52,6 +52,7 @@ export default function ChapterScreen() {
   const [loading, setLoading] = useState(true);
   const [chapterTitle, setChapterTitle] = useState("");
   const [items, setItems] = useState<Item[]>([]);
+  const [showTooltips, setShowTooltips] = useState(false);
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
@@ -60,40 +61,51 @@ export default function ChapterScreen() {
   // Tour
   const { tourActive, currentStep, setCurrentStep, endTour, skipTour, numbersQuizId } = useTour();
 
-  useEffect(() => {
-    const loadChapter = async () => {
-      setLoading(true);
-      try {
-        const res = await getChapterItems(chapterId as string);
-        if (res.success && res.chapter) {
-          setChapterTitle(res.chapter.title);
-          setItems(res.chapter.items);
-        }
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
+  const loadChapter = useCallback(async () => {
+    setLoading(true);
+    setShowTooltips(false);
+    try {
+      const res = await getChapterItems(chapterId as string);
+      if (res.success && res.chapter) {
+        setChapterTitle(res.chapter.title);
+        setItems(res.chapter.items);
       }
-    };
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  }, [chapterId, getChapterItems]);
+
+  // Load chapter data on mount
+  useEffect(() => {
     loadChapter();
-  }, [chapterId]);
+  }, []);
+
+  // Reload chapter data when screen comes into focus (e.g., after returning from quiz)
+  useFocusEffect(
+    useCallback(() => {
+      loadChapter();
+    }, [])
+  );
+
+  // Delay tooltip appearance after loading completes
+  useEffect(() => {
+    if (!loading && tourActive) {
+      const timer = setTimeout(() => {
+        setShowTooltips(true);
+      }, 400); // 400ms delay after page loads
+      return () => clearTimeout(timer);
+    } else {
+      setShowTooltips(false);
+    }
+  }, [loading, tourActive]);
 
   const handleTourNext = () => {
-    // Special handling for ENTER_QUIZ step - navigate to quiz when clicking Next
-    if (currentStep === TOUR_STEPS.ENTER_QUIZ && numbersQuizId) {
-      const quizIndex = items.findIndex(item => item.id === numbersQuizId);
-      if (quizIndex !== -1) {
-        const flatItems = items.map(i => ({ ...i, chapterId }));
-        setCurrentStep(currentStep + 1); // Move to next step first
-        router.push({
-          pathname: `/course/${chapterId}/quiz/${numbersQuizId}` as any,
-          params: {
-            allItems: JSON.stringify(flatItems),
-            currentIndex: quizIndex
-          },
-        });
-        return;
-      }
+    // If on the last step (ENTER_QUIZ), just end the tour without navigating
+    if (currentStep === TOUR_STEPS.ENTER_QUIZ) {
+      endTour();
+      return;
     }
 
     if (currentStep === TOTAL_TOUR_STEPS - 1) {
@@ -278,10 +290,10 @@ export default function ChapterScreen() {
             const isFirstLesson = item.id === firstLesson?.id;
             const isFirstQuiz = item.id === firstQuiz?.id;
 
-            const showLessonTooltip = tourActive && currentStep === TOUR_STEPS.LESSONS_SECTION && isFirstLesson;
-            const showQuizTooltip = tourActive && currentStep === TOUR_STEPS.ENTER_QUIZ && item.id === numbersQuizId; 
+            const showLessonTooltip = tourActive && currentStep === TOUR_STEPS.LESSONS_SECTION && isFirstLesson && showTooltips;
+            const showQuizTooltip = tourActive && currentStep === TOUR_STEPS.ENTER_QUIZ && item.id === numbersQuizId && showTooltips;
 
-            const tooltipVisible = showLessonTooltip || showQuizTooltip;
+            const tooltipVisible = (showLessonTooltip || showQuizTooltip) && showTooltips;
 
             let tooltipInfo = null;
             if (showLessonTooltip) tooltipInfo = getTourStepInfo(TOUR_STEPS.LESSONS_SECTION);
@@ -387,6 +399,9 @@ export default function ChapterScreen() {
                     stepNumber={currentStep + 1}
                     totalSteps={TOTAL_TOUR_STEPS}
                     placement="bottom"
+                    nextButtonText={currentStep === TOUR_STEPS.ENTER_QUIZ ? "Finish Guide" : "Next"}
+                    skipButtonText="Skip Tour"
+                    showSkipButton={currentStep !== TOUR_STEPS.ENTER_QUIZ}
                   >
                     <TouchableOpacity
                       onPress={() => handleItemPress(item, index)}

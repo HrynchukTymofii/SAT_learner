@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigation, useRouter } from "expo-router";
 import { ResetTestDialog } from "./modals/ResetTestDialog";
+import AllTasksDialog from "./modals/AllTasksDialog";
 import Toast from "react-native-toast-message";
 import {
   Animated, 
@@ -31,6 +32,8 @@ import ResultsModal from "./TP components/ResultsCard";
 import { useTour } from "@/context/TourContext";
 import { TourTooltip } from "./Tour/TourTooltip";
 import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
+import * as SecureStore from "expo-secure-store";
+import { calculateSATScore } from "@/lib/utils";
 
 interface LatestResult {
   score: number;
@@ -52,6 +55,50 @@ interface TestsPageProps {
   pageType?: "wrong" | "saved" | "topic" | "random" | "worst" | "exam";
   onRestart?: () => void;
 }
+
+
+/**
+ * Save exam state to SecureStore (exam ID and time elapsed)
+ */
+const saveExamState = async (examId: string, timeElapsed: number) => {
+  try {
+    const examState = JSON.stringify({
+      examId,
+      timeElapsed,
+      timestamp: Date.now(),
+    });
+    await SecureStore.setItemAsync("paused_exam", examState);
+  } catch (error) {
+    console.error("Failed to save exam state:", error);
+  }
+};
+
+/**
+ * Load exam state from SecureStore
+ */
+const loadExamState = async (): Promise<{ examId: string; timeElapsed: number } | null> => {
+  try {
+    const examState = await SecureStore.getItemAsync("paused_exam");
+    if (examState) {
+      return JSON.parse(examState);
+    }
+    return null;
+  } catch (error) {
+    console.error("Failed to load exam state:", error);
+    return null;
+  }
+};
+
+/**
+ * Clear exam state from SecureStore
+ */
+const clearExamState = async () => {
+  try {
+    await SecureStore.deleteItemAsync("paused_exam");
+  } catch (error) {
+    console.error("Failed to clear exam state:", error);
+  }
+};
 
 const TestsPage = ({
   quiz,
@@ -81,6 +128,7 @@ const TestsPage = ({
   const [wasReseted, setWasReseted] = useState(false);
 
   const [isResetDialogOpen, setIsResetDialogOpen] = useState(false);
+  const [isAllTasksDialogOpen, setIsAllTasksDialogOpen] = useState(false);
   const [enableFinishSaved, setEnableFinishedSaved] = useState(false);
 
   const [isCompleated, setIsCompleated] = useState(false);
@@ -88,13 +136,12 @@ const TestsPage = ({
 
   const [isConfirmedAS, setIsConfirmedAS] = useState(false);
 
-  const [webViewLoading, setWebViewLoading] = useState(true);
+  const [webViewLoading, setWebViewLoading] = useState(false);
 
-  const [wrongAnswersCount, setWrongAnswersCount] = useState(0);
   const quizHeaderRef = useRef<QuizHeaderRef>(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
 
-  const { resetQuizLocal, submitQuizAnswersLocal } = useQuizDatabase();
+  const { resetQuizLocal, submitQuizAnswersLocal, fetchSavedQuizAnswersLocal } = useQuizDatabase();
   const [isProModalOpen, setIsProModalOpen] = useState(false);
   const [isHintModalOpen, setIsHintModalOpen] = useState(false);
 
@@ -159,7 +206,7 @@ const TestsPage = ({
    */
   useEffect(() => {
     const answers = latestResult?.answers;
-    if (!answers || !(pageType === "topic" || pageType === "worst")) return;
+    if (!answers || !(pageType === "topic")) return;   //TODO exam prew results  || pageType === "exam"
 
     const latestResultLength = Object.keys(latestResult?.answers ?? {}).length;
     if (latestResultLength == questions.length) {
@@ -189,12 +236,66 @@ const TestsPage = ({
   }, []);
 
   /**
-   * Starts the exam automatically when the component mounts
+   * Starts or resumes the exam when the component mounts
    * if the current page type is "exam".
+   * Checks SecureStore for saved exam state and quiz_results for saved answers.
    */
+
   useEffect(() => {
     if (pageType == "exam") startExam();
   }, []);
+  // useEffect(() => {
+  //   const initializeExam = async () => {
+  //     if (pageType !== "exam") return;
+
+  //     // Check if there's a saved exam state
+  //     const savedState = await loadExamState();
+
+  //     if (savedState && savedState.examId === quiz.id) {
+  //       // Resume the saved exam
+  //       try {
+  //         // Load saved answers from quiz_results
+  //         const savedAnswers = await fetchSavedQuizAnswersLocal(quiz.id);
+
+  //         if (savedAnswers && Object.keys(savedAnswers).length > 0) {
+  //           setSelectedAnswers(savedAnswers);
+
+  //           // Mark questions as answered based on correctness
+  //           const answeredQs: Record<string, boolean> = {};
+  //           for (const questionId in savedAnswers) {
+  //             const question = quiz.questions.find(q => q.id === questionId);
+  //             if (question) {
+  //               const userAnswers = savedAnswers[questionId];
+  //               const isCorrect = checkIsCorrect(question.answers, userAnswers);
+  //               answeredQs[questionId] = isCorrect;
+  //             }
+  //           }
+  //           setAnsweredQuestions(answeredQs);
+  //         }
+
+  //         // Resume exam with saved time
+  //         quizHeaderRef.current?.resumeExam(savedState.timeElapsed);
+
+  //         Toast.show({
+  //           type: "info",
+  //           text1: "Exam resumed",
+  //           text2: "Continuing from where you left off",
+  //           position: "top",
+  //           visibilityTime: 2000,
+  //         });
+  //       } catch (error) {
+  //         console.error("Failed to restore exam state:", error);
+  //         // If restoration fails, start fresh
+  //         startExam();
+  //       }
+  //     } else {
+  //       // Start fresh exam
+  //       startExam();
+  //     }
+  //   };
+
+  //   initializeExam();
+  // }, []);
 
   // useFocusEffect(
   //   useCallback(() => {
@@ -210,16 +311,6 @@ const TestsPage = ({
   //   }, [pageType])
   // );
 
-  /**
-   * Automatically submits the quiz if the user has reached
-   * 3 or more wrong answers during an exam.
-   */
-  useEffect(() => {
-    if (pageType === "exam" && wrongAnswersCount >= 3) {
-      submitQuizResults();
-      return;
-    }
-  }, [wrongAnswersCount]);
 
   /**
    * Handles the hardware back button navigation for both Android and iOS.
@@ -303,12 +394,38 @@ const TestsPage = ({
    * Handles navigating back from the quiz page.
    *
    * Behavior:
-   * - If the page is not "saved" and `needSave` is true, submits the quiz results.
+   * - For exams: saves current progress to quiz_results and exam state to SecureStore
+   * - For other page types: submits the quiz results if needSave is true
    * - Navigates back to the URL specified by `backUrl`.
    *
    * @param needSave - Whether to save/submit the quiz before navigating back (default: true)
    */
   const handleBack = async (needSave: boolean = true) => {
+    // if (pageType === "exam" && needSave) {
+    //   // For exams, save progress but don't submit final results
+    //   try {
+    //     // Save answers to quiz_results table
+    //     const answersToSave = selectedAnswersRef.current;
+    //     if (Object.keys(answersToSave).length > 0) {
+    //       await submitQuizAnswersLocal(quiz.id, answersToSave, "PATCH");
+    //     }
+
+    //     // Get current time elapsed from QuizHeader
+    //     const timeElapsed = quizHeaderRef.current?.getTimeElapsed?.() ?? 0;
+
+    //     // Save exam state to SecureStore
+    //     await saveExamState(quiz.id, timeElapsed);
+
+    //     Toast.show({
+    //       type: "success",
+    //       text1: "Exam paused and saved",
+    //       position: "top",
+    //       visibilityTime: 1500,
+    //     });
+    //   } catch (e) {
+    //     console.warn("Failed to save exam progress:", e);
+    //   }
+    // } else 
     if (pageType !== "saved" && needSave) {
       try {
         await submitQuizResults();
@@ -399,7 +516,6 @@ const TestsPage = ({
         visibilityTime: 700,
       });
     } else {
-      setWrongAnswersCount((prev) => prev + 1);
       Toast.show({
         type: "error",
         text1: "Incorrect ❌",
@@ -607,6 +723,14 @@ const TestsPage = ({
       return;
     }
 
+    if (
+      pageType == "exam" && answeredQuestionsLength == 0 
+    ) {
+      //console.log('ok')
+      setIsSubmitting(false);
+      return;
+    }
+
     //console.log("submit_1")
 
     try {
@@ -632,37 +756,46 @@ const TestsPage = ({
       }
 
       //console.log("submit_2")
+      let satScore = null;
 
       if (pageType === "exam") {
         const totalQuestions = quiz.questions.length;
         const wrongCount = totalQuestions - correctCount;
-        let totalScore = correctCount;
 
-        // +10 if passed (≤2 wrong)
+        // Calculate SAT Math Score (200-800)
+        satScore = calculateSATScore(correctCount, totalQuestions);
+        console.log(satScore)
+
+        // Award points based on performance
+        let pointsEarned = correctCount; // Base points from correct answers
+
+        // Bonus points
         const passed = wrongCount <= 2;
-        if (passed) totalScore += 10;
-
-        // +10 if all correct
-        if (correctCount === totalQuestions) totalScore += 10;
+        if (passed) pointsEarned += 10; // +10 if passed (≤2 wrong)
+        if (correctCount === totalQuestions) pointsEarned += 10; // +10 if perfect
 
         setResults({
           correctCount,
           totalQuestions,
           passed,
-          totalScore,
+          satScore, // SAT score for display
+          totalScore: pointsEarned, // Points to award
           percentage: Math.round((correctCount / totalQuestions) * 100),
         });
         setShowResults(true);
 
-        if (totalScore > 0) {
-          if (user) setUser({ ...user, points: user.points + totalScore });
-          await updateUserPoints(token, totalScore).catch(() =>
+        if (pointsEarned > 0) {
+          if (user) setUser({ ...user, points: user.points + pointsEarned });
+          await updateUserPoints(token, pointsEarned).catch(() =>
             enqueueOfflineAction({
               type: "updatePoints",
-              payload: { points: totalScore },
+              payload: { points: pointsEarned },
             })
           );
         }
+
+        // Clear saved exam state since exam is completed
+        //await clearExamState();
 
         Toast.show({
           type: "success",
@@ -671,7 +804,9 @@ const TestsPage = ({
           visibilityTime: 1500,
         });
 
-        return;
+        // Exit early for exam mode to prevent results from being overwritten
+        // setIsSubmitting(false);
+        // return;
       }
 
       const percentage = Math.round((correctCount / questions.length) * 100);
@@ -682,6 +817,7 @@ const TestsPage = ({
         totalQuestions: questions.length,
         percentage,
         passed,
+        satScore,
         totalScore: correctCount,
       });
 
@@ -817,6 +953,14 @@ const TestsPage = ({
         onConfirm={handleRetakeQuiz}
         testTitle={quiz.title}
       />
+      <AllTasksDialog
+        isOpen={isAllTasksDialogOpen}
+        onClose={() => setIsAllTasksDialogOpen(false)}
+        questions={questions}
+        answeredQuestions={answeredQuestions}
+        currentQuestionIndex={currentQuestionIndex}
+        onQuestionSelect={setCurrentQuestionIndex}
+      />
       <ScrollView
         contentContainerStyle={{
           flexGrow: 1,
@@ -837,6 +981,7 @@ const TestsPage = ({
             currentIconColor={currentIconColor}
             maxFreeIndex={maxFreeIndex}
             toggleResetDialog={() => setIsResetDialogOpen(true)}
+            toggleAllTasksDialog={() => setIsAllTasksDialogOpen(true)}
             setCurrentQuestionIndex={setCurrentQuestionIndex}
             setIsProModalOpen={setIsProModalOpen}
             handleBack={handleBack}
@@ -933,9 +1078,9 @@ const TestsPage = ({
                 minHeight: 10,
               }}
               scrollEnabled={false}
-              onLoadEnd={() => {
-                hideLoader();
-              }}
+              // onLoadEnd={() => {
+              //   hideLoader();
+              // }}
             />
             {currentQuestion.questionImageUrl && (
               <QuestionImage
@@ -977,44 +1122,56 @@ const TestsPage = ({
 
             {/* Explanation */}
             {isAnswered && currentQuestion.explanation && (
-              <View
+              <>
+                 <View
                 style={{
                   backgroundColor: isDark ? "#1e293b" : "#ffffff",
-                  borderRadius: 16,
-                  padding: 4,
-                  marginTop: 16,
-                  marginBottom: 16,
-                  borderLeftWidth: 4,
-                  borderLeftColor: "#8B5CF6",
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  borderRadius: 12,
+                  marginTop: 32, 
+                  marginHorizontal: 8,
+                  alignSelf: "flex-start",
+                  borderLeftWidth: 2,
+                  borderLeftColor:"#8B5CF6",
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 3,
+                  shadowRadius: 4,
+                  elevation: 2,
                 }}
               >
                 <Text
                   style={{
-                    fontSize: 20,
-                    fontWeight: "800",
+                    fontSize: 18,
+                    fontWeight: "700",
                     color: isDark ? "#ffffff" : "#1f2937",
-                    padding: 12
                   }}
                 >
-                  Explanation
-                </Text>
-                <AutoHeightWebView
-                  //key={`explanation-${currentQuestion.id}`}
-                  source={{
-                    html: wrapHtmlContent(currentQuestion.explanation || "", { isDark }),
-                  }}
-                  style={{
-                    width: "100%",
-                    minHeight: 10,
-                  }}
-                  scrollEnabled={false}
-                />
-              </View>
+                    💡 Explanation
+                  </Text>
+                </View>
+                  <AutoHeightWebView
+                    //key={`explanation-${currentQuestion.id}`}
+                    source={{
+                      html: wrapHtmlContent(currentQuestion.explanation || "", { isDark }),
+                    }}
+                    style={{
+                      width: "100%",
+                      minHeight: 10,
+                    }}
+                    scrollEnabled={false}
+                  />
+                
+                {currentQuestion.hintImageUrl && (
+                  <View style={{ marginBottom: 16 }}>
+                    <QuestionImage
+                      uri={currentQuestion.hintImageUrl}
+                      height={currentQuestion.imageHeight * 1.2}
+                    />
+                  </View>
+                )}
+              </>
             )}
           </View>
         </View>

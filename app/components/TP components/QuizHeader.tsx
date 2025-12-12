@@ -1,16 +1,15 @@
-import { View, Text, TouchableOpacity } from "react-native";
-import { ArrowLeft, Clock, RotateCcw } from "lucide-react-native";
-import QuestionNumberScroller from "./QuestionNumberScroller";
+import { View, Text, TouchableOpacity, Animated } from "react-native";
+import { ArrowLeft, Clock, RotateCcw, LayoutGrid } from "lucide-react-native";
 import TimeAlert from "./TimeAlert";
 import { Question } from "@/types";
-import { useEffect, useImperativeHandle, useState } from "react";
+import { useEffect, useImperativeHandle, useState, useRef } from "react";
 import Toast from "react-native-toast-message";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { TourTooltip } from "@/components/Tour/TourTooltip";
-import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
 
 export interface QuizHeaderRef {
   startExam: () => void;
+  getTimeElapsed: () => number;
+  resumeExam: (elapsedSeconds: number) => void;
 }
 
 interface QuizHeaderProps {
@@ -22,12 +21,12 @@ interface QuizHeaderProps {
   currentIconColor: string;
   maxFreeIndex: number;
   toggleResetDialog: () => void;
+  toggleAllTasksDialog: () => void;
   setCurrentQuestionIndex: (index: number) => void;
   setIsProModalOpen: (isOpen: boolean) => void;
   handleBack: (needSave?: boolean) => void;
   submitQuizResults: () => void;
   ref?: React.Ref<QuizHeaderRef>;
-  // Tour props
   tourActive?: boolean;
   currentStep?: number;
   handleTourNext?: () => void;
@@ -44,6 +43,7 @@ export default function QuizHeader({
   currentIconColor,
   maxFreeIndex,
   toggleResetDialog,
+  toggleAllTasksDialog,
   setCurrentQuestionIndex,
   setIsProModalOpen,
   handleBack,
@@ -62,10 +62,23 @@ export default function QuizHeader({
   const [isExamFinished, setIsExamFinished] = useState(false);
   const timeLimit = 70 * 60; // 70 minutes
 
+  // Animation for glowing effect
+  const glowAnim = useRef(new Animated.Value(0)).current;
+  const scaleAnim = useRef(new Animated.Value(1)).current;
+
   useImperativeHandle(ref, () => ({
     startExam() {
       setTimeSpent(0);
       setStartTime(Date.now());
+      setIsExamStarted(true);
+      setIsExamFinished(false);
+    },
+    getTimeElapsed() {
+      return timeSpent;
+    },
+    resumeExam(elapsedSeconds: number) {
+      setTimeSpent(elapsedSeconds);
+      setStartTime(Date.now() - elapsedSeconds * 1000);
       setIsExamStarted(true);
       setIsExamFinished(false);
     },
@@ -86,6 +99,49 @@ export default function QuizHeader({
     return () => clearInterval(timer);
   }, [isExamStarted, startTime, timeLimit, isExamFinished]);
 
+  // Check if quiz is completed
+  const isQuizCompleted = Object.keys(answeredQuestions).length >= questions.length;
+
+  // Glowing animation when quiz is completed
+  useEffect(() => {
+    if (isQuizCompleted && pageType !== "exam" && pageType !== "saved") {
+      // Glow animation (for opacity)
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(glowAnim, {
+            toValue: 1,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+          Animated.timing(glowAnim, {
+            toValue: 0.3,
+            duration: 1000,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+
+      // Bounce animation
+      Animated.loop(
+        Animated.sequence([
+          Animated.timing(scaleAnim, {
+            toValue: 1.08,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+          Animated.timing(scaleAnim, {
+            toValue: 1,
+            duration: 800,
+            useNativeDriver: true,
+          }),
+        ])
+      ).start();
+    } else {
+      glowAnim.setValue(0);
+      scaleAnim.setValue(1);
+    }
+  }, [isQuizCompleted, pageType]);
+
   const handleAutoSubmit = () => {
     Toast.show({
       type: "error",
@@ -104,7 +160,7 @@ export default function QuizHeader({
       pageType === "saved"
     )
       return "Back to Topics";
-    if (pageType === "exam") return "End Exam";
+    if (pageType === "exam") return "Stop Exam";
     return "Finish Later";
   };
 
@@ -148,52 +204,93 @@ export default function QuizHeader({
           </Text>
         </TouchableOpacity>
 
-        {/* Reset or Timer */}
+        {/* All Tasks and Reset Buttons */}
         {pageType !== "wrong" &&
           pageType !== "exam" &&
           Object.keys(answeredQuestions).length > 0 && (
-            tourActive && currentStep === TOUR_STEPS.RESTART_TEST && isNumbersQuiz ? (
-              <TourTooltip
-                visible={true}
-                onNext={handleTourNext}
-                onPrev={handleTourPrev}
-                onSkip={skipTour}
-                onClose={() => {}}
-                title={getTourStepInfo(TOUR_STEPS.RESTART_TEST).title}
-                content={getTourStepInfo(TOUR_STEPS.RESTART_TEST).content}
-                stepNumber={TOUR_STEPS.RESTART_TEST + 1}
-                totalSteps={TOTAL_TOUR_STEPS}
-                placement="bottom"
-              >
-                <TouchableOpacity
-                  onPress={toggleResetDialog}
-                  activeOpacity={0.7}
+            <View style={{ flexDirection: "row", gap: 8 }}>
+              {/* All Tasks Button */}
+              <View style={{ position: "relative" }}>
+                {isQuizCompleted && (
+                  <Animated.View
+                    style={{
+                      position: "absolute",
+                      top: -4,
+                      left: -4,
+                      right: -4,
+                      bottom: -4,
+                      backgroundColor: "#06B6D4",
+                      borderRadius: 16,
+                      opacity: glowAnim,
+                    }}
+                  />
+                )}
+                <Animated.View
                   style={{
-                    backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
-                    padding: 10,
-                    borderRadius: 12,
-                    borderWidth: 1,
-                    borderColor: isDark ? "#374155" : "#e5e7eb",
+                    transform: [{ scale: isQuizCompleted ? scaleAnim : 1 }],
                   }}
                 >
-                  <RotateCcw size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
-                </TouchableOpacity>
-              </TourTooltip>
-            ) : (
-              <TouchableOpacity
-                onPress={toggleResetDialog}
-                activeOpacity={0.7}
-                style={{
-                  backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
-                  padding: 10,
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: isDark ? "#374155" : "#e5e7eb",
-                }}
-              >
-                <RotateCcw size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
-              </TouchableOpacity>
-            )
+                  <TouchableOpacity
+                    onPress={toggleAllTasksDialog}
+                    activeOpacity={0.7}
+                    style={{
+                      backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                      padding: 10,
+                      borderRadius: 12,
+                      borderWidth: isQuizCompleted ? 2 : 1,
+                      borderColor: isQuizCompleted
+                        ? "#06B6D4"
+                        : isDark
+                        ? "#374155"
+                        : "#e5e7eb",
+                    }}
+                  >
+                    <LayoutGrid size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
+
+              {/* Reset Button */}
+              <View style={{ position: "relative" }}>
+                {isQuizCompleted && (
+                  <Animated.View
+                    style={{
+                      position: "absolute",
+                      top: -4,
+                      left: -4,
+                      right: -4,
+                      bottom: -4,
+                      backgroundColor: "#06B6D4",
+                      borderRadius: 16,
+                      opacity: glowAnim,
+                    }}
+                  />
+                )}
+                <Animated.View
+                  style={{
+                    transform: [{ scale: isQuizCompleted ? scaleAnim : 1 }],
+                  }}
+                >
+                  <TouchableOpacity
+                    onPress={toggleResetDialog}
+                    activeOpacity={0.7}
+                    style={{
+                      backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                      padding: 10,
+                      borderRadius: 12,
+                      borderWidth: isQuizCompleted ? 2 : 1,
+                      borderColor: isQuizCompleted
+                        ? "#06B6D4"
+                        : isDark
+                        ? "#374155"
+                        : "#e5e7eb",
+                    }}
+                  >
+                    <RotateCcw size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+                  </TouchableOpacity>
+                </Animated.View>
+              </View>
+            </View>
           )}
 
         {pageType === "exam" && (

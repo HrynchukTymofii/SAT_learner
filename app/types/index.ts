@@ -36,6 +36,7 @@ export interface QuizQuestion {
 export interface Question {
   id: string;
   question: string;
+  questionType?: string;
   imageHeight: number;
   questionImageUrl?: string | null;
   options: string[];

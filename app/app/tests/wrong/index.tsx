@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useCallback } from "react"
 import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native"
-import { useRouter } from "expo-router"
+import { useRouter, useFocusEffect } from "expo-router"
 import { ArrowLeft, XCircle, RotateCcw, Search, X } from "lucide-react-native"
 import { useAuth } from "@/context/AuthContext"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
@@ -28,25 +28,31 @@ export default function WrongQuizzesScreen() {
   const [loading, setLoading] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
 
-  useEffect(() => {
+  const loadQuizzes = useCallback(async () => {
     if (!token) {
       router.push("/login")
       return
     }
-
-    const loadQuizzes = async () => {
-      setLoading(true)
-      const res = await fetchWrongQuizzesLocal()
-      if (res.success) {
-        setQuizzes(res.quizzes)
-      } else {
-        console.warn("Failed to load wrong quizzes:", res.error)
-      }
-      setLoading(false)
+    setLoading(true)
+    const res = await fetchWrongQuizzesLocal()
+    if (res.success) {
+      setQuizzes(res.quizzes)
+    } else {
+      console.warn("Failed to load wrong quizzes:", res.error)
     }
+    setLoading(false)
+  }, [token, fetchWrongQuizzesLocal, router])
 
+  useEffect(() => {
     loadQuizzes()
-  }, [token])
+  }, [])
+
+  // Refresh wrong questions list when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadQuizzes()
+    }, [])
+  )
 
   if (loading) {
     return <GraduationCap3DLoader />;

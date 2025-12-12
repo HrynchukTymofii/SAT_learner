@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { Text, TextInput, TouchableOpacity, View, ScrollView } from "react-native";
 import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { ArrowLeft, Heart, RotateCcw, Search, X } from "lucide-react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useQuizDatabase } from "@/lib/db/quiz";
@@ -29,25 +29,31 @@ export default function SavedQuizzesScreen() {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState("");
 
-  useEffect(() => {
+  const loadQuizzes = useCallback(async () => {
     if (!token) {
-      router.push("/login")
-      return
+      router.push("/login");
+      return;
     }
-
-    async function loadQuizzes() {
-      setLoading(true);
-      const res = await fetchSavedQuizzesLocal();
-      if (res.success) {
-        setQuizzes(res.quizzes ?? []);
-      } else {
-        console.warn("Failed to load saved quizzes:", res.error);
-      }
-      setLoading(false);
+    setLoading(true);
+    const res = await fetchSavedQuizzesLocal();
+    if (res.success) {
+      setQuizzes(res.quizzes ?? []);
+    } else {
+      console.warn("Failed to load saved quizzes:", res.error);
     }
+    setLoading(false);
+  }, [token, fetchSavedQuizzesLocal, router]);
 
+  useEffect(() => {
     loadQuizzes();
-  }, [token]);
+  }, []);
+
+  // Refresh saved questions list when screen comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      loadQuizzes();
+    }, [])
+  );
 
   if (loading) {
     return <GraduationCap3DLoader />;

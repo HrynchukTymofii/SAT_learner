@@ -137,8 +137,9 @@ function escapeHtml(text: string): string {
     ">": "&gt;",
     '"': "&quot;",
     "'": "&#039;",
+    "$": "&#36;", 
   };
-  return text.replace(/[&<>"']/g, (m) => map[m]);
+  return text.replace(/[&<>"'$]/g, (m) => map[m]);
 }
 
 
@@ -254,6 +255,7 @@ async function main() {
       points INTEGER DEFAULT 5,
       position INTEGER,
       hintImageUrl TEXT,
+      localHintImagePath TEXT,
       note TEXT,
       likes INTEGER DEFAULT 0,
       dislikes INTEGER DEFAULT 0,
@@ -398,15 +400,29 @@ async function main() {
     }
   }
 
-  // 3️⃣ Download images for all questions
+  // 3️⃣ Download images for all questions (both question images and hint images)
   const withLocalImages = await Promise.all(
     allQuestions.map((qq) =>
       limitImages(async () => {
         let localPath = null;
+        let localHintPath = null;
+
+        // Download question image
         if (qq.questionImageUrl) {
           localPath = await downloadImage(qq.questionImageUrl, qq.id);
         }
-        return { ...qq, localImagePath: localPath };
+
+        // Download hint image
+        if (qq.hintImageUrl) {
+          localHintPath = await downloadImage(qq.hintImageUrl, `${qq.id}_hint`);
+        }
+
+        return {
+          ...qq,
+          localImagePath: localPath,
+          localHintImagePath: localHintPath,
+          // hintImageUrl stays as original URL (already in qq.hintImageUrl)
+        };
       })
     )
   );
@@ -429,8 +445,8 @@ async function main() {
   db.serialize(() => {
     const stmt = db.prepare(
       `INSERT OR REPLACE INTO quiz_questions
-     (id, question, questionType, questionImageUrl, localImagePath, imageHeight, options, answers, hint, points, position, hintImageUrl, note, likes, dislikes, quizId, updatedAt)
-     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+     (id, question, questionType, questionImageUrl, localImagePath, imageHeight, options, answers, hint, points, position, hintImageUrl, localHintImagePath, note, likes, dislikes, quizId, updatedAt)
+     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
     );
 
     for (const qq of withHtmlContent) {
@@ -446,7 +462,8 @@ async function main() {
         qq.hintHtml, // Convert hint to HTML
         qq.points || 1,
         qq.position || 0,
-        qq.hintImageUrl || "",
+        qq.hintImageUrl || "", // Original hint image URL from API
+        qq.localHintImagePath || "", // Local hint image filename
         qq.noteHtml, // Convert note (explanation) to HTML
         qq.likes || 0,
         qq.dislikes || 0,

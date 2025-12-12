@@ -24,11 +24,11 @@ const onboardingData = [
     description:
       "Your complete SAT Math preparation platform with comprehensive lessons, practice problems, mock exams, and detailed test modes to help you achieve your target score.",
     image: require("@/assets/images/onboarding.png"),
-    badge: "800+ practice problems",
+    badge: "500+ practice problems",
   },
   {
     id: "2",
-    title: "Structured Learning\nPath",
+    title: "Learn and Revise\nEvery Topic",
     description:
       "Follow our expertly designed curriculum covering all SAT Math topics. From algebra to advanced problem-solving, master every concept step by step.",
     image: require("@/assets/images/onboarding.png"),

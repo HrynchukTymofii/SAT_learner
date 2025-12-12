@@ -65,8 +65,8 @@ export const upgradeToPro = async (token: string, plan: string) => {
 
 export const removePro = async (token: string) => {
   try {
-    const res = await api.post(
-      "/user/remove-pro",
+    const res = await api.patch(
+      "/user/upgrade",
       {},
       {
         headers: {

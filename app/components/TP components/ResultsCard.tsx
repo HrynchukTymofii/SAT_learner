@@ -16,6 +16,7 @@ interface ResultsCardProps {
     percentage: number;
     correctCount: number;
     totalQuestions: number;
+    satScore?: number;
   };
   pageType: "exam" | "topic" | "saved" | "random" | "wrong";
   backUrl: string;
@@ -24,7 +25,7 @@ interface ResultsCardProps {
   handleRetakeQuiz: () => void;
   handleBack: (needSave?: boolean) => void;
   showResults: boolean;
-  setShowResults: (show: boolean) => void; 
+  setShowResults: (show: boolean) => void;
   isDark?: boolean;
 }
 
@@ -91,6 +92,8 @@ export default function ResultsModal({
       return "Don't worry, keep practicing and you’ll get it!";
     }
   };
+
+  console.log(results)
 
 
   return (
@@ -206,10 +209,10 @@ export default function ResultsModal({
                 marginBottom: 4,
               }}
             >
-              {results.percentage}%
+              {pageType === "exam" && results.satScore ? results.satScore : `${results.percentage}%`}
             </Text>
             <Text style={{ fontSize: 14, color: isDark ? "#ccc" : "#555" }}>
-              Score
+              {pageType === "exam" ? "SAT Score" : "Score"}
             </Text>
           </View>
           <View style={{ alignItems: "center" }}>

@@ -1,9 +1,9 @@
 import { ExpoConfig } from "expo/config";
 
 const config: ExpoConfig = {
-  name: "SAT Prep App",
+  name: "SAT Math Learner",
   slug: "sat-prep-app",
-  version: "1.0.4",
+  version: "1.0.5",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
   scheme: "satprepapp",
@@ -14,12 +14,7 @@ const config: ExpoConfig = {
     supportsTablet: true,
     bundleIdentifier: "com.hrynchuk.satprepapp",
     buildNumber: "1",
-    icon: "./assets/images/ios-light.png",
-    // {
-    //   light: "./assets/images/ios-light.png",
-    //   dark: "./assets/images/ios-dark.png",
-    //   tinted: "./assets/images/ios-tinted.png",
-    // },
+    icon: "./assets/images/icon.png",
     infoPlist: {
       ITSAppUsesNonExemptEncryption: false,
     },
@@ -57,7 +52,7 @@ const config: ExpoConfig = {
     [
       "expo-splash-screen",
       {
-        image: "./assets/images/splash-icon-light.png",
+        image: "./assets/images/splash-icon.png",
         imageWidth: 200,
         resizeMode: "contain",
         backgroundColor: "#111827",
@@ -69,7 +64,7 @@ const config: ExpoConfig = {
       {
         icon: "./assets/images/icon.png",
         color: "#111827",
-        sounds: ["./assets/sounds/notification.wav"],
+        sounds: [],
       },
     ],
     [
@@ -97,7 +92,7 @@ const config: ExpoConfig = {
   },
 
   splash: {
-    image: "./assets/images/splash-icon-light.png",
+    image: "./assets/images/splash-icon.png",
     resizeMode: "contain",
     backgroundColor: "#111827",
   },
