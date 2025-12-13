@@ -112,7 +112,7 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
 
               if (res.success) {
                 setUser({ ...user, isPro: true });
-                console.log("✅ User upgraded to PRO via RevenueCat sync");
+                //console.log("✅ User upgraded to PRO via RevenueCat sync");
               } else {
                 console.warn("❌ Failed to sync PRO status:", res.error);
               }
@@ -120,7 +120,7 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
           } else {
             // User should NOT have PRO
             if (user.isPro) {
-              console.log("⚠️ PRO expired, removing access");
+              //console.log("⚠️ PRO expired, removing access");
               setUser({ ...user, isPro: false });
               await removePro(token);
             }
@@ -166,7 +166,7 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
     const setupNotifications = async () => {
       try {
         await scheduleDailyStudyReminder();
-        console.log("Daily study reminder scheduled successfully");
+        //console.log("Daily study reminder scheduled successfully");
       } catch (error) {
         console.error("Failed to schedule daily reminder:", error);
       }

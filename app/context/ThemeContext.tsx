@@ -25,7 +25,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const loadTheme = async () => {
       try {
         const stored = await AsyncStorage.getItem(THEME_STORAGE_KEY);
-        console.log('📱 Loaded theme from storage:', stored);
+        //console.log('📱 Loaded theme from storage:', stored);
         if (stored && (stored === 'light' || stored === 'dark' || stored === 'system')) {
           setThemeModeState(stored as ThemeMode);
         }
@@ -47,10 +47,10 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Function to update theme and persist to storage
   const setThemeMode = async (mode: ThemeMode) => {
     try {
-      console.log('💾 Saving theme to storage:', mode);
+      //console.log('💾 Saving theme to storage:', mode);
       setThemeModeState(mode);
       await AsyncStorage.setItem(THEME_STORAGE_KEY, mode);
-      console.log('✅ Theme saved successfully');
+      //console.log('✅ Theme saved successfully');
     } catch (error) {
       console.error('Failed to save theme preference:', error);
     }

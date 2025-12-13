@@ -95,7 +95,7 @@ const QuestionNumberButton = ({
 
   const handlePress = () => {
     if (isLocked) {
-      console.log("isLockedNB");
+      //console.log("isLockedNB");
       setIsProModalOpen(true);
       return;
     }

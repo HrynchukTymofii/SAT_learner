@@ -62,7 +62,7 @@ export function useLoadUserInBackground() {
         setUser(mappedUser);
 
         if (forceSync || res.user.needSync) {
-          console.log('here')
+          //console.log('here')
           await fetchAndStoreUserData(token);
           await upgradeToSync(token);
           const res = await checkAppNeedSync(); 
