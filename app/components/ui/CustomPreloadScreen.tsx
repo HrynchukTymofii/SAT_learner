@@ -1,10 +1,9 @@
-import { View, Text, Image, Animated } from "react-native";
+import { View, Text, Image, Animated, useColorScheme as useSystemColorScheme } from "react-native";
 import * as Progress from "react-native-progress";
 import { useEffect, useRef, useState } from "react";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { LinearGradient } from "expo-linear-gradient";
 import TopBlur from "./TobBlur";
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 const phrases = [
   "Preparing your SAT prep environment…",
@@ -19,9 +18,9 @@ export default function CustomPreloadScreen() {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const pulseAnim = useRef(new Animated.Value(1)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
-  const colorScheme = useColorScheme();
+  const colorScheme = useSystemColorScheme();
   const isDark = colorScheme === "dark";
-  console.log('PreloadScreen')
+  //console.log('PreloadScreen')
 
   useEffect(() => {
     // Fade animation for text

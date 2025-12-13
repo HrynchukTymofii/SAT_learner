@@ -87,7 +87,7 @@ export default function PaywallScreen() {
 
         setPackages({ monthly: monthly || null, yearly: yearly || null });
       } catch (e) {
-        console.log("Error fetching offerings:", e);
+        console.error("Error fetching offerings:", e);
       }
     };
     fetchOfferings();
@@ -132,7 +132,7 @@ export default function PaywallScreen() {
         }
       }
     } catch (e: any) {
-      console.log("Purchase error:", e);
+      console.error("Purchase error:", e);
       if (!e.userCancelled)
         Toast.show({
           type: "error",

@@ -5,8 +5,6 @@ import { Question } from "@/types";
 import { Bookmark, Lightbulb } from "lucide-react-native";
 import { TouchableOpacity, View } from "react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { TourTooltip } from "@/components/Tour/TourTooltip";
-import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
 
 interface QuestionTogglesProps {
   currentQuestion: Question;
@@ -17,13 +15,6 @@ interface QuestionTogglesProps {
   quizId: string;
   setQuestions: React.Dispatch<React.SetStateAction<Question[]>>;
   onHintPress: () => void;
-  // Tour props
-  tourActive?: boolean;
-  currentStep?: number;
-  handleTourNext?: () => void;
-  handleTourPrev?: () => void;
-  skipTour?: () => void;
-  isNumbersQuiz?: boolean;
 }
 
 const QuestionToggles = ({
@@ -35,12 +26,6 @@ const QuestionToggles = ({
   quizId,
   setQuestions,
   onHintPress,
-  tourActive = false,
-  currentStep = 0,
-  handleTourNext = () => {},
-  handleTourPrev = () => {},
-  skipTour = () => {},
-  isNumbersQuiz = false,
 }: QuestionTogglesProps) => {
   const {
     toggleSaveQuestionLocal,
@@ -118,42 +103,10 @@ const QuestionToggles = ({
   return (
     <View style={{ flexDirection: "row", gap: 8 }}>
       {/* Hint Button */}
-      {currentQuestion.hint && (
-        tourActive && currentStep === TOUR_STEPS.USE_HINT && isNumbersQuiz ? (
-          <TourTooltip
-            visible={true}
-            onNext={handleTourNext}
-            onPrev={handleTourPrev}
-            onSkip={skipTour}
-            onClose={() => {}}
-            title={getTourStepInfo(TOUR_STEPS.USE_HINT).title}
-            content={getTourStepInfo(TOUR_STEPS.USE_HINT).content}
-            stepNumber={TOUR_STEPS.USE_HINT + 1}
-            totalSteps={TOTAL_TOUR_STEPS}
-            placement="bottom"
-          >
-            {hintButton}
-          </TourTooltip>
-        ) : hintButton
-      )}
+      {currentQuestion.hint && hintButton}
 
       {/* Bookmark Button */}
-      {tourActive && currentStep === TOUR_STEPS.SAVE_QUESTION && isNumbersQuiz ? (
-        <TourTooltip
-          visible={true}
-          onNext={handleTourNext}
-          onPrev={handleTourPrev}
-          onSkip={skipTour}
-          onClose={() => {}}
-          title={getTourStepInfo(TOUR_STEPS.SAVE_QUESTION).title}
-          content={getTourStepInfo(TOUR_STEPS.SAVE_QUESTION).content}
-          stepNumber={TOUR_STEPS.SAVE_QUESTION + 1}
-          totalSteps={TOTAL_TOUR_STEPS}
-          placement="bottom"
-        >
-          {saveButton}
-        </TourTooltip>
-      ) : saveButton}
+      {saveButton}
     </View>
   );
 };

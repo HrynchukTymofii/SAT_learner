@@ -5,7 +5,6 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  useColorScheme,
   StyleSheet,
 } from "react-native";
 import { router, useFocusEffect } from "expo-router";
@@ -22,6 +21,7 @@ import {
 } from "react-native-safe-area-context";
 import { useAuth } from "@/context/AuthContext";
 import { useCourseDatabase } from "@/lib/db/course";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import {
   getStudyPlan,
   getDefaultPlanSuggestion,
@@ -548,7 +548,6 @@ export default function ExploreScreen() {
               className="-mx-6 px-6"
             >
               {weekDates.map((date, index) => {
-                const selected = isSameDay(date, selectedDate);
                 const today = isToday(date);
                 const isSATDay = satDate && isSameDay(date, new Date(satDate));
                 const dateKey = formatDateKey(date);
@@ -565,11 +564,9 @@ export default function ExploreScreen() {
                     className={`items-center justify-center mr-4 py-4 px-5 rounded-2xl ${
                       isSATDay
                         ? ""
-                        : selected
-                          ? "bg-cyan-500"
-                          : isDark
-                            ? "bg-gray-800"
-                            : "bg-white"
+                        : isDark
+                          ? "bg-gray-800"
+                          : "bg-white"
                     }`}
                     style={{
                       backgroundColor: isSATDay
@@ -583,22 +580,26 @@ export default function ExploreScreen() {
                   >
                     <Text
                       className={`text-3xl font-bold mb-1 ${
-                        isSATDay || selected
+                        isSATDay
                           ? "text-white"
-                          : isDark
-                            ? "text-white"
-                            : "text-gray-900"
+                          : today
+                            ? "text-cyan-500"
+                            : isDark
+                              ? "text-white"
+                              : "text-gray-900"
                       }`}
                     >
                       {formatDay(date)}
                     </Text>
                     <Text
                       className={`text-sm ${
-                        isSATDay || selected
+                        isSATDay
                           ? "text-white"
-                          : isDark
-                            ? "text-gray-400"
-                            : "text-gray-600"
+                          : today
+                            ? "text-cyan-400"
+                            : isDark
+                              ? "text-gray-400"
+                              : "text-gray-600"
                       }`}
                     >
                       {formatDayName(date)}
@@ -612,7 +613,7 @@ export default function ExploreScreen() {
                           minWidth: 16,
                           height: 16,
                           borderRadius: 8,
-                          backgroundColor: selected ? "#ffffff" : "#06B6D4",
+                          backgroundColor: "#06B6D4",
                           justifyContent: "center",
                           alignItems: "center",
                           paddingHorizontal: 4,
@@ -622,7 +623,7 @@ export default function ExploreScreen() {
                           style={{
                             fontSize: 10,
                             fontWeight: "700",
-                            color: selected ? "#06B6D4" : "#ffffff",
+                            color: "#ffffff",
                           }}
                         >
                           {taskCount}

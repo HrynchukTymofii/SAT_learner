@@ -13,6 +13,7 @@ import { useColorScheme } from "@/hooks/useColorScheme";
 import Toast from "react-native-toast-message";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { TourProvider } from "@/context/TourContext";
+import { ThemeProvider as CustomThemeProvider } from "@/context/ThemeContext";
 import { Suspense, useEffect, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { SQLiteProvider } from "expo-sqlite";
@@ -177,33 +178,9 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-export default function RootLayout() {
+function AppContent() {
   const colorScheme = useColorScheme();
-  const router = useRouter();
-  const [loaded] = useFonts({
-    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
-  });
 
-  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const checkOnboarding = async () => {
-      const done = await SecureStore.getItemAsync("onboardingCompleted");
-      setOnboardingDone(!!done);
-    };
-    checkOnboarding();
-  }, []);
-
-  useEffect(() => {
-    if (onboardingDone === false) {
-      router.replace("/onboarding");
-    }
-  }, [onboardingDone]);
-
-  // Wait until we know the onboarding status + fonts loaded
-  if (!loaded || onboardingDone === null) return <CustomPreloadScreen />;
-
-  // Otherwise show the normal app
   return (
     <AuthProvider>
       <TourProvider>
@@ -250,11 +227,44 @@ export default function RootLayout() {
               </Stack>
               <Toast />
               <StatusBar style="auto" />
-            </ThemeProvider>
-          </AppSyncWrapper>
-        </SQLiteProvider>
-      </Suspense>
+              </ThemeProvider>
+            </AppSyncWrapper>
+          </SQLiteProvider>
+        </Suspense>
       </TourProvider>
     </AuthProvider>
+  );
+}
+
+export default function RootLayout() {
+  const router = useRouter();
+  const [loaded] = useFonts({
+    SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+  });
+
+  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    const checkOnboarding = async () => {
+      const done = await SecureStore.getItemAsync("onboardingCompleted");
+      setOnboardingDone(!!done);
+    };
+    checkOnboarding();
+  }, []);
+
+  useEffect(() => {
+    if (onboardingDone === false) {
+      router.replace("/onboarding");
+    }
+  }, [onboardingDone]);
+
+  // Wait until we know the onboarding status + fonts loaded
+  if (!loaded || onboardingDone === null) return <CustomPreloadScreen />;
+
+  // Otherwise show the normal app
+  return (
+    <CustomThemeProvider>
+      <AppContent />
+    </CustomThemeProvider>
   );
 }

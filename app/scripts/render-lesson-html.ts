@@ -150,7 +150,7 @@ export async function fetchRenderedLessonHtml(
 
     // Otherwise, fetch it from the API
     if (!contentJson) {
-      console.log(`📡 Fetching lesson content for ${lessonId}...`);
+      //console.log(`📡 Fetching lesson content for ${lessonId}...`);
       const url = `${API_BASE_URL}/api/user/course/chapters`;
       const response = await axios.get(url);
 
@@ -454,7 +454,7 @@ export async function renderAllLessonsForChapter(
     const result = await fetchRenderedLessonHtml(chapterId, lessonId);
     if (result) {
       results.set(lessonId, result.combinedHtml);
-      console.log(`✅ Rendered lesson ${lessonId}`);
+      //console.log(`✅ Rendered lesson ${lessonId}`);
     } else {
       console.warn(`⚠️ Failed to render lesson ${lessonId}`);
     }

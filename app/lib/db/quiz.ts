@@ -830,7 +830,7 @@ export function useQuizDatabase() {
 
   async function applyAllQuizUpdatesLocally(updates: any[]) {
   if (!updates || updates.length === 0) {
-    console.log("ℹ️ No quiz updates to apply.");
+    //console.log("ℹ️ No quiz updates to apply.");
     return { success: true };
   }
 

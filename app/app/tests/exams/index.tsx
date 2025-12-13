@@ -47,46 +47,7 @@ export default function TestsByTopicScreen() {
     try {
       const res = await fetchExamsLocal();
       if (res.success) {
-        // DUMMY DATA FOR APP STORE SCREENSHOTS
-        // Uncomment this section to show completed exams with high scores
-        const dummyQuizzes: Quiz[] = [
-          {
-            id: "exam-1",
-            title: "SAT Math Practice Test 1",
-            questionCount: 44,
-            progress: 100, // 44/44 correct = 800 score
-            completed: true,
-            score: 800,
-            attemptCount: 1,
-            lastAttempt: new Date().toISOString(),
-          },
-          {
-            id: "exam-2",
-            title: "SAT Math Practice Test 2",
-            questionCount: 44,
-            progress: 81, // 42/44 correct = 770 score
-            completed: true,
-            score: 690,
-            attemptCount: 2,
-            lastAttempt: new Date(Date.now() - 86400000 * 2).toISOString(), // 2 days ago
-          },
-          {
-            id: "exam-3",
-            title: "SAT Math Practice Test 3",
-            questionCount: 44,
-            progress: 90.91, // 40/44 correct = 750 score
-            completed: true,
-            score: 750,
-            attemptCount: 1,
-            lastAttempt: new Date(Date.now() - 86400000 * 5).toISOString(), // 5 days ago
-          },
-        ];
-
-        // Comment out the line below to use real data instead of dummy data
-        setQuizzes(dummyQuizzes);
-
-        // Uncomment the line below to use real data
-        // setQuizzes(res.quizzes);
+        setQuizzes(res.quizzes);
       } else {
         console.warn("Failed to load quizzes:", res.error);
       }

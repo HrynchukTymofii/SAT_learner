@@ -26,7 +26,7 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
     }
 
     if (finalStatus !== "granted") {
-      console.log("Notification permissions not granted");
+      //console.log("Notification permissions not granted");
       return false;
     }
 

@@ -11,14 +11,24 @@ export default function TestDatesPage() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const testDates2024 = [
-    { month: "March", date: "9", registration: "February 23" },
-    { month: "May", date: "4", registration: "April 19" },
-    { month: "June", date: "1", registration: "May 17" },
-    { month: "August", date: "24", registration: "August 9" },
-    { month: "October", date: "5", registration: "September 20" },
-    { month: "November", date: "2", registration: "October 18" },
-    { month: "December", date: "7", registration: "November 22" },
+  const testDatesSpring2026 = [
+    { month: "March", date: "14", year: "2026", registration: "February 27 / March 3, 2026" },
+    { month: "May", date: "2", year: "2026", registration: "April 17 / April 21, 2026" },
+    { month: "June", date: "6", year: "2026", registration: "May 22 / May 26, 2026" },
+  ];
+
+  const testDatesFall2026 = [
+    { month: "August", date: "15", year: "2026", registration: "TBA" },
+    { month: "September", date: "12", year: "2026", registration: "TBA" },
+    { month: "October", date: "3", year: "2026", registration: "TBA" },
+    { month: "November", date: "7", year: "2026", registration: "TBA" },
+    { month: "December", date: "5", year: "2026", registration: "TBA" },
+  ];
+
+  const testDatesSpring2027 = [
+    { month: "March", date: "13", year: "2027", registration: "TBA" },
+    { month: "May", date: "1", year: "2027", registration: "TBA" },
+    { month: "June", date: "5", year: "2027", registration: "TBA" },
   ];
 
   const registrationSteps = [
@@ -126,7 +136,7 @@ export default function TestDatesPage() {
         contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
         showsVerticalScrollIndicator={false}
       >
-        {/* 2024-2025 Test Dates */}
+        {/* Spring 2026 Test Dates */}
         <View style={{ marginBottom: 24 }}>
           <Text
             style={{
@@ -136,10 +146,10 @@ export default function TestDatesPage() {
               marginBottom: 16,
             }}
           >
-            2024-2025 SAT Test Dates
+            Spring 2026 SAT Test Dates
           </Text>
 
-          {testDates2024.map((item, index) => (
+          {testDatesSpring2026.map((item, index) => (
             <View
               key={index}
               style={{
@@ -168,7 +178,7 @@ export default function TestDatesPage() {
                     marginBottom: 4,
                   }}
                 >
-                  {item.month} {item.date}, 2024
+                  {item.month} {item.date}, {item.year}
                 </Text>
                 <Text
                   style={{
@@ -180,6 +190,122 @@ export default function TestDatesPage() {
                 </Text>
               </View>
               <Calendar size={24} color="#8B5CF6" />
+            </View>
+          ))}
+        </View>
+
+        {/* Fall 2026 Test Dates */}
+        <View style={{ marginBottom: 24 }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "700",
+              color: isDark ? "#ffffff" : "#1f2937",
+              marginBottom: 16,
+            }}
+          >
+            Fall 2026 SAT Test Dates
+          </Text>
+
+          {testDatesFall2026.map((item, index) => (
+            <View
+              key={index}
+              style={{
+                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                borderRadius: 16,
+                padding: 20,
+                marginBottom: 12,
+                borderLeftWidth: 4,
+                borderLeftColor: "#06B6D4",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "700",
+                    color: isDark ? "#ffffff" : "#1f2937",
+                    marginBottom: 4,
+                  }}
+                >
+                  {item.month} {item.date}, {item.year}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: isDark ? "#9ca3af" : "#6b7280",
+                  }}
+                >
+                  Registration Deadline: {item.registration}
+                </Text>
+              </View>
+              <Calendar size={24} color="#06B6D4" />
+            </View>
+          ))}
+        </View>
+
+        {/* Spring 2027 Test Dates */}
+        <View style={{ marginBottom: 24 }}>
+          <Text
+            style={{
+              fontSize: 20,
+              fontWeight: "700",
+              color: isDark ? "#ffffff" : "#1f2937",
+              marginBottom: 16,
+            }}
+          >
+            Spring 2027 SAT Test Dates
+          </Text>
+
+          {testDatesSpring2027.map((item, index) => (
+            <View
+              key={index}
+              style={{
+                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                borderRadius: 16,
+                padding: 20,
+                marginBottom: 12,
+                borderLeftWidth: 4,
+                borderLeftColor: "#10B981",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 2 },
+                shadowOpacity: 0.1,
+                shadowRadius: 8,
+                elevation: 3,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <View style={{ flex: 1 }}>
+                <Text
+                  style={{
+                    fontSize: 18,
+                    fontWeight: "700",
+                    color: isDark ? "#ffffff" : "#1f2937",
+                    marginBottom: 4,
+                  }}
+                >
+                  {item.month} {item.date}, {item.year}
+                </Text>
+                <Text
+                  style={{
+                    fontSize: 14,
+                    color: isDark ? "#9ca3af" : "#6b7280",
+                  }}
+                >
+                  Registration Deadline: {item.registration}
+                </Text>
+              </View>
+              <Calendar size={24} color="#10B981" />
             </View>
           ))}
         </View>

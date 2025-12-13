@@ -9,6 +9,7 @@ import Animated, {
   Easing,
 } from "react-native-reanimated";
 import { useAuth } from "@/context/AuthContext";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 const AnimatedPath = Animated.createAnimatedComponent(Path);
 const AnimatedPolygon = Animated.createAnimatedComponent(Polygon);
@@ -16,6 +17,8 @@ const AnimatedEllipse = Animated.createAnimatedComponent(Ellipse);
 
 export default function GraduationCap3DLoader() {
   const { user } = useAuth();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
   const progress = useSharedValue(0);
 
   // Golden color for PRO users, cyan for free users
@@ -54,7 +57,14 @@ export default function GraduationCap3DLoader() {
   });
 
   return (
-    <View className="flex-1 items-center justify-center bg-white dark:bg-gray-900">
+    <View
+      style={{
+        flex: 1,
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: isDark ? "#111827" : "#ffffff",
+      }}
+    >
       <Svg width={140} height={120} viewBox="0 0 140 120">
         {/* Top 3D square (mortarboard) */}
         <AnimatedPolygon

@@ -21,6 +21,7 @@ import { useAuth } from "@/context/AuthContext";
 import { updateUser, deleteUserAccount } from "@/lib/api/user";
 import Toast from "react-native-toast-message";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -32,10 +33,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
-
-  const [preferredScheme, setPreferredScheme] = useState<
-    "light" | "dark" | "system"
-  >("system");
+  const { themeMode, setThemeMode } = useTheme();
 
   const themeOptions: {
     label: string;
@@ -181,7 +179,7 @@ export default function SettingsScreen() {
             {themeOptions.map((option) => (
               <Pressable
                 key={option.value}
-                onPress={() => setPreferredScheme(option.value)}
+                onPress={() => setThemeMode(option.value)}
                 style={{
                   flexDirection: "row",
                   alignItems: "center",
@@ -194,12 +192,12 @@ export default function SettingsScreen() {
                     height: 20,
                     borderRadius: 10,
                     borderWidth: 2,
-                    borderColor: preferredScheme === option.value ? "#06B6D4" : (isDark ? "#6b7280" : "#9ca3af"),
+                    borderColor: themeMode === option.value ? "#06B6D4" : (isDark ? "#6b7280" : "#9ca3af"),
                     alignItems: "center",
                     justifyContent: "center",
                   }}
                 >
-                  {preferredScheme === option.value && (
+                  {themeMode === option.value && (
                     <View
                       style={{
                         width: 10,

@@ -9,6 +9,7 @@ import {
   Platform,
   Image,
   ActivityIndicator,
+  Linking,
 } from "react-native";
 import { useAuth } from "../context/AuthContext";
 import { router } from "expo-router";
@@ -25,6 +26,7 @@ import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
 import { AppleLoginButton } from "@/components/AppleLoginButton";
 import { handleAppleLogin } from "@/hooks/useAppleLogin";
 import { useLoadUserInBackground } from "@/lib/user";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 // Configure Google Sign-In
 GoogleSignin.configure({
@@ -48,6 +50,8 @@ export default function AuthScreen() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const { setToken, setUser } = useAuth();
   const { loadUserInBackground } = useLoadUserInBackground();
+  const colorScheme = useColorScheme();
+  const isDark = colorScheme === "dark";
 
   const returnUrl = params.get("returnUrl");
   const safeReturnUrl =
@@ -320,10 +324,18 @@ export default function AuthScreen() {
     }
   };
 
+  const handleBack = () => {
+    if (router.canGoBack()) {
+      router.back();
+    } else {
+      router.replace("/");
+    }
+  };
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      className="flex-1 bg-white dark:bg-gray-900"
+      style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#ffffff" }}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -331,19 +343,28 @@ export default function AuthScreen() {
         bounces={false}
       >
         {/* Header with Back Button */}
-        <View className="pt-12 pl-6 pb-6">
+        <View style={{ paddingTop: 48, paddingLeft: 24, paddingBottom: 24 }}>
           <TouchableOpacity
-            onPress={() => router.back()}
+            onPress={handleBack}
             activeOpacity={0.7}
-            className="mb-6"
+            style={{ marginBottom: 24 }}
           >
             <ArrowLeft size={24} color="#06B6D4" />
           </TouchableOpacity>
 
-          <Text className="text-4xl font-bold text-gray-900 dark:text-white">
+          <Text style={{
+            fontSize: 36,
+            fontWeight: "bold",
+            color: isDark ? "#ffffff" : "#111827"
+          }}>
             {mode === "login" ? "Welcome Back! 👋" : "Start Your Journey ✨"}
           </Text>
-          <Text className="text-gray-600 dark:text-gray-300 mt-3 pr-6 leading-6">
+          <Text style={{
+            color: isDark ? "#d1d5db" : "#4b5563",
+            marginTop: 12,
+            paddingRight: 24,
+            lineHeight: 24
+          }}>
             {mode === "login"
               ? "Continue your SAT Math preparation and ace your exam"
               : "Join thousands of students mastering SAT Math. Sign up to get started"}
@@ -351,14 +372,27 @@ export default function AuthScreen() {
         </View>
 
         {/* Form Container */}
-        <View className="px-6 flex-1">
+        <View style={{ paddingHorizontal: 24, flex: 1 }}>
           {/* Email Input */}
-          <View className="mb-4">
-            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Email</Text>
-            <View className="flex-row items-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2">
+          <View style={{ marginBottom: 16 }}>
+            <Text style={{
+              color: isDark ? "#d1d5db" : "#374151",
+              marginBottom: 8,
+              fontWeight: "500"
+            }}>Email</Text>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: isDark ? "#1f2937" : "#f9fafb",
+              borderWidth: 1,
+              borderColor: isDark ? "#374155" : "#e5e7eb",
+              borderRadius: 12,
+              paddingHorizontal: 16,
+              paddingVertical: Platform.OS === 'ios' ? 16 : 8
+            }}>
               <Mail size={20} color="#06B6D4" />
               <TextInput
-                className="flex-1 ml-3 text-gray-900 dark:text-white"
+                style={{ flex: 1, marginLeft: 12, color: isDark ? "#ffffff" : "#111827" }}
                 placeholder="Your email"
                 placeholderTextColor="#9CA3AF"
                 value={email}
@@ -371,12 +405,25 @@ export default function AuthScreen() {
           </View>
 
           {/* Password Input */}
-          <View className="mb-4">
-            <Text className="text-gray-700 dark:text-gray-300 mb-2 font-medium">Password</Text>
-            <View className="flex-row items-center bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl px-4 py-2">
+          <View style={{ marginBottom: 16 }}>
+            <Text style={{
+              color: isDark ? "#d1d5db" : "#374151",
+              marginBottom: 8,
+              fontWeight: "500"
+            }}>Password</Text>
+            <View style={{
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: isDark ? "#1f2937" : "#f9fafb",
+              borderWidth: 1,
+              borderColor: isDark ? "#374155" : "#e5e7eb",
+              borderRadius: 12,
+              paddingHorizontal: 16,
+              paddingVertical: Platform.OS === 'ios' ? 16 : 8
+            }}>
               <Lock size={20} color="#06B6D4" />
               <TextInput
-                className="flex-1 ml-3 text-gray-900 dark:text-white"
+                style={{ flex: 1, marginLeft: 12, color: isDark ? "#ffffff" : "#111827" }}
                 placeholder="Your password"
                 placeholderTextColor="#9CA3AF"
                 secureTextEntry={!showPassword}
@@ -413,25 +460,33 @@ export default function AuthScreen() {
 
           {/* Terms & Conditions (Register Mode) */}
           {mode === "register" && (
-            <View className="flex-row items-start mb-6">
+            <View style={{ flexDirection: "row", alignItems: "flex-start", marginBottom: 24 }}>
               <TouchableOpacity
                 onPress={() => setAgreeToTerms(!agreeToTerms)}
                 activeOpacity={0.7}
-                className="mr-3 mt-0.5"
+                style={{ marginRight: 12, marginTop: 2 }}
               >
                 <View
-                  className={`w-5 h-5 rounded border-2 items-center justify-center ${
-                    agreeToTerms
-                      ? "bg-cyan-500 border-cyan-500"
-                      : "border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800"
-                  }`}
+                  style={{
+                    width: 20,
+                    height: 20,
+                    borderRadius: 4,
+                    borderWidth: 2,
+                    borderColor: agreeToTerms ? "#06B6D4" : (isDark ? "#4b5563" : "#d1d5db"),
+                    backgroundColor: agreeToTerms ? "#06B6D4" : (isDark ? "#1f2937" : "#ffffff"),
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}
                 >
-                  {agreeToTerms && <Text className="text-white text-xs">✓</Text>}
+                  {agreeToTerms && <Text style={{ color: "#ffffff", fontSize: 12 }}>✓</Text>}
                 </View>
               </TouchableOpacity>
-              <Text className="flex-1 text-gray-700 dark:text-gray-300 text-sm">
+              <Text style={{ flex: 1, color: isDark ? "#d1d5db" : "#374151", fontSize: 14 }}>
                 I agree to SAT Math Learner{" "}
-                <Text className="text-cyan-500 dark:text-cyan-400 font-medium">
+                <Text
+                  style={{ color: isDark ? "#22d3ee" : "#06B6D4", fontWeight: "500" }}
+                  onPress={() => Linking.openURL("https://www.satlearner.com/privacy-policy")}
+                >
                   Terms & Conditions
                 </Text>
                 .
@@ -444,31 +499,47 @@ export default function AuthScreen() {
             onPress={handleEmailAuth}
             disabled={loading}
             activeOpacity={0.8}
-            className="bg-cyan-500 rounded-full py-4 items-center justify-center mb-6"
+            style={{
+              backgroundColor: "#06B6D4",
+              borderRadius: 24,
+              paddingVertical: 16,
+              alignItems: "center",
+              justifyContent: "center",
+              marginBottom: 24
+            }}
           >
             {loading ? (
               <ActivityIndicator color="#ffffff" />
             ) : (
-              <Text className="text-white font-semibold text-base">
+              <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 16 }}>
                 {mode === "login" ? "Sign in" : "Sign up"}
               </Text>
             )}
           </TouchableOpacity>
 
           {/* Divider */}
-          <View className="flex-row items-center mb-6">
-            <View className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
-            <Text className="mx-4 text-gray-500 dark:text-gray-400">or continue with</Text>
-            <View className="flex-1 h-px bg-gray-200 dark:bg-gray-700" />
+          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24 }}>
+            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#374155" : "#e5e7eb" }} />
+            <Text style={{ marginHorizontal: 16, color: isDark ? "#9ca3af" : "#6b7280" }}>or continue with</Text>
+            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#374155" : "#e5e7eb" }} />
           </View>
 
           {/* Social Login Buttons */}
-          <View className="flex-row justify-center items-center gap-x-8 mb-6">
+          <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 32, marginBottom: 24 }}>
             <TouchableOpacity
               onPress={handleGoogleAuth}
               disabled={googleLoading}
               activeOpacity={0.7}
-              className="w-28 h-16 rounded-full border border-gray-200 dark:border-gray-700 items-center justify-center bg-white dark:bg-gray-800"
+              style={{
+                width: 112,
+                height: 64,
+                borderRadius: 48,
+                borderWidth: 1,
+                borderColor: isDark ? "#374155" : "#e5e7eb",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: isDark ? "#1f2937" : "#ffffff"
+              }}
             >
               {googleLoading ? (
                 <ActivityIndicator size="small" color="#06B6D4" />
@@ -492,7 +563,16 @@ export default function AuthScreen() {
                   })
                 }
                 activeOpacity={0.7}
-                className="w-28 h-16 rounded-full border border-gray-200 dark:border-gray-700 items-center justify-center bg-white dark:bg-gray-800"
+                style={{
+                  width: 112,
+                  height: 64,
+                  borderRadius: 48,
+                  borderWidth: 1,
+                  borderColor: isDark ? "#374155" : "#e5e7eb",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: isDark ? "#1f2937" : "#ffffff"
+                }}
               >
                 <Image
                   source={require("@/assets/images/apple-logo.png")}
@@ -502,8 +582,8 @@ export default function AuthScreen() {
             )}
           </View>
           {/* Toggle to other mode */}
-          <View className="flex-row justify-center items-center mt-auto mb-24">
-            <Text className="text-gray-600 dark:text-gray-400">
+          <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: "auto", marginBottom: 96 }}>
+            <Text style={{ color: isDark ? "#9ca3af" : "#4b5563" }}>
               {mode === "login"
                 ? "Don't have an account? "
                 : "Already have an account? "}
@@ -512,7 +592,7 @@ export default function AuthScreen() {
               onPress={() => setMode(mode === "login" ? "register" : "login")}
               activeOpacity={0.7}
             >
-              <Text className="text-cyan-500 dark:text-cyan-400 font-medium">
+              <Text style={{ color: isDark ? "#22d3ee" : "#06B6D4", fontWeight: "500" }}>
                 {mode === "login" ? "Sign up" : "Sign in"}
               </Text>
             </TouchableOpacity>

@@ -8,6 +8,7 @@ import {
   TextInput,
   StyleSheet,
   Dimensions,
+  Platform,
 } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
 import { useAuth } from "@/context/AuthContext";
@@ -352,8 +353,8 @@ export default function HomeScreen() {
                 </Text>
 
                 {/* Footer */}
-                <View style={styles.footerRow}>
-                  {/* Progress Badge */}
+                {/* <View style={styles.footerRow}>
+                  
                   <View
                     style={[
                       styles.badge,
@@ -371,16 +372,14 @@ export default function HomeScreen() {
                     </Text>
                   </View>
 
-                  {/* Lock Icon and More */}
+                 
                   <View style={styles.actionsRow}>
                     {isLocked && (
                       <Lock size={16} color="#2563eb" style={styles.lockIcon} />
                     )}
-                    {/* <TouchableOpacity activeOpacity={0.7}>
-                      <MoreVertical size={20} color={isDark ? "#94a3b8" : "#6b7280"} />
-                    </TouchableOpacity> */}
+                   
                   </View>
-                </View>
+                </View> */}
               </TouchableOpacity>
             );
 
@@ -456,7 +455,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 12,
     paddingHorizontal: 16,
-    paddingVertical: 6,
+    paddingVertical: Platform.OS === 'ios' ? 12 : 6,
   },
   searchInput: {
     flex: 1,
@@ -515,7 +514,7 @@ const styles = StyleSheet.create({
   },
   statsText: {
     fontSize: 14,
-    marginBottom: 16,
+    marginBottom: 8,
   },
   footerRow: {
     flexDirection: "row",

@@ -14,7 +14,7 @@ import {
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { resetQuiz, submitQuizAnswers, updateUserPoints } from "@/lib/api/quiz";
-import { useColorScheme } from "nativewind";
+import { useColorScheme } from "@/hooks/useColorScheme";
 import { useQuizDatabase } from "@/lib/db/quiz";
 import { useAuth } from "@/context/AuthContext";
 import { enqueueOfflineAction } from "@/lib/offlineQueue";
@@ -111,7 +111,7 @@ const TestsPage = ({
 }: TestsPageProps) => {
   const router = useRouter();
   const navigation = useNavigation();
-  const { colorScheme } = useColorScheme();
+  const colorScheme = useColorScheme();
 
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<
@@ -764,7 +764,7 @@ const TestsPage = ({
 
         // Calculate SAT Math Score (200-800)
         satScore = calculateSATScore(correctCount, totalQuestions);
-        console.log(satScore)
+        //console.log(satScore)
 
         // Award points based on performance
         let pointsEarned = correctCount; // Base points from correct answers
@@ -1039,12 +1039,6 @@ const TestsPage = ({
               quizId={quiz.id}
               setQuestions={setQuestions}
               onHintPress={() => setIsHintModalOpen(true)}
-              tourActive={tourActive}
-              currentStep={currentStep}
-              handleTourNext={handleTourNext}
-              handleTourPrev={handleTourPrev}
-              skipTour={skipTour}
-              isNumbersQuiz={isNumbersQuiz}
             />
           </View>
 

@@ -92,7 +92,7 @@ export default function OnboardingScreen() {
         animated: true,
       });
     } else {
-      router.replace('/auth')
+      router.replace('/auth' as any)
     }
   };
 
@@ -228,7 +228,11 @@ export default function OnboardingScreen() {
                         colors={["#14B8A6", "#06B6D4"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
-                        className="py-4 items-center justify-center"
+                        style={{
+                          paddingVertical: 16,
+                          alignItems: 'center',
+                          justifyContent: 'center'
+                        }}
                       >
                         <Text className="text-white font-semibold text-base">
                           Continue
@@ -245,7 +249,11 @@ export default function OnboardingScreen() {
                       colors={["#14B8A6", "#06B6D4"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
-                      className="py-4 items-center justify-center"
+                      style={{
+                        paddingVertical: 16,
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}
                     >
                       <Text className="text-white font-semibold text-base">
                         Let's Get Started

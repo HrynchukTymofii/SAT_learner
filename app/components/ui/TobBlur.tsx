@@ -1,11 +1,22 @@
 import React from "react";
-import { StyleSheet, useColorScheme } from "react-native";
+import { StyleSheet, useColorScheme as useSystemColorScheme } from "react-native";
 import { BlurView } from "expo-blur";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useTheme } from "@/context/ThemeContext";
 
 export default function TopBlur() {
   const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
+
+  // Try to use custom theme, fall back to system theme if not in provider
+  let colorScheme: "light" | "dark";
+  try {
+    const { colorScheme: themeColorScheme } = useTheme();
+    colorScheme = themeColorScheme;
+  } catch {
+    // Fall back to system color scheme if not in ThemeProvider
+    const systemColorScheme = useSystemColorScheme();
+    colorScheme = systemColorScheme === "dark" ? "dark" : "light";
+  }
 
   // Choose tint based on theme
   const tint = colorScheme === "light" ? "light" : "dark";

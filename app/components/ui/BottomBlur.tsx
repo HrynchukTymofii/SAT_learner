@@ -1,6 +1,7 @@
 import React from "react";
-import { View, StyleSheet, useColorScheme } from "react-native";
+import { View, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { useColorScheme } from "@/hooks/useColorScheme";
 
 export default function BottomBlur() {
   const insets = useSafeAreaInsets();
