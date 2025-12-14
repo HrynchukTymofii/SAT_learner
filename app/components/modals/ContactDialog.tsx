@@ -29,7 +29,7 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
 
   useEffect(() => {
     if (topic === "mistake") {
-      setMessage("Test number:\nTopic number:\n\nMessage:");
+      setMessage("Topic name:\nProblem number:\n\nMessage:");
     } else {
       setMessage("");
     }

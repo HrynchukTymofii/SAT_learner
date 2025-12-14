@@ -72,13 +72,13 @@ export default function OnboardingScreen() {
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter()
   const colorScheme = useColorScheme();
-  useEffect(() => {
-      console.log("🧠 Onboarding mounted");
+  // useEffect(() => {
+  //     console.log("🧠 Onboarding mounted");
   
-      return () => {
-        console.log("🧹 Onboarding unmounted");
-      };
-    }, []);
+  //     return () => {
+  //       console.log("🧹 Onboarding unmounted");
+  //     };
+  //   }, []);
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { x: scrollX } } }],

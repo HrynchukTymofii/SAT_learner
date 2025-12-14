@@ -231,7 +231,7 @@ export default function LessonScreen() {
                 inset: 0,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#111827" : "#ffffff",
                 zIndex: 10,
               }}
             >
@@ -254,7 +254,7 @@ export default function LessonScreen() {
             scrollEnabled={false}
             customStyle={
             isDark
-              ? `html, body { margin:0; background-color: #1e293b; color: #f5f5f4;} .expo-content {background-color: #1e293b; color: #f5f5f4; padding: 8px } .expo-content blockquote {
+              ? `html, body { margin:0; background-color: #111827; color: #f5f5f4;} .expo-content {background-color: #111827; color: #f5f5f4; padding: 8px } .expo-content blockquote {
         --blockquote-bg-color: #b7c1cf !important;
       }`
               : ""
