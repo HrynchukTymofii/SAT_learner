@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   View,
   Text,
@@ -25,7 +25,7 @@ import {
   Crown,
   ThumbsUp,
 } from "lucide-react-native";
-import { useRouter } from "expo-router";
+import { useRouter, useFocusEffect } from "expo-router";
 import { getUserData } from "@/lib/api/user";
 import Toast from "react-native-toast-message";
 import { useColorScheme } from "@/hooks/useColorScheme";
@@ -276,66 +276,73 @@ export default function ProfileScreen() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    (async () => {
-      const SAT_EXAMS_CHAPTER_ID = "8d3703a4-41ce-46b0-a27c-e25c0a0702e2";
+  // Load stats when page comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      (async () => {
+        const SAT_EXAMS_CHAPTER_ID = "8d3703a4-41ce-46b0-a27c-e25c0a0702e2";
 
-      const lessonsRes = await getCompletedLessonsCount();
-      const quizzesRes = await getCompletedQuizzesCount();
-      const avgSatScoreRes = await getAverageScoreByChapter(SAT_EXAMS_CHAPTER_ID);
-      const have100 = await hasPerfectScoreInPublishedChapters();
-      const highScoreRes = await hasHighSATScore(SAT_EXAMS_CHAPTER_ID);
+        const lessonsRes = await getCompletedLessonsCount();
+        const quizzesRes = await getCompletedQuizzesCount();
+        const avgSatScoreRes = await getAverageScoreByChapter(SAT_EXAMS_CHAPTER_ID);
+        const have100 = await hasPerfectScoreInPublishedChapters();
+        const highScoreRes = await hasHighSATScore(SAT_EXAMS_CHAPTER_ID);
 
-      const newLessonsCount = lessonsRes.success ? (lessonsRes.count ?? 0) : 0;
-      const newQuizzesCount = quizzesRes.success ? (quizzesRes.count ?? 0) : 0;
-      const newAverageScore = avgSatScoreRes.success ? (avgSatScoreRes.average ?? 0) : 0;
-      const newHasHighScore = highScoreRes.success ? (highScoreRes.hasHighScore ?? false) : false;
+        const newLessonsCount = lessonsRes.success ? (lessonsRes.count ?? 0) : 0;
+        const newQuizzesCount = quizzesRes.success ? (quizzesRes.count ?? 0) : 0;
+        const newAverageScore = avgSatScoreRes.success ? (avgSatScoreRes.average ?? 0) : 0;
+        const newHasHighScore = highScoreRes.success ? (highScoreRes.hasHighScore ?? false) : false;
 
-      setLessonsCount(newLessonsCount);
-      setQuizzesCount(newQuizzesCount);
-      setAverageSatScore(newAverageScore);
-      setHave100Quiz(have100.hasPerfectScore || false);
-      setHasHighScore(newHasHighScore);
+        setLessonsCount(newLessonsCount);
+        setQuizzesCount(newQuizzesCount);
+        setAverageSatScore(newAverageScore);
+        setHave100Quiz(have100.hasPerfectScore || false);
+        setHasHighScore(newHasHighScore);
 
-      setAchievements(
-        getDynamicAchievements({
-          lessonsCount: newLessonsCount,
-          quizzesCount: newQuizzesCount,
-          averageSatScore: newAverageScore,
-          has100Quiz: have100.hasPerfectScore || false,
-          hasHighScore: newHasHighScore,
-        })
-      );
-    })();
-  }, []);
+        setAchievements(
+          getDynamicAchievements({
+            lessonsCount: newLessonsCount,
+            quizzesCount: newQuizzesCount,
+            averageSatScore: newAverageScore,
+            has100Quiz: have100.hasPerfectScore || false,
+            hasHighScore: newHasHighScore,
+          })
+        );
+      })();
+    }, [])
+  );
 
-  useEffect(() => {
-    if (!token) {
-      router.push({ pathname: "/login", params: { returnUrl: "/profile" } });
-      return;
-    }
-
-    const load = async () => {
-      try {
-        const res = await getUserData(token);
-        if (res.success) {
-          const mappedUser: UserType = {
-            ...res.user,
-            categories: res.user.league,
-          };
-          setUser(mappedUser);
-        } else {
-          setError(res.error || "Error loading data");
-        }
-      } catch {
-        setError("An unexpected error occurred");
-      } finally {
-        setLoading(false);
+  // Load user data when page comes into focus
+  useFocusEffect(
+    useCallback(() => {
+      if (!token) {
+        router.push({ pathname: "/login", params: { returnUrl: "/profile" } });
+        return;
       }
-    };
 
-    load();
-  }, [token]);
+      const load = async () => {
+        try {
+          setLoading(true);
+          const res = await getUserData(token);
+          if (res.success) {
+            const mappedUser: UserType = {
+              ...res.user,
+              categories: res.user.league,
+            };
+            setUser(mappedUser);
+          } else {
+            setError(res.error || "Error loading data");
+          }
+        } catch {
+          setError("An unexpected error occurred");
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      load();
+    }, [token])
+  );
 
   useEffect(() => {
     const loadAnswers = async () => {
@@ -377,7 +384,7 @@ export default function ProfileScreen() {
         Linking.openURL(appStoreLink).catch(() => Linking.openURL(webLink));
       } else if (Platform.OS === "android") {
         const playStoreLink = "market://details?id=com.hrynchuk.pdrtests";
-        const webLink = "https://play.google.com/store/apps/details?id=com.hrynchuk.satprep";
+        const webLink = "https://play.google.com/store/apps/details?id=com.hrynchuk.satprepapp";
 
         Linking.openURL(playStoreLink).catch(() => Linking.openURL(webLink));
       }

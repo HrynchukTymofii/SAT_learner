@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   View,
   Text,
@@ -23,15 +23,17 @@ const onboardingData = [
     title: "Master SAT Math\nWith Confidence",
     description:
       "Your complete SAT Math preparation platform with comprehensive lessons, practice problems, mock exams, and detailed test modes to help you achieve your target score.",
-    image: require("@/assets/images/onboarding.png"),
-    badge: "500+ practice problems",
+    imageLight: require("@/assets/images/onboarding1l.png"),
+    imageDark: require("@/assets/images/onboarding1d.png"),
+    badge: "700+ practice problems",
   },
   {
     id: "2",
     title: "Learn and Revise\nEvery Topic",
     description:
       "Follow our expertly designed curriculum covering all SAT Math topics. From algebra to advanced problem-solving, master every concept step by step.",
-    image: require("@/assets/images/onboarding.png"),
+    imageLight: require("@/assets/images/onboarding2l.png"),
+    imageDark: require("@/assets/images/onboarding2d.png"),
     badge: "Complete SAT curriculum",
   },
   {
@@ -39,7 +41,8 @@ const onboardingData = [
     title: "Practice Like\nThe Real Exam",
     description:
       "Take full-length practice exams, timed tests, and review your mistakes. Track your progress and identify areas that need improvement.",
-    image: require("@/assets/images/onboarding.png"),
+    imageLight: require("@/assets/images/onboarding3l.png"),
+    imageDark: require("@/assets/images/onboarding3d.png"),
     badge: "Real exam experience",
   },
 ];
@@ -69,6 +72,13 @@ export default function OnboardingScreen() {
   const flatListRef = useRef<FlatList>(null);
   const router = useRouter()
   const colorScheme = useColorScheme();
+  useEffect(() => {
+      console.log("🧠 Onboarding mounted");
+  
+      return () => {
+        console.log("🧹 Onboarding unmounted");
+      };
+    }, []);
 
   const handleScroll = Animated.event(
     [{ nativeEvent: { contentOffset: { x: scrollX } } }],
@@ -138,7 +148,7 @@ export default function OnboardingScreen() {
               className="items-center"
             >
               <Image
-                source={item.image}
+                source={colorScheme === 'dark' ? item.imageDark : item.imageLight}
                 style={{
                   width: width * 0.75,
                   height: undefined,

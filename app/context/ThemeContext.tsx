@@ -18,7 +18,6 @@ const THEME_STORAGE_KEY = '@app_theme_preference';
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const systemColorScheme = useSystemColorScheme();
   const [themeMode, setThemeModeState] = useState<ThemeMode>('system');
-  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load theme preference from storage on mount
   useEffect(() => {
@@ -31,8 +30,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         }
       } catch (error) {
         console.error('Failed to load theme preference:', error);
-      } finally {
-        setIsLoaded(true);
       }
     };
     loadTheme();
@@ -55,11 +52,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       console.error('Failed to save theme preference:', error);
     }
   };
-
-  // Don't render children until theme is loaded to prevent flash
-  if (!isLoaded) {
-    return null;
-  }
 
   return (
     <ThemeContext.Provider value={{ themeMode, colorScheme, setThemeMode }}>

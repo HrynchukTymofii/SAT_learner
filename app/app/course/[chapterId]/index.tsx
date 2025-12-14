@@ -339,7 +339,7 @@ export default function ChapterScreen() {
                     color: isDark ? "#ffffff" : "#1f2937",
                     marginBottom: 4,
                   }}
-                  numberOfLines={2}
+                  numberOfLines={1}
                 >
                   {item.title}
                 </Text>

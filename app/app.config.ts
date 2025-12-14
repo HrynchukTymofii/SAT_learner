@@ -38,7 +38,7 @@ const config: ExpoConfig = {
     icon: "./assets/images/icon.png",
     color: "#06b6d4",
     androidMode: "default",
-    androidCollapsedTitle: "SAT Prep Reminder",
+    androidCollapsedTitle: "SAT Learner Reminder",
   },
 
   web: {

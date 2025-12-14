@@ -8,29 +8,26 @@ import { Redirect, Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import "../global.css";
-
-import { useColorScheme } from "@/hooks/useColorScheme";
 import Toast from "react-native-toast-message";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { TourProvider } from "@/context/TourContext";
 import { ThemeProvider as CustomThemeProvider } from "@/context/ThemeContext";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import * as SecureStore from "expo-secure-store";
 import { SQLiteProvider } from "expo-sqlite";
 import CustomPreloadScreen from "@/components/ui/CustomPreloadScreen";
-import * as Network from 'expo-network';
+import * as Network from "expo-network";
 
 import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
-import Purchases, {LOG_LEVEL} from "react-native-purchases"
-import { AppState, Platform } from "react-native";
+import Purchases, { LOG_LEVEL } from "react-native-purchases";
+import { AppState, Platform, useColorScheme } from "react-native";
 import { useLoadUserInBackground } from "@/lib/user";
 import { processOfflineQueue } from "@/lib/offlineQueue";
 import { upgradeToPro, removePro } from "@/lib/api/user";
 import { scheduleDailyStudyReminder } from "@/lib/notifications";
-
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -178,63 +175,6 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
   return <>{children}</>;
 }
 
-function AppContent() {
-  const colorScheme = useColorScheme();
-
-  return (
-    <AuthProvider>
-      <TourProvider>
-        <Suspense fallback={<CustomPreloadScreen />}>
-          <SQLiteProvider
-            databaseName="satprep.db"
-            assetSource={{ assetId: require("@/assets/databases/satprep.db") }}
-            useSuspense
-          >
-            <AppSyncWrapper>
-              <ThemeProvider
-                value={colorScheme === "dark" ? DarkTheme : DefaultTheme}
-              >
-              <Stack screenOptions={{ headerShown: false }}>
-                {/* Main tabs */}
-                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-
-                {/* Auth screens */}
-                <Stack.Screen name="onboarding" options={{ headerShown: false }} />
-                <Stack.Screen name="login" options={{ headerShown: false }} />
-                <Stack.Screen name="register" options={{ headerShown: false }} />
-                <Stack.Screen name="auth" options={{ headerShown: false }} />
-                <Stack.Screen name="selling-onboarding" options={{ headerShown: false }} />
-
-                {/* Profile & Settings */}
-                <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
-                <Stack.Screen name="settings" options={{ headerShown: false }} />
-                <Stack.Screen name="payment" options={{ headerShown: false }} />
-
-                {/* Calendar */}
-                <Stack.Screen name="calendar" options={{ headerShown: false }} />
-
-                {/* Course (nested stack) */}
-                <Stack.Screen name="course" options={{ headerShown: false }} />
-
-                {/* Info (nested stack) */}
-                <Stack.Screen name="info" options={{ headerShown: false }} />
-
-                {/* Tests (nested stack) */}
-                <Stack.Screen name="tests" options={{ headerShown: false }} />
-
-                {/* Not found */}
-                <Stack.Screen name="+not-found" />
-              </Stack>
-              <Toast />
-              <StatusBar style="auto" />
-              </ThemeProvider>
-            </AppSyncWrapper>
-          </SQLiteProvider>
-        </Suspense>
-      </TourProvider>
-    </AuthProvider>
-  );
-}
 
 export default function RootLayout() {
   const router = useRouter();
@@ -242,7 +182,7 @@ export default function RootLayout() {
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
   });
 
-  const [onboardingDone, setOnboardingDone] = useState<boolean | null>(null);
+  const [onboardingDone, setOnboardingDone] = useState<boolean>(true);
 
   useEffect(() => {
     const checkOnboarding = async () => {
@@ -259,12 +199,67 @@ export default function RootLayout() {
   }, [onboardingDone]);
 
   // Wait until we know the onboarding status + fonts loaded
-  if (!loaded || onboardingDone === null) return <CustomPreloadScreen />;
+  if (!loaded) return <CustomPreloadScreen />;
 
   // Otherwise show the normal app
   return (
-    <CustomThemeProvider>
-      <AppContent />
-    </CustomThemeProvider>
+    
+      <AuthProvider>
+       
+          <Suspense fallback={<CustomPreloadScreen />}>
+            <SQLiteProvider
+              databaseName="satprep.db"
+              assetSource={{
+                assetId: require("@/assets/databases/satprep.db"),
+              }}
+              useSuspense
+            >
+              <AppSyncWrapper>
+                 <TourProvider>
+                <CustomThemeProvider>
+                  <Stack screenOptions={{ headerShown: false }}>
+                    {/* Main tabs */}
+                    <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+
+                    {/* Auth screens */}
+                    <Stack.Screen name="onboarding" options={{ headerShown: false }} />
+                    <Stack.Screen name="login" options={{ headerShown: false }} />
+                    <Stack.Screen name="register" options={{ headerShown: false }} />
+                    <Stack.Screen name="auth" options={{ headerShown: false }} />
+                    <Stack.Screen
+                      name="selling-onboarding"
+                      options={{ headerShown: false }}
+                    />
+
+                    {/* Profile & Settings */}
+                    <Stack.Screen name="edit-profile" options={{ headerShown: false }} />
+                    <Stack.Screen name="settings" options={{ headerShown: false }} />
+                    <Stack.Screen name="payment" options={{ headerShown: false }} />
+
+                    {/* Calendar */}
+                    <Stack.Screen name="calendar" options={{ headerShown: false }} />
+
+                    {/* Course (nested stack) */}
+                    <Stack.Screen name="course" options={{ headerShown: false }} />
+
+                    {/* Info (nested stack) */}
+                    <Stack.Screen name="info" options={{ headerShown: false }} />
+
+                    {/* Tests (nested stack) */}
+                    <Stack.Screen name="tests" options={{ headerShown: false }} />
+
+                    {/* Not found */}
+                    <Stack.Screen name="+not-found" />
+                  </Stack>
+                  <Toast />
+                  <StatusBar style="auto" />
+                </CustomThemeProvider>
+                </TourProvider>
+             </AppSyncWrapper>
+            </SQLiteProvider>
+          </Suspense>
+        
+      </AuthProvider>
+    
   );
 }

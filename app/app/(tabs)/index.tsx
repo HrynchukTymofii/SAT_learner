@@ -480,6 +480,7 @@ export default function ExploreScreen() {
                     {/* Title and Progress */}
                     <View style={styles.chapterCardHeader}>
                       <Text
+                        numberOfLines={1}
                         style={[
                           styles.chapterTitle,
                           { color: isDark ? "#ffffff" : "#1f2937" },

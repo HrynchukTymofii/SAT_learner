@@ -20,7 +20,13 @@ export default function CustomPreloadScreen() {
   const rotateAnim = useRef(new Animated.Value(0)).current;
   const colorScheme = useSystemColorScheme();
   const isDark = colorScheme === "dark";
-  //console.log('PreloadScreen')
+  // useEffect(() => {
+  //   console.log("🧠 TestsPage mounted");
+
+  //   return () => {
+  //     console.log("🧹 TestsPage unmounted");
+  //   };
+  // }, []);
 
   useEffect(() => {
     // Fade animation for text
