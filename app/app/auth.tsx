@@ -7,6 +7,7 @@ import {
   Image,
   ActivityIndicator,
   Platform,
+  Linking,
 } from "react-native";
 import { router } from "expo-router";
 import { useAuth } from "../context/AuthContext";
@@ -181,7 +182,11 @@ export default function AuthLandingScreen() {
             className="flex-row items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 mb-4 shadow-sm"
           >
             {googleLoading ? (
-              <ActivityIndicator size="small" color="#06B6D4" className="mr-4" />
+              <ActivityIndicator
+                size="small"
+                color="#06B6D4"
+                className="mr-4"
+              />
             ) : (
               <Image
                 source={require("@/assets/images/google-logo.webp")}
@@ -194,7 +199,7 @@ export default function AuthLandingScreen() {
           </TouchableOpacity>
 
           {/* Apple - iOS only */}
-          {Platform.OS === 'ios' && (
+          {Platform.OS === "ios" && (
             <TouchableOpacity
               onPress={handleAppleAuth}
               disabled={appleLoading}
@@ -202,7 +207,11 @@ export default function AuthLandingScreen() {
               className="flex-row items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 mb-4 shadow-sm"
             >
               {appleLoading ? (
-                <ActivityIndicator size="small" color="#06B6D4" className="mr-4" />
+                <ActivityIndicator
+                  size="small"
+                  color="#06B6D4"
+                  className="mr-4"
+                />
               ) : (
                 <Image
                   source={require("@/assets/images/apple-logo.png")}
@@ -230,7 +239,12 @@ export default function AuthLandingScreen() {
 
         {/* Sign Up Button */}
         <TouchableOpacity
-          onPress={() => router.push({ pathname: "/login", params: { tab: "register" } } as any)}
+          onPress={() =>
+            router.push({
+              pathname: "/login",
+              params: { tab: "register" },
+            } as any)
+          }
           activeOpacity={0.8}
           className="bg-cyan-500 rounded-full py-4 items-center justify-center mb-4"
         >
@@ -239,21 +253,41 @@ export default function AuthLandingScreen() {
 
         {/* Sign In Button */}
         <TouchableOpacity
-          onPress={() => router.push({ pathname: "/login", params: { tab: "login" } } as any)}
+          onPress={() =>
+            router.push({ pathname: "/login", params: { tab: "login" } } as any)
+          }
           activeOpacity={0.8}
           className="bg-cyan-500/10 dark:bg-cyan-500/20 rounded-full py-4 items-center justify-center mb-8"
         >
-          <Text className="text-cyan-500 dark:text-cyan-400 font-semibold text-base">Sign in</Text>
+          <Text className="text-cyan-500 dark:text-cyan-400 font-semibold text-base">
+            Sign in
+          </Text>
         </TouchableOpacity>
 
         {/* Footer Links */}
         <View className="flex-row justify-center items-center">
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text className="text-gray-500 dark:text-gray-400 text-sm">Privacy Policy</Text>
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() =>
+              Linking.openURL("https://www.satlearner.com/privacy-policy")
+            }
+          >
+            <Text className="text-gray-500 dark:text-gray-400 text-sm">
+              Privacy Policy
+            </Text>
           </TouchableOpacity>
+
           <Text className="text-gray-400 dark:text-gray-500 mx-2">·</Text>
-          <TouchableOpacity activeOpacity={0.7}>
-            <Text className="text-gray-500 dark:text-gray-400 text-sm">Terms of Service</Text>
+
+          <TouchableOpacity
+            activeOpacity={0.7}
+            onPress={() =>
+              Linking.openURL("https://www.satlearner.com/terms-of-service")
+            }
+          >
+            <Text className="text-gray-500 dark:text-gray-400 text-sm">
+              Terms of Service
+            </Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

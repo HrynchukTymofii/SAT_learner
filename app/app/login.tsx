@@ -485,7 +485,7 @@ export default function AuthScreen() {
                 I agree to SAT Math Learner{" "}
                 <Text
                   style={{ color: isDark ? "#22d3ee" : "#06B6D4", fontWeight: "500" }}
-                  onPress={() => Linking.openURL("https://www.satlearner.com/privacy-policy")}
+                  onPress={() => Linking.openURL("https://www.satlearner.com/terms-of-service")}
                 >
                   Terms & Conditions
                 </Text>

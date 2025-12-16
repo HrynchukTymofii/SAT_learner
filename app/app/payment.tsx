@@ -9,6 +9,7 @@ import {
   Dimensions,
   // Animated,
   Modal,
+  Linking,
 } from "react-native";
 import { useRouter } from "expo-router";
 import Purchases, { PurchasesPackage } from "react-native-purchases";
@@ -24,11 +25,11 @@ import {
   GraduationCap,
   BookOpen,
   Award,
-  Star
+  Star,
 } from "lucide-react-native";
 import { useColorScheme } from "@/hooks/useColorScheme";
 
-const { width } = Dimensions.get('window');
+const { width } = Dimensions.get("window");
 
 export default function PaywallScreen() {
   const router = useRouter();
@@ -37,11 +38,16 @@ export default function PaywallScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
 
-  const [packages, setPackages] = useState<{ monthly: PurchasesPackage | null; yearly: PurchasesPackage | null }>({
+  const [packages, setPackages] = useState<{
+    monthly: PurchasesPackage | null;
+    yearly: PurchasesPackage | null;
+  }>({
     monthly: null,
     yearly: null,
   });
-  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">("yearly");
+  const [selectedPlan, setSelectedPlan] = useState<"monthly" | "yearly">(
+    "yearly"
+  );
   const [loading, setLoading] = useState(false);
   const [showUpsellModal, setShowUpsellModal] = useState(false);
   // const [spinsLeft, setSpinsLeft] = useState(3);
@@ -75,14 +81,16 @@ export default function PaywallScreen() {
           });
         }
 
-        const monthly = allPackages.find(pkg =>
-          pkg.identifier.toLowerCase().includes("monthly") ||
-          pkg.identifier.toLowerCase().includes("month")
+        const monthly = allPackages.find(
+          (pkg) =>
+            pkg.identifier.toLowerCase().includes("monthly") ||
+            pkg.identifier.toLowerCase().includes("month")
         );
-        const yearly = allPackages.find(pkg =>
-          pkg.identifier.toLowerCase().includes("yearly") ||
-          pkg.identifier.toLowerCase().includes("annual") ||
-          pkg.identifier.toLowerCase().includes("year")
+        const yearly = allPackages.find(
+          (pkg) =>
+            pkg.identifier.toLowerCase().includes("yearly") ||
+            pkg.identifier.toLowerCase().includes("annual") ||
+            pkg.identifier.toLowerCase().includes("year")
         );
 
         setPackages({ monthly: monthly || null, yearly: yearly || null });
@@ -102,7 +110,10 @@ export default function PaywallScreen() {
       const { customerInfo } = await Purchases.purchasePackage(pkg);
 
       // Check for PRO Yearly or PRO Monthly entitlements
-      if (customerInfo.entitlements.active["PRO Yearly"] || customerInfo.entitlements.active["PRO Monthly"]) {
+      if (
+        customerInfo.entitlements.active["PRO Yearly"] ||
+        customerInfo.entitlements.active["PRO Monthly"]
+      ) {
         // Determine plan name based on active entitlement
         let planName = "PRO Yearly"; // default
         if (customerInfo.entitlements.active["PRO Monthly"]) {
@@ -231,78 +242,88 @@ export default function PaywallScreen() {
       >
         {/* Header with SAT Theme Gradient */}
         <LinearGradient
-          colors={['#06B6D4', '#0891B2', '#0e7490']}
+          colors={["#06B6D4", "#0891B2", "#0e7490"]}
           style={{
             height: 150,
-            position: 'relative',
-            overflow: 'hidden',
+            position: "relative",
+            overflow: "hidden",
           }}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 1 }}
         >
           {/* Decorative Elements */}
-          <View style={{ position: 'absolute', top: 40, left: 30 }}>
+          <View style={{ position: "absolute", top: 40, left: 30 }}>
             <Star size={12} color="#FCD34D" fill="#FCD34D" />
           </View>
-          <View style={{ position: 'absolute', top: 40, right: 60 }}>
+          <View style={{ position: "absolute", top: 40, right: 60 }}>
             <Star size={8} color="#FCD34D" fill="#FCD34D" />
           </View>
-          <View style={{ position: 'absolute', bottom: 20, left: width * 0.65 }}>
+          <View
+            style={{ position: "absolute", bottom: 20, left: width * 0.65 }}
+          >
             <Star size={12} color="#FCD34D" fill="#FCD34D" />
           </View>
-          <View style={{ position: 'absolute', bottom: 30, left: 50 }}>
+          <View style={{ position: "absolute", bottom: 30, left: 50 }}>
             <Star size={10} color="#FCD34D" fill="#FCD34D" />
           </View>
 
           {/* Floating Icons */}
-          <View style={{
-            position: 'absolute',
-            top: 50,
-            left: 70,
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            borderRadius: 40,
-            width: 48,
-            height: 48,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
+          <View
+            style={{
+              position: "absolute",
+              top: 50,
+              left: 70,
+              backgroundColor: "rgba(255,255,255,0.15)",
+              borderRadius: 40,
+              width: 48,
+              height: 48,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <BookOpen size={24} color="#FFF" />
           </View>
 
-          <View style={{
-            position: 'absolute',
-            bottom: 35,
-            right: 65,
-            backgroundColor: 'rgba(255,255,255,0.15)',
-            borderRadius: 40,
-            width: 48,
-            height: 48,
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}>
+          <View
+            style={{
+              position: "absolute",
+              bottom: 35,
+              right: 65,
+              backgroundColor: "rgba(255,255,255,0.15)",
+              borderRadius: 40,
+              width: 48,
+              height: 48,
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
             <Award size={22} color="#FFF" />
           </View>
 
           {/* Central Graduation Cap */}
-          <View style={{
-            position: 'absolute',
-            top: 60,
-            left: width / 2 - 40,
-            alignItems: 'center',
-          }}>
-            <View style={{
-              width: 80,
-              height: 80,
-              backgroundColor: '#FFF',
-              borderRadius: 40,
-              justifyContent: 'center',
-              alignItems: 'center',
-              shadowColor: '#000',
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.2,
-              shadowRadius: 8,
-              elevation: 5,
-            }}>
+          <View
+            style={{
+              position: "absolute",
+              top: 60,
+              left: width / 2 - 40,
+              alignItems: "center",
+            }}
+          >
+            <View
+              style={{
+                width: 80,
+                height: 80,
+                backgroundColor: "#FFF",
+                borderRadius: 40,
+                justifyContent: "center",
+                alignItems: "center",
+                shadowColor: "#000",
+                shadowOffset: { width: 0, height: 4 },
+                shadowOpacity: 0.2,
+                shadowRadius: 8,
+                elevation: 5,
+              }}
+            >
               <GraduationCap size={42} color="#06B6D4" />
             </View>
           </View>
@@ -312,16 +333,16 @@ export default function PaywallScreen() {
             // onPress={handleBackPress}
             onPress={() => router.back()}
             style={{
-              position: 'absolute',
+              position: "absolute",
               top: insets.top + 12,
               right: 20,
               width: 40,
               height: 40,
               borderRadius: 20,
-              backgroundColor: '#FFF',
-              justifyContent: 'center',
-              alignItems: 'center',
-              shadowColor: '#000',
+              backgroundColor: "#FFF",
+              justifyContent: "center",
+              alignItems: "center",
+              shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
               shadowRadius: 4,
@@ -335,30 +356,36 @@ export default function PaywallScreen() {
         {/* Content */}
         <View style={{ paddingHorizontal: 24 }}>
           {/* PRO Badge */}
-          <View style={{
-            alignSelf: 'flex-start',
-            flexDirection: 'row',
-            alignItems: 'center',
-            backgroundColor: '#06B6D4',
-            paddingHorizontal: 12,
-            paddingVertical: 6,
-            borderRadius: 20,
-            marginTop: 24,
-            marginBottom: 16,
-          }}>
+          <View
+            style={{
+              alignSelf: "flex-start",
+              flexDirection: "row",
+              alignItems: "center",
+              backgroundColor: "#06B6D4",
+              paddingHorizontal: 12,
+              paddingVertical: 6,
+              borderRadius: 20,
+              marginTop: 24,
+              marginBottom: 16,
+            }}
+          >
             <Sparkles size={14} color="#FFF" style={{ marginRight: 4 }} />
-            <Text style={{ color: '#FFF', fontSize: 14, fontWeight: '700' }}>PRO</Text>
+            <Text style={{ color: "#FFF", fontSize: 14, fontWeight: "700" }}>
+              PRO
+            </Text>
           </View>
 
           {/* Title */}
-          <Text style={{
-            fontSize: 32,
-            fontWeight: '700',
-            color: isDark ? '#ffffff' : '#1f2937',
-            marginBottom: 24,
-            lineHeight: 38,
-          }}>
-            Unlock Your Full{'\n'}SAT Potential
+          <Text
+            style={{
+              fontSize: 32,
+              fontWeight: "700",
+              color: isDark ? "#ffffff" : "#1f2937",
+              marginBottom: 24,
+              lineHeight: 38,
+            }}
+          >
+            Unlock Your Full{"\n"}SAT Potential
           </Text>
 
           {/* <Text style={{
@@ -373,26 +400,33 @@ export default function PaywallScreen() {
           {/* Features List */}
           <View style={{ marginBottom: 28 }}>
             {features.map((feature, idx) => (
-              <View key={idx} style={{
-                flexDirection: 'row',
-                alignItems: 'flex-start',
-                marginBottom: 18,
-              }}>
-                <View style={{
-                  backgroundColor: '#06B6D4',
-                  borderRadius: 6,
-                  padding: 4,
-                  marginRight: 12,
-                  marginTop: 2,
-                }}>
+              <View
+                key={idx}
+                style={{
+                  flexDirection: "row",
+                  alignItems: "flex-start",
+                  marginBottom: 18,
+                }}
+              >
+                <View
+                  style={{
+                    backgroundColor: "#06B6D4",
+                    borderRadius: 6,
+                    padding: 4,
+                    marginRight: 12,
+                    marginTop: 2,
+                  }}
+                >
                   <Check size={16} color="#FFF" />
                 </View>
-                <Text style={{
-                  flex: 1,
-                  fontSize: 16,
-                  color: isDark ? '#ffffff' : '#1f2937',
-                  lineHeight: 24,
-                }}>
+                <Text
+                  style={{
+                    flex: 1,
+                    fontSize: 16,
+                    color: isDark ? "#ffffff" : "#1f2937",
+                    lineHeight: 24,
+                  }}
+                >
                   {feature.text}
                 </Text>
               </View>
@@ -402,240 +436,394 @@ export default function PaywallScreen() {
           {/* Pricing Container */}
           <View style={{ marginBottom: 24 }}>
             {!packages.yearly && !packages.monthly ? (
-              <View style={{
-                padding: 40,
-                alignItems: 'center',
-              }}>
+              <View
+                style={{
+                  padding: 40,
+                  alignItems: "center",
+                }}
+              >
                 <ActivityIndicator size="large" color="#06B6D4" />
-                <Text style={{
-                  marginTop: 12,
-                  fontSize: 14,
-                  color: isDark ? '#9ca3af' : '#6b7280',
-                }}>
+                <Text
+                  style={{
+                    marginTop: 12,
+                    fontSize: 14,
+                    color: isDark ? "#9ca3af" : "#6b7280",
+                  }}
+                >
                   Loading plans...
                 </Text>
               </View>
             ) : (
               <>
-            {/* Annual Plan */}
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: 20,
-                borderRadius: 16,
-                borderWidth: selectedPlan === 'yearly' ? 3 : 2,
-                borderColor: selectedPlan === 'yearly' ? '#06B6D4' : (isDark ? '#334155' : '#e5e7eb'),
-                backgroundColor: isDark ? '#1e293b' : '#FFF',
-                marginBottom: packages.monthly ? 16 : 0,
-                position: 'relative',
-                paddingTop: packages.monthly ? 30 : 20,
-              }}
-              onPress={() => setSelectedPlan('yearly')}
-              activeOpacity={0.7}
-              disabled={!packages.yearly}
-            >
-              {/* POPULAR Badge - only show if there's a monthly option */}
-              {packages.monthly && (
-              <View style={{
-                position: 'absolute',
-                top: -12,
-                left: 16,
-                backgroundColor: '#FCD34D',
-                paddingHorizontal: 12,
-                paddingVertical: 4,
-                borderRadius: 12,
-              }}>
-                <Text style={{
-                  fontSize: 11,
-                  fontWeight: '700',
-                  color: '#1f2937',
-                  letterSpacing: 0.5,
-                }}>
-                  POPULAR
-                </Text>
-              </View>
-              )}
+                {/* Annual Plan */}
+                <TouchableOpacity
+                  style={{
+                    flexDirection: "row",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                    padding: 20,
+                    borderRadius: 16,
+                    borderWidth: selectedPlan === "yearly" ? 3 : 2,
+                    borderColor:
+                      selectedPlan === "yearly"
+                        ? "#06B6D4"
+                        : isDark
+                          ? "#334155"
+                          : "#e5e7eb",
+                    backgroundColor: isDark ? "#1e293b" : "#FFF",
+                    marginBottom: packages.monthly ? 16 : 0,
+                    position: "relative",
+                    paddingTop: packages.monthly ? 30 : 20,
+                  }}
+                  onPress={() => setSelectedPlan("yearly")}
+                  activeOpacity={0.7}
+                  disabled={!packages.yearly}
+                >
+                  {/* POPULAR Badge - only show if there's a monthly option */}
+                  {packages.monthly && (
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: -12,
+                        left: 16,
+                        backgroundColor: "#FCD34D",
+                        paddingHorizontal: 12,
+                        paddingVertical: 4,
+                        borderRadius: 12,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          fontWeight: "700",
+                          color: "#1f2937",
+                          letterSpacing: 0.5,
+                        }}
+                      >
+                        POPULAR
+                      </Text>
+                    </View>
+                  )}
 
-              {/* Discount Badge - only show if there's a monthly option */}
-              {packages.monthly && packages.yearly && (
-              <View style={{
-                position: 'absolute',
-                top: -12,
-                right: 16,
-                backgroundColor: '#10B981',
-                paddingHorizontal: 12,
-                paddingVertical: 4,
-                borderRadius: 12,
-              }}>
-                <Text style={{
-                  fontSize: 11,
-                  fontWeight: '700',
-                  color: '#FFF',
-                  letterSpacing: 0.5,
-                }}>
-                  SAVE {Math.round(((packages.monthly.product.price - (packages.yearly.product.price / 12)) / packages.monthly.product.price) * 100)}%
-                </Text>
-              </View>
-              )}
+                  {/* Discount Badge - only show if there's a monthly option */}
+                  {packages.monthly && packages.yearly && (
+                    <View
+                      style={{
+                        position: "absolute",
+                        top: -12,
+                        right: 16,
+                        backgroundColor: "#10B981",
+                        paddingHorizontal: 12,
+                        paddingVertical: 4,
+                        borderRadius: 12,
+                      }}
+                    >
+                      <Text
+                        style={{
+                          fontSize: 11,
+                          fontWeight: "700",
+                          color: "#FFF",
+                          letterSpacing: 0.5,
+                        }}
+                      >
+                        SAVE{" "}
+                        {Math.round(
+                          ((packages.monthly.product.price -
+                            packages.yearly.product.price / 12) /
+                            packages.monthly.product.price) *
+                            100
+                        )}
+                        %
+                      </Text>
+                    </View>
+                  )}
 
-              <View style={{ flex: 1 }}>
-                <Text style={{
-                  fontSize: 18,
-                  fontWeight: '600',
-                  color: isDark ? '#ffffff' : '#1f2937',
-                  marginBottom: 4,
-                }}>
-                  Annual
-                </Text>
-                {packages.yearly && (
-                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-                    {packages.yearly.product.introPrice && (
-                      <Text style={{
-                        fontSize: 14,
-                        color: isDark ? '#6b7280' : '#9ca3af',
-                        textDecorationLine: 'line-through',
-                      }}>
-                        {packages.yearly.product.priceString}
+                  <View style={{ flex: 1 }}>
+                    <Text
+                      style={{
+                        fontSize: 18,
+                        fontWeight: "600",
+                        color: isDark ? "#ffffff" : "#1f2937",
+                        marginBottom: 4,
+                      }}
+                    >
+                      Annual
+                    </Text>
+                    {packages.yearly && (
+                      <View
+                        style={{
+                          flexDirection: "row",
+                          alignItems: "center",
+                          gap: 8,
+                        }}
+                      >
+                        {packages.yearly.product.introPrice && (
+                          <Text
+                            style={{
+                              fontSize: 14,
+                              color: isDark ? "#6b7280" : "#9ca3af",
+                              textDecorationLine: "line-through",
+                            }}
+                          >
+                            {packages.yearly.product.priceString}
+                          </Text>
+                        )}
+                        <Text
+                          style={{
+                            fontSize: 14,
+                            fontWeight: "700",
+                            color: isDark ? "#ffffff" : "#1f2937",
+                          }}
+                        >
+                          {packages.yearly.product.introPrice?.priceString ||
+                            packages.yearly.product.priceString}
+                        </Text>
+                      </View>
+                    )}
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
+                    {packages.yearly && packages.monthly && (
+                      <Text
+                        style={{
+                          fontSize: 16,
+                          fontWeight: "600",
+                          color: isDark ? "#ffffff" : "#1f2937",
+                        }}
+                      >
+                        {new Intl.NumberFormat(undefined, {
+                          style: "currency",
+                          currency: packages.yearly.product.currencyCode,
+                        }).format(packages.yearly.product.price / 12)}{" "}
+                        / MO
                       </Text>
                     )}
-                    <Text style={{
-                      fontSize: 14,
-                      fontWeight: '700',
-                      color: isDark ? '#ffffff' : '#1f2937',
-                    }}>
-                      {packages.yearly.product.introPrice?.priceString || packages.yearly.product.priceString}
-                    </Text>
+                    {packages.monthly && (
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          borderWidth: 2,
+                          borderColor:
+                            selectedPlan === "yearly"
+                              ? "#06B6D4"
+                              : isDark
+                                ? "#6b7280"
+                                : "#d1d5db",
+                          backgroundColor:
+                            selectedPlan === "yearly"
+                              ? "#06B6D4"
+                              : "transparent",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {selectedPlan === "yearly" && (
+                          <Check size={16} color="#FFF" />
+                        )}
+                      </View>
+                    )}
                   </View>
-                )}
-              </View>
+                </TouchableOpacity>
 
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                {packages.yearly && packages.monthly && (
-                  <Text style={{
-                    fontSize: 16,
-                    fontWeight: '600',
-                    color: isDark ? '#ffffff' : '#1f2937',
-                  }}>
-                    {new Intl.NumberFormat(undefined, {
-                      style: 'currency',
-                      currency: packages.yearly.product.currencyCode,
-                    }).format(packages.yearly.product.price / 12)} / MO
-                  </Text>
-                )}
+                {/* Monthly Plan */}
                 {packages.monthly && (
-                <View style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 12,
-                  borderWidth: 2,
-                  borderColor: selectedPlan === 'yearly' ? '#06B6D4' : (isDark ? '#6b7280' : '#d1d5db'),
-                  backgroundColor: selectedPlan === 'yearly' ? '#06B6D4' : 'transparent',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                  {selectedPlan === 'yearly' && (
-                    <Check size={16} color="#FFF" />
-                  )}
-                </View>
-                )}
-              </View>
-            </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      flexDirection: "row",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                      padding: 20,
+                      borderRadius: 16,
+                      borderWidth: selectedPlan === "monthly" ? 3 : 2,
+                      borderColor:
+                        selectedPlan === "monthly"
+                          ? "#06B6D4"
+                          : isDark
+                            ? "#334155"
+                            : "#e5e7eb",
+                      backgroundColor: isDark ? "#1e293b" : "#FFF",
+                    }}
+                    onPress={() => setSelectedPlan("monthly")}
+                    activeOpacity={0.7}
+                  >
+                    <View style={{ flex: 1 }}>
+                      <Text
+                        style={{
+                          fontSize: 18,
+                          fontWeight: "600",
+                          color: isDark ? "#ffffff" : "#1f2937",
+                        }}
+                      >
+                        Monthly
+                      </Text>
+                    </View>
 
-            {/* Monthly Plan */}
-            {packages.monthly && (
-            <TouchableOpacity
-              style={{
-                flexDirection: 'row',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                padding: 20,
-                borderRadius: 16,
-                borderWidth: selectedPlan === 'monthly' ? 3 : 2,
-                borderColor: selectedPlan === 'monthly' ? '#06B6D4' : (isDark ? '#334155' : '#e5e7eb'),
-                backgroundColor: isDark ? '#1e293b' : '#FFF',
-              }}
-              onPress={() => setSelectedPlan('monthly')}
-              activeOpacity={0.7}
-            >
-              <View style={{ flex: 1 }}>
-                <Text style={{
-                  fontSize: 18,
-                  fontWeight: '600',
-                  color: isDark ? '#ffffff' : '#1f2937',
-                }}>
-                  Monthly
-                </Text>
-              </View>
-
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-                {packages.monthly && (
-                  <Text style={{
-                    fontSize: 16,
-                    fontWeight: '600',
-                    color: isDark ? '#ffffff' : '#1f2937',
-                  }}>
-                    {packages.monthly.product.priceString} / MO
-                  </Text>
+                    <View
+                      style={{
+                        flexDirection: "row",
+                        alignItems: "center",
+                        gap: 12,
+                      }}
+                    >
+                      {packages.monthly && (
+                        <Text
+                          style={{
+                            fontSize: 16,
+                            fontWeight: "600",
+                            color: isDark ? "#ffffff" : "#1f2937",
+                          }}
+                        >
+                          {packages.monthly.product.priceString} / MO
+                        </Text>
+                      )}
+                      <View
+                        style={{
+                          width: 24,
+                          height: 24,
+                          borderRadius: 12,
+                          borderWidth: 2,
+                          borderColor:
+                            selectedPlan === "monthly"
+                              ? "#06B6D4"
+                              : isDark
+                                ? "#6b7280"
+                                : "#d1d5db",
+                          backgroundColor:
+                            selectedPlan === "monthly"
+                              ? "#06B6D4"
+                              : "transparent",
+                          justifyContent: "center",
+                          alignItems: "center",
+                        }}
+                      >
+                        {selectedPlan === "monthly" && (
+                          <Check size={16} color="#FFF" />
+                        )}
+                      </View>
+                    </View>
+                  </TouchableOpacity>
                 )}
-                <View style={{
-                  width: 24,
-                  height: 24,
-                  borderRadius: 12,
-                  borderWidth: 2,
-                  borderColor: selectedPlan === 'monthly' ? '#06B6D4' : (isDark ? '#6b7280' : '#d1d5db'),
-                  backgroundColor: selectedPlan === 'monthly' ? '#06B6D4' : 'transparent',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }}>
-                  {selectedPlan === 'monthly' && (
-                    <Check size={16} color="#FFF" />
-                  )}
-                </View>
-              </View>
-            </TouchableOpacity>
-            )}
-            </>
+              </>
             )}
           </View>
 
+          <View
+            style={{
+              marginVertical: 20,
+              paddingHorizontal: 8,
+              alignItems: "center",
+            }}
+          >
+            <Text
+              style={{
+                fontSize: 12,
+                textAlign: "center",
+                color: isDark ? "#9ca3af" : "#6b7280",
+                lineHeight: 18,
+              }}
+            >
+              Payment will be charged to your {Platform.OS === "ios" ? "Apple ID" : "Google Play"} account at confirmation
+              of purchase. Subscriptions automatically renew unless canceled at
+              least 24 hours before the end of the current period.
+            </Text>
+
+            <View
+              style={{
+                flexDirection: "row",
+                marginTop: 8,
+                flexWrap: "wrap",
+                justifyContent: "center",
+              }}
+            >
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL("https://www.satlearner.com/terms-of-service")
+                }
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: "#06B6D4",
+                    fontWeight: "500",
+                  }}
+                >
+                  Terms of Service
+                </Text>
+              </TouchableOpacity>
+
+              <Text
+                style={{
+                  fontSize: 12,
+                  marginHorizontal: 6,
+                  color: isDark ? "#9ca3af" : "#6b7280",
+                }}
+              >
+                •
+              </Text>
+
+              <TouchableOpacity
+                onPress={() =>
+                  Linking.openURL("https://www.satlearner.com/privacy-policy")
+                }
+              >
+                <Text
+                  style={{
+                    fontSize: 12,
+                    color: "#06B6D4",
+                    fontWeight: "500",
+                  }}
+                >
+                  Privacy Policy
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
         </View>
       </ScrollView>
 
       {/* Fixed Bottom CTA Button */}
-      <View style={{
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        backgroundColor: isDark ? '#0f172a' : '#ffffff',
-        paddingHorizontal: 20,
-        paddingTop: 12,
-        paddingBottom: insets.bottom + 12,
-        borderTopWidth: 1,
-        borderTopColor: isDark ? '#1f2937' : '#e5e7eb',
-        shadowColor: '#000',
-        shadowOffset: { width: 0, height: -4 },
-        shadowOpacity: 0.1,
-        shadowRadius: 8,
-        elevation: 10,
-      }}>
+      <View
+        style={{
+          position: "absolute",
+          bottom: 0,
+          left: 0,
+          right: 0,
+          backgroundColor: isDark ? "#0f172a" : "#ffffff",
+          paddingHorizontal: 20,
+          paddingTop: 12,
+          paddingBottom: insets.bottom + 12,
+          borderTopWidth: 1,
+          borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
+          shadowColor: "#000",
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 10,
+        }}
+      >
         <TouchableOpacity
           onPress={handleSubscribe}
           disabled={loading || (!packages.monthly && !packages.yearly)}
           style={{
             borderRadius: 16,
-            overflow: 'hidden',
+            overflow: "hidden",
             marginBottom: 8,
           }}
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={loading ? ['#9ca3af', '#9ca3af'] : ['#06B6D4', '#0891B2']}
+            colors={loading ? ["#9ca3af", "#9ca3af"] : ["#06B6D4", "#0891B2"]}
             style={{
               paddingVertical: 16,
-              alignItems: 'center',
+              alignItems: "center",
             }}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
@@ -643,11 +831,13 @@ export default function PaywallScreen() {
             {loading ? (
               <ActivityIndicator color="#FFF" />
             ) : (
-              <Text style={{
-                fontSize: 18,
-                fontWeight: '700',
-                color: '#FFF',
-              }}>
+              <Text
+                style={{
+                  fontSize: 18,
+                  fontWeight: "700",
+                  color: "#FFF",
+                }}
+              >
                 Start Learning Now
               </Text>
             )}
@@ -655,16 +845,18 @@ export default function PaywallScreen() {
         </TouchableOpacity>
 
         {/* Trial Info */}
-        <Text style={{
-          fontSize: 12,
-          color: isDark ? '#6b7280' : '#9ca3af',
-          textAlign: 'center',
-          lineHeight: 16,
-        }}>
-          {selectedPlan === 'yearly'
-            ? `${packages.yearly?.product.priceString || ''}/year${packages.yearly?.product.introPrice ? ' • Save ' + Math.round((1 - (packages.yearly.product.introPrice.price / packages.yearly.product.price)) * 100) + '%' : ''}`
-            : `${packages.monthly?.product.priceString || ''}/month`
-          } • Cancel in {Platform.OS === 'ios' ? 'App Store' : 'Google Play'}
+        <Text
+          style={{
+            fontSize: 12,
+            color: isDark ? "#6b7280" : "#9ca3af",
+            textAlign: "center",
+            lineHeight: 16,
+          }}
+        >
+          {selectedPlan === "yearly"
+            ? `${packages.yearly?.product.priceString || ""}/year${packages.yearly?.product.introPrice ? " • Save " + Math.round((1 - packages.yearly.product.introPrice.price / packages.yearly.product.price) * 100) + "%" : ""}`
+            : `${packages.monthly?.product.priceString || ""}/month`}{" "}
+          • Cancel in {Platform.OS === "ios" ? "App Store" : "Google Play"}
         </Text>
       </View>
 
@@ -700,7 +892,7 @@ export default function PaywallScreen() {
               Wait! Don't Go Yet! 🎰
             </Text> */}
 
-            {/* <Text style={{
+      {/* <Text style={{
               fontSize: 16,
               color: isDark ? '#9ca3af' : '#6b7280',
               marginBottom: 24,
@@ -709,10 +901,10 @@ export default function PaywallScreen() {
               Spin the wheel for an exclusive discount!
             </Text> */}
 
-            {/* Roulette Wheel */}
-            {/* <View style={{ width: '100%', alignItems: 'center', marginBottom: 24 }}> */}
-              {/* Pointer at top */}
-              {/* <View style={{
+      {/* Roulette Wheel */}
+      {/* <View style={{ width: '100%', alignItems: 'center', marginBottom: 24 }}> */}
+      {/* Pointer at top */}
+      {/* <View style={{
                 position: 'absolute',
                 top: -12,
                 zIndex: 10,
@@ -728,7 +920,7 @@ export default function PaywallScreen() {
                 borderTopColor: '#EF4444',
               }} /> */}
 
-              {/* <Animated.View style={{
+      {/* <Animated.View style={{
                 width: 300,
                 height: 300,
                 borderRadius: 150,
@@ -745,8 +937,8 @@ export default function PaywallScreen() {
                 shadowRadius: 8,
                 elevation: 8,
               }}> */}
-                {/* Wheel segments */}
-                {/* {[
+      {/* Wheel segments */}
+      {/* {[
                   { discount: 5, color: '#EF4444' },
                   { discount: 10, color: '#F59E0B' },
                   { discount: 15, color: '#10B981' },
@@ -769,7 +961,7 @@ export default function PaywallScreen() {
                       }}
                     >
                       {/* Colored segment - triangle wedge */}
-                      {/* <View style={{
+      {/* <View style={{
                         position: 'absolute',
                         top: 0,
                         left: '50%',
@@ -786,8 +978,8 @@ export default function PaywallScreen() {
                         transform: [{ translateX: -86.6 }],
                       }} /> */}
 
-                      {/* Text label */}
-                      {/* <View style={{
+      {/* Text label */}
+      {/* <View style={{
                         position: 'absolute',
                         top: 20,
                         left: '50%',
@@ -810,8 +1002,8 @@ export default function PaywallScreen() {
                   );
                 })} */}
 
-                {/* Center circle */}
-                {/* <View style={{
+      {/* Center circle */}
+      {/* <View style={{
                   position: 'absolute',
                   top: '50%',
                   left: '50%',
@@ -843,8 +1035,8 @@ export default function PaywallScreen() {
               </Animated.View>
             </View> */}
 
-            {/* Spins Left */}
-            {/* <Text style={{
+      {/* Spins Left */}
+      {/* <Text style={{
               fontSize: 14,
               color: isDark ? '#9ca3af' : '#6b7280',
               marginBottom: 16,
@@ -852,8 +1044,8 @@ export default function PaywallScreen() {
               {spinsLeft > 0 ? `${spinsLeft} spin${spinsLeft > 1 ? 's' : ''} remaining` : 'No spins left'}
             </Text> */}
 
-            {/* Best Discount Achieved */}
-            {/* {finalDiscount > 0 && (
+      {/* Best Discount Achieved */}
+      {/* {finalDiscount > 0 && (
               <Animated.View style={{
                 backgroundColor: '#FCD34D',
                 paddingHorizontal: 16,
@@ -878,8 +1070,8 @@ export default function PaywallScreen() {
               </Animated.View>
             )} */}
 
-            {/* Spin Button */}
-            {/* {spinsLeft > 0 ? (
+      {/* Spin Button */}
+      {/* {spinsLeft > 0 ? (
               <TouchableOpacity
                 onPress={spinRoulette}
                 style={{
@@ -935,8 +1127,8 @@ export default function PaywallScreen() {
               </TouchableOpacity>
             )} */}
 
-            {/* No Thanks Button */}
-            {/* <TouchableOpacity
+      {/* No Thanks Button */}
+      {/* <TouchableOpacity
               onPress={() => {
                 setShowUpsellModal(false);
                 router.back();
@@ -958,21 +1150,6 @@ export default function PaywallScreen() {
     </View>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import { useEffect, useState, useRef } from "react";
 // import {
