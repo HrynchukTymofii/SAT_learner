@@ -48,7 +48,6 @@ export async function POST(req: NextRequest) {
           email,
           name,
           platform: "SATecosystem",
-          isPro: true,
         },
       });
     }

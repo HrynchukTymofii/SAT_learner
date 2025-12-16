@@ -87,7 +87,6 @@ export const authOptions: NextAuthOptions = {
                   name: user.name || "Student",
                   image: user.image,
                   platform: 'SATecosystem',
-                  isPro: true
               },
             });
         }

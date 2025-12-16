@@ -23,7 +23,6 @@ export async function POST(req: Request) {
                 name,
                 password: hashedPassword,
                 platform: 'SATecosystem',
-                isPro: true
             },
         })
 
