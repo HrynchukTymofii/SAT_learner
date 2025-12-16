@@ -1,6 +1,4 @@
-import React from "react";
-
-const TermsOfService = () => {
+export default function TermsOfService() {
   return (
     <div className="mx-auto max-w-4xl px-4 py-8 text-gray-900">
       <div className="mb-6">
@@ -123,5 +121,3 @@ const TermsOfService = () => {
     </div>
   );
 };
-
-export default TermsOfService;
