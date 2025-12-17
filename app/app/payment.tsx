@@ -156,6 +156,56 @@ export default function PaywallScreen() {
     }
   };
 
+  const handleRestorePurchases = async () => {
+    try {
+      setLoading(true);
+
+      const customerInfo = await Purchases.restorePurchases();
+
+      const hasPro =
+        customerInfo.entitlements.active["PRO Yearly"] ||
+        customerInfo.entitlements.active["PRO Monthly"];
+
+      if (hasPro) {
+        let planName = "PRO Yearly";
+        if (customerInfo.entitlements.active["PRO Monthly"]) {
+          planName = "PRO Monthly";
+        }
+
+        const result = await upgradeToPro(token!, planName);
+        if (result.success) {
+          if (user) setUser({ ...user, isPro: true });
+
+          Toast.show({
+            type: "success",
+            text1: "Purchases restored",
+            text2: "Your PRO access has been restored",
+            position: "top",
+          });
+
+          router.replace("/");
+        }
+      } else {
+        Toast.show({
+          type: "info",
+          text1: "No purchases found",
+          text2: "No previous subscriptions were detected",
+          position: "top",
+        });
+      }
+    } catch (e) {
+      console.error("Restore error:", e);
+      Toast.show({
+        type: "error",
+        text1: "Restore failed",
+        text2: "Please try again later",
+        position: "top",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const features = [
     { text: "Unlimited access to 400+ SAT practice questions" },
     { text: "Full-length practice exams with real SAT scoring" },
@@ -549,6 +599,30 @@ export default function PaywallScreen() {
                     >
                       Annual
                     </Text>
+                    {packages.yearly && packages.monthly && (
+                      <Text
+                        style={{
+                          fontSize: 12,
+                          fontWeight: "600",
+                          color: isDark ? "#ffffff" : "#1f2937",
+                        }}
+                      >
+                        {new Intl.NumberFormat(undefined, {
+                          style: "currency",
+                          currency: packages.yearly.product.currencyCode,
+                        }).format(packages.yearly.product.price / 12)}{" "}
+                        / MO
+                      </Text>
+                    )}
+                  </View>
+
+                  <View
+                    style={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: 12,
+                    }}
+                  >
                     {packages.yearly && (
                       <View
                         style={{
@@ -570,8 +644,8 @@ export default function PaywallScreen() {
                         )}
                         <Text
                           style={{
-                            fontSize: 14,
-                            fontWeight: "700",
+                            fontSize: 16,
+                            fontWeight: "600",
                             color: isDark ? "#ffffff" : "#1f2937",
                           }}
                         >
@@ -579,30 +653,6 @@ export default function PaywallScreen() {
                             packages.yearly.product.priceString}
                         </Text>
                       </View>
-                    )}
-                  </View>
-
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      gap: 12,
-                    }}
-                  >
-                    {packages.yearly && packages.monthly && (
-                      <Text
-                        style={{
-                          fontSize: 16,
-                          fontWeight: "600",
-                          color: isDark ? "#ffffff" : "#1f2937",
-                        }}
-                      >
-                        {new Intl.NumberFormat(undefined, {
-                          style: "currency",
-                          currency: packages.yearly.product.currencyCode,
-                        }).format(packages.yearly.product.price / 12)}{" "}
-                        / MO
-                      </Text>
                     )}
                     {packages.monthly && (
                       <View
@@ -730,9 +780,10 @@ export default function PaywallScreen() {
                 lineHeight: 18,
               }}
             >
-              Payment will be charged to your {Platform.OS === "ios" ? "Apple ID" : "Google Play"} account at confirmation
-              of purchase. Subscriptions automatically renew unless canceled at
-              least 24 hours before the end of the current period.
+              Payment will be charged to your{" "}
+              {Platform.OS === "ios" ? "Apple ID" : "Google Play"} account at
+              confirmation of purchase. Subscriptions automatically renew unless
+              canceled at least 24 hours before the end of the current period.
             </Text>
 
             <View
@@ -785,6 +836,26 @@ export default function PaywallScreen() {
                 </Text>
               </TouchableOpacity>
             </View>
+          </View>
+
+           <View style={{ marginBottom: 24 }}>
+            <TouchableOpacity
+              onPress={handleRestorePurchases}
+              disabled={loading}
+              accessibilityRole="button"
+            >
+              <Text
+                style={{
+                  fontSize: 15,
+                  color: "#06B6D4",
+                  fontWeight: "600",
+                  textAlign: "center",
+                  textDecorationLine: "underline",
+                }}
+              >
+                Restore Purchases
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
       </ScrollView>
@@ -859,6 +930,8 @@ export default function PaywallScreen() {
           • Cancel in {Platform.OS === "ios" ? "App Store" : "Google Play"}
         </Text>
       </View>
+
+     
 
       {/* Upsell Roulette Modal */}
       {/* <Modal
