@@ -131,7 +131,7 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
             <div className="lg:col-span-2">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/30 to-blue-600/30 rounded-3xl opacity-0 group-hover:opacity-100 blur transition duration-300" />
-                <Card className="relative overflow-hidden shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl">
+                <Card className="relative overflow-hidden shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl gap-0">
                   <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-600" />
                   <div className="relative">
                     {course.courseVideoUrl ? (
@@ -173,7 +173,7 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
               >
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-pink-600/30 rounded-3xl opacity-0 group-hover:opacity-100 blur transition duration-300" />
-                  <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden">
+                  <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden gap-0">
                     <div className="h-1 bg-gradient-to-r from-purple-500 to-pink-600" />
                     <CardContent className="p-6">
                       {/* Add course title here */}
@@ -295,7 +295,7 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
         >
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-3xl opacity-0 group-hover:opacity-100 blur transition duration-300" />
-            <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden py-6 mb-8">
+            <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden pb-6 mb-8">
               <div className="h-1 bg-gradient-to-r from-blue-500 to-purple-600" />
               <CardHeader>
                 <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">

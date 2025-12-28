@@ -6,7 +6,7 @@ import { ArrowRight, Mail, MapPin, Phone } from "lucide-react"
 
 export function ContactSection() {
   return (
-    <section className="py-16 bg-muted/30">
+    <section className="py-16 ">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
           <Badge className="bg-muted text-foreground mb-4">Contact Us</Badge>

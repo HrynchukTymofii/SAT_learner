@@ -13,14 +13,14 @@ export default function CourseLoading() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Video Section */}
             <div className="lg:col-span-2">
-              <Card className="overflow-hidden border-0 bg-card/80 backdrop-blur-xl rounded-3xl shadow-2xl">
+              <Card className="overflow-hidden border-0 bg-card/80 backdrop-blur-xl rounded-3xl shadow-2xl gap-0">
                 <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-600" />
                 <div className="aspect-video bg-foreground/10 animate-pulse" />
               </Card>
             </div>
 
             {/* Enrollment Card */}
-            <Card className="border-0 bg-card/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden">
+            <Card className="border-0 bg-card/80 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden gap-0">
               <div className="h-1 bg-gradient-to-r from-purple-500 to-pink-600" />
               <CardContent className="p-6 space-y-4">
                 {/* Title */}

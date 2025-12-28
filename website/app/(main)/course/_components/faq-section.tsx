@@ -98,9 +98,9 @@ export default function FaqSection() {
                 <div className="p-2 bg-gradient-to-r from-blue-500 to-purple-500 rounded-lg">
                   <HelpCircle className="h-6 w-6 text-white" />
                 </div>
-                <h2 className="text-3xl lg:text-4xl font-bold text-slate-900">Frequently Asked Questions</h2>
+                <h2 className="text-3xl lg:text-4xl font-bold text-slate-900 dark:text-slate-100">Frequently Asked Questions</h2>
               </div>
-              <p className="text-lg text-slate-600 leading-relaxed">
+              <p className="text-lg text-slate-600 dark:text-slate-400 leading-relaxed">
                 Everything you need to know about the course. Can't find the answer you're looking for? Feel free to
                 reach out to our support team.
               </p>
@@ -126,13 +126,13 @@ export default function FaqSection() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, delay: 0.1 * index }}
             >
-              <Card className="shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200 overflow-hidden p-6 pb-5">
+              <Card className="shadow-sm hover:shadow-md transition-all duration-200 border border-slate-200 dark:border-slate-700 overflow-hidden p-6 pb-5">
                 <CardHeader
-                  className="cursor-pointer hover:bg-slate-50 transition-colors duration-200 p2-4"
+                  className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors duration-200 p2-4"
                   onClick={() => toggleItem(index)}
                 >
                   <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg font-semibold text-slate-900 pr-4 leading-tight">
+                    <CardTitle className="text-lg font-semibold dark:text-slate-100 text-slate-900 pr-4 leading-tight">
                       {faq.question}
                     </CardTitle>
                     <motion.div
@@ -141,9 +141,9 @@ export default function FaqSection() {
                       className="flex-shrink-0"
                     >
                       {expandedItem === index ? (
-                        <Minus className="h-5 w-5 text-slate-500" />
+                        <Minus className="h-5 w-5 text-slate-500 dark:text-slate-400" />
                       ) : (
-                        <Plus className="h-5 w-5 text-slate-500" />
+                        <Plus className="h-5 w-5 text-slate-500 dark:text-slate-400" />
                       )}
                     </motion.div>
                   </div>
@@ -158,8 +158,8 @@ export default function FaqSection() {
                       transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
                       <CardContent className="pt-0 pb-6">
-                        <div className="border-t border-slate-100 pt-4">
-                          <p className="text-slate-700 leading-relaxed">{faq.answer}</p>
+                        <div className="border-t border-slate-100 dark:border-slate-700 pt-4">
+                          <p className="text-slate-700 dark:text-slate-300 leading-relaxed">{faq.answer}</p>
                         </div>
                       </CardContent>
                     </motion.div>

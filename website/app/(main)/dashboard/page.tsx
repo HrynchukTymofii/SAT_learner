@@ -219,7 +219,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6 relative overflow-hidden">
+    <div className="min-h-screen p-4 md:p-6 relative overflow-hidden">
       {/* Background decorations */}
       <div className="fixed top-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-primary/10 to-primary/5 rounded-full blur-3xl -z-10" />
       <div className="fixed bottom-0 left-0 w-[800px] h-[800px] bg-gradient-to-br from-purple-500/10 to-pink-500/5 rounded-full blur-3xl -z-10" />

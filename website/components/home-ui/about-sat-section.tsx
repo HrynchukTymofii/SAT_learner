@@ -15,11 +15,11 @@ const AboutSatSection = () => {
               Learn About SAT
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <span className="text-foreground">
                 Everything You Need to Know About the SAT
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Get comprehensive information about the SAT exam structure, scoring, and preparation tips
             </p>
           </div>
@@ -28,7 +28,7 @@ const AboutSatSection = () => {
             <Link href="/info/what-is-sat" className="group">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-                <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+                <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                   <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -38,8 +38,8 @@ const AboutSatSection = () => {
                           <FileText className="h-7 w-7 text-white" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900">What is SAT?</h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <h3 className="text-lg font-bold text-foreground">What is SAT?</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         Learn about the SAT exam format, sections, and what to expect on test day
                       </p>
                       <div className="flex items-center text-cyan-600 text-sm font-semibold group-hover:gap-2 transition-all">
@@ -54,7 +54,7 @@ const AboutSatSection = () => {
             <Link href="/info/how-sat-is-scored" className="group">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-green-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-                <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+                <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                   <div className="h-1 bg-gradient-to-r from-emerald-500 to-green-500" />
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -64,8 +64,8 @@ const AboutSatSection = () => {
                           <Calculator className="h-7 w-7 text-white" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900">How SAT is Scored</h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <h3 className="text-lg font-bold text-foreground">How SAT is Scored</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         Understand the SAT scoring system and what your scores mean for college admissions
                       </p>
                       <div className="flex items-center text-emerald-600 text-sm font-semibold group-hover:gap-2 transition-all">
@@ -80,7 +80,7 @@ const AboutSatSection = () => {
             <Link href="/info/test-dates-registration" className="group">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-                <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+                <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                   <div className="h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -90,8 +90,8 @@ const AboutSatSection = () => {
                           <Clock className="h-7 w-7 text-white" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900">Test Dates & Registration</h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <h3 className="text-lg font-bold text-foreground">Test Dates & Registration</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         Find upcoming SAT test dates and learn how to register for the exam
                       </p>
                       <div className="flex items-center text-purple-600 text-sm font-semibold group-hover:gap-2 transition-all">
@@ -106,7 +106,7 @@ const AboutSatSection = () => {
             <Link href="/info/study-tips" className="group">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-                <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+                <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                   <div className="h-1 bg-gradient-to-r from-amber-500 to-orange-500" />
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -116,8 +116,8 @@ const AboutSatSection = () => {
                           <Lightbulb className="h-7 w-7 text-white" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900">Study Tips & Strategies</h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <h3 className="text-lg font-bold text-foreground">Study Tips & Strategies</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         Proven strategies and tips to maximize your SAT preparation effectiveness
                       </p>
                       <div className="flex items-center text-amber-600 text-sm font-semibold group-hover:gap-2 transition-all">
@@ -132,7 +132,7 @@ const AboutSatSection = () => {
             <Link href="/info/college-admissions" className="group">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-red-500 to-rose-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-                <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+                <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                   <div className="h-1 bg-gradient-to-r from-red-500 to-rose-500" />
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -142,8 +142,8 @@ const AboutSatSection = () => {
                           <Award className="h-7 w-7 text-white" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900">College Admissions</h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <h3 className="text-lg font-bold text-foreground">College Admissions</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         How SAT scores impact college admissions and scholarship opportunities
                       </p>
                       <div className="flex items-center text-red-600 text-sm font-semibold group-hover:gap-2 transition-all">
@@ -158,7 +158,7 @@ const AboutSatSection = () => {
             <Link href="/info" className="group">
               <div className="relative">
                 <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-400 to-gray-600 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-                <Card className="relative border-0 bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+                <Card className="relative border-0 bg-muted rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                   <div className="h-1 bg-gradient-to-r from-gray-500 to-gray-700" />
                   <CardContent className="p-6">
                     <div className="space-y-4">
@@ -168,11 +168,11 @@ const AboutSatSection = () => {
                           <BookOpen className="h-7 w-7 text-white" />
                         </div>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900">View All Articles</h3>
-                      <p className="text-gray-600 text-sm leading-relaxed">
+                      <h3 className="text-lg font-bold text-foreground">View All Articles</h3>
+                      <p className="text-muted-foreground text-sm leading-relaxed">
                         Browse our complete collection of SAT preparation articles and guides
                       </p>
-                      <div className="flex items-center text-gray-700 text-sm font-semibold group-hover:gap-2 transition-all">
+                      <div className="flex items-center text-foreground text-sm font-semibold group-hover:gap-2 transition-all">
                         View All <ArrowRight className="ml-1 h-4 w-4 group-hover:translate-x-1 transition-transform" />
                       </div>
                     </div>

@@ -47,7 +47,7 @@ export function PricingSection() {
   ]
 
   return (
-    <section className="py-16 mt-8 bg-gradient-to-br from-muted/30 to-muted/50 rounded-3xl">
+    <section className="py-16 mt-8 ">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
           <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 mb-4 px-4 py-2 rounded-full shadow-lg">

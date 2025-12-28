@@ -57,10 +57,39 @@ export default async function PlannerPage() {
   // Get suggested tasks (next incomplete lessons/quizzes)
   const suggestedTasks = await getSuggestedTasks(session.user.userId)
 
+  // Serialize dates for client component
+  const serializedTodayPlan = todayPlan
+    ? {
+        ...todayPlan,
+        date: todayPlan.date.toISOString(),
+        tasks: todayPlan.tasks.map((t) => ({
+          id: t.id,
+          title: t.title,
+          type: t.type,
+          targetId: t.targetId,
+          completed: t.completed,
+          position: t.position,
+        })),
+      }
+    : null
+
+  const serializedWeekPlans = weekPlans.map((plan) => ({
+    ...plan,
+    date: plan.date.toISOString(),
+    tasks: plan.tasks.map((t) => ({
+      id: t.id,
+      title: t.title,
+      type: t.type,
+      targetId: t.targetId,
+      completed: t.completed,
+      position: t.position,
+    })),
+  }))
+
   return (
     <StudyPlannerClient
-      initialPlan={todayPlan}
-      initialWeekPlans={weekPlans}
+      initialPlan={serializedTodayPlan}
+      initialWeekPlans={serializedWeekPlans}
       satDate={settings?.satDate?.toISOString() || null}
       suggestedTasks={suggestedTasks}
     />

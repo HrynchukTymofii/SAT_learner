@@ -8,16 +8,16 @@ const TasteFirstSection = () => {
     <section className="py-16 mt-4">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-12">
-            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-100 to-blue-100 rounded-full mb-4">
-              <Zap className="w-4 h-4 text-cyan-600" />
-              <span className="text-sm font-semibold text-cyan-700">Try it Free</span>
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-cyan-500/20 to-blue-500/20 rounded-full mb-4">
+              <Zap className="w-4 h-4 text-cyan-500" />
+              <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400">Try it Free</span>
             </div>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <span className="text-foreground">
                 Try Before You Buy
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Experience our platform with a free practice test and sample lesson
             </p>
           </div>
@@ -28,7 +28,7 @@ const TasteFirstSection = () => {
               {/* Glow effect on hover */}
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl opacity-0 group-hover:opacity-30 blur transition duration-500" />
 
-              <Card className="relative border-0 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden transform group-hover:scale-105">
+              <Card className="relative border-0 bg-card rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden transform group-hover:scale-105">
                 {/* Gradient accent */}
                 <div className="h-2 bg-gradient-to-r from-blue-500 to-cyan-500" />
 
@@ -43,8 +43,8 @@ const TasteFirstSection = () => {
                     </div>
 
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3">Free Practice Test</h3>
-                      <p className="text-gray-600 leading-relaxed">
+                      <h3 className="text-2xl font-bold text-foreground mb-3">Free Practice Test</h3>
+                      <p className="text-muted-foreground leading-relaxed">
                         Take a full-length SAT practice test and get detailed score analysis
                       </p>
                     </div>
@@ -58,11 +58,11 @@ const TasteFirstSection = () => {
 
                     {/* Stats badges */}
                     <div className="flex justify-center gap-4 pt-2">
-                      <div className="px-3 py-1 bg-blue-50 rounded-full">
-                        <span className="text-sm font-semibold text-blue-700">2 hours</span>
+                      <div className="px-3 py-1 bg-blue-500/10 rounded-full">
+                        <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">2 hours</span>
                       </div>
-                      <div className="px-3 py-1 bg-cyan-50 rounded-full">
-                        <span className="text-sm font-semibold text-cyan-700">Full Report</span>
+                      <div className="px-3 py-1 bg-cyan-500/10 rounded-full">
+                        <span className="text-sm font-semibold text-cyan-600 dark:text-cyan-400">Full Report</span>
                       </div>
                     </div>
                   </div>
@@ -75,7 +75,7 @@ const TasteFirstSection = () => {
               {/* Glow effect on hover */}
               <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-green-500 rounded-3xl opacity-0 group-hover:opacity-30 blur transition duration-500" />
 
-              <Card className="relative border-0 bg-white rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden transform group-hover:scale-105">
+              <Card className="relative border-0 bg-card rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 overflow-hidden transform group-hover:scale-105">
                 {/* Gradient accent */}
                 <div className="h-2 bg-gradient-to-r from-emerald-500 to-green-500" />
 
@@ -90,8 +90,8 @@ const TasteFirstSection = () => {
                     </div>
 
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-3">Sample Lesson</h3>
-                      <p className="text-gray-600 leading-relaxed">
+                      <h3 className="text-2xl font-bold text-foreground mb-3">Sample Lesson</h3>
+                      <p className="text-muted-foreground leading-relaxed">
                         Preview our comprehensive course with a free lesson on algebra fundamentals
                       </p>
                     </div>
@@ -105,11 +105,11 @@ const TasteFirstSection = () => {
 
                     {/* Stats badges */}
                     <div className="flex justify-center gap-4 pt-2">
-                      <div className="px-3 py-1 bg-emerald-50 rounded-full">
-                        <span className="text-sm font-semibold text-emerald-700">30 min</span>
+                      <div className="px-3 py-1 bg-emerald-500/10 rounded-full">
+                        <span className="text-sm font-semibold text-emerald-600 dark:text-emerald-400">30 min</span>
                       </div>
-                      <div className="px-3 py-1 bg-green-50 rounded-full">
-                        <span className="text-sm font-semibold text-green-700">HD Video</span>
+                      <div className="px-3 py-1 bg-green-500/10 rounded-full">
+                        <span className="text-sm font-semibold text-green-600 dark:text-green-400">HD Video</span>
                       </div>
                     </div>
                   </div>

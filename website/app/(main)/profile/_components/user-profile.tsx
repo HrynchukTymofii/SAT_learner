@@ -251,7 +251,7 @@ export default function UserProfilePage() {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-6 relative overflow-hidden">
+    <div className="min-h-screen p-4 md:p-6 relative overflow-hidden">
       {/* Floating gradient orbs */}
       <div className="fixed top-0 right-0 w-[500px] h-[500px] bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 rounded-full blur-3xl -z-10" />
       <div className="fixed bottom-0 left-0 w-[700px] h-[700px] bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/5 dark:to-cyan-500/5 rounded-full blur-3xl -z-10" />
@@ -327,7 +327,7 @@ export default function UserProfilePage() {
           className="relative"
         >
           <div className="absolute -inset-0.5 bg-gradient-to-r from-cyan-500 to-blue-500 rounded-3xl opacity-10 blur" />
-          <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden">
+          <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden pb-6">
             <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-500" />
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
@@ -407,7 +407,7 @@ export default function UserProfilePage() {
           className="relative"
         >
           <div className="absolute -inset-0.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-3xl opacity-10 blur" />
-          <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden">
+          <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden  pb-6">
             <div className="h-1 bg-gradient-to-r from-amber-500 to-orange-500" />
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
@@ -435,7 +435,7 @@ export default function UserProfilePage() {
           className="relative"
         >
           <div className="absolute -inset-0.5 bg-gradient-to-r from-gray-400 to-gray-600 rounded-3xl opacity-10 blur" />
-          <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden">
+          <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden  pb-6">
             <div className="h-1 bg-gradient-to-r from-gray-500 to-gray-700" />
             <CardHeader>
               <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">

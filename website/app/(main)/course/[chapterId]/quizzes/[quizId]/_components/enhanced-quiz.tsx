@@ -391,8 +391,8 @@ export const EnhancedQuiz = ({
       </div>
 
       {/* Header */}
-      <Card className="shadow-sm border-0 bg-white">
-        <CardContent className="p-4">
+      <Card className="shadow-sm border-0 bg-card">
+        <CardContent className="p-4 py-5">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               {prevItem && (
@@ -406,12 +406,12 @@ export const EnhancedQuiz = ({
                 </Button>
               )}
               <div>
-                <h1 className="text-lg font-bold text-slate-900">{quiz.title}</h1>
-                <div className="flex items-center gap-2 text-sm text-slate-600">
+                <h1 className="text-lg font-bold text-foreground">{quiz.title}</h1>
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
                   <Badge variant="outline">
                     Question {currentQuestionIndex + 1} / {questions.length}
                   </Badge>
-                  <Badge variant="outline" className="bg-green-50 text-green-700">
+                  <Badge variant="outline" className="bg-green-500/10 text-green-600 dark:text-green-400 border-green-500/20">
                     {correctCount} correct
                   </Badge>
                 </div>
@@ -420,7 +420,7 @@ export const EnhancedQuiz = ({
 
             <div className="flex items-center gap-3">
               {/* Timer */}
-              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 text-slate-700">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted text-foreground">
                 <Clock className="h-4 w-4" />
                 <span className="font-mono font-semibold">{formatTime(timeSpent)}</span>
               </div>
@@ -446,14 +446,14 @@ export const EnhancedQuiz = ({
             exit={{ opacity: 0, x: 20 }}
             transition={{ duration: 0.2 }}
           >
-            <Card className="shadow-lg border-0 bg-white h-full">
-              <CardHeader className="pb-2">
+            <Card className="shadow-lg border-0 bg-card h-full">
+              <CardHeader className="pb-2 pt-5">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-bold">
+                    <div className="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold">
                       {currentQuestionIndex + 1}
                     </div>
-                    <Badge variant="outline" className="bg-amber-50 text-amber-700">
+                    <Badge variant="outline" className="bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20">
                       {currentQuestion.points} pts
                     </Badge>
                   </div>
@@ -493,18 +493,18 @@ export const EnhancedQuiz = ({
         </AnimatePresence>
 
         {/* Options Side */}
-        <Card className="shadow-lg border-0 bg-white">
-          <CardHeader className="pb-2">
-            <CardTitle className="text-lg">
+        <Card className="shadow-lg border-0 bg-card">
+          <CardHeader className="pb-2 pt-5">
+            <CardTitle className="text-lg text-foreground">
               {isGridIn ? "Enter your answer" : "Choose your answer"}
             </CardTitle>
           </CardHeader>
-          <CardContent className="space-y-3">
+          <CardContent className="space-y-3 pb-5">
             {isGridIn ? (
               /* Grid-In Question Type */
               <div className="space-y-4">
-                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                  <p className="text-sm text-blue-800">
+                <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-3">
+                  <p className="text-sm text-blue-700 dark:text-blue-300">
                     Write your answer as a number (e.g., 3.14 or 42)
                   </p>
                 </div>
@@ -518,7 +518,7 @@ export const EnhancedQuiz = ({
                       value={gridInValue}
                       onChange={(e) => setGridInValue(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleGridInSubmit()}
-                      className="flex-1 text-lg h-12"
+                      className="flex-1 text-lg h-12 bg-background"
                     />
                     <Button
                       onClick={handleGridInSubmit}
@@ -533,22 +533,22 @@ export const EnhancedQuiz = ({
                     className={cn(
                       "p-4 rounded-lg border-2",
                       answeredQuestions[currentQuestion.id]
-                        ? "bg-green-50 border-green-400"
-                        : "bg-red-50 border-red-400"
+                        ? "bg-green-500/10 border-green-500/30"
+                        : "bg-red-500/10 border-red-500/30"
                     )}
                   >
                     <div className="flex items-center gap-3">
                       {answeredQuestions[currentQuestion.id] ? (
-                        <CheckCircle className="h-6 w-6 text-green-600" />
+                        <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-400" />
                       ) : (
-                        <XCircle className="h-6 w-6 text-red-600" />
+                        <XCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
                       )}
                       <div>
-                        <p className="font-medium">
+                        <p className="font-medium text-foreground">
                           Your answer: {selectedAnswers[currentQuestion.id]?.[0]}
                         </p>
                         {!answeredQuestions[currentQuestion.id] && (
-                          <p className="text-sm text-green-700 mt-1">
+                          <p className="text-sm text-green-700 dark:text-green-400 mt-1">
                             Correct answer: {currentQuestion.answers[0]}
                           </p>
                         )}
@@ -564,13 +564,13 @@ export const EnhancedQuiz = ({
                 const isCorrectOption = currentQuestion.answers.includes(option)
                 const showFeedback = isAnswered
 
-                let optionStyle = "bg-slate-50 border-slate-200 hover:bg-slate-100 hover:border-slate-300"
+                let optionStyle = "bg-muted/50 border-border hover:bg-muted hover:border-muted-foreground/30"
                 if (isSelected && !showFeedback) {
-                  optionStyle = "bg-blue-50 border-blue-300"
+                  optionStyle = "bg-blue-500/10 border-blue-500/30"
                 } else if (showFeedback && isCorrectOption) {
-                  optionStyle = "bg-green-50 border-green-400"
+                  optionStyle = "bg-green-500/10 border-green-500/30"
                 } else if (showFeedback && isSelected && !isCorrectOption) {
-                  optionStyle = "bg-red-50 border-red-400"
+                  optionStyle = "bg-red-500/10 border-red-500/30"
                 }
 
                 return (
@@ -589,17 +589,17 @@ export const EnhancedQuiz = ({
                         isSelected && !showFeedback && "bg-blue-600 text-white",
                         showFeedback && isCorrectOption && "bg-green-600 text-white",
                         showFeedback && isSelected && !isCorrectOption && "bg-red-600 text-white",
-                        !isSelected && !showFeedback && "bg-slate-200 text-slate-600"
+                        !isSelected && !showFeedback && "bg-muted text-muted-foreground"
                       )}
                     >
                       {String.fromCharCode(65 + index)}
                     </div>
-                    <span className="flex-1 text-slate-700">{option}</span>
+                    <span className="flex-1 text-foreground">{option}</span>
                     {showFeedback && isCorrectOption && (
-                      <CheckCircle className="h-5 w-5 text-green-600 flex-shrink-0" />
+                      <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0" />
                     )}
                     {showFeedback && isSelected && !isCorrectOption && (
-                      <XCircle className="h-5 w-5 text-red-600 flex-shrink-0" />
+                      <XCircle className="h-5 w-5 text-red-600 dark:text-red-400 flex-shrink-0" />
                     )}
                   </div>
                 )
@@ -609,13 +609,13 @@ export const EnhancedQuiz = ({
 
           {/* Explanation - shown after answering */}
           {isAnswered && currentQuestion.note && (
-            <CardContent className="pt-0">
-              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4">
+            <CardContent className="pt-0 pb-5">
+              <div className="bg-purple-500/10 border border-purple-500/20 rounded-lg p-4">
                 <div className="flex items-start gap-3">
-                  <Lightbulb className="h-5 w-5 text-purple-600 mt-0.5 flex-shrink-0" />
+                  <Lightbulb className="h-5 w-5 text-purple-600 dark:text-purple-400 mt-0.5 flex-shrink-0" />
                   <div className="flex-1">
-                    <h4 className="font-semibold text-purple-900 mb-2">Explanation</h4>
-                    <div className="prose prose-sm max-w-none text-purple-800">
+                    <h4 className="font-semibold text-purple-700 dark:text-purple-300 mb-2">Explanation</h4>
+                    <div className="prose prose-sm max-w-none text-purple-800 dark:text-purple-200">
                       <ReadOnlyEditor initialContent={currentQuestion.note} />
                     </div>
                   </div>
@@ -627,8 +627,8 @@ export const EnhancedQuiz = ({
       </div>
 
       {/* Navigation */}
-      <Card className="shadow-sm border-0 bg-white">
-        <CardContent className="p-4">
+      <Card className="shadow-sm border-0 bg-card">
+        <CardContent className="p-4 py-5">
           <div className="flex items-center justify-between">
             <Button
               variant="outline"
@@ -639,7 +639,7 @@ export const EnhancedQuiz = ({
               Previous
             </Button>
 
-            <div className="text-sm text-slate-600">
+            <div className="text-sm text-muted-foreground">
               {answeredCount} of {questions.length} answered
             </div>
 
@@ -666,9 +666,9 @@ export const EnhancedQuiz = ({
 
       {/* Hint Modal */}
       <Dialog open={isHintModalOpen} onOpenChange={setIsHintModalOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-foreground">
               <Lightbulb className="h-5 w-5 text-amber-500 fill-amber-500" />
               Hint
             </DialogTitle>
@@ -697,9 +697,9 @@ export const EnhancedQuiz = ({
 
       {/* Question Grid Modal */}
       <Dialog open={isGridModalOpen} onOpenChange={setIsGridModalOpen}>
-        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto">
+        <DialogContent className="max-w-lg max-h-[80vh] overflow-y-auto bg-card">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
+            <DialogTitle className="flex items-center gap-2 text-foreground">
               <Grid3X3 className="h-5 w-5" />
               All Questions
             </DialogTitle>
@@ -707,19 +707,19 @@ export const EnhancedQuiz = ({
           <div className="space-y-6">
             {/* Summary */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-3 bg-slate-100 rounded-lg">
-                <div className="text-2xl font-bold text-slate-900">{answeredCount}</div>
-                <div className="text-xs text-slate-600">Answered</div>
+              <div className="text-center p-3 bg-muted rounded-lg">
+                <div className="text-2xl font-bold text-foreground">{answeredCount}</div>
+                <div className="text-xs text-muted-foreground">Answered</div>
               </div>
-              <div className="text-center p-3 bg-green-50 rounded-lg">
-                <div className="text-2xl font-bold text-green-600">{correctCount}</div>
-                <div className="text-xs text-green-700">Correct</div>
+              <div className="text-center p-3 bg-green-500/10 rounded-lg">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400">{correctCount}</div>
+                <div className="text-xs text-green-700 dark:text-green-400">Correct</div>
               </div>
-              <div className="text-center p-3 bg-red-50 rounded-lg">
-                <div className="text-2xl font-bold text-red-600">
+              <div className="text-center p-3 bg-red-500/10 rounded-lg">
+                <div className="text-2xl font-bold text-red-600 dark:text-red-400">
                   {answeredCount - correctCount}
                 </div>
-                <div className="text-xs text-red-700">Incorrect</div>
+                <div className="text-xs text-red-700 dark:text-red-400">Incorrect</div>
               </div>
             </div>
 
@@ -741,9 +741,9 @@ export const EnhancedQuiz = ({
                     }}
                     className={cn(
                       "relative w-12 h-12 p-0 font-semibold transition-all",
-                      isCurrent && "ring-2 ring-blue-500 bg-blue-50 border-blue-300",
-                      qAnswered && isCorrect && "bg-green-50 border-green-300 text-green-700",
-                      qAnswered && !isCorrect && "bg-red-50 border-red-300 text-red-700"
+                      isCurrent && "ring-2 ring-blue-500 bg-blue-500/10 border-blue-500/30",
+                      qAnswered && isCorrect && "bg-green-500/10 border-green-500/30 text-green-600 dark:text-green-400",
+                      qAnswered && !isCorrect && "bg-red-500/10 border-red-500/30 text-red-600 dark:text-red-400"
                     )}
                   >
                     {index + 1}
@@ -804,13 +804,13 @@ const QuizResults = ({
 
   const getPerformanceMessage = () => {
     if (results.percentage >= 90) {
-      return { title: "Outstanding!", emoji: "🏆", color: "text-green-600", bg: "bg-green-50" }
+      return { title: "Outstanding!", emoji: "🏆", color: "text-green-600 dark:text-green-400", bg: "bg-green-500/10" }
     } else if (results.percentage >= 70) {
-      return { title: "Great Job!", emoji: "🌟", color: "text-blue-600", bg: "bg-blue-50" }
+      return { title: "Great Job!", emoji: "🌟", color: "text-blue-600 dark:text-blue-400", bg: "bg-blue-500/10" }
     } else if (results.percentage >= 50) {
-      return { title: "Good Effort!", emoji: "💪", color: "text-amber-600", bg: "bg-amber-50" }
+      return { title: "Good Effort!", emoji: "💪", color: "text-amber-600 dark:text-amber-400", bg: "bg-amber-500/10" }
     } else {
-      return { title: "Keep Practicing!", emoji: "📚", color: "text-red-600", bg: "bg-red-50" }
+      return { title: "Keep Practicing!", emoji: "📚", color: "text-red-600 dark:text-red-400", bg: "bg-red-500/10" }
     }
   }
 
@@ -819,7 +819,7 @@ const QuizResults = ({
   return (
     <div className="max-w-4xl mx-auto p-4 space-y-6">
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
-        <Card className="shadow-xl border-0 overflow-hidden">
+        <Card className="shadow-xl border-0 overflow-hidden bg-card">
           <div className="bg-gradient-to-r from-purple-600 to-indigo-600 text-white p-6 text-center">
             <Trophy className="h-16 w-16 mx-auto mb-4 text-yellow-300" />
             <h1 className="text-2xl md:text-3xl font-bold mb-2">Quiz Complete!</h1>
@@ -836,26 +836,26 @@ const QuizResults = ({
 
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-slate-900">{results.percentage}%</div>
-                  <div className="text-sm text-slate-600">Score</div>
+                  <div className="text-3xl font-bold text-foreground">{results.percentage}%</div>
+                  <div className="text-sm text-muted-foreground">Score</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-slate-900">
+                  <div className="text-3xl font-bold text-foreground">
                     {results.correctCount}/{results.totalQuestions}
                   </div>
-                  <div className="text-sm text-slate-600">Correct</div>
+                  <div className="text-sm text-muted-foreground">Correct</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-slate-900">
+                  <div className="text-3xl font-bold text-foreground">
                     {results.earnedPoints}/{results.totalPoints}
                   </div>
-                  <div className="text-sm text-slate-600">Points</div>
+                  <div className="text-sm text-muted-foreground">Points</div>
                 </div>
                 <div className="text-center">
-                  <div className="text-3xl font-bold text-slate-900">
+                  <div className="text-3xl font-bold text-foreground">
                     {Math.floor(results.timeSpent / 60)}m
                   </div>
-                  <div className="text-sm text-slate-600">Time</div>
+                  <div className="text-sm text-muted-foreground">Time</div>
                 </div>
               </div>
 
@@ -876,7 +876,7 @@ const QuizResults = ({
 
             {/* Question Review */}
             <div className="space-y-4">
-              <h3 className="text-lg font-semibold">Question Review</h3>
+              <h3 className="text-lg font-semibold text-foreground">Question Review</h3>
               {questions.map((question, index) => {
                 const userAnswer = selectedAnswers[question.id] || []
                 const isCorrect =
@@ -885,18 +885,18 @@ const QuizResults = ({
                 const isExpanded = expandedQuestions.has(question.id)
 
                 return (
-                  <div key={question.id} className="border rounded-lg overflow-hidden">
+                  <div key={question.id} className="border border-border rounded-lg overflow-hidden">
                     <div
                       onClick={() => toggleQuestion(question.id)}
                       className={cn(
                         "flex items-center justify-between p-4 cursor-pointer transition-colors",
-                        isCorrect ? "bg-green-50 hover:bg-green-100" : "bg-red-50 hover:bg-red-100"
+                        isCorrect ? "bg-green-500/10 hover:bg-green-500/20" : "bg-red-500/10 hover:bg-red-500/20"
                       )}
                     >
                       <div className="flex items-center gap-3">
-                        <span className="font-semibold text-slate-700">Q{index + 1}</span>
+                        <span className="font-semibold text-foreground">Q{index + 1}</span>
                         {isCorrect ? (
-                          <Badge className="bg-green-100 text-green-800">
+                          <Badge className="bg-green-500/20 text-green-700 dark:text-green-400 border-green-500/30">
                             <CheckCircle className="h-3 w-3 mr-1" />
                             Correct
                           </Badge>
@@ -908,12 +908,12 @@ const QuizResults = ({
                         )}
                       </div>
                       <ChevronRight
-                        className={cn("h-5 w-5 transition-transform text-slate-500", isExpanded && "rotate-90")}
+                        className={cn("h-5 w-5 transition-transform text-muted-foreground", isExpanded && "rotate-90")}
                       />
                     </div>
 
                     {isExpanded && (
-                      <div className="p-4 bg-white space-y-4 border-t">
+                      <div className="p-4 bg-card space-y-4 border-t border-border">
                         <div className="prose prose-sm max-w-none">
                           <ReadOnlyEditor initialContent={question.question} />
                         </div>
@@ -930,7 +930,7 @@ const QuizResults = ({
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                           <div>
-                            <h5 className={cn("font-medium mb-2", isCorrect ? "text-green-600" : "text-red-600")}>
+                            <h5 className={cn("font-medium mb-2", isCorrect ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400")}>
                               Your Answer:
                             </h5>
                             {userAnswer.length > 0 ? (
@@ -938,22 +938,22 @@ const QuizResults = ({
                                 <div
                                   key={i}
                                   className={cn(
-                                    "p-2 rounded text-sm",
-                                    isCorrect ? "bg-green-50" : "bg-red-50"
+                                    "p-2 rounded text-sm text-foreground",
+                                    isCorrect ? "bg-green-500/10" : "bg-red-500/10"
                                   )}
                                 >
                                   {ans}
                                 </div>
                               ))
                             ) : (
-                              <div className="text-slate-500 italic text-sm">No answer</div>
+                              <div className="text-muted-foreground italic text-sm">No answer</div>
                             )}
                           </div>
                           {!isCorrect && (
                             <div>
-                              <h5 className="font-medium text-green-600 mb-2">Correct Answer:</h5>
+                              <h5 className="font-medium text-green-600 dark:text-green-400 mb-2">Correct Answer:</h5>
                               {question.answers.map((ans, i) => (
-                                <div key={i} className="bg-green-50 p-2 rounded text-sm">
+                                <div key={i} className="bg-green-500/10 p-2 rounded text-sm text-foreground">
                                   {ans}
                                 </div>
                               ))}
@@ -962,12 +962,12 @@ const QuizResults = ({
                         </div>
 
                         {question.note && (
-                          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                            <h5 className="font-medium text-blue-900 mb-2 flex items-center gap-2">
+                          <div className="bg-blue-500/10 border border-blue-500/20 rounded-lg p-4">
+                            <h5 className="font-medium text-blue-700 dark:text-blue-300 mb-2 flex items-center gap-2">
                               <Lightbulb className="h-4 w-4" />
                               Explanation
                             </h5>
-                            <div className="prose prose-sm max-w-none text-blue-800">
+                            <div className="prose prose-sm max-w-none text-blue-800 dark:text-blue-200">
                               <ReadOnlyEditor initialContent={question.note} />
                             </div>
                           </div>

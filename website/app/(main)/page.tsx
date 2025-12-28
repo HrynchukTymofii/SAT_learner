@@ -18,7 +18,7 @@ export default function SATHomepage() {
       <div className="fixed bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 rounded-full blur-3xl -z-10" />
       <div className="fixed top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/5 dark:to-cyan-500/5 rounded-full blur-3xl -z-10 transform -translate-x-1/2 -translate-y-1/2" />
 
-      <div className="max-w-7xl mx-auto px-4 py-4 relative">
+      <div className="max-w-7xl mx-auto px-4 pt-4 relative">
         <HeroSection />
         <TasteFirstSection />
         <AboutCourseSection />
