@@ -31,12 +31,12 @@ const ArticlesPage = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-6xl mx-auto px-4 py-8 md:py-12">
         {/* Header */}
         <div className="text-center mb-12">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-slate-900 mb-4">SAT Resources</h1>
-          <p className="text-lg md:text-xl text-slate-600 max-w-3xl mx-auto">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-4">SAT Resources</h1>
+          <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto">
             Everything you need to know about the SAT exam. From basics to advanced preparation strategies.
           </p>
         </div>
@@ -46,7 +46,7 @@ const ArticlesPage = () => {
           {articles.map((article) => (
             <Card
               key={article.href}
-              className="group hover:shadow-xl transition-all duration-300 border-0 bg-white overflow-hidden pb-6"
+              className="group hover:shadow-xl transition-all duration-300 border-0 bg-card overflow-hidden pb-6"
             >
               <div className={`h-2 bg-gradient-to-r ${article.color}`} />
               <CardHeader className="pb-4">
@@ -55,14 +55,14 @@ const ArticlesPage = () => {
                     <article.icon className="h-6 w-6 text-white" />
                   </div>
                 </div>
-                <CardTitle className="text-xl font-bold text-slate-900 group-hover:text-blue-600 transition-colors">
+                <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
                   {article.title}
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
-                <p className="text-slate-600 leading-relaxed">{article.description}</p>
+                <p className="text-muted-foreground leading-relaxed">{article.description}</p>
                 <Link href={article.href}>
-                  <Button className="w-full group-hover:bg-blue-600 transition-colors flex items-center gap-2">
+                  <Button className="w-full bg-primary hover:opacity-90 transition-all flex items-center gap-2">
                     Read Article
                     <ArrowRight className="h-4 w-4 group-hover:translate-x-1 transition-transform" />
                   </Button>

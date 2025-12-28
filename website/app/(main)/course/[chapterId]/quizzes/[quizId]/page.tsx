@@ -10,13 +10,15 @@ const QuizPage = async ({ params }: { params: Promise<{ chapterId: string; quizI
   const user = await auth()
   const userId = user.userId
 
-  if (!userId)return
+  if (!userId) return
 
   const quiz = await db.quiz.findUnique({
     where: { id: quizId },
     include: {
       chapter: {
-        include: {
+        select: {
+          id: true,
+          title: true,
           course: true,
         },
       },
@@ -42,6 +44,41 @@ const QuizPage = async ({ params }: { params: Promise<{ chapterId: string; quizI
     return redirect(`/course`)
   }
 
+  // Fetch all lessons and quizzes in this chapter for navigation
+  const chapterContent = await db.chapter.findUnique({
+    where: { id: chapterId },
+    include: {
+      lessons: {
+        where: { isPublished: true },
+        orderBy: { position: "asc" },
+        select: { id: true, title: true, position: true }
+      },
+      quizzes: {
+        where: { isPublished: true },
+        orderBy: { position: "asc" },
+        select: { id: true, title: true, position: true }
+      }
+    }
+  });
+
+  // Build navigation items
+  const navItems: { id: string; title: string; type: "lesson" | "quiz"; position: number }[] = [];
+
+  if (chapterContent) {
+    chapterContent.lessons.forEach(l => {
+      navItems.push({ id: l.id, title: l.title, type: "lesson", position: l.position });
+    });
+    chapterContent.quizzes.forEach(q => {
+      navItems.push({ id: q.id, title: q.title, type: "quiz", position: q.position });
+    });
+  }
+
+  navItems.sort((a, b) => a.position - b.position);
+
+  const currentIndex = navItems.findIndex(item => item.id === quizId && item.type === "quiz");
+  const prevItem = currentIndex > 0 ? navItems[currentIndex - 1] : null;
+  const nextItem = currentIndex < navItems.length - 1 ? navItems[currentIndex + 1] : null;
+
   const formattedQuestions = questions.map((question) => {
     const options = Array.isArray(question.options)
       ? (question.options as string[]).filter((option) => typeof option === "string")
@@ -52,9 +89,18 @@ const QuizPage = async ({ params }: { params: Promise<{ chapterId: string; quizI
       : []
 
     return {
-      ...question,
+      id: question.id,
+      position: question.position,
+      question: question.question,
+      questionType: question.questionType,
+      questionImageUrl: question.questionImageUrl,
+      imageHeight: question.imageHeight,
       options,
       answers,
+      points: question.points,
+      hint: question.hint,
+      hintImageUrl: question.hintImageUrl,
+      note: question.note,
     }
   })
 
@@ -66,6 +112,11 @@ const QuizPage = async ({ params }: { params: Promise<{ chapterId: string; quizI
       chapterId={chapterId}
       userId={userId}
       existingResult={existingResult}
+      chapterTitle={quiz.chapter?.title || "Chapter"}
+      currentIndex={currentIndex}
+      totalItems={navItems.length}
+      prevItem={prevItem}
+      nextItem={nextItem}
     />
   )
 }

@@ -5,7 +5,7 @@ import Link from "next/link"
 
 const WhatIsSATPage = () => {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
         <Link href="/info">
@@ -16,7 +16,7 @@ const WhatIsSATPage = () => {
         </Link>
 
         {/* Header */}
-        <Card className="shadow-xl border-0 bg-white mb-8">
+        <Card className="shadow-xl border-0 bg-card mb-8">
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div className="p-3 bg-white/20 rounded-lg">
@@ -33,31 +33,31 @@ const WhatIsSATPage = () => {
         </Card>
 
         {/* Quick Facts */}
-        <Card className="shadow-lg border-0 bg-white mb-8 py-6">
+        <Card className="shadow-lg border-0 bg-card mb-8 py-6">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-slate-900">Quick Facts</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground">Quick Facts</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-blue-50 rounded-lg">
-                <Clock className="h-8 w-8 mx-auto mb-2 text-blue-600" />
-                <div className="font-semibold text-slate-900">3 hours</div>
-                <div className="text-sm text-slate-600">Test Duration</div>
+              <div className="text-center p-4 bg-blue-500/10 rounded-lg">
+                <Clock className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+                <div className="font-semibold text-foreground">3 hours</div>
+                <div className="text-sm text-muted-foreground">Test Duration</div>
               </div>
-              <div className="text-center p-4 bg-green-50 rounded-lg">
-                <Target className="h-8 w-8 mx-auto mb-2 text-green-600" />
-                <div className="font-semibold text-slate-900">1600</div>
-                <div className="text-sm text-slate-600">Max Score</div>
+              <div className="text-center p-4 bg-green-500/10 rounded-lg">
+                <Target className="h-8 w-8 mx-auto mb-2 text-green-500" />
+                <div className="font-semibold text-foreground">1600</div>
+                <div className="text-sm text-muted-foreground">Max Score</div>
               </div>
-              <div className="text-center p-4 bg-purple-50 rounded-lg">
-                <BookOpen className="h-8 w-8 mx-auto mb-2 text-purple-600" />
-                <div className="font-semibold text-slate-900">2 Sections</div>
-                <div className="text-sm text-slate-600">Main Areas</div>
+              <div className="text-center p-4 bg-purple-500/10 rounded-lg">
+                <BookOpen className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+                <div className="font-semibold text-foreground">2 Sections</div>
+                <div className="text-sm text-muted-foreground">Main Areas</div>
               </div>
-              <div className="text-center p-4 bg-amber-50 rounded-lg">
-                <Users className="h-8 w-8 mx-auto mb-2 text-amber-600" />
-                <div className="font-semibold text-slate-900">1.5M+</div>
-                <div className="text-sm text-slate-600">Annual Test Takers</div>
+              <div className="text-center p-4 bg-amber-500/10 rounded-lg">
+                <Users className="h-8 w-8 mx-auto mb-2 text-amber-500" />
+                <div className="font-semibold text-foreground">1.5M+</div>
+                <div className="text-sm text-muted-foreground">Annual Test Takers</div>
               </div>
             </div>
           </CardContent>
@@ -66,20 +66,20 @@ const WhatIsSATPage = () => {
         {/* Main Content */}
         <div className="space-y-8">
           {/* Introduction */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">Introduction to SAT</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Introduction to SAT</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-slate max-w-none">
-              <p className="text-lg text-slate-700 leading-relaxed mb-6">
+              <p className="text-lg text-foreground leading-relaxed mb-6">
                 The SAT (Scholastic Assessment Test) is a standardized test widely used for college admissions in the
                 United States. Originally called the Scholastic Aptitude Test, the SAT is developed and administered by
                 the College Board and is designed to assess a student&apos;s readiness for college.
               </p>
 
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6">
-                <h3 className="text-lg font-semibold text-blue-900 mb-3">Key Purpose</h3>
-                <p className="text-blue-800">
+              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-semibold text-blue-500 mb-3">Key Purpose</h3>
+                <p className="text-foreground">
                   The SAT provides colleges with a common data point that can be used to compare all applicants,
                   regardless of their high school background, curriculum, or grading standards.
                 </p>
@@ -88,25 +88,25 @@ const WhatIsSATPage = () => {
           </Card>
 
           {/* Test Structure */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">Test Structure</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Test Structure</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-lg border border-blue-200">
-                    <h3 className="text-xl font-semibold text-blue-900 mb-3">Evidence-Based Reading and Writing</h3>
-                    <div className="space-y-2 text-blue-800">
+                  <div className="p-6 bg-blue-500/10 rounded-lg border border-blue-500/30">
+                    <h3 className="text-xl font-semibold text-blue-500 mb-3">Evidence-Based Reading and Writing</h3>
+                    <div className="space-y-2 text-foreground">
                       <p>• Reading Test: 52 questions, 65 minutes</p>
                       <p>• Writing and Language Test: 44 questions, 35 minutes</p>
                       <p>• Score Range: 200-800</p>
                     </div>
                   </div>
 
-                  <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-lg border border-green-200">
-                    <h3 className="text-xl font-semibold text-green-900 mb-3">Math</h3>
-                    <div className="space-y-2 text-green-800">
+                  <div className="p-6 bg-green-500/10 rounded-lg border border-green-500/30">
+                    <h3 className="text-xl font-semibold text-green-500 mb-3">Math</h3>
+                    <div className="space-y-2 text-foreground">
                       <p>• Calculator Section: 38 questions, 55 minutes</p>
                       <p>• No Calculator Section: 20 questions, 25 minutes</p>
                       <p>• Score Range: 200-800</p>
@@ -114,9 +114,9 @@ const WhatIsSATPage = () => {
                   </div>
                 </div>
 
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-amber-900 mb-3">Optional Essay (Discontinued)</h3>
-                  <p className="text-amber-800">
+                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-amber-500 mb-3">Optional Essay (Discontinued)</h3>
+                  <p className="text-foreground">
                     As of June 2021, the College Board discontinued the optional SAT Essay. Most colleges no longer
                     require or consider SAT Essay scores for admissions.
                   </p>
@@ -126,18 +126,18 @@ const WhatIsSATPage = () => {
           </Card>
 
           {/* Content Areas */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">What the SAT Tests</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">What the SAT Tests</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-4">Reading Test</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Reading Test</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <h4 className="font-medium text-slate-800">Passage Types:</h4>
-                      <ul className="space-y-1 text-slate-700">
+                      <h4 className="font-medium text-foreground">Passage Types:</h4>
+                      <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-600" />
                           Literature
@@ -157,8 +157,8 @@ const WhatIsSATPage = () => {
                       </ul>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-medium text-slate-800">Skills Tested:</h4>
-                      <ul className="space-y-1 text-slate-700">
+                      <h4 className="font-medium text-foreground">Skills Tested:</h4>
+                      <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-600" />
                           Reading Comprehension
@@ -181,11 +181,11 @@ const WhatIsSATPage = () => {
                 </div>
 
                 <div>
-                  <h3 className="text-xl font-semibold text-slate-900 mb-4">Math Test</h3>
+                  <h3 className="text-xl font-semibold text-foreground mb-4">Math Test</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <h4 className="font-medium text-slate-800">Topics Covered:</h4>
-                      <ul className="space-y-1 text-slate-700">
+                      <h4 className="font-medium text-foreground">Topics Covered:</h4>
+                      <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-600" />
                           Algebra
@@ -205,8 +205,8 @@ const WhatIsSATPage = () => {
                       </ul>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-medium text-slate-800">Question Types:</h4>
-                      <ul className="space-y-1 text-slate-700">
+                      <h4 className="font-medium text-foreground">Question Types:</h4>
+                      <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
                           <CheckCircle className="h-4 w-4 text-green-600" />
                           Multiple Choice
@@ -232,36 +232,36 @@ const WhatIsSATPage = () => {
           </Card>
 
           {/* Why Take the SAT */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">Why Take the SAT?</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Why Take the SAT?</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">College Admissions</h3>
-                  <p className="text-slate-700">
+                  <h3 className="text-lg font-semibold text-foreground">College Admissions</h3>
+                  <p className="text-foreground">
                     Most colleges and universities in the US use SAT scores as part of their admissions process. A good
                     SAT score can significantly improve your chances of getting into your dream school.
                   </p>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Scholarships</h3>
-                  <p className="text-slate-700">
+                  <h3 className="text-lg font-semibold text-foreground">Scholarships</h3>
+                  <p className="text-foreground">
                     Many scholarship programs use SAT scores as criteria for awarding financial aid. Higher scores can
                     lead to more scholarship opportunities.
                   </p>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">College Readiness</h3>
-                  <p className="text-slate-700">
+                  <h3 className="text-lg font-semibold text-foreground">College Readiness</h3>
+                  <p className="text-foreground">
                     The SAT helps assess your readiness for college-level work and can guide you in choosing appropriate
                     courses and support services.
                   </p>
                 </div>
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">National Recognition</h3>
-                  <p className="text-slate-700">
+                  <h3 className="text-lg font-semibold text-foreground">National Recognition</h3>
+                  <p className="text-foreground">
                     High SAT scores can qualify you for national recognition programs and honors that look great on
                     college applications.
                   </p>

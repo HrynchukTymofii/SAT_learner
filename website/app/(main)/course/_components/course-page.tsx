@@ -12,7 +12,9 @@ import {
   Users,
   Calendar,
   Clock,
+  Lock,
 } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -62,6 +64,33 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
     );
   };
 
+  // Calculate chapter progress
+  const getChapterProgress = (chapter: any) => {
+    const totalItems = chapter.lessons.length + chapter.quizzes.length;
+    if (totalItems === 0) return 0;
+
+    let completedItems = 0;
+    chapter.lessons.forEach((lesson: any) => {
+      if (lesson.progress?.length > 0 && lesson.progress[0].completed) {
+        completedItems++;
+      }
+    });
+    chapter.quizzes.forEach((quiz: any) => {
+      if (quiz.results?.length > 0 && quiz.results[0].completed) {
+        completedItems++;
+      }
+    });
+
+    return Math.round((completedItems / totalItems) * 100);
+  };
+
+  // Count free items in chapter
+  const getChapterFreeCount = (chapter: any) => {
+    const freeLessons = chapter.lessons.filter((l: any) => l.isFree).length;
+    const freeQuizzes = chapter.quizzes.filter((q: any) => q.isFree).length;
+    return freeLessons + freeQuizzes;
+  };
+
   const handleContentClick = (
     chapterId: string,
     contentId: string,
@@ -102,7 +131,7 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
             <div className="lg:col-span-2">
               <div className="relative group">
                 <div className="absolute -inset-1 bg-gradient-to-r from-cyan-500/30 to-blue-600/30 rounded-3xl opacity-0 group-hover:opacity-100 blur transition duration-300" />
-                <Card className="relative overflow-hidden shadow-2xl border-0 bg-white/90 backdrop-blur-xl rounded-3xl">
+                <Card className="relative overflow-hidden shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl">
                   <div className="h-1 bg-gradient-to-r from-cyan-500 to-blue-600" />
                   <div className="relative">
                     {course.courseVideoUrl ? (
@@ -144,12 +173,12 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
               >
                 <div className="relative group">
                   <div className="absolute -inset-1 bg-gradient-to-r from-purple-500/30 to-pink-600/30 rounded-3xl opacity-0 group-hover:opacity-100 blur transition duration-300" />
-                  <Card className="relative shadow-2xl border-0 bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden">
+                  <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden">
                     <div className="h-1 bg-gradient-to-r from-purple-500 to-pink-600" />
                     <CardContent className="p-6">
                       {/* Add course title here */}
                       <div className="mb-4">
-                        <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent mb-2">
+                        <h1 className="text-2xl font-bold text-foreground mb-2">
                           {course.title}
                         </h1>
                         <Badge className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white border-0 shadow-lg shadow-cyan-500/30">
@@ -176,33 +205,33 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                               />
                             ))}
                           </div>
-                          <span className="text-sm text-slate-600">
+                          <span className="text-sm text-muted-foreground">
                             (128 reviews)
                           </span>
                         </div>
 
                         <div className="space-y-2 text-sm">
-                          <div className="flex items-center gap-2 text-slate-700">
-                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-purple-100 to-pink-100">
-                              <Users className="h-3.5 w-3.5 text-purple-600" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <div className="p-1.5 rounded-lg bg-purple-500/10">
+                              <Users className="h-3.5 w-3.5 text-purple-500" />
                             </div>
                             <span>{courseInfo.students} students</span>
                           </div>
-                          <div className="flex items-center gap-2 text-slate-700">
-                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-blue-100 to-cyan-100">
-                              <Calendar className="h-3.5 w-3.5 text-blue-600" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <div className="p-1.5 rounded-lg bg-blue-500/10">
+                              <Calendar className="h-3.5 w-3.5 text-blue-500" />
                             </div>
                             <span>Updated {courseInfo.lastUpdated}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-slate-700">
-                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-emerald-100 to-green-100">
-                              <Clock className="h-3.5 w-3.5 text-emerald-600" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <div className="p-1.5 rounded-lg bg-emerald-500/10">
+                              <Clock className="h-3.5 w-3.5 text-emerald-500" />
                             </div>
                             <span>{courseInfo.duration}</span>
                           </div>
-                          <div className="flex items-center gap-2 text-slate-700">
-                            <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100">
-                              <Award className="h-3.5 w-3.5 text-amber-600" />
+                          <div className="flex items-center gap-2 text-foreground">
+                            <div className="p-1.5 rounded-lg bg-amber-500/10">
+                              <Award className="h-3.5 w-3.5 text-amber-500" />
                             </div>
                             <span>Certificate</span>
                           </div>
@@ -230,19 +259,19 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                       />
 
                       <div className="mt-6 space-y-3">
-                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-emerald-50 to-green-50 border border-emerald-200/50">
-                          <CheckCircle className="h-5 w-5 text-emerald-600" />
-                          <span className="text-sm font-medium text-slate-700">Full lifetime access</span>
+                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20">
+                          <CheckCircle className="h-5 w-5 text-emerald-500" />
+                          <span className="text-sm font-medium text-foreground">Full lifetime access</span>
                         </div>
-                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-blue-50 to-cyan-50 border border-blue-200/50">
-                          <CheckCircle className="h-5 w-5 text-blue-600" />
-                          <span className="text-sm font-medium text-slate-700">
+                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+                          <CheckCircle className="h-5 w-5 text-blue-500" />
+                          <span className="text-sm font-medium text-foreground">
                             Access on mobile and desktop
                           </span>
                         </div>
-                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200/50">
-                          <CheckCircle className="h-5 w-5 text-purple-600" />
-                          <span className="text-sm font-medium text-slate-700">
+                        <div className="flex items-center gap-3 p-3 rounded-2xl bg-purple-500/10 border border-purple-500/20">
+                          <CheckCircle className="h-5 w-5 text-purple-500" />
+                          <span className="text-sm font-medium text-foreground">
                             Certificate of completion
                           </span>
                         </div>
@@ -266,16 +295,16 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
         >
           <div className="relative group">
             <div className="absolute -inset-1 bg-gradient-to-r from-blue-500/20 to-purple-600/20 rounded-3xl opacity-0 group-hover:opacity-100 blur transition duration-300" />
-            <Card className="relative shadow-2xl border-0 bg-white/90 backdrop-blur-xl rounded-3xl overflow-hidden py-6 mb-8">
+            <Card className="relative shadow-2xl border-0 bg-card/90 backdrop-blur-xl rounded-3xl overflow-hidden py-6 mb-8">
               <div className="h-1 bg-gradient-to-r from-blue-500 to-purple-600" />
               <CardHeader>
-                <CardTitle className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent flex items-center gap-3">
-                  <div className="p-2.5 rounded-xl bg-gradient-to-br from-blue-100 to-purple-100 transform rotate-3">
-                    <FileText className="h-6 w-6 text-blue-600" />
+                <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-3">
+                  <div className="p-2.5 rounded-xl bg-blue-500/10 transform rotate-3">
+                    <FileText className="h-6 w-6 text-blue-500" />
                   </div>
                   Course Content
                 </CardTitle>
-                <CardDescription className="text-base text-slate-600">
+                <CardDescription className="text-base text-muted-foreground">
                   {course.chapters.length} chapters •{" "}
                   {course.chapters.reduce(
                     (acc: number, chapter: any) =>
@@ -286,7 +315,12 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {course.chapters.map((chapter: any, chapterIndex: number) => (
+                {course.chapters.map((chapter: any, chapterIndex: number) => {
+                  const chapterProgress = getChapterProgress(chapter);
+                  const freeCount = getChapterFreeCount(chapter);
+                  const totalItems = chapter.lessons.length + chapter.quizzes.length;
+
+                  return (
                   <Collapsible
                     key={chapter.id}
                     open={openChapters.includes(chapter.id)}
@@ -296,20 +330,31 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                     <CollapsibleTrigger asChild>
                       <Button
                         variant="ghost"
-                        className="w-full justify-between p-4 h-auto hover:bg-gradient-to-r hover:from-blue-50 hover:to-purple-50 rounded-2xl border-2 border-slate-200 hover:border-blue-300 transition-all duration-200 hover:shadow-lg group"
+                        className="w-full justify-between p-4 h-auto hover:bg-blue-500/5 rounded-2xl border-2 border-border hover:border-blue-500/30 transition-all duration-200 hover:shadow-lg group"
                       >
-                        <div className="flex items-center gap-3">
+                        <div className="flex items-center gap-3 flex-1">
                           <div className="flex items-center justify-center w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-xl font-bold text-sm shadow-lg group-hover:scale-110 transition-transform duration-200">
                             {chapterIndex + 1}
                           </div>
-                          <div className="text-left">
-                            <h4 className="font-bold text-slate-900">
+                          <div className="text-left flex-1">
+                            <h4 className="font-bold text-foreground">
                               {chapter.title}
                             </h4>
-                            <p className="text-sm text-slate-600">
-                              {chapter.lessons.length} lessons •{" "}
-                              {chapter.quizzes.length} quizzes
-                            </p>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <span>{chapter.lessons.length} lessons • {chapter.quizzes.length} quizzes</span>
+                              {freeCount > 0 && (
+                                <Badge className="bg-green-100 text-green-700 text-xs px-1.5 py-0">
+                                  {freeCount} FREE
+                                </Badge>
+                              )}
+                            </div>
+                            {/* Progress bar */}
+                            {userId && chapterProgress > 0 && (
+                              <div className="mt-2 flex items-center gap-2">
+                                <Progress value={chapterProgress} className="h-1.5 flex-1 max-w-32" />
+                                <span className="text-xs text-muted-foreground">{chapterProgress}%</span>
+                              </div>
+                            )}
                           </div>
                         </div>
                         {openChapters.includes(chapter.id) ? (
@@ -324,6 +369,8 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                         {/* Lessons */}
                         {chapter.lessons.map(
                           (lesson: any, lessonIndex: number) => {
+                            const isCompleted = lesson.progress?.length > 0 && lesson.progress[0].completed;
+                            const isFree = lesson.isFree;
 
                             return (
                               <motion.div
@@ -343,18 +390,26 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                                   )
                                 }
                               >
-                                <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-cyan-50 hover:to-blue-50 transition-all hover:shadow-md border border-transparent hover:border-cyan-200">
-                                  <div className="flex items-center justify-center w-7 h-7 bg-gradient-to-br from-slate-100 to-slate-200 text-slate-700 rounded-lg text-xs font-semibold shadow-sm">
+                                <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-primary/5 transition-all hover:shadow-md border border-transparent hover:border-primary/20">
+                                  <div className="flex items-center justify-center w-7 h-7 bg-muted text-foreground rounded-lg text-xs font-semibold shadow-sm">
                                     {lessonIndex + 1}
                                   </div>
-                                  <div className="p-1.5 rounded-lg bg-gradient-to-br from-cyan-100 to-blue-100">
-                                    <Play className="h-3.5 w-3.5 text-cyan-600" />
+                                  <div className="p-1.5 rounded-lg bg-primary/10">
+                                    <Play className="h-3.5 w-3.5 text-primary" />
                                   </div>
                                   <div className="flex-1">
-                                    <h5 className="font-semibold text-slate-700 group-hover:text-cyan-700 transition-colors">
+                                    <h5 className="font-semibold text-foreground group-hover:text-primary transition-colors">
                                       {lesson.title}
                                     </h5>
                                   </div>
+                                  {/* Status indicators */}
+                                  {isCompleted ? (
+                                    <CheckCircle className="h-4 w-4 text-green-500" />
+                                  ) : isFree ? (
+                                    <Badge className="bg-green-100 text-green-700 text-xs px-1.5 py-0">FREE</Badge>
+                                  ) : (
+                                    <Lock className="h-4 w-4 text-slate-400" />
+                                  )}
                                 </div>
                               </motion.div>
                             );
@@ -363,6 +418,8 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
 
                         {/* Quizzes */}
                         {chapter.quizzes.map((quiz: any, quizIndex: number) => {
+                          const isCompleted = quiz.results?.length > 0 && quiz.results[0].completed;
+                          const isFree = quiz.isFree;
 
                           return (
                             <motion.div
@@ -379,18 +436,26 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                                 handleContentClick(chapter.id, quiz.id, "quiz")
                               }
                             >
-                              <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-gradient-to-r hover:from-amber-50 hover:to-orange-50 transition-all hover:shadow-md border border-transparent hover:border-amber-200">
-                                <div className="flex items-center justify-center w-7 h-7 bg-gradient-to-br from-amber-100 to-orange-200 text-amber-700 rounded-lg text-xs font-bold shadow-sm">
+                              <div className="flex items-center gap-3 p-3 rounded-xl hover:bg-amber-500/5 transition-all hover:shadow-md border border-transparent hover:border-amber-500/20">
+                                <div className="flex items-center justify-center w-7 h-7 bg-amber-500/10 text-amber-500 rounded-lg text-xs font-bold shadow-sm">
                                   Q{quizIndex + 1}
                                 </div>
-                                <div className="p-1.5 rounded-lg bg-gradient-to-br from-amber-100 to-orange-100">
-                                  <HelpCircle className="h-3.5 w-3.5 text-amber-600" />
+                                <div className="p-1.5 rounded-lg bg-amber-500/10">
+                                  <HelpCircle className="h-3.5 w-3.5 text-amber-500" />
                                 </div>
                                 <div className="flex-1">
-                                  <h5 className="font-semibold text-slate-700 group-hover:text-amber-700 transition-colors">
+                                  <h5 className="font-semibold text-foreground group-hover:text-amber-500 transition-colors">
                                     {quiz.title}
                                   </h5>
                                 </div>
+                                {/* Status indicators */}
+                                {isCompleted ? (
+                                  <CheckCircle className="h-4 w-4 text-green-500" />
+                                ) : isFree ? (
+                                  <Badge className="bg-green-100 text-green-700 text-xs px-1.5 py-0">FREE</Badge>
+                                ) : (
+                                  <Lock className="h-4 w-4 text-slate-400" />
+                                )}
                               </div>
                             </motion.div>
                           );
@@ -398,7 +463,8 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                       </div>
                     </CollapsibleContent>
                   </Collapsible>
-                ))}
+                  );
+                })}
               </CardContent>
             </Card>
           </div>

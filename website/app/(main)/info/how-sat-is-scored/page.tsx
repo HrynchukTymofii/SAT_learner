@@ -7,7 +7,7 @@ import Link from "next/link"
 
 const HowSATIsScoredPage = () => {
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
         <Link href="/info">
@@ -18,7 +18,7 @@ const HowSATIsScoredPage = () => {
         </Link>
 
         {/* Header */}
-        <Card className="shadow-xl border-0 bg-white mb-8">
+        <Card className="shadow-xl border-0 bg-card mb-8">
           <div className="bg-gradient-to-r from-green-600 to-blue-600 text-white p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div className="p-3 bg-white/20 rounded-lg">
@@ -35,9 +35,9 @@ const HowSATIsScoredPage = () => {
         </Card>
 
         {/* Score Overview */}
-        <Card className="shadow-lg border-0 bg-white mb-8 py-6">
+        <Card className="shadow-lg border-0 bg-card mb-8 py-6">
           <CardHeader>
-            <CardTitle className="text-xl font-bold text-slate-900">Score Overview</CardTitle>
+            <CardTitle className="text-xl font-bold text-foreground">Score Overview</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -63,9 +63,9 @@ const HowSATIsScoredPage = () => {
         {/* Main Content */}
         <div className="space-y-8">
           {/* Scoring Process */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">How Scoring Works</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">How Scoring Works</CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -75,9 +75,9 @@ const HowSATIsScoredPage = () => {
                   answers, so it&apos;s always better to guess than leave a question blank.
                 </p>
                 <div className="bg-white rounded-lg p-4">
-                  <div className="text-sm text-slate-600 mb-2">Example: Math Section</div>
+                  <div className="text-sm text-muted-foreground mb-2">Example: Math Section</div>
                   <div className="flex items-center gap-4">
-                    <span className="text-slate-900">Correct Answers: 45/58</span>
+                    <span className="text-foreground">Correct Answers: 45/58</span>
                     <span className="text-slate-500">→</span>
                     <span className="font-semibold text-blue-600">Raw Score: 45</span>
                   </div>
@@ -91,7 +91,7 @@ const HowSATIsScoredPage = () => {
                   fairness across different test dates and versions.
                 </p>
                 <div className="bg-white rounded-lg p-4">
-                  <div className="text-sm text-slate-600 mb-2">Conversion Example</div>
+                  <div className="text-sm text-muted-foreground mb-2">Conversion Example</div>
                   <div className="space-y-2">
                     <div className="flex justify-between items-center">
                       <span>Raw Score: 45</span>
@@ -108,7 +108,7 @@ const HowSATIsScoredPage = () => {
                   Your total SAT score is the sum of your Math and Evidence-Based Reading and Writing section scores.
                 </p>
                 <div className="bg-white rounded-lg p-4 mt-3">
-                  <div className="text-sm text-slate-600 mb-2">Total Score Calculation</div>
+                  <div className="text-sm text-muted-foreground mb-2">Total Score Calculation</div>
                   <div className="space-y-2">
                     <div className="flex justify-between">
                       <span>Math Section:</span>
@@ -130,15 +130,15 @@ const HowSATIsScoredPage = () => {
           </Card>
 
           {/* Score Ranges */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">Understanding Score Ranges</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Understanding Score Ranges</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Score Percentiles</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Score Percentiles</h3>
                     <div className="space-y-3">
                       <div className="flex justify-between items-center p-3 bg-red-50 rounded-lg">
                         <span className="font-medium">1400-1600</span>
@@ -164,7 +164,7 @@ const HowSATIsScoredPage = () => {
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-slate-900">What Scores Mean</h3>
+                    <h3 className="text-lg font-semibold text-foreground">What Scores Mean</h3>
                     <div className="space-y-3">
                       <div className="p-4 bg-green-50 border border-green-200 rounded-lg">
                         <h4 className="font-semibold text-green-900 mb-2">1400+ (Excellent)</h4>
@@ -198,14 +198,14 @@ const HowSATIsScoredPage = () => {
           </Card>
 
           {/* Subscores */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">Subscores and Cross-Test Scores</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Subscores and Cross-Test Scores</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div>
-                  <h3 className="text-lg font-semibold text-slate-900 mb-4">Test Subscores (1-15 scale)</h3>
+                  <h3 className="text-lg font-semibold text-foreground mb-4">Test Subscores (1-15 scale)</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="p-4 bg-blue-50 rounded-lg">
                       <h4 className="font-medium text-blue-900 mb-2">Reading Test</h4>
@@ -243,18 +243,18 @@ const HowSATIsScoredPage = () => {
           </Card>
 
           {/* Score Improvement Tips */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">Score Improvement Strategies</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Score Improvement Strategies</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-green-600" />
                     Math Section
                   </h3>
-                  <ul className="space-y-2 text-slate-700">
+                  <ul className="space-y-2 text-foreground">
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-green-500 rounded-full mt-2"></div>
                       <span>Master algebra fundamentals and linear equations</span>
@@ -275,11 +275,11 @@ const HowSATIsScoredPage = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                     <TrendingUp className="h-5 w-5 text-blue-600" />
                     Reading & Writing
                   </h3>
-                  <ul className="space-y-2 text-slate-700">
+                  <ul className="space-y-2 text-foreground">
                     <li className="flex items-start gap-2">
                       <div className="w-2 h-2 bg-blue-500 rounded-full mt-2"></div>
                       <span>Read actively and practice finding evidence</span>

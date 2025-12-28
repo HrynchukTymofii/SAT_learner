@@ -47,7 +47,7 @@ export function PricingSection() {
   ]
 
   return (
-    <section className="py-16 mt-8 bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl">
+    <section className="py-16 mt-8 bg-gradient-to-br from-muted/30 to-muted/50 rounded-3xl">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-16">
           <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white border-0 mb-4 px-4 py-2 rounded-full shadow-lg">
@@ -55,11 +55,11 @@ export function PricingSection() {
             Pricing
           </Badge>
           <h2 className="text-4xl md:text-5xl font-bold mb-4">
-            <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+            <span className="text-foreground">
               Choose Your Plan
             </span>
           </h2>
-          <p className="text-xl text-gray-600">Flexible pricing options to fit your preparation timeline</p>
+          <p className="text-xl text-muted-foreground">Flexible pricing options to fit your preparation timeline</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -68,13 +68,13 @@ export function PricingSection() {
               {/* Glow effect */}
               <div className={`absolute -inset-1 bg-gradient-to-r ${plan.glowColor} rounded-3xl opacity-0 group-hover:opacity-30 blur transition duration-500 ${plan.popular ? "opacity-20" : ""}`} />
 
-              <Card className={`relative border-0 bg-white/90 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform ${plan.popular ? "scale-105" : "group-hover:scale-105"} overflow-hidden`}>
+              <Card className={`relative border-0 bg-card/90 backdrop-blur-xl rounded-3xl shadow-xl hover:shadow-2xl transition-all duration-300 transform ${plan.popular ? "scale-105" : "group-hover:scale-105"} overflow-hidden`}>
                 {/* Gradient top bar */}
                 <div className={`h-2 bg-gradient-to-r ${plan.gradient}`} />
 
                 {plan.popular && (
                   <div className="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-                    <Badge className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-2 rounded-full shadow-xl border-4 border-white">
+                    <Badge className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-6 py-2 rounded-full shadow-xl border-4 border-card">
                       <Sparkles className="w-4 h-4 inline mr-1" />
                       Most Popular
                     </Badge>
@@ -84,18 +84,18 @@ export function PricingSection() {
                 <CardContent className="p-8 pt-10">
                   <div className="text-center space-y-6">
                     <div>
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                      <p className="text-gray-600">{plan.description}</p>
+                      <h3 className="text-2xl font-bold text-foreground mb-2">{plan.name}</h3>
+                      <p className="text-muted-foreground">{plan.description}</p>
                     </div>
 
                     <div>
                       <div className={`text-5xl font-bold bg-gradient-to-r ${plan.gradient} bg-clip-text text-transparent mb-2`}>
                         {plan.price}
                       </div>
-                      <div className="text-gray-500 font-medium">{plan.period}</div>
+                      <div className="text-muted-foreground font-medium">{plan.period}</div>
                       {plan.savings && (
-                        <div className="mt-2 inline-block px-3 py-1 bg-green-100 rounded-full">
-                          <span className="text-sm text-green-700 font-bold">{plan.savings}</span>
+                        <div className="mt-2 inline-block px-3 py-1 bg-green-500/10 rounded-full">
+                          <span className="text-sm text-green-500 font-bold">{plan.savings}</span>
                         </div>
                       )}
                     </div>
@@ -106,7 +106,7 @@ export function PricingSection() {
                           <div className="flex-shrink-0">
                             <CheckCircle className="h-5 w-5 text-emerald-500" />
                           </div>
-                          <span className="text-gray-700">{feature}</span>
+                          <span className="text-foreground">{feature}</span>
                         </div>
                       ))}
                     </div>
@@ -124,9 +124,9 @@ export function PricingSection() {
         </div>
 
         <div className="text-center mt-12">
-          <div className="inline-flex items-center gap-2 px-6 py-3 bg-white rounded-2xl shadow-lg">
+          <div className="inline-flex items-center gap-2 px-6 py-3 bg-card rounded-2xl shadow-lg">
             <CheckCircle className="w-5 h-5 text-green-500" />
-            <p className="text-gray-700 font-medium">All plans include a 30-day money-back guarantee</p>
+            <p className="text-foreground font-medium">All plans include a 30-day money-back guarantee</p>
           </div>
         </div>
       </div>

@@ -6,7 +6,7 @@ import Link from "next/link"
 
 const AboutCourseSection = () => {
   return (
-    <section className="py-16 bg-gradient-to-br from-gray-50 to-gray-100">
+    <section className="py-16 bg-gradient-to-br from-muted/30 to-muted/50">
         <div className="max-w-7xl mx-auto px-4">
           <div className="text-center mb-16">
             <Badge className="bg-gradient-to-r from-purple-500 to-pink-500 text-white border-0 mb-4 px-4 py-2 rounded-full shadow-lg">
@@ -14,11 +14,11 @@ const AboutCourseSection = () => {
               Our Course
             </Badge>
             <h2 className="text-4xl md:text-5xl font-bold mb-4">
-              <span className="bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              <span className="text-foreground">
                 Complete SAT Preparation Course
               </span>
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
               Everything you need to achieve your target score in one comprehensive program
             </p>
           </div>
@@ -27,7 +27,7 @@ const AboutCourseSection = () => {
             {/* Card 1 - Personalized Learning */}
             <div className="group relative">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-              <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+              <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                 <div className="h-1 bg-gradient-to-r from-blue-500 to-cyan-500" />
                 <CardContent className="p-8">
                   <div className="text-center space-y-4">
@@ -37,8 +37,8 @@ const AboutCourseSection = () => {
                         <Target className="h-8 w-8 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">Personalized Learning</h3>
-                    <p className="text-gray-600">AI-powered study plan adapted to your strengths and weaknesses</p>
+                    <h3 className="text-xl font-bold text-foreground">Personalized Learning</h3>
+                    <p className="text-muted-foreground">AI-powered study plan adapted to your strengths and weaknesses</p>
                   </div>
                 </CardContent>
               </Card>
@@ -47,7 +47,7 @@ const AboutCourseSection = () => {
             {/* Card 2 - Expert Content */}
             <div className="group relative">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-emerald-500 to-green-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-              <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+              <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                 <div className="h-1 bg-gradient-to-r from-emerald-500 to-green-500" />
                 <CardContent className="p-8">
                   <div className="text-center space-y-4">
@@ -57,8 +57,8 @@ const AboutCourseSection = () => {
                         <BookOpen className="h-8 w-8 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">Expert Content</h3>
-                    <p className="text-gray-600">Created by SAT experts with 15+ years of teaching experience</p>
+                    <h3 className="text-xl font-bold text-foreground">Expert Content</h3>
+                    <p className="text-muted-foreground">Created by SAT experts with 15+ years of teaching experience</p>
                   </div>
                 </CardContent>
               </Card>
@@ -67,7 +67,7 @@ const AboutCourseSection = () => {
             {/* Card 3 - Progress Tracking */}
             <div className="group relative">
               <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-3xl opacity-0 group-hover:opacity-20 blur transition duration-500" />
-              <Card className="relative border-0 bg-white rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
+              <Card className="relative border-0 bg-card rounded-3xl shadow-lg hover:shadow-2xl transition-all duration-300 transform group-hover:scale-105 overflow-hidden">
                 <div className="h-1 bg-gradient-to-r from-purple-500 to-pink-500" />
                 <CardContent className="p-8">
                   <div className="text-center space-y-4">
@@ -77,8 +77,8 @@ const AboutCourseSection = () => {
                         <TrendingUp className="h-8 w-8 text-white" />
                       </div>
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">Progress Tracking</h3>
-                    <p className="text-gray-600">Detailed analytics and progress reports to monitor improvement</p>
+                    <h3 className="text-xl font-bold text-foreground">Progress Tracking</h3>
+                    <p className="text-muted-foreground">Detailed analytics and progress reports to monitor improvement</p>
                   </div>
                 </CardContent>
               </Card>

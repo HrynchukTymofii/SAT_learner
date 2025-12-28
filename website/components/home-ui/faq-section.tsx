@@ -31,25 +31,25 @@ export function FAQSection() {
   ]
 
   return (
-    <section className="py-16 bg-slate-50">
+    <section className="py-16 bg-muted/30">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <Badge className="bg-slate-100 text-slate-800 mb-4">FAQ</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Frequently Asked Questions</h2>
-          <p className="text-xl text-slate-600">Get answers to common questions about our SAT prep program</p>
+          <Badge className="bg-muted text-foreground mb-4">FAQ</Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Frequently Asked Questions</h2>
+          <p className="text-xl text-muted-foreground">Get answers to common questions about our SAT prep program</p>
         </div>
 
         <div className="space-y-6">
           {faqs.map((faq, index) => (
-            <Card key={index} className="shadow-lg border-0 bg-white rounded-xl">
+            <Card key={index} className="shadow-lg border-0 bg-card rounded-xl">
               <CardContent className="p-6">
                 <div className="flex items-start gap-4">
-                  <div className={`p-2 bg-${faq.color}-100 rounded-xl`}>
-                    <HelpCircle className={`h-5 w-5 text-${faq.color}-600`} />
+                  <div className={`p-2 bg-${faq.color}-500/10 rounded-xl`}>
+                    <HelpCircle className={`h-5 w-5 text-${faq.color}-500`} />
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-lg font-bold text-slate-900 mb-2">{faq.question}</h3>
-                    <p className="text-slate-600">{faq.answer}</p>
+                    <h3 className="text-lg font-bold text-foreground mb-2">{faq.question}</h3>
+                    <p className="text-muted-foreground">{faq.answer}</p>
                   </div>
                 </div>
               </CardContent>

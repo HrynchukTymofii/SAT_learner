@@ -44,27 +44,27 @@ export function TipsSection() {
   ]
 
   return (
-    <section className="py-16 bg-white rounded-3xl">
+    <section className="py-16 bg-card rounded-3xl">
       <div className="max-w-7xl mx-auto px-4">
         <div className="text-center mb-12">
-          <Badge className="bg-amber-100 text-amber-800 mb-4">Pro Tips</Badge>
-          <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">SAT Success Tips</h2>
-          <p className="text-xl text-slate-600">Expert strategies to maximize your SAT performance</p>
+          <Badge className="bg-amber-500/10 text-amber-500 mb-4">Pro Tips</Badge>
+          <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">SAT Success Tips</h2>
+          <p className="text-xl text-muted-foreground">Expert strategies to maximize your SAT performance</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {tips.map((tip, index) => (
             <Card
               key={index}
-              className={`shadow-lg border-0 bg-gradient-to-br from-${tip.color}-50 to-${tip.color}-100 rounded-xl`}
+              className={`shadow-lg border-0 bg-${tip.color}-500/5 dark:bg-${tip.color}-500/10 rounded-xl`}
             >
               <CardContent className="p-6">
                 <div className="space-y-4">
-                  <div className={`p-3 bg-${tip.color}-600 rounded-xl w-fit`}>
+                  <div className={`p-3 bg-${tip.color}-500 rounded-xl w-fit`}>
                     <tip.icon className="h-6 w-6 text-white" />
                   </div>
-                  <h3 className={`text-xl font-bold text-${tip.color}-900`}>{tip.title}</h3>
-                  <p className={`text-${tip.color}-800`}>{tip.description}</p>
+                  <h3 className="text-xl font-bold text-foreground">{tip.title}</h3>
+                  <p className="text-muted-foreground">{tip.description}</p>
                 </div>
               </CardContent>
             </Card>

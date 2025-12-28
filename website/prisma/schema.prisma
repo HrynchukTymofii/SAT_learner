@@ -12,7 +12,7 @@ datasource db {
   directUrl = env("DATABASE_URL_UNPOOLED")
 }
 
-model User{  
+model User{
   userId        String    @id @default(uuid())
   isPro         Boolean   @default(false)
   league        String    @default("Beginner")
@@ -36,6 +36,48 @@ model User{
   comments Comment[]
 
   purchases Purchase[]
+
+  studyPlans StudyPlan[]
+  settings   UserSettings?
+}
+
+// Study Planner System
+model StudyPlan {
+  id        String      @id @default(uuid())
+  userId    String
+  date      DateTime    @db.Date
+  user      User        @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  tasks     StudyTask[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  @@unique([userId, date])
+  @@index([userId])
+}
+
+model StudyTask {
+  id          String    @id @default(uuid())
+  planId      String
+  title       String
+  type        String    // "lesson" | "quiz" | "review" | "custom"
+  targetId    String?   // lessonId or quizId if applicable
+  completed   Boolean   @default(false)
+  position    Int       @default(0)
+  plan        StudyPlan @relation(fields: [planId], references: [id], onDelete: Cascade)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([planId])
+}
+
+model UserSettings {
+  id           String    @id @default(uuid())
+  userId       String    @unique
+  satDate      DateTime?
+  reminderTime String?   // "09:00" format
+  user         User      @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
 }
 
 model UserMessage {

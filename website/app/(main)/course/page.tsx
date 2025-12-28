@@ -18,14 +18,24 @@ const CourseIdPage = async () => {
         include: {
           lessons: {
             where: { isPublished: true },
-            include: {
-              progress: userId ? { where: { userId } } : true,
+            orderBy: { position: "asc" },
+            select: {
+              id: true,
+              title: true,
+              isFree: true,
+              position: true,
+              progress: userId ? { where: { userId } } : false,
             },
           },
           quizzes: {
             where: { isPublished: true },
-            include: {
-              results: userId ? { where: { userId } } : true,
+            orderBy: { position: "asc" },
+            select: {
+              id: true,
+              title: true,
+              isFree: true,
+              position: true,
+              results: userId ? { where: { userId } } : false,
             },
           },
         },
@@ -72,7 +82,8 @@ const CourseIdPage = async () => {
     }
 
     if (nextContent) {
-      return redirect(`/course/${course.id}/${nextContent.type}s/${nextContent.id}`)
+      const path = nextContent.type === 'quiz' ? 'quizzes' : 'lessons'
+      return redirect(`/course/${course.id}/${path}/${nextContent.id}`)
     } else {
       return redirect(`/course/${course.id}/completed`)
     }

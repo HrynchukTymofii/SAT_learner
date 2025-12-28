@@ -23,7 +23,7 @@ const TestDatesRegistrationPage = () => {
   ]
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-background">
       <div className="max-w-4xl mx-auto px-4 py-8">
         {/* Back Button */}
         <Link href="/info">
@@ -34,7 +34,7 @@ const TestDatesRegistrationPage = () => {
         </Link>
 
         {/* Header */}
-        <Card className="shadow-xl border-0 bg-white mb-8">
+        <Card className="shadow-xl border-0 bg-card mb-8">
           <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div className="p-3 bg-white/20 rounded-lg">
@@ -62,9 +62,9 @@ const TestDatesRegistrationPage = () => {
         {/* Main Content */}
         <div className="space-y-8">
           {/* 2025 Test Dates */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Calendar className="h-6 w-6 text-purple-600" />
                 2025 SAT Test Dates
               </CardTitle>
@@ -78,10 +78,10 @@ const TestDatesRegistrationPage = () => {
                   >
                     <div className="flex-1">
                       <div className="flex items-center gap-2 mb-2">
-                        <h3 className="text-lg font-semibold text-slate-900">{test.date}</h3>
+                        <h3 className="text-lg font-semibold text-foreground">{test.date}</h3>
                         <Badge className="bg-green-600">Available</Badge>
                       </div>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-slate-600">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm text-muted-foreground">
                         <div>Regular Registration: {test.registration}</div>
                         <div>Late Registration: {test.late}</div>
                       </div>
@@ -94,23 +94,23 @@ const TestDatesRegistrationPage = () => {
           </Card>
 
           {/* Registration Process */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">How to Register</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">How to Register</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Online Registration (Recommended)</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Online Registration (Recommended)</h3>
                     <ol className="space-y-3">
                       <li className="flex items-start gap-3">
                         <div className="w-6 h-6 bg-blue-600 text-white rounded-full flex items-center justify-center text-sm font-semibold">
                           1
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">Create a College Board Account</p>
-                          <p className="text-sm text-slate-600">Visit collegeboard.org and create your account</p>
+                          <p className="font-medium text-foreground">Create a College Board Account</p>
+                          <p className="text-sm text-muted-foreground">Visit collegeboard.org and create your account</p>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
@@ -118,8 +118,8 @@ const TestDatesRegistrationPage = () => {
                           2
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">Choose Test Date & Location</p>
-                          <p className="text-sm text-slate-600">Select your preferred test center and date</p>
+                          <p className="font-medium text-foreground">Choose Test Date & Location</p>
+                          <p className="text-sm text-muted-foreground">Select your preferred test center and date</p>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
@@ -127,8 +127,8 @@ const TestDatesRegistrationPage = () => {
                           3
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">Complete Registration</p>
-                          <p className="text-sm text-slate-600">Fill out personal information and pay fees</p>
+                          <p className="font-medium text-foreground">Complete Registration</p>
+                          <p className="text-sm text-muted-foreground">Fill out personal information and pay fees</p>
                         </div>
                       </li>
                       <li className="flex items-start gap-3">
@@ -136,15 +136,15 @@ const TestDatesRegistrationPage = () => {
                           4
                         </div>
                         <div>
-                          <p className="font-medium text-slate-900">Print Admission Ticket</p>
-                          <p className="text-sm text-slate-600">Print your ticket 1-2 weeks before test date</p>
+                          <p className="font-medium text-foreground">Print Admission Ticket</p>
+                          <p className="text-sm text-muted-foreground">Print your ticket 1-2 weeks before test date</p>
                         </div>
                       </li>
                     </ol>
                   </div>
 
                   <div className="space-y-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Registration Requirements</h3>
+                    <h3 className="text-lg font-semibold text-foreground">Registration Requirements</h3>
                     <div className="space-y-3">
                       <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                         <CheckCircle className="h-5 w-5 text-blue-600" />
@@ -170,9 +170,9 @@ const TestDatesRegistrationPage = () => {
           </Card>
 
           {/* Fees */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <DollarSign className="h-6 w-6 text-green-600" />
                 Registration Fees
               </CardTitle>
@@ -180,37 +180,37 @@ const TestDatesRegistrationPage = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Standard Fees</h3>
+                  <h3 className="text-lg font-semibold text-foreground">Standard Fees</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                      <span className="font-medium text-slate-900">SAT Registration</span>
-                      <span className="font-bold text-slate-900">$60</span>
+                      <span className="font-medium text-foreground">SAT Registration</span>
+                      <span className="font-bold text-foreground">$60</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                      <span className="font-medium text-slate-900">Late Registration Fee</span>
-                      <span className="font-bold text-slate-900">+$30</span>
+                      <span className="font-medium text-foreground">Late Registration Fee</span>
+                      <span className="font-bold text-foreground">+$30</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                      <span className="font-medium text-slate-900">Change Fee</span>
-                      <span className="font-bold text-slate-900">$35</span>
+                      <span className="font-medium text-foreground">Change Fee</span>
+                      <span className="font-bold text-foreground">$35</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Additional Services</h3>
+                  <h3 className="text-lg font-semibold text-foreground">Additional Services</h3>
                   <div className="space-y-3">
                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                      <span className="font-medium text-slate-900">Score Reports (per college)</span>
-                      <span className="font-bold text-slate-900">$14</span>
+                      <span className="font-medium text-foreground">Score Reports (per college)</span>
+                      <span className="font-bold text-foreground">$14</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                      <span className="font-medium text-slate-900">Question-and-Answer Service</span>
-                      <span className="font-bold text-slate-900">$18</span>
+                      <span className="font-medium text-foreground">Question-and-Answer Service</span>
+                      <span className="font-bold text-foreground">$18</span>
                     </div>
                     <div className="flex justify-between items-center p-3 bg-slate-50 rounded-lg">
-                      <span className="font-medium text-slate-900">Student Answer Service</span>
-                      <span className="font-bold text-slate-900">$13.50</span>
+                      <span className="font-medium text-foreground">Student Answer Service</span>
+                      <span className="font-bold text-foreground">$13.50</span>
                     </div>
                   </div>
                 </div>
@@ -230,9 +230,9 @@ const TestDatesRegistrationPage = () => {
           </Card>
 
           {/* Test Day Information */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900 flex items-center gap-2">
+              <CardTitle className="text-2xl font-bold text-foreground flex items-center gap-2">
                 <Clock className="h-6 w-6 text-blue-600" />
                 Test Day Information
               </CardTitle>
@@ -240,33 +240,33 @@ const TestDatesRegistrationPage = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">What to Bring</h3>
+                  <h3 className="text-lg font-semibold text-foreground">What to Bring</h3>
                   <ul className="space-y-2">
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-slate-700">Admission ticket (printed)</span>
+                      <span className="text-foreground">Admission ticket (printed)</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-slate-700">Acceptable photo ID</span>
+                      <span className="text-foreground">Acceptable photo ID</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-slate-700">No. 2 pencils with erasers</span>
+                      <span className="text-foreground">No. 2 pencils with erasers</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-slate-700">Approved calculator</span>
+                      <span className="text-foreground">Approved calculator</span>
                     </li>
                     <li className="flex items-center gap-2">
                       <CheckCircle className="h-4 w-4 text-green-600" />
-                      <span className="text-slate-700">Watch (without alarm)</span>
+                      <span className="text-foreground">Watch (without alarm)</span>
                     </li>
                   </ul>
                 </div>
 
                 <div className="space-y-4">
-                  <h3 className="text-lg font-semibold text-slate-900">Test Day Timeline</h3>
+                  <h3 className="text-lg font-semibold text-foreground">Test Day Timeline</h3>
                   <div className="space-y-3">
                     <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                       <Clock className="h-5 w-5 text-blue-600" />
@@ -309,9 +309,9 @@ const TestDatesRegistrationPage = () => {
           </Card>
 
           {/* Score Reporting */}
-          <Card className="shadow-lg border-0 bg-white py-6">
+          <Card className="shadow-lg border-0 bg-card py-6">
             <CardHeader>
-              <CardTitle className="text-2xl font-bold text-slate-900">Score Reporting</CardTitle>
+              <CardTitle className="text-2xl font-bold text-foreground">Score Reporting</CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-6">

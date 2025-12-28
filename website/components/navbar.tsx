@@ -3,7 +3,8 @@
 import * as React from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
-import { BarChart2, BookOpen, GraduationCap, Home, Menu } from "lucide-react"
+import { BarChart2, BookOpen, GraduationCap, Home, Menu, Moon, Sun, Calendar } from "lucide-react"
+import { useTheme } from "next-themes"
 
 import { Button } from "@/components/ui/button"
 import {
@@ -26,6 +27,12 @@ export function Navbar() {
   const isEmbedded = searchParams.get("embed") === "true"
   const {user} = useAuth()
   const [isOpen, setIsOpen] = React.useState(false)
+  const { theme, setTheme } = useTheme()
+  const [mounted, setMounted] = React.useState(false)
+
+  React.useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const isLoggedIn = !!user
 
@@ -65,27 +72,27 @@ export function Navbar() {
               </Link>
 
               <div className="flex flex-col gap-2">
-                <h3 className="text-lg font-semibold">Online SAT</h3>
+                <h3 className="text-lg font-semibold">Practice Tests</h3>
                 <Link
-                  href="/test"
+                  href="/tests"
                   className="ml-4 flex items-center gap-2 rounded-md p-2 hover:bg-accent"
                   onClick={() => setIsOpen(false)}
                 >
-                  Full Practice Test
+                  All Test Modes
                 </Link>
                 <Link
-                  href="/test"
+                  href="/tests/exam"
                   className="ml-4 flex items-center gap-2 rounded-md p-2 hover:bg-accent"
                   onClick={() => setIsOpen(false)}
                 >
-                  Math Section
+                  Full SAT Exam
                 </Link>
                 <Link
-                  href="/test"
+                  href="/tests"
                   className="ml-4 flex items-center gap-2 rounded-md p-2 hover:bg-accent"
                   onClick={() => setIsOpen(false)}
                 >
-                  Reading & Writing Section
+                  Practice by Topics
                 </Link>
               </div>
 
@@ -122,6 +129,42 @@ export function Navbar() {
                   Test Dates & Registration
                 </Link>
               </div>
+
+              {/* Theme Toggle - Mobile */}
+              <div className="flex items-center justify-between py-2">
+                <span className="text-lg font-semibold">Theme</span>
+                {mounted && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+                    className="gap-2"
+                  >
+                    {theme === "dark" ? (
+                      <>
+                        <Sun className="h-4 w-4" />
+                        Light
+                      </>
+                    ) : (
+                      <>
+                        <Moon className="h-4 w-4" />
+                        Dark
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
+
+              {/* {isLoggedIn && (
+                <Link
+                  href="/planner"
+                  className="flex items-center gap-2 text-lg font-semibold"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <Calendar className="h-5 w-5" />
+                  Study Planner
+                </Link>
+              )} */}
 
               {isLoggedIn ? (
                 <>
@@ -190,14 +233,42 @@ export function Navbar() {
           </NavigationMenu>
         </div>
 
-        {/* Auth Button */}
+        {/* Auth Button & Theme Toggle */}
         <div className="ml-auto flex items-center gap-2">
+          {/* Theme Toggle */}
+          {mounted && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+              className="h-9 w-9"
+            >
+              {theme === "dark" ? (
+                <Sun className="h-5 w-5" />
+              ) : (
+                <Moon className="h-5 w-5" />
+              )}
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          )}
+
+          {/* Planner Link */}
+          {isLoggedIn && (
+            <Link
+              href="/planner"
+              className="flex items-center gap-2 px-3 py-2 rounded-md hover:bg-muted transition-colors"
+            >
+              <Calendar className="h-5 w-5" />
+              <span className="hidden lg:inline text-sm font-medium">Planner</span>
+            </Link>
+          )}
+
           {isLoggedIn ? (
             <>
             {user.isPro &&
              <Link
               href="/dashboard"
-              className="flex items-center gap-2 px-3 py-2 rounded-md font-semibold text-sm bg-gradient-to-br from-blue-500 to-blue-600 text-white"
+              className="flex items-center gap-2 px-3 py-2 rounded-md font-semibold text-sm bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
             >
               <BarChart2 className="w-4 h-4" />
               Dashboard
@@ -228,19 +299,19 @@ export function Navbar() {
 
 const testItems = [
   {
-    title: "Full Practice Test",
-    href: "/test",
-    description: "Complete SAT practice tests with timed sections and scoring.",
+    title: "Practice Tests",
+    href: "/tests",
+    description: "All test modes: Full SAT, Practice by Topics, and more.",
   },
   {
-    title: "Math Section",
-    href: "/test/math-section",
-    description: "Practice tests focused on the math section of the SAT.",
+    title: "Full SAT Exam",
+    href: "/tests/exam",
+    description: "70-minute timed exam with SAT scoring (200-800).",
   },
   {
-    title: "Reading & Writing Section",
-    href: "/test/readwrite-section",
-    description: "Practice tests for the reading and writing sections.",
+    title: "Practice by Topics",
+    href: "/tests",
+    description: "Focus on specific math topics and chapters.",
   },
 ]
 
