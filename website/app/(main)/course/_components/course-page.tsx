@@ -14,7 +14,6 @@ import {
   Clock,
   Lock,
 } from "lucide-react";
-import { Progress } from "@/components/ui/progress";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -40,21 +39,14 @@ import FaqSection from "./faq-section";
 import StorySection from "./story-section";
 import PromiseSection from "./promise-section";
 import { LoginFirstModal } from "./login-require-madal";
-import { enrollUser } from "@/app/actions/user-actions";
 
 interface CoursePageProps {
   course: any;
-  isEnrolled: boolean;
-  userId: string | null;
 }
 
-const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
+const CoursePage = ({ course }: CoursePageProps) => {
   const [openChapters, setOpenChapters] = useState<string[]>([]);
   const [showLoginModal, setShowLoginModal] = useState(false);
-
-  if (isEnrolled) {
-    return null
-  }
 
   const toggleChapter = (chapterId: string) => {
     setOpenChapters((prev) =>
@@ -62,26 +54,6 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
         ? prev.filter((id) => id !== chapterId)
         : [...prev, chapterId]
     );
-  };
-
-  // Calculate chapter progress
-  const getChapterProgress = (chapter: any) => {
-    const totalItems = chapter.lessons.length + chapter.quizzes.length;
-    if (totalItems === 0) return 0;
-
-    let completedItems = 0;
-    chapter.lessons.forEach((lesson: any) => {
-      if (lesson.progress?.length > 0 && lesson.progress[0].completed) {
-        completedItems++;
-      }
-    });
-    chapter.quizzes.forEach((quiz: any) => {
-      if (quiz.results?.length > 0 && quiz.results[0].completed) {
-        completedItems++;
-      }
-    });
-
-    return Math.round((completedItems / totalItems) * 100);
   };
 
   // Count free items in chapter
@@ -97,18 +69,6 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
     contentType: string
   ) => {
     window.location.href = `/course/${chapterId}/${contentType}s/${contentId}`;
-  };
-
-  const handleEnroll = async () => {
-    if (!userId || !course?.id) return;
-
-    const result = await enrollUser(userId, course.id);
-
-    if (result.success) {
-      console.log("Enrolled!", result.data);
-    } else {
-      console.error(result.message || result.error);
-    }
   };
 
   return (
@@ -238,21 +198,12 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                         </div>
                       </div>
 
-                      {userId ? (
-                        <Button
-                          className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-xl shadow-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-500/40 transition-all duration-300 hover:scale-105 rounded-2xl py-6 text-base font-semibold"
-                          onClick={() => handleEnroll()}
-                        >
-                          Enroll Now - It&apos;s Free
-                        </Button>
-                      ) : (
-                        <Button
-                          className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-xl shadow-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-500/40 transition-all duration-300 hover:scale-105 rounded-2xl py-6 text-base font-semibold"
-                          onClick={() => setShowLoginModal(true)}
-                        >
-                          Enroll Now - It&apos;s Free
-                        </Button>
-                      )}
+                      <Button
+                        className="w-full bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white border-0 shadow-xl shadow-cyan-500/30 hover:shadow-2xl hover:shadow-cyan-500/40 transition-all duration-300 hover:scale-105 rounded-2xl py-6 text-base font-semibold"
+                        onClick={() => setShowLoginModal(true)}
+                      >
+                        Enroll Now - It&apos;s Free
+                      </Button>
                       <LoginFirstModal
                         isOpen={showLoginModal}
                         onClose={() => setShowLoginModal(false)}
@@ -316,9 +267,7 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {course.chapters.map((chapter: any, chapterIndex: number) => {
-                  const chapterProgress = getChapterProgress(chapter);
                   const freeCount = getChapterFreeCount(chapter);
-                  const totalItems = chapter.lessons.length + chapter.quizzes.length;
 
                   return (
                   <Collapsible
@@ -348,13 +297,6 @@ const CoursePage = ({ course, isEnrolled, userId }: CoursePageProps) => {
                                 </Badge>
                               )}
                             </div>
-                            {/* Progress bar */}
-                            {userId && chapterProgress > 0 && (
-                              <div className="mt-2 flex items-center gap-2">
-                                <Progress value={chapterProgress} className="h-1.5 flex-1 max-w-32" />
-                                <span className="text-xs text-muted-foreground">{chapterProgress}%</span>
-                              </div>
-                            )}
                           </div>
                         </div>
                         {openChapters.includes(chapter.id) ? (

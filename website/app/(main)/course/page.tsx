@@ -48,22 +48,14 @@ const CourseIdPage = async () => {
     return redirect("/course")
   }
 
-  let isEnrolled = false
+  // If logged in, redirect to first undone lesson/quiz
   if (userId) {
-    const enrollment = await db.courseSubscription.findFirst({
-      where: { userId, courseId },
-    })
-    isEnrolled = !!enrollment
-  }
-
-  // 🔑 if enrolled, compute next lesson/quiz on the server
-  if (isEnrolled) {
     let nextContent: { id: string; type: "lesson" | "quiz" } | null = null
 
     for (const chapter of course.chapters) {
       for (const lesson of chapter.lessons) {
         const isCompleted =
-          lesson.progress!  && lesson.progress.length > 0 && lesson.progress[0].completed
+          lesson.progress && lesson.progress.length > 0 && lesson.progress[0].completed
         if (!isCompleted) {
           nextContent = { id: lesson.id, type: "lesson" }
           break
@@ -89,8 +81,8 @@ const CourseIdPage = async () => {
     }
   }
 
-  // 🔓 If not enrolled, show landing page
-  return <CoursePage course={course} isEnrolled={isEnrolled} userId={userId} />
+  // If not logged in, show landing page
+  return <CoursePage course={course} />
 }
 
 export default CourseIdPage

@@ -2,12 +2,12 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card"
 
 export default function LessonLoading() {
   return (
-    <div className="min-h-screen relative overflow-hidden">
+    <div className="flex-1 min-h-screen relative overflow-hidden">
       {/* Floating gradient orbs */}
       <div className="fixed top-0 left-0 w-[500px] h-[500px] bg-gradient-to-br from-cyan-500/10 to-blue-500/10 dark:from-cyan-500/5 dark:to-blue-500/5 rounded-full blur-3xl -z-10" />
       <div className="fixed bottom-0 right-0 w-[600px] h-[600px] bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 rounded-full blur-3xl -z-10" />
 
-      <div className="max-w-4xl mx-auto px-4 py-8">
+      <div className="w-full px-4 py-8">
         {/* Navigation */}
         <div className="flex items-center justify-between mb-6">
           <div className="h-10 bg-foreground/10 rounded-xl animate-pulse w-32" />

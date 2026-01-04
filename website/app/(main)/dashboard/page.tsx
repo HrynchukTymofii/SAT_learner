@@ -263,7 +263,7 @@ export default function DashboardPage() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            <Card className="shadow-xl">
+            <Card className="shadow-xl pb-6">
               <CardHeader>
                 <CardTitle className="text-2xl font-bold flex items-center gap-3">
                   <div className="p-2 bg-primary rounded-xl">
@@ -318,7 +318,7 @@ export default function DashboardPage() {
                         </Card>
                       )}
 
-                      <Card className="bg-emerald-500/5 border-emerald-500/20">
+                      <Card className="bg-emerald-500/5 border-emerald-500/20 pb-6">
                         <CardContent className="p-5">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-semibold">Est. SAT Score</span>
@@ -331,7 +331,7 @@ export default function DashboardPage() {
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-purple-500/5 border-purple-500/20">
+                      <Card className="bg-purple-500/5 border-purple-500/20 pb-6">
                         <CardContent className="p-5">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-semibold">Avg. Score</span>
@@ -342,7 +342,7 @@ export default function DashboardPage() {
                         </CardContent>
                       </Card>
 
-                      <Card className="bg-amber-500/5 border-amber-500/20">
+                      <Card className="bg-amber-500/5 border-amber-500/20 pb-6">
                         <CardContent className="p-5">
                           <div className="flex items-center justify-between mb-2">
                             <span className="text-sm font-semibold">Saved Questions</span>
