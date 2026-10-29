@@ -18,7 +18,8 @@ async function getAppleJWKS() {
 
 export async function POST(req: NextRequest) {
   try {
-    const { id_token, name: frontendName, email: frontendEmail } = await req.json();
+    // The app also sends `email`, but it's ignored: only the verified token decides the account
+    const { id_token, name: frontendName } = await req.json();
     if (!id_token) {
       return NextResponse.json({ error: "Missing id_token" }, { status: 400 });
     }
@@ -30,7 +31,10 @@ export async function POST(req: NextRequest) {
       audience: process.env.APPLE_CLIENT_ID,
     });
 
-    const email = frontendEmail || (payload.email as string | undefined);
+    // Email from the verified token only. Trusting the email sent by the app let any valid
+    // Apple token log in as any account. Apple puts the email (or private relay address)
+    // in the token on every sign-in when the EMAIL scope is requested
+    const email = payload.email as string | undefined;
     const name = frontendName || "Student";
 
     if (!email) {

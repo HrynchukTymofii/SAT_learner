@@ -16,13 +16,15 @@ export async function POST(req: Request) {
       where: { email, platform: "SATecosystem" },
     });
 
+    // Same answer for unknown email and wrong password, so the endpoint
+    // can't be used to check which emails have an account
     if (!user || !user.password) {
-      return NextResponse.json({ error: "User not found" }, { status: 404 });
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     const valid = await bcrypt.compare(password, user.password);
     if (!valid) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
+      return NextResponse.json({ error: "Invalid email or password" }, { status: 401 });
     }
 
     const token = createJwtToken(user);

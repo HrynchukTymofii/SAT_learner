@@ -1,64 +1,38 @@
 import { NextRequest, NextResponse } from "next/server"
-import jwt from "jsonwebtoken"
 
-import { db } from "@/lib/db"
-import { deleteUserAccount } from "@/app/actions/user-actions"
-
-const JWT_SECRET = process.env.JWT_SECRET!
+import { deleteUserAccount, getUserData } from "@/app/actions/user-actions"
+import { requireAuth } from "@/lib/expo-auth"
+import { getRefreshedToken } from "@/lib/jwt"
 
 export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get("authorization")
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  const token = authHeader.split(" ")[1]
+  // Invalid or expired token → 401 "Unauthorized", which the app treats as logged out
+  const auth = requireAuth(req)
+  if (auth instanceof NextResponse) return auth
+  const { userId } = auth
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string }
+    const result = await getUserData(userId)
 
-    const user = await db.user.findUnique({
-      where: { userId: decoded.id },
-      select: {
-        userId: true,
-        name: true,
-        email: true,
-        image: true,
-        isPro: true,
-        league: true,
-        points: true,
-        platform: true,
-        createdAt: true,
-        updatedAt: true,
-      },
-    })
-
-    if (!user) {
+    if (!result.success || !result.user) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
-    return NextResponse.json(user)
+    const token = getRefreshedToken(req, result.user)
+    return NextResponse.json(token ? { ...result.user, token } : result.user)
   } catch (error) {
-    console.error("❌ Error verifying token:", error)
-    return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 })
+    console.error("❌ Error fetching user:", error)
+    return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 })
   }
 }
 
 
 export async function DELETE(req: NextRequest) {
-  const authHeader = req.headers.get("authorization")
-
-  if (!authHeader?.startsWith("Bearer ")) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
-  }
-
-  const token = authHeader.split(" ")[1]
+  const auth = requireAuth(req)
+  if (auth instanceof NextResponse) return auth
+  const { userId } = auth
 
   try {
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string }
-
-    const result = await deleteUserAccount(decoded.id)
+    const result = await deleteUserAccount(userId)
 
     if (!result.success) {
       return NextResponse.json({ error: result.error }, { status: 500 })
@@ -66,7 +40,7 @@ export async function DELETE(req: NextRequest) {
 
     return NextResponse.json({ success: true })
   } catch (err) {
-    console.error("❌ Invalid token on delete:", err)
-    return NextResponse.json({ error: "Invalid or expired token" }, { status: 401 })
+    console.error("❌ Error deleting account:", err)
+    return NextResponse.json({ error: "Failed to delete account" }, { status: 500 })
   }
 }

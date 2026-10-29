@@ -19,6 +19,7 @@ export async function getUserData(userId: string) {
         league: true,
         points: true,
         platform: true,
+        needSync: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -200,12 +201,17 @@ export async function enrollUser(userId: string, courseId: string) {
 
 export async function deleteUserAccount(userId: string) {
   try {
-    await db.userQuizQuestion.deleteMany({ where: { userId } })
-    await db.quizResult.deleteMany({ where: { userId } })
-    await db.lessonProgress.deleteMany({ where: { userId } })
-    //await db.courseEditor.deleteMany({ where: { userId } })
-
-    await db.user.delete({ where: { userId } })
+    // One transaction: if the user delete fails, their progress isn't half-deleted.
+    // Purchase and UserMessage have no cascade on User, so without these
+    // deletes the user delete fails for anyone who paid or contacted support
+    await db.$transaction([
+      db.userQuizQuestion.deleteMany({ where: { userId } }),
+      db.quizResult.deleteMany({ where: { userId } }),
+      db.lessonProgress.deleteMany({ where: { userId } }),
+      db.purchase.deleteMany({ where: { userId } }),
+      db.userMessage.deleteMany({ where: { userId } }),
+      db.user.delete({ where: { userId } }),
+    ])
 
     revalidatePath("/")
     return { success: true }

@@ -4,6 +4,12 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { db } from "@/lib/db"
 import bcrypt from "bcryptjs"
 import { NextAuthOptions } from "next-auth"
+import { hasActiveProEntitlement } from "@/lib/revenuecat"
+
+// How often the session re-checks PRO with RevenueCat
+const PRO_CHECK_INTERVAL_MS = 10 * 60 * 1000
+
+const useSecureCookies = process.env.NEXTAUTH_URL?.startsWith("https://") ?? false;
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -57,6 +63,19 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   cookies: {
+    // One login for satlearner.com and app.satlearner.com: in production set
+    // AUTH_COOKIE_DOMAIN=.satlearner.com. Name and flags match NextAuth's defaults,
+    // so existing sessions stay valid.
+    sessionToken: {
+      name: `${useSecureCookies ? "__Secure-" : ""}next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+        domain: process.env.AUTH_COOKIE_DOMAIN || undefined,
+      },
+    },
     pkceCodeVerifier: {
       name: "next-auth.pkce.code_verifier",
       options: {
@@ -120,7 +139,18 @@ export const authOptions: NextAuthOptions = {
 
             if (existingUser) {
                 token.userId = existingUser.userId
-                token.isPro = existingUser.isPro
+
+                // RevenueCat is the source of truth for PRO, same as in the mobile app.
+                // If RevenueCat can't be reached, fall back to the DB value.
+                const lastProCheck = (token.proCheckedAt as number | undefined) ?? 0
+                if (Date.now() - lastProCheck > PRO_CHECK_INTERVAL_MS) {
+                    const rcPro = await hasActiveProEntitlement(existingUser.userId)
+                    if (rcPro !== null) {
+                        token.rcPro = rcPro
+                        token.proCheckedAt = Date.now()
+                    }
+                }
+                token.isPro = (token.rcPro as boolean | undefined) ?? existingUser.isPro
                 token.points = existingUser.points
                 token.name = existingUser.name || token.name
                 token.picture = existingUser.image || token.picture

@@ -2,6 +2,8 @@ import { updateUserPoints } from "@/app/actions/user-actions"
 import { requireAuth } from "@/lib/expo-auth";
 import { NextRequest, NextResponse } from "next/server"
 
+const MAX_POINTS_PER_REQUEST = 200
+
 export async function POST(req: NextRequest) {
   try {
     const authResult = requireAuth(req);
@@ -14,6 +16,11 @@ export async function POST(req: NextRequest) {
     const { points } = await req.json();
     if (!points) {
       return new NextResponse("Missing required fields", { status: 400 });
+    }
+
+    // Only whole positive numbers, capped per request
+    if (!Number.isInteger(points) || points < 1 || points > MAX_POINTS_PER_REQUEST) {
+      return new NextResponse("Invalid points value", { status: 400 });
     }
 
     const result = await updateUserPoints(userId, points, "mobile");

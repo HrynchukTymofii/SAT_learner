@@ -150,14 +150,6 @@ export async function GET() {
       where: { userId, saved: true },
     })
 
-    // Get wrong answers count
-    const wrongAnswersCount = await db.quizResult.count({
-      where: {
-        userId,
-        completed: true,
-        score: { lt: db.quizResult.fields.score }, // This won't work, need different approach
-      },
-    })
 
     // Calculate study streak (simplified - count consecutive days with activity)
     const recentDays = await db.quizResult.findMany({

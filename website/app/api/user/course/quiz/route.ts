@@ -1,6 +1,7 @@
 import { updateUserNeedSync, updateUserPoints } from "@/app/actions/user-actions";
 import { db } from "@/lib/db";
 import { requireAuth } from "@/lib/expo-auth";
+import { isCorrectAnswer } from "@/lib/answers";
 import { auth } from "@/lib/getAuth";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -36,14 +37,19 @@ export async function POST(req: NextRequest) {
       return new NextResponse("Quiz not found", { status: 404 });
     }
 
+    // Points are only for score gained since the saved result. The web quiz saves
+    // every answer with PATCH before this POST, so giving the full score here paid twice.
+    const previousQuizResult = await db.quizResult.findUnique({
+      where: { userId_quizId: { userId, quizId } },
+      select: { score: true },
+    });
+
     let totalScore = 0;
 
     const questionResults = quiz.questions.map((question) => {
       const userAnswers = answers[question.id] || [];
       const correctAnswers = question.answers as string[];
-      const isCorrect =
-        correctAnswers.every((a) => userAnswers.includes(a)) &&
-        userAnswers.length === correctAnswers.length;
+      const isCorrect = isCorrectAnswer(correctAnswers, userAnswers);
 
       if (isCorrect) {
         totalScore += question.points;
@@ -75,7 +81,8 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    const updateResult = await updateUserPoints(userId, totalScore, platform);
+    const pointsToAdd = Math.max(0, totalScore - (previousQuizResult?.score ?? 0));
+    const updateResult = await updateUserPoints(userId, pointsToAdd, platform);
 
     if (!updateResult.success) {
       console.error("Failed to update user points:", updateResult.error);
@@ -160,9 +167,7 @@ export async function PATCH(req: NextRequest) {
             const userAnswer = updatedAnswers[question.id] || [];
             const correctAnswers = question.answers as string[];
 
-            const isCorrect =
-              correctAnswers.every((a) => userAnswer.includes(a)) &&
-              userAnswer.length === correctAnswers.length;
+            const isCorrect = isCorrectAnswer(correctAnswers, userAnswer);
 
             if (isCorrect) {
               newScore += question.points;
@@ -222,9 +227,7 @@ export async function PATCH(req: NextRequest) {
       const questionResults = quiz.questions.map((question) => {
         const userAnswers = answers[question.id] || [];
         const correctAnswers = question.answers as string[];
-        const isCorrect =
-          correctAnswers.every((a) => userAnswers.includes(a)) &&
-          userAnswers.length === correctAnswers.length;
+        const isCorrect = isCorrectAnswer(correctAnswers, userAnswers);
 
         if (isCorrect) {
           totalScore += question.points;
@@ -236,14 +239,24 @@ export async function PATCH(req: NextRequest) {
       const previousScore = previousQuizResult?.score ?? 0;
       const pointsToAdd = Math.max(0, totalScore - previousScore);
 
-      const quizResult = await db.quizResult.update({
+      // Upsert: the result may not exist on the server yet (e.g. after a reset
+      // or when local progress is pushed for the first time)
+      const quizResult = await db.quizResult.upsert({
         where: { userId_quizId: { userId, quizId } },
-        data: {
+        update: {
           score: totalScore,
           answers: answers,
           completed: totalScore > 0,
           attemptCount: { increment: 1 },
           updatedAt: new Date(),
+        },
+        create: {
+          userId,
+          quizId,
+          score: totalScore,
+          answers: answers,
+          completed: totalScore > 0,
+          attemptCount: 1,
         },
       });
 

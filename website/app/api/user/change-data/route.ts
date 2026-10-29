@@ -10,6 +10,10 @@ export async function PATCH(req: NextRequest) {
 
   const { name, password } = await req.json();
 
+  if (password && (typeof password !== "string" || password.length < 4)) {
+    return NextResponse.json({ error: "Password must be at least 4 characters" }, { status: 400 });
+  }
+
   try {
     const updateData: any = { };
     if (name) updateData.name = name;

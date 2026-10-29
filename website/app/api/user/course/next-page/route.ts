@@ -1,13 +1,31 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
+import { auth } from "@/lib/getAuth";
+import { requireAuth } from "@/lib/expo-auth";
+
+async function getAuthenticatedUserId(req: NextRequest): Promise<string | null> {
+  const session = await auth();
+  if (session?.user?.userId) return session.user.userId;
+  const authResult = requireAuth(req);
+  if (!(authResult instanceof NextResponse)) {
+    return authResult.userId;
+  }
+  return null;
+}
 
 // POST method for the API
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { userId, courseId, currentChapterId, currentItemId } = body;
+    // The user comes from the session, never from the body (that let anyone read another user's progress)
+    const userId = await getAuthenticatedUserId(req);
+    if (!userId) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    if (!userId || !courseId) {
+    const body = await req.json();
+    const { courseId, currentChapterId, currentItemId } = body;
+
+    if (!courseId) {
       return NextResponse.json({ error: "Missing userId or courseId" }, { status: 400 });
     }
 
