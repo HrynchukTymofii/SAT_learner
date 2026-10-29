@@ -1,6 +1,7 @@
 import { SavedQuiz } from "@/app/tests/saved";
 import { WrongQuiz } from "@/app/tests/wrong";
 import * as Crypto from "expo-crypto";
+import { isCorrect as isCorrectAnswer } from "@/components/quiz/quizLogic";
 // import { SavedQuiz } from "@/app/tests/saved";
 // import { WrongQuiz } from "@/app/tests/wrong";
 import { useSQLiteContext } from "expo-sqlite";
@@ -474,9 +475,7 @@ export function useQuizDatabase() {
           const correctAnswers = JSON.parse(question.answers || "[]") as string[];
           const selectedAnswers = ans.selected;
 
-          const isCorrect =
-            correctAnswers.length === selectedAnswers.length &&
-            correctAnswers.every((a) => selectedAnswers.includes(a));
+          const isCorrect = isCorrectAnswer(correctAnswers, selectedAnswers);
 
           if (!isCorrect) {
             if (!wrongMap.has(res.quizId)) {
@@ -531,7 +530,7 @@ export function useQuizDatabase() {
     try {
       const rows = quizId === "all"
         ? await db.getAllAsync<any>(`
-            SELECT q.id, q.question, q.questionType, q.options, q.answers, q.quizId, q.questionImageUrl,
+            SELECT q.id, q.quizId, q.question, q.questionType, q.options, q.answers, q.quizId, q.questionImageUrl,
                   q.localImagePath, q.imageHeight, q.position, q.note AS explanation,
                   q.hint, q.hintImageUrl, q.localHintImagePath,
                   q.likes, q.dislikes, quiz.title AS quizTitle, chapter.title AS chapterTitle,
@@ -583,7 +582,7 @@ export function useQuizDatabase() {
       }));
 
       const quizTitle = quizId === "all" ? "Усі збережені питання" : rows[0].quizTitle;
-      const chapterTitle = quizId === "all" ? "Всі розділи" : rows[0].chapterTitle;
+      const chapterTitle = quizId === "all" ? "All chapters" : rows[0].chapterTitle;
 
       return {
         success: true,
@@ -639,13 +638,12 @@ export function useQuizDatabase() {
           const correctAnswers = q.answers ? JSON.parse(q.answers) : [];
           const selectedAnswers = rawAnswers[questionId] || [];
 
-          const isCorrect =
-            correctAnswers.length === selectedAnswers.length &&
-            correctAnswers.every((ans: string) => selectedAnswers.includes(ans));
+          const isCorrect = isCorrectAnswer(correctAnswers, selectedAnswers);
 
           if (!isCorrect && !wrongMap.has(q.id)) {
             wrongMap.set(q.id, {
               id: q.id,
+              quizId: q.quizId,
               question: q.question,
               questionType: q.questionType,
               options: q.options ? JSON.parse(q.options) : [],
@@ -676,7 +674,7 @@ export function useQuizDatabase() {
       const wrongQuestions = Array.from(wrongMap.values());
 
       const quizTitle =
-        quizId === "all" ? "Усі неправильні відповіді" : wrongQuestions[0]?.quizTitle || "";
+        quizId === "all" ? "All wrong answers" : wrongQuestions[0]?.quizTitle || "";
       const chapterTitle =
         quizId === "all" ? "Всі розділи" : wrongQuestions[0]?.chapterTitle || "";
 
@@ -779,9 +777,7 @@ export function useQuizDatabase() {
       const questionResults = questions.map((question) => {
         const userAnswers = answers[question.id] || [];
         const correctAnswers: string[] = question.answers ? JSON.parse(question.answers) : [];
-        const isCorrect =
-          correctAnswers.length === userAnswers.length &&
-          correctAnswers.every((a) => userAnswers.includes(a));
+        const isCorrect = isCorrectAnswer(correctAnswers, userAnswers);
 
         if (isCorrect) totalScore += question.points ?? 5;
 

@@ -7,7 +7,7 @@ export default function BottomBlur() {
   const insets = useSafeAreaInsets();
   const colorScheme = useColorScheme();
 
-  const backgroundColor = colorScheme === "light" ? "#f8fafc" : "#1c1917"; // light bg or dark bg
+  const backgroundColor = colorScheme === "light" ? "#F4F1F9" : "#1c1917"; // light bg or dark bg
 
   return (
     <View style={[styles.cover, { height: insets.bottom, backgroundColor }]} />

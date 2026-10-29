@@ -56,7 +56,7 @@ export const ResetTestDialog = ({
       >
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             padding: 16,
             borderRadius: 16,
             width: "100%",
@@ -77,12 +77,12 @@ export const ResetTestDialog = ({
               right: 16,
               zIndex: 10,
               padding: 8,
-              backgroundColor: isDark ? "#334155" : "#f3f4f6",
+              backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
               borderRadius: 8,
             }}
             activeOpacity={0.7}
           >
-            <X size={20} color={isDark ? "#ffffff" : "#1f2937"} />
+            <X size={20} color={isDark ? "#F4F1F8" : "#0B0A0F"} />
           </TouchableOpacity>
 
           {/* Title */}
@@ -91,7 +91,7 @@ export const ResetTestDialog = ({
               fontSize: 20,
               fontWeight: "700",
               marginBottom: 20,
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               paddingLeft: 8,
             }}
           >
@@ -104,7 +104,7 @@ export const ResetTestDialog = ({
               textAlign: "center",
               fontSize: 16,
               lineHeight: 24,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               marginBottom: 8,
             }}
           >
@@ -115,7 +115,7 @@ export const ResetTestDialog = ({
               textAlign: "center",
               fontSize: 16,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 8,
             }}
           >
@@ -126,7 +126,7 @@ export const ResetTestDialog = ({
               textAlign: "center",
               fontSize: 16,
               lineHeight: 24,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               marginBottom: 24,
             }}
           >
@@ -144,15 +144,15 @@ export const ResetTestDialog = ({
                 paddingVertical: 14,
                 borderRadius: 12,
                 alignItems: "center",
-                backgroundColor: isDark ? "#334155" : "#f3f4f6",
+                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
                 borderWidth: 1,
-                borderColor: isDark ? "#334155" : "#e5e7eb",
+                borderColor: isDark ? "#2B2733" : "#E5DFEE",
               }}
               activeOpacity={0.7}
             >
               <Text
                 style={{
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                   fontWeight: "600",
                   fontSize: 16,
                 }}
@@ -170,7 +170,7 @@ export const ResetTestDialog = ({
                 paddingVertical: 14,
                 borderRadius: 12,
                 alignItems: "center",
-                backgroundColor: isLoading ? (isDark ? "#334155" : "#d1d5db") : "#06B6D4",
+                backgroundColor: isLoading ? (isDark ? "#2B2733" : "#D9D2E5") : "#8A5CE6",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: isLoading ? 0 : 0.1,
@@ -184,7 +184,7 @@ export const ResetTestDialog = ({
               ) : (
                 <Text
                   style={{
-                    color: isLoading ? (isDark ? "#9ca3af" : "#6b7280") : "#ffffff",
+                    color: isLoading ? (isDark ? "#9C95A8" : "#6B6577") : "#ffffff",
                     fontWeight: "600",
                     fontSize: 16,
                   }}

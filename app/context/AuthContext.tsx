@@ -6,6 +6,7 @@ interface AuthContextType {
   setToken: (token: string | null) => void;
   user: UserType | null;
   setUser: (user: UserType | null) => void;
+  hydrated: boolean;   // false until the stored token/user have been read
 }
 
 const AuthContext = createContext<AuthContextType>({
@@ -13,6 +14,7 @@ const AuthContext = createContext<AuthContextType>({
   setToken: () => {},
   user: { name: "", isPro: false, categories: "Beginner", points: 0, createdAt: '' },
   setUser: () => {},
+  hydrated: false,
 });
 
 export interface UserType {
@@ -28,21 +30,26 @@ export interface UserType {
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [token, setTokenState] = useState<string | null>(null);
   const [user, setUserState] = useState<UserType | null>(null);
+  const [hydrated, setHydrated] = useState(false);
 
   useEffect(() => {
     const loadAuthData = async () => {
-      const storedToken = await SecureStore.getItemAsync("token");
-      const storedUser = await SecureStore.getItemAsync("user");
+      try {
+        const storedToken = await SecureStore.getItemAsync("token");
+        const storedUser = await SecureStore.getItemAsync("user");
 
-      if (storedToken) {
-        setTokenState(storedToken);
-      }
-      if (storedUser) {
-        try {
-          setUserState(JSON.parse(storedUser));
-        } catch (err) {
-          console.error("Failed to parse stored user", err);
+        if (storedToken) {
+          setTokenState(storedToken);
         }
+        if (storedUser) {
+          try {
+            setUserState(JSON.parse(storedUser));
+          } catch (err) {
+            console.error("Failed to parse stored user", err);
+          }
+        }
+      } finally {
+        setHydrated(true);
       }
     };
     loadAuthData();
@@ -67,7 +74,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   return (
-    <AuthContext.Provider value={{ token, setToken, user, setUser }}>
+    <AuthContext.Provider value={{ token, setToken, user, setUser, hydrated }}>
       {children}
     </AuthContext.Provider>
   );

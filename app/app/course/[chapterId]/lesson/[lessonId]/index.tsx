@@ -52,11 +52,10 @@ export default function LessonScreen() {
   const currentItem = allItems[currentIndex];
   const nextItem = allItems[currentIndex + 1];
 
-  const player = currentItem?.videoUrl
-    ? useVideoPlayer(currentItem?.videoUrl, (player) => {
-        player.loop = false;
-      })
-    : null;
+  // Always call the hook (null source = no video) so the hook count doesn't change between lessons
+  const player = useVideoPlayer(currentItem?.videoUrl ?? null, (player) => {
+    player.loop = false;
+  });
 
   // Load local HTML from database
   useEffect(() => {
@@ -128,16 +127,16 @@ export default function LessonScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View
         style={{
           paddingTop: insets.top + 8,
           paddingBottom: 10,
           paddingHorizontal: 16,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         {/* Back Button */}
@@ -149,15 +148,15 @@ export default function LessonScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text
             style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "600",
               marginLeft: 6,
               fontSize: 14,
@@ -182,7 +181,7 @@ export default function LessonScreen() {
             style={{
               fontSize: 24,
               fontWeight: "800",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 8,
               paddingHorizontal: 8
             }}
@@ -191,7 +190,7 @@ export default function LessonScreen() {
           </Text>
 
         {/* Video */}
-        {player && (
+        {currentItem?.videoUrl && (
           <View
             style={{
               marginBottom: 16,
@@ -207,7 +206,7 @@ export default function LessonScreen() {
             <VideoView
               style={styles.video}
               player={player}
-              allowsFullscreen
+              fullscreenOptions={{ enable: true }}
               allowsPictureInPicture
             />
           </View>
@@ -231,7 +230,7 @@ export default function LessonScreen() {
                 inset: 0,
                 justifyContent: "center",
                 alignItems: "center",
-                backgroundColor: isDark ? "#111827" : "#ffffff",
+                backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
                 zIndex: 10,
               }}
             >
@@ -273,12 +272,12 @@ export default function LessonScreen() {
         {/* Discussion Section */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 16,
             padding: 12,
             marginBottom: insets.bottom + 100,
             borderLeftWidth: 4,
-            borderLeftColor: "#8B5CF6",
+            borderLeftColor: "#8A5CE6",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -287,12 +286,12 @@ export default function LessonScreen() {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16, padding:6 }}>
-            <MessageCircle size={24} color="#8B5CF6" style={{ marginRight: 8 }} />
+            <MessageCircle size={24} color="#8A5CE6" style={{ marginRight: 8 }} />
             <Text
               style={{
                 fontSize: 24,
                 fontWeight: "700",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
               }}
             >
               Discussion
@@ -302,23 +301,23 @@ export default function LessonScreen() {
           {/* Loading / Empty / Comments */}
           {loadingComments ? (
             <View style={{ paddingVertical: 20, alignItems: "center" }}>
-              <ActivityIndicator size="small" color="#06B6D4" />
+              <ActivityIndicator size="small" color="#8A5CE6" />
             </View>
           ) : comments.length === 0 ? (
             <View
               style={{
                 paddingVertical: 20,
                 paddingHorizontal: 16,
-                backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                 borderRadius: 12,
                 borderWidth: 1,
-                borderColor: isDark ? "#334155" : "#e5e7eb",
+                borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 borderStyle: "dashed",
               }}
             >
               <Text
                 style={{
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   textAlign: "center",
                   fontSize: 14,
                 }}
@@ -333,10 +332,10 @@ export default function LessonScreen() {
                 style={{
                   marginBottom: 16,
                   borderRadius: 12,
-                  backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                  backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                   padding: 12,
                   borderWidth: 1,
-                  borderColor: isDark ? "#334155" : "#e5e7eb",
+                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 }}
               >
                 {/* Top Row: Avatar, Name, Reply Button */}
@@ -360,7 +359,7 @@ export default function LessonScreen() {
                           borderRadius: 16,
                           marginRight: 10,
                           borderWidth: 2,
-                          borderColor: "#06B6D4",
+                          borderColor: "#8A5CE6",
                         }}
                       />
                     ) : (
@@ -370,7 +369,7 @@ export default function LessonScreen() {
                           height: 32,
                           borderRadius: 16,
                           marginRight: 10,
-                          backgroundColor: "#06B6D4",
+                          backgroundColor: "#8A5CE6",
                           justifyContent: "center",
                           alignItems: "center",
                         }}
@@ -385,7 +384,7 @@ export default function LessonScreen() {
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: isDark ? "#ffffff" : "#1f2937",
+                        color: isDark ? "#F4F1F8" : "#0B0A0F",
                         fontSize: 14,
                       }}
                     >
@@ -399,13 +398,13 @@ export default function LessonScreen() {
                     style={{
                       paddingHorizontal: 10,
                       paddingVertical: 4,
-                      backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                      backgroundColor: isDark ? "#17151C" : "#ffffff",
                       borderRadius: 8,
                       borderWidth: 1,
-                      borderColor: "#06B6D4",
+                      borderColor: "#8A5CE6",
                     }}
                   >
-                    <Text style={{ color: "#06B6D4", fontWeight: "600", fontSize: 13 }}>
+                    <Text style={{ color: "#8A5CE6", fontWeight: "600", fontSize: 13 }}>
                       Reply
                     </Text>
                   </Pressable>
@@ -414,7 +413,7 @@ export default function LessonScreen() {
                 {/* Bottom: Comment Content */}
                 <Text
                   style={{
-                    color: isDark ? "#9ca3af" : "#374151",
+                    color: isDark ? "#9C95A8" : "#2E2A35",
                     lineHeight: 20,
                     fontSize: 14,
                   }}
@@ -429,17 +428,17 @@ export default function LessonScreen() {
                     style={{
                       marginLeft: 46,
                       marginTop: 12,
-                      backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                      backgroundColor: isDark ? "#17151C" : "#ffffff",
                       padding: 12,
                       borderRadius: 12,
                       borderLeftWidth: 2,
-                      borderLeftColor: "#06B6D4",
+                      borderLeftColor: "#8A5CE6",
                     }}
                   >
                     <Text
                       style={{
                         fontWeight: "600",
-                        color: isDark ? "#ffffff" : "#1f2937",
+                        color: isDark ? "#F4F1F8" : "#0B0A0F",
                         marginBottom: 4,
                         fontSize: 13,
                       }}
@@ -448,7 +447,7 @@ export default function LessonScreen() {
                     </Text>
                     <Text
                       style={{
-                        color: isDark ? "#9ca3af" : "#4b5563",
+                        color: isDark ? "#9C95A8" : "#4F4A5A",
                         fontSize: 13,
                         lineHeight: 18,
                       }}
@@ -472,15 +471,15 @@ export default function LessonScreen() {
                     marginBottom: 8,
                     paddingHorizontal: 12,
                     paddingVertical: 8,
-                    backgroundColor: isDark ? "#0f172a" : "#f0f9ff",
+                    backgroundColor: isDark ? "#0B0A0F" : "#f0f9ff",
                     borderRadius: 8,
                   }}
                 >
-                  <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontSize: 13 }}>
+                  <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontSize: 13 }}>
                     Replying to comment
                   </Text>
                   <Pressable onPress={() => setReplyTo(null)}>
-                    <Text style={{ color: "#ef4444", fontWeight: "600", fontSize: 13 }}>
+                    <Text style={{ color: "#D93F55", fontWeight: "600", fontSize: 13 }}>
                       Cancel
                     </Text>
                   </Pressable>
@@ -493,16 +492,16 @@ export default function LessonScreen() {
                   minHeight: 44,
                   borderRadius: 12,
                   borderWidth: 1,
-                  borderColor: isDark ? "#334155" : "#d1d5db",
+                  borderColor: isDark ? "#2B2733" : "#D9D2E5",
                   paddingHorizontal: 14,
                   paddingVertical: 10,
-                  color: isDark ? "#ffffff" : "#1f2937",
-                  backgroundColor: isDark ? "#0f172a" : "#ffffff",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
+                  backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
                   marginBottom: 10,
                   fontSize: 14,
                 }}
                 placeholder="Write a comment..."
-                placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+                placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
                 value={newComment}
                 onChangeText={setNewComment}
                 multiline
@@ -535,7 +534,7 @@ export default function LessonScreen() {
                 activeOpacity={0.8}
                 disabled={submitting || !newComment.trim()}
                 style={{
-                  backgroundColor: submitting || !newComment.trim() ? (isDark ? "#334155" : "#d1d5db") : "#06B6D4",
+                  backgroundColor: submitting || !newComment.trim() ? (isDark ? "#2B2733" : "#D9D2E5") : "#8A5CE6",
                   borderRadius: 12,
                   paddingVertical: 12,
                   paddingHorizontal: 16,
@@ -572,16 +571,16 @@ export default function LessonScreen() {
               style={{
                 paddingVertical: 16,
                 paddingHorizontal: 16,
-                backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                 borderRadius: 12,
                 borderWidth: 1,
-                borderColor: isDark ? "#334155" : "#e5e7eb",
+                borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 marginTop: 16,
               }}
             >
               <Text
                 style={{
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   textAlign: "center",
                   fontSize: 14,
                 }}
@@ -603,9 +602,9 @@ export default function LessonScreen() {
             right: 0,
             padding: 16,
             paddingBottom: insets.bottom + 16,
-            backgroundColor: isDark ? "#111827" : "#ffffff",
+            backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
             borderTopWidth: 1,
-            borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
+            borderTopColor: isDark ? "#17151C" : "#E5DFEE",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: -4 },
             shadowOpacity: 0.1,
@@ -647,13 +646,13 @@ export default function LessonScreen() {
             activeOpacity={0.8}
             disabled={marking}
             style={{
-              backgroundColor: marking ? (isDark ? "#334155" : "#d1d5db") : "#06B6D4",
+              backgroundColor: marking ? (isDark ? "#2B2733" : "#D9D2E5") : "#8A5CE6",
               borderRadius: 16,
               paddingVertical: 16,
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
-              shadowColor: "#06B6D4",
+              shadowColor: "#8A5CE6",
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.3,
               shadowRadius: 8,

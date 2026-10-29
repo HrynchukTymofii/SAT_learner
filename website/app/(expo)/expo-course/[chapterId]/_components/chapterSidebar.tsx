@@ -124,7 +124,7 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
         id="sidebar-toggle"
         variant="outline"
         size="icon"
-        className="fixed bottom-12 left-6 z-50 rounded-full shadow-lg md:hidden bg-gradient-to-br from-indigo-600 via-violet-600 to-purple-600 border-0 text-white"
+        className="fixed bottom-12 left-6 z-50 rounded-full shadow-lg md:hidden bg-lav border-0 text-on-pastel"
         onClick={() => setIsMobileOpen(!isMobileOpen)}
       >
         {isMobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -143,16 +143,16 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
         <div
           id="course-sidebar"
           className={cn(
-            "md:flex fixed inset-y-0 left-0 z-50 min-w-80 w-80 bg-white dark:bg-slate-900 shadow-xl  flex-col rounded-3xl ",
+            "md:flex fixed inset-y-0 left-0 z-50 min-w-80 w-80 bg-white shadow-xl flex-col rounded-3xl ",
             "md:relative md:shadow-none md:translate-x-0 md:z-0",
             isMobileOpen ? "flex" : "hidden",
           )}
         >
            {/* Course Header */}
-          <div className="p-4 border-b border-slate-200 dark:border-slate-700">
+          <div className="p-4 border-b border-border">
             <Link
               href={`/course`}
-              className="flex items-center gap-4 p-3 rounded-lg transition hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="flex items-center gap-4 p-3 rounded-lg transition hover:bg-muted"
               onClick={() => setIsMobileOpen(false)}
             >
               <div className="w-14 h-14 shrink-0">
@@ -169,10 +169,10 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <h2 className="font-semibold text-slate-900 dark:text-white truncate">{course.title}</h2>
+                <h2 className="font-semibold text-foreground dark:text-white truncate">{course.title}</h2>
                 <div className="flex items-center gap-2 mt-1">
                   <Progress value={completionPercentage} className="h-1.5 flex-1" />
-                  <span className="text-xs text-slate-500 dark:text-slate-400 whitespace-nowrap">
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">
                     {completedItems}/{totalItems} completed
                   </span>
                 </div>
@@ -224,16 +224,16 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
                   className={cn(
                     "rounded-lg overflow-hidden border",
                     isCurrentChapter
-                      ? "border-violet-300 dark:border-violet-700 shadow-md"
-                      : "border-slate-200 dark:border-slate-700",
+                      ? "border-transparent shadow-md"
+                      : "border-border",
                   )}
                 >
                   <CollapsibleTrigger asChild>
                     <div
                       className={cn(
                         "flex items-center justify-between p-3 cursor-pointer",
-                        isCurrentChapter ? "bg-violet-50 dark:bg-violet-900/20" : "bg-white dark:bg-slate-800",
-                        "hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors",
+                        isCurrentChapter ? "bg-lav-2" : "bg-white",
+                        "hover:bg-muted transition-colors",
                       )}
                     >
                       <div className="flex items-center gap-3">
@@ -241,54 +241,54 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
                           className={cn(
                             "flex items-center justify-center w-8 h-8 rounded-full text-sm font-medium",
                             chapterCompletionPercentage === 100
-                              ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
-                              : "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300",
+                              ? "bg-mint text-foreground"
+                              : "bg-muted text-foreground",
                           )}
                         >
                           {chapterCompletionPercentage === 100 ? <CheckCircle className="h-4 w-4" /> : chapterIndex + 1}
                         </div>
-                        <h3 className="font-medium text-slate-900 dark:text-white">{chapter.title}</h3>
+                        <h3 className="font-medium text-foreground dark:text-white">{chapter.title}</h3>
                       </div>
                       <div className="flex items-center gap-2">
                         {totalChapterItems > 0 && (
-                          <span className="text-xs text-slate-500 dark:text-slate-400">
+                          <span className="text-xs text-muted-foreground">
                             {completedChapterItems}/{totalChapterItems}
                           </span>
                         )}
                         {isChapterOpen ? (
-                          <ChevronDown className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                          <ChevronDown className="h-4 w-4 text-muted-foreground" />
                         ) : (
-                          <ChevronRight className="h-4 w-4 text-slate-500 dark:text-slate-400" />
+                          <ChevronRight className="h-4 w-4 text-muted-foreground" />
                         )}
                       </div>
                     </div>
                   </CollapsibleTrigger>
-                  <CollapsibleContent className="bg-slate-50 dark:bg-slate-800/50">
+                  <CollapsibleContent className="bg-muted">
                     <div className="p-2 space-y-1.5">
                       {combinedItems.map((item) => {
                         const isCurrentItem = currentItemId === item.id && currentItemType === item.type
 
                         // Determine icon and styling based on item type
                         let ItemIcon = PlayCircle
-                        let itemBg = "bg-white dark:bg-slate-800"
-                        let itemHoverBg = "hover:bg-slate-100 dark:hover:bg-slate-700"
+                        let itemBg = "bg-white"
+                        let itemHoverBg = "hover:bg-muted"
                         let statusElement = null
 
                         if (item.type === "lesson") {
                           ItemIcon = FileText
                           if (item.completed === 1) {
-                            statusElement = <CheckCircle className="h-4 w-4 text-green-500 shrink-0" />
+                            statusElement = <CheckCircle className="h-4 w-4 text-success shrink-0" />
                           }
                         } else if (item.type === "quizze") {
                           ItemIcon = HelpCircle
-                          itemBg = "bg-blue-50 dark:bg-blue-900/20"
-                          itemHoverBg = "hover:bg-blue-100 dark:hover:bg-blue-900/30"
+                          itemBg = "bg-lav"
+                          itemHoverBg = "hover:bg-lav"
 
                           if (item.completed >= 0) {
                             statusElement = (
                               <Badge
                                 variant="outline"
-                                className="bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400 text-xs"
+                                className="bg-lav text-foreground text-xs"
                               >
                                 {Math.round(item.completed)}%
                               </Badge>
@@ -304,7 +304,7 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
                               "flex items-center justify-between p-2 rounded-md transition-all",
                               itemBg,
                               itemHoverBg,
-                              isCurrentItem && "ring-2 ring-violet-500 dark:ring-violet-400",
+                              isCurrentItem && "ring-2 ring-lav-2",
                               "group",
                             )}
                             onClick={() => setIsMobileOpen(false)}
@@ -314,15 +314,15 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
                                 className={cn(
                                   "flex items-center justify-center w-6 h-6 rounded-full text-xs",
                                   item.type === "lesson"
-                                    ? "bg-slate-100 text-slate-700 dark:bg-slate-700 dark:text-slate-300"
+                                    ? "bg-muted text-foreground"
                                     : item.type === "quizze"
-                                      ? "bg-blue-100 text-blue-700 dark:bg-blue-900/50 dark:text-blue-300"
-                                      : "bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300",
+                                      ? "bg-lav text-foreground"
+                                      : "bg-butter text-foreground",
                                 )}
                               >
                                 <ItemIcon className="h-3.5 w-3.5" />
                               </div>
-                              <span className="text-sm text-slate-700 dark:text-slate-200 truncate">{item.title}</span>
+                              <span className="text-sm text-foreground truncate">{item.title}</span>
                             </div>
                             {statusElement}
                           </Link>
@@ -336,7 +336,7 @@ const ChapterSidebar = ({ course, currentChapterId, currentItemId, currentItemTy
           </div>
 
           {/* Mobile Close Button */}
-          <div className="p-4 border-t border-slate-200 dark:border-slate-700 md:hidden">
+          <div className="p-4 border-t border-border md:hidden">
             <Button variant="outline" className="w-full" onClick={() => setIsMobileOpen(false)}>
               <ChevronLeft className="h-4 w-4 mr-2" />
               Close Navigation

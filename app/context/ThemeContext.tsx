@@ -38,7 +38,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   // Calculate the actual color scheme based on preference and system theme
   const colorScheme: ColorScheme =
     themeMode === 'system'
-      ? (systemColorScheme || 'light')
+      ? (systemColorScheme === 'dark' ? 'dark' : 'light')
       : themeMode;
 
   // Function to update theme and persist to storage

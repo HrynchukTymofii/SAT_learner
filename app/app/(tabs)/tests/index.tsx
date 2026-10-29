@@ -78,7 +78,7 @@ export default function QuizzesPage() {
       description: "Complete 70-minute practice test with real SAT conditions",
       icon: GraduationCap,
       isFree: true,
-      color: "#06B6D4",
+      color: "#8A5CE6",
       badge: "Free",
       stats: "70 min • 44 questions",
     },
@@ -88,7 +88,7 @@ export default function QuizzesPage() {
     //   description: "Focus on specific topics to strengthen your weak areas",
     //   icon: Target,
     //   isFree: true,
-    //   color: "#8B5CF6",
+    //   color: "#8A5CE6",
     //   badge: "Free",
     //   stats: "Adaptive learning",
     // },
@@ -98,7 +98,7 @@ export default function QuizzesPage() {
       description: "Revisit questions you got wrong to improve faster",
       icon: X,
       isFree: false,
-      color: "#EF4444",
+      color: "#D93F55",
       badge: "PRO",
       stats: "Learn from mistakes",
     },
@@ -108,7 +108,7 @@ export default function QuizzesPage() {
       description: "Review questions you marked for later practice",
       icon: Heart,
       isFree: false,
-      color: "#F59E0B",
+      color: "#E5A50A",
       badge: "PRO",
       stats: "Your bookmarks",
     },
@@ -116,7 +116,7 @@ export default function QuizzesPage() {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}
+      style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}
       edges={["bottom"]}
     >
       {/* Header */}
@@ -125,16 +125,16 @@ export default function QuizzesPage() {
           paddingTop: insets.top + 16,
           paddingBottom: 20,
           paddingHorizontal: 20,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         <Text
           style={{
             fontSize: 32,
             fontWeight: "bold",
-            color: isDark ? "#ffffff" : "#1f2937",
+            color: isDark ? "#F4F1F8" : "#0B0A0F",
             marginBottom: 8,
             letterSpacing: -0.5,
           }}
@@ -144,7 +144,7 @@ export default function QuizzesPage() {
         <Text
           style={{
             fontSize: 15,
-            color: isDark ? "#9ca3af" : "#6b7280",
+            color: isDark ? "#9C95A8" : "#6B6577",
             lineHeight: 22,
           }}
         >
@@ -164,7 +164,7 @@ export default function QuizzesPage() {
             marginBottom: 24,
             borderRadius: 20,
             overflow: "hidden",
-            shadowColor: "#06B6D4",
+            shadowColor: "#8A5CE6",
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.2,
             shadowRadius: 12,
@@ -172,7 +172,7 @@ export default function QuizzesPage() {
           }}
         >
           <LinearGradient
-            colors={["#06B6D4", "#0891B2"]}
+            colors={["#8A5CE6", "#8A5CE6"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{ padding: 24 }}
@@ -257,7 +257,7 @@ export default function QuizzesPage() {
               }}
             >
               <Text
-                style={{ color: "#06B6D4", fontSize: 16, fontWeight: "600" }}
+                style={{ color: "#8A5CE6", fontSize: 16, fontWeight: "600" }}
               >
                 Start Full Test
               </Text>
@@ -270,7 +270,7 @@ export default function QuizzesPage() {
           style={{
             fontSize: 18,
             fontWeight: "bold",
-            color: isDark ? "#ffffff" : "#1f2937",
+            color: isDark ? "#F4F1F8" : "#0B0A0F",
             marginBottom: 16,
           }}
         >
@@ -287,7 +287,7 @@ export default function QuizzesPage() {
               activeOpacity={0.7}
               onPress={() => handleModeSelect(mode.id)}
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 20,
                 borderLeftWidth: 4,
@@ -306,7 +306,7 @@ export default function QuizzesPage() {
                     width: 48,
                     height: 48,
                     borderRadius: 12,
-                    backgroundColor: isDark ? "#334155" : "#f3f4f6",
+                    backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
                     alignItems: "center",
                     justifyContent: "center",
                     marginRight: 16,
@@ -328,7 +328,7 @@ export default function QuizzesPage() {
                       style={{
                         fontSize: 18,
                         fontWeight: "bold",
-                        color: isDark ? "#ffffff" : "#1f2937",
+                        color: isDark ? "#F4F1F8" : "#0B0A0F",
                         flex: 1,
                       }}
                     >
@@ -347,14 +347,14 @@ export default function QuizzesPage() {
                       >
                         <Lock
                           size={12}
-                          color={isDark ? "#a78bfa" : "#7c3aed"}
+                          color={isDark ? "#C9AAFB" : "#7A4BDB"}
                         />
                         <Text
                           style={{
                             marginLeft: 4,
                             fontSize: 11,
                             fontWeight: "600",
-                            color: isDark ? "#a78bfa" : "#7c3aed",
+                            color: isDark ? "#C9AAFB" : "#7A4BDB",
                           }}
                         >
                           PRO
@@ -374,7 +374,7 @@ export default function QuizzesPage() {
                           style={{
                             fontSize: 11,
                             fontWeight: "600",
-                            color: isDark ? "#34d399" : "#059669",
+                            color: isDark ? "#6FCF97" : "#2E9A5E",
                           }}
                         >
                           Free
@@ -386,7 +386,7 @@ export default function QuizzesPage() {
                   <Text
                     style={{
                       fontSize: 14,
-                      color: isDark ? "#94a3b8" : "#6b7280",
+                      color: isDark ? "#9C95A8" : "#6B6577",
                       marginBottom: 12,
                       lineHeight: 20,
                     }}
@@ -400,17 +400,17 @@ export default function QuizzesPage() {
                       alignItems: "center",
                       paddingHorizontal: 12,
                       paddingVertical: 6,
-                      backgroundColor: isDark ? "#334155" : "#f3f4f6",
+                      backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
                       borderRadius: 8,
                       alignSelf: "flex-start",
                     }}
                   >
-                    <Zap size={12} color={isDark ? "#94a3b8" : "#6b7280"} />
+                    <Zap size={12} color={isDark ? "#9C95A8" : "#6B6577"} />
                     <Text
                       style={{
                         marginLeft: 6,
                         fontSize: 12,
-                        color: isDark ? "#94a3b8" : "#6b7280",
+                        color: isDark ? "#9C95A8" : "#6B6577",
                         fontWeight: "500",
                       }}
                     >
@@ -439,18 +439,18 @@ export default function QuizzesPage() {
         <View
           style={{
             marginTop: 8,
-            backgroundColor: isDark ? "#1e293b" : "#f0f9ff",
+            backgroundColor: isDark ? "#17151C" : "#f0f9ff",
             borderRadius: 16,
             padding: 20,
             borderWidth: 1,
-            borderColor: isDark ? "#334155" : "#bae6fd",
+            borderColor: isDark ? "#2B2733" : "#bae6fd",
           }}
         >
           <Text
             style={{
               fontSize: 16,
               fontWeight: "600",
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               marginBottom: 8,
             }}
           >
@@ -459,7 +459,7 @@ export default function QuizzesPage() {
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? "#94a3b8" : "#64748b",
+              color: isDark ? "#9C95A8" : "#6B6577",
               lineHeight: 20,
             }}
           >
@@ -541,7 +541,7 @@ export default function QuizzesPage() {
 //       description: "Official 60-minute mock SAT with real test conditions.",
 //       icon: GraduationCap,
 //       isFree: true,
-//       colors: ["#2563eb", "#1e40af"], // deep blue gradient
+//       colors: ["#8A5CE6", "#1e40af"], // deep blue gradient
 //       buttonText: "Start Test",
 //     },
 //     {
@@ -550,7 +550,7 @@ export default function QuizzesPage() {
 //       description: "Focus on Math, Reading, or Writing to improve faster.",
 //       icon: BookOpen,
 //       isFree: true,
-//       colors: ["#3b82f6", "#8b5cf6"], // blue–purple
+//       colors: ["#8A5CE6", "#8A5CE6"], // blue–purple
 //       buttonText: "Go to Practice",
 //     },
 //     // {
@@ -559,7 +559,7 @@ export default function QuizzesPage() {
 //     //     description: "Adaptive tasks tailored to your mistakes to help you improve efficiently.",
 //     //     icon: ChartNoAxesCombined,
 //     //     isFree: true,
-//     //     colors: ["#22d3ee", "#0ea5e9"], // teal gradient
+//     //     colors: ["#8A5CE6", "#8A5CE6"], // teal gradient
 //     //     buttonText: "Start Personalized Practice",
 //     // },
 //     {
@@ -568,7 +568,7 @@ export default function QuizzesPage() {
 //       description: "Review questions you marked for later.",
 //       icon: Heart,
 //       isFree: false,
-//       colors: ["#8b5cf6", "#7c3aed"], // purple
+//       colors: ["#8A5CE6", "#8A5CE6"], // purple
 //       buttonText: "View Saved",
 //     },
 //     {
@@ -675,7 +675,7 @@ export default function QuizzesPage() {
 //       {examMode && (
 //         <View className="absolute bottom-0 left-0 right-0 bg-white dark:bg-[#1e293b] px-6 py-6 border-t border-gray-200 dark:border-stone-700 pb-36">
 //           <View className="flex-row items-start gap-3 mb-3">
-//             <examMode.icon size={28} color="#2563eb" />
+//             <examMode.icon size={28} color="#8A5CE6" />
 //             <View className="flex-1">
 //               <Text className="text-blue-600 dark:text-blue-400 font-bold text-2xl">
 //                 {examMode.title}

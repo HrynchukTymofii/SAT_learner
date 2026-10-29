@@ -52,16 +52,16 @@ export default function ResultsModal({
 ): readonly [string, string] => {
     if (percentage >= 90) {
       // Green
-      return isDark ? ["#22c55e", "#16a34a"] : ["#22c55e", "#16a34a"];
+      return isDark ? ["#2E9A5E", "#2E9A5E"] : ["#2E9A5E", "#2E9A5E"];
     } else if (percentage >= 60) {
       // Yellow
       return isDark ? ["#facc15", "#ca8a04"] : ["#fef08a", "#facc15"];
     } else if (percentage >= 30) {
       // Blue
-      return isDark ? ["#3b82f6", "#2563eb"] : ["#60a5fa", "#3b82f6"];
+      return isDark ? ["#8A5CE6", "#8A5CE6"] : ["#8A5CE6", "#8A5CE6"];
     } else {
       // Slate gray
-      return isDark ? ["#64748b", "#475569"] : ["#cbd5e1", "#94a3b8"];
+      return isDark ? ["#7E7889", "#475569"] : ["#cbd5e1", "#9C95A8"];
     }
   };
 
@@ -106,7 +106,7 @@ export default function ResultsModal({
         left: 0,
         width: "100%",
         height: "100%",
-        backgroundColor: isDark ? "#111827" : "#f9fafb",
+        backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
         zIndex: 9999,
         paddingTop: 46,
       }}
@@ -119,18 +119,18 @@ export default function ResultsModal({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             paddingHorizontal: 16,
             paddingVertical: 10,
             borderRadius: 12,
             alignSelf: "flex-start",
             borderWidth: 1,
-            borderColor: isDark ? "#374155" : "#e5e7eb",
+            borderColor: isDark ? "#2B2733" : "#E5DFEE",
           }}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text style={{
-            color: isDark ? "#06B6D4" : "#0891B2",
+            color: isDark ? "#C9AAFB" : "#7A4BDB",
             fontWeight: "600",
             marginLeft: 8,
           }}>
@@ -145,7 +145,7 @@ export default function ResultsModal({
         {/* Results Card */}
         <View
           style={{
-            backgroundColor: results.passed ? "#22c55e" : "#f59e0b",
+            backgroundColor: results.passed ? "#2E9A5E" : "#E5A50A",
             padding: 32,
             borderRadius: 16,
             marginBottom: 24,
@@ -239,19 +239,19 @@ export default function ResultsModal({
             onPress={() => handleBack(false)}
             activeOpacity={0.7}
             style={{
-              backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+              backgroundColor: isDark ? "#17151C" : "#EFEAF7",
               flexDirection: "row",
               alignItems: "center",
               justifyContent: "center",
               paddingVertical: 16,
               borderRadius: 12,
               borderWidth: 1,
-              borderColor: isDark ? "#374155" : "#e5e7eb",
+              borderColor: isDark ? "#2B2733" : "#E5DFEE",
             }}
           >
-            <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} style={{ marginRight: 8 }} />
+            <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} style={{ marginRight: 8 }} />
             <Text style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "700",
               fontSize: 16,
             }}>
@@ -267,13 +267,13 @@ export default function ResultsModal({
               }}
               activeOpacity={0.7}
               style={{
-                backgroundColor: "#06B6D4",
+                backgroundColor: "#8A5CE6",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
                 paddingVertical: 16,
                 borderRadius: 12,
-                shadowColor: "#06B6D4",
+                shadowColor: "#8A5CE6",
                 shadowOffset: { width: 0, height: 4 },
                 shadowOpacity: 0.3,
                 shadowRadius: 8,

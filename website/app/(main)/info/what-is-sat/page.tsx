@@ -17,14 +17,14 @@ const WhatIsSATPage = () => {
 
         {/* Header */}
         <Card className="shadow-xl border-0 bg-card mb-8">
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-6 md:p-8">
+          <div className="bg-lav text-on-pastel p-6 md:p-8">
             <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
               <div className="p-3 bg-white/20 rounded-lg">
                 <BookOpen className="h-8 w-8 text-white" />
               </div>
               <div className="flex-1">
                 <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2">What is SAT?</h1>
-                <p className="text-blue-100 text-base md:text-lg">
+                <p className="text-muted-foreground text-base md:text-lg">
                   A comprehensive guide to understanding the SAT exam
                 </p>
               </div>
@@ -39,23 +39,23 @@ const WhatIsSATPage = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div className="text-center p-4 bg-blue-500/10 rounded-lg">
-                <Clock className="h-8 w-8 mx-auto mb-2 text-blue-500" />
+              <div className="text-center p-4 bg-lav rounded-lg">
+                <Clock className="h-8 w-8 mx-auto mb-2 text-brand" />
                 <div className="font-semibold text-foreground">3 hours</div>
                 <div className="text-sm text-muted-foreground">Test Duration</div>
               </div>
-              <div className="text-center p-4 bg-green-500/10 rounded-lg">
-                <Target className="h-8 w-8 mx-auto mb-2 text-green-500" />
+              <div className="text-center p-4 bg-mint rounded-lg">
+                <Target className="h-8 w-8 mx-auto mb-2 text-success" />
                 <div className="font-semibold text-foreground">1600</div>
                 <div className="text-sm text-muted-foreground">Max Score</div>
               </div>
-              <div className="text-center p-4 bg-purple-500/10 rounded-lg">
-                <BookOpen className="h-8 w-8 mx-auto mb-2 text-purple-500" />
+              <div className="text-center p-4 bg-lav-2 rounded-lg">
+                <BookOpen className="h-8 w-8 mx-auto mb-2 text-brand" />
                 <div className="font-semibold text-foreground">2 Sections</div>
                 <div className="text-sm text-muted-foreground">Main Areas</div>
               </div>
-              <div className="text-center p-4 bg-amber-500/10 rounded-lg">
-                <Users className="h-8 w-8 mx-auto mb-2 text-amber-500" />
+              <div className="text-center p-4 bg-butter rounded-lg">
+                <Users className="h-8 w-8 mx-auto mb-2 text-warn" />
                 <div className="font-semibold text-foreground">1.5M+</div>
                 <div className="text-sm text-muted-foreground">Annual Test Takers</div>
               </div>
@@ -77,8 +77,8 @@ const WhatIsSATPage = () => {
                 the College Board and is designed to assess a student&apos;s readiness for college.
               </p>
 
-              <div className="bg-blue-500/10 border border-blue-500/30 rounded-lg p-6 mb-6">
-                <h3 className="text-lg font-semibold text-blue-500 mb-3">Key Purpose</h3>
+              <div className="bg-lav border border-lav-2 rounded-lg p-6 mb-6">
+                <h3 className="text-lg font-semibold text-brand mb-3">Key Purpose</h3>
                 <p className="text-foreground">
                   The SAT provides colleges with a common data point that can be used to compare all applicants,
                   regardless of their high school background, curriculum, or grading standards.
@@ -95,8 +95,8 @@ const WhatIsSATPage = () => {
             <CardContent>
               <div className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="p-6 bg-blue-500/10 rounded-lg border border-blue-500/30">
-                    <h3 className="text-xl font-semibold text-blue-500 mb-3">Evidence-Based Reading and Writing</h3>
+                  <div className="p-6 bg-lav rounded-lg border border-lav-2">
+                    <h3 className="text-xl font-semibold text-brand mb-3">Evidence-Based Reading and Writing</h3>
                     <div className="space-y-2 text-foreground">
                       <p>• Reading Test: 52 questions, 65 minutes</p>
                       <p>• Writing and Language Test: 44 questions, 35 minutes</p>
@@ -104,8 +104,8 @@ const WhatIsSATPage = () => {
                     </div>
                   </div>
 
-                  <div className="p-6 bg-green-500/10 rounded-lg border border-green-500/30">
-                    <h3 className="text-xl font-semibold text-green-500 mb-3">Math</h3>
+                  <div className="p-6 bg-mint rounded-lg border border-success/40">
+                    <h3 className="text-xl font-semibold text-success mb-3">Math</h3>
                     <div className="space-y-2 text-foreground">
                       <p>• Calculator Section: 38 questions, 55 minutes</p>
                       <p>• No Calculator Section: 20 questions, 25 minutes</p>
@@ -114,8 +114,8 @@ const WhatIsSATPage = () => {
                   </div>
                 </div>
 
-                <div className="bg-amber-500/10 border border-amber-500/30 rounded-lg p-6">
-                  <h3 className="text-lg font-semibold text-amber-500 mb-3">Optional Essay (Discontinued)</h3>
+                <div className="bg-butter border border-[#F2C94C] rounded-lg p-6">
+                  <h3 className="text-lg font-semibold text-warn mb-3">Optional Essay (Discontinued)</h3>
                   <p className="text-foreground">
                     As of June 2021, the College Board discontinued the optional SAT Essay. Most colleges no longer
                     require or consider SAT Essay scores for admissions.
@@ -139,19 +139,19 @@ const WhatIsSATPage = () => {
                       <h4 className="font-medium text-foreground">Passage Types:</h4>
                       <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Literature
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Historical Documents
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Social Science
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Natural Science
                         </li>
                       </ul>
@@ -160,19 +160,19 @@ const WhatIsSATPage = () => {
                       <h4 className="font-medium text-foreground">Skills Tested:</h4>
                       <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Reading Comprehension
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Vocabulary in Context
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Analysis of Evidence
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Data Interpretation
                         </li>
                       </ul>
@@ -187,19 +187,19 @@ const WhatIsSATPage = () => {
                       <h4 className="font-medium text-foreground">Topics Covered:</h4>
                       <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Algebra
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Geometry & Trigonometry
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Data Analysis
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Advanced Math
                         </li>
                       </ul>
@@ -208,19 +208,19 @@ const WhatIsSATPage = () => {
                       <h4 className="font-medium text-foreground">Question Types:</h4>
                       <ul className="space-y-1 text-foreground">
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Multiple Choice
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Student-Produced Response
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Real-World Applications
                         </li>
                         <li className="flex items-center gap-2">
-                          <CheckCircle className="h-4 w-4 text-green-600" />
+                          <CheckCircle className="h-4 w-4 text-success" />
                           Multi-Step Problems
                         </li>
                       </ul>

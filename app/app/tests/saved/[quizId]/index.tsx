@@ -3,7 +3,7 @@ import { View, Text } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { fetchSavedQuestions } from "@/lib/api/quiz"
 import { useAuth } from "@/context/AuthContext"
-import TestsPage from "@/components/TestsPage"
+import QuizScreen from "@/components/quiz/QuizScreen"
 
 import { useQuizDatabase } from "@/lib/db/quiz"
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader"
@@ -59,7 +59,7 @@ const SavedQuizScreen = () => {
   }
 
   return (
-    <TestsPage
+    <QuizScreen
       quiz={{
         id: quizData.id,
         title: quizData.quizTitle,

@@ -82,7 +82,7 @@ export default function PrivacyPolicyPage() {
         We may update this Privacy Policy from time to time. The latest version will always be available in the App, and the "Last Updated" date will be displayed at the end of this document.
       </p>
 
-      <p className="mt-8 text-sm text-gray-500">
+      <p className="mt-8 text-sm text-muted-foreground">
         Last updated: October 23, 2025
       </p>
     </main>

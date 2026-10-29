@@ -21,11 +21,13 @@ import { useAuth } from "@/context/AuthContext";
 import { updateUser, deleteUserAccount } from "@/lib/api/user";
 import Toast from "react-native-toast-message";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { useLogout } from "@/hooks/useLogout";
 import { useTheme } from "@/context/ThemeContext";
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { token, setToken, user, setUser } = useAuth();
+  const { token, user, setUser } = useAuth();
+  const logout = useLogout();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [confirmText, setConfirmText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
@@ -45,9 +47,9 @@ export default function SettingsScreen() {
     { label: "Dark", value: "dark", icon: Moon },
   ];
 
-  const handleLogout = () => {
-    setToken(null);
-    setUser(null);
+  const handleAccountDeleted = async () => {
+    // The account is gone on the server, so don't try to send its offline actions
+    await logout({ flushQueue: false });
     router.replace("/");
     Toast.show({
       type: "success",
@@ -59,6 +61,10 @@ export default function SettingsScreen() {
 
   const handleSave = async () => {
     if (!token) return alert("User not authorized");
+    if (password.length < 4) {
+      Alert.alert("Error", "Password must be at least 4 characters.");
+      return;
+    }
     const result = await updateUser(token, { password });
     if (result.success) {
       if (user) setUser({ ...user });
@@ -73,15 +79,15 @@ export default function SettingsScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View style={{
         paddingTop: insets.top + 12,
         paddingBottom: 16,
         paddingHorizontal: 16,
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+        borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
       }}>
         {/* Back Button */}
         <TouchableOpacity
@@ -93,22 +99,22 @@ export default function SettingsScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
-          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
+          <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
             Back
           </Text>
         </TouchableOpacity>
 
         {/* Title */}
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 4 }}>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 4 }}>
           Settings
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           Manage your account preferences
         </Text>
       </View>
@@ -121,13 +127,13 @@ export default function SettingsScreen() {
         {/* Password Section */}
         <View style={{ marginBottom: 24 }}>
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-            <Key size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+            <Key size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
             <Text
               style={{
                 fontSize: 18,
                 fontWeight: "600",
                 marginLeft: 8,
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
               }}
             >
               Change Password
@@ -139,29 +145,29 @@ export default function SettingsScreen() {
             placeholder="New password"
             secureTextEntry
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
-              color: isDark ? "#ffffff" : "#1f2937",
-              borderColor: isDark ? "#334155" : "#e5e7eb",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
+              borderColor: isDark ? "#2B2733" : "#E5DFEE",
               borderWidth: 1,
               borderRadius: 12,
               paddingHorizontal: 16,
               paddingVertical: 12,
               fontSize: 16,
             }}
-            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
           />
         </View>
 
         {/* Theme Section */}
         <View style={{ marginBottom: 24 }}>
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-            <Sun size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+            <Sun size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
             <Text
               style={{
                 fontSize: 18,
                 fontWeight: "600",
                 marginLeft: 8,
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
               }}
             >
               App Theme
@@ -169,11 +175,11 @@ export default function SettingsScreen() {
           </View>
           <View
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
               borderRadius: 12,
               padding: 16,
               borderWidth: 1,
-              borderColor: isDark ? "#334155" : "#e5e7eb",
+              borderColor: isDark ? "#2B2733" : "#E5DFEE",
             }}
           >
             {themeOptions.map((option) => (
@@ -192,7 +198,7 @@ export default function SettingsScreen() {
                     height: 20,
                     borderRadius: 10,
                     borderWidth: 2,
-                    borderColor: themeMode === option.value ? "#06B6D4" : (isDark ? "#6b7280" : "#9ca3af"),
+                    borderColor: themeMode === option.value ? "#8A5CE6" : (isDark ? "#7E7889" : "#9C95A8"),
                     alignItems: "center",
                     justifyContent: "center",
                   }}
@@ -203,7 +209,7 @@ export default function SettingsScreen() {
                         width: 10,
                         height: 10,
                         borderRadius: 5,
-                        backgroundColor: "#06B6D4",
+                        backgroundColor: "#8A5CE6",
                       }}
                     />
                   )}
@@ -211,7 +217,7 @@ export default function SettingsScreen() {
                 <Text style={{
                   marginLeft: 12,
                   fontSize: 16,
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                 }}>
                   {option.label}
                 </Text>
@@ -224,7 +230,7 @@ export default function SettingsScreen() {
         <TouchableOpacity
           onPress={handleSave}
           style={{
-            backgroundColor: "#06B6D4",
+            backgroundColor: "#8A5CE6",
             borderRadius: 12,
             paddingVertical: 16,
             alignItems: "center",
@@ -245,13 +251,13 @@ export default function SettingsScreen() {
         {/* Danger Zone */}
         <View style={{
           borderTopWidth: 1,
-          borderTopColor: isDark ? "#334155" : "#e5e7eb",
+          borderTopColor: isDark ? "#2B2733" : "#E5DFEE",
           paddingTop: 24,
         }}>
           <Text style={{
             fontSize: 18,
             fontWeight: "600",
-            color: "#EF4444",
+            color: "#D93F55",
             marginBottom: 12,
           }}>
             Danger Zone
@@ -260,15 +266,15 @@ export default function SettingsScreen() {
             onPress={() => setShowDeleteModal(true)}
             style={{
               borderWidth: 2,
-              borderColor: "#EF4444",
+              borderColor: "#D93F55",
               borderRadius: 12,
               paddingVertical: 12,
               alignItems: "center",
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
             }}
             activeOpacity={0.7}
           >
-            <Text style={{ color: "#EF4444", fontWeight: "600", fontSize: 16 }}>
+            <Text style={{ color: "#D93F55", fontWeight: "600", fontSize: 16 }}>
               Delete Account
             </Text>
           </TouchableOpacity>
@@ -286,7 +292,7 @@ export default function SettingsScreen() {
         }}>
           <View
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
               borderRadius: 16,
               padding: 24,
               width: "100%",
@@ -298,7 +304,7 @@ export default function SettingsScreen() {
                 fontSize: 20,
                 fontWeight: "bold",
                 marginBottom: 16,
-                color: "#EF4444",
+                color: "#D93F55",
               }}
             >
               Confirm Deletion
@@ -306,7 +312,7 @@ export default function SettingsScreen() {
             <Text style={{
               fontSize: 16,
               marginBottom: 12,
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
             }}>
               This action is irreversible. To confirm, type{" "}
               <Text style={{ fontWeight: "bold" }}>Delete</Text> below:
@@ -317,9 +323,9 @@ export default function SettingsScreen() {
               onChangeText={setConfirmText}
               placeholder="Type Delete"
               style={{
-                backgroundColor: isDark ? "#0f172a" : "#f9fafb",
-                color: isDark ? "#ffffff" : "#1f2937",
-                borderColor: isDark ? "#334155" : "#e5e7eb",
+                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
+                borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 borderWidth: 1,
                 borderRadius: 12,
                 paddingHorizontal: 16,
@@ -327,7 +333,7 @@ export default function SettingsScreen() {
                 fontSize: 16,
                 marginBottom: 16,
               }}
-              placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+              placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
             />
 
             <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 12 }}>
@@ -340,12 +346,12 @@ export default function SettingsScreen() {
                   flex: 1,
                   paddingVertical: 12,
                   borderRadius: 12,
-                  backgroundColor: isDark ? "#334155" : "#e5e7eb",
+                  backgroundColor: isDark ? "#2B2733" : "#E5DFEE",
                   alignItems: "center",
                 }}
                 activeOpacity={0.7}
               >
-                <Text style={{ color: isDark ? "#ffffff" : "#1f2937", fontWeight: "600" }}>
+                <Text style={{ color: isDark ? "#F4F1F8" : "#0B0A0F", fontWeight: "600" }}>
                   Cancel
                 </Text>
               </TouchableOpacity>
@@ -364,7 +370,7 @@ export default function SettingsScreen() {
 
                   if (result.success) {
                     setShowDeleteModal(false);
-                    handleLogout();
+                    await handleAccountDeleted();
                   } else {
                     alert(result.error || "Failed to delete account");
                   }
@@ -373,7 +379,7 @@ export default function SettingsScreen() {
                   flex: 1,
                   paddingVertical: 12,
                   borderRadius: 12,
-                  backgroundColor: "#EF4444",
+                  backgroundColor: "#D93F55",
                   alignItems: "center",
                 }}
                 activeOpacity={0.7}

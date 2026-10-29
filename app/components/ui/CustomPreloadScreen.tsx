@@ -83,7 +83,7 @@ export default function CustomPreloadScreen() {
 
   return (
     <SafeAreaView
-      style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#ffffff", paddingTop: 2 }}
+      style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#ffffff", paddingTop: 2 }}
     >
       <TopBlur />
 
@@ -96,7 +96,7 @@ export default function CustomPreloadScreen() {
           }}
         >
           <LinearGradient
-            colors={["#06B6D4", "#0891B2", "#06B6D4"]}
+            colors={["#8A5CE6", "#8A5CE6", "#8A5CE6"]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 1 }}
             style={{
@@ -115,7 +115,7 @@ export default function CustomPreloadScreen() {
             width: 220,
             height: 220,
             borderRadius: 110,
-            backgroundColor: isDark ? "#06B6D420" : "#06B6D415",
+            backgroundColor: isDark ? "#C9AAFB20" : "#7A4BDB15",
           }}
         />
 
@@ -130,10 +130,10 @@ export default function CustomPreloadScreen() {
               width: 170,
               height: 170,
               borderRadius: 85,
-              backgroundColor: isDark ? "#1e293b" : "#f8fafc",
+              backgroundColor: isDark ? "#17151C" : "#F4F1F9",
               alignItems: "center",
               justifyContent: "center",
-              shadowColor: "#06B6D4",
+              shadowColor: "#8A5CE6",
               shadowOffset: { width: 0, height: 8 },
               shadowOpacity: 0.3,
               shadowRadius: 16,
@@ -150,7 +150,7 @@ export default function CustomPreloadScreen() {
 
         {/* Title with gradient */}
         <LinearGradient
-          colors={["#06B6D4", "#0891B2"]}
+          colors={["#8A5CE6", "#8A5CE6"]}
           start={{ x: 0, y: 0 }}
           end={{ x: 1, y: 0 }}
           style={{
@@ -178,7 +178,7 @@ export default function CustomPreloadScreen() {
             opacity: fadeAnim,
             marginTop: 20,
             fontSize: 16,
-            color: isDark ? "#94a3b8" : "#64748b",
+            color: isDark ? "#9C95A8" : "#6B6577",
             textAlign: "center",
             fontWeight: "500",
           }}
@@ -192,8 +192,8 @@ export default function CustomPreloadScreen() {
             progress={1}
             indeterminate
             width={280}
-            color="#06B6D4"
-            unfilledColor={isDark ? "#1e293b" : "#e2e8f0"}
+            color="#8A5CE6"
+            unfilledColor={isDark ? "#17151C" : "#E5DFEE"}
             borderWidth={0}
             borderRadius={12}
             height={8}
@@ -209,7 +209,7 @@ export default function CustomPreloadScreen() {
                 width: 8,
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: "#06B6D4",
+                backgroundColor: "#8A5CE6",
                 opacity: fadeAnim,
               }}
             />
@@ -235,7 +235,7 @@ function PreloadFooter({ isDark }: { isDark: boolean }) {
       <Text
         style={{
           fontSize: 12,
-          color: isDark ? "#94a3b8" : "#6b7280",
+          color: isDark ? "#9C95A8" : "#6B6577",
           textAlign: "center",
         }}
       >

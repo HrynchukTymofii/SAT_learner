@@ -3,6 +3,7 @@ import { Animated, Pressable, Text, TextInput, View } from "react-native";
 import { CheckCircle, XCircle } from "lucide-react-native";
 import { Question } from "@/types";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { isCorrect as isCorrectAnswer } from "@/components/quiz/quizLogic";
 
 interface QuestionOptionsProps {
   currentQuestion: Question;
@@ -58,20 +59,20 @@ const QuestionOptions = ({
   if (currentQuestion.questionType === "grid_in") {
     const userAnswer = selectedAnswers[currentQuestion.id]?.[0];
     const correctAnswer = currentQuestion.answers[0];
-    const isCorrect = isAnswered && userAnswer === correctAnswer;
-    const isIncorrect = isAnswered && userAnswer !== correctAnswer;
+    const isCorrect = isAnswered && isCorrectAnswer(currentQuestion.answers, userAnswer ? [userAnswer] : []);
+    const isIncorrect = isAnswered && !isCorrect;
 
     return (
       <View style={{ gap: 16, paddingHorizontal: 8 }}>
         {/* Instructional Text */}
         {!isAnswered && <View
           style={{
-            backgroundColor: isDark ? "#1e3a5f" : "#dbeafe",
+            backgroundColor: isDark ? "#1e3a5f" : "#E4CDFF",
             paddingVertical: 10,
             paddingHorizontal: 14,
             borderRadius: 10,
             borderLeftWidth: 3,
-            borderLeftColor: "#3b82f6",
+            borderLeftColor: "#8A5CE6",
           }}
         >
           <Text
@@ -89,21 +90,21 @@ const QuestionOptions = ({
         <View style={{ gap: 12 }}>
           <TextInput
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
               borderWidth: isAnswered ? 2 : 1,
               borderColor: isCorrect
-                ? "#22c55e"
+                ? "#2E9A5E"
                 : isIncorrect
-                ? "#ef4444"
+                ? "#D93F55"
                 : isDark
-                ? "#334155"
-                : "#e5e7eb",
+                ? "#2B2733"
+                : "#E5DFEE",
               borderRadius: 12,
               paddingVertical: 14,
               paddingHorizontal: 16,
               fontSize: 18,
               fontWeight: "500",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -111,7 +112,7 @@ const QuestionOptions = ({
               elevation: 2,
             }}
             placeholder="Enter your answer..."
-            placeholderTextColor={isDark ? "#64748b" : "#9ca3af"}
+            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
             value={gridInValue}
             onChangeText={setGridInValue}
             keyboardType="numeric"
@@ -127,10 +128,10 @@ const QuestionOptions = ({
               disabled={!gridInValue.trim()}
               style={{
                 backgroundColor: gridInValue.trim()
-                  ? "#06B6D4"
+                  ? "#8A5CE6"
                   : isDark
-                  ? "#334155"
-                  : "#e5e7eb",
+                  ? "#2B2733"
+                  : "#E5DFEE",
                 paddingVertical: 14,
                 paddingHorizontal: 20,
                 borderRadius: 12,
@@ -147,8 +148,8 @@ const QuestionOptions = ({
                   color: gridInValue.trim()
                     ? "#ffffff"
                     : isDark
-                    ? "#64748b"
-                    : "#9ca3af",
+                    ? "#7E7889"
+                    : "#9C95A8",
                   fontSize: 16,
                   fontWeight: "700",
                 }}
@@ -176,18 +177,18 @@ const QuestionOptions = ({
                 paddingHorizontal: 16,
                 borderRadius: 12,
                 borderWidth: 2,
-                borderColor: isCorrect ? "#22c55e" : "#ef4444",
+                borderColor: isCorrect ? "#2E9A5E" : "#D93F55",
               }}
             >
               {isCorrect ? (
-                <CheckCircle size={24} color="#22c55e" />
+                <CheckCircle size={24} color="#2E9A5E" />
               ) : (
-                <XCircle size={24} color="#ef4444" />
+                <XCircle size={24} color="#D93F55" />
               )}
               <View style={{ flex: 1 }}>
                 <Text
                   style={{
-                    color: isDark ? "#ffffff" : "#1f2937",
+                    color: isDark ? "#F4F1F8" : "#0B0A0F",
                     fontSize: 15,
                     fontWeight: "600",
                   }}
@@ -197,7 +198,7 @@ const QuestionOptions = ({
                 {isIncorrect && (
                   <Text
                     style={{
-                      color: isDark ? "#fca5a5" : "#dc2626",
+                      color: isDark ? "#fca5a5" : "#D93F55",
                       fontSize: 14,
                       marginTop: 4,
                     }}
@@ -237,21 +238,21 @@ const QuestionOptions = ({
 
                 if (!isAnswered) {
                   bgColor = isSelected
-                    ? (isDark ? "#1e293b" : "#ffffff")
-                    : (isDark ? "#1e293b" : "#ffffff");
-                  borderColor = isSelected ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb");
+                    ? (isDark ? "#17151C" : "#ffffff")
+                    : (isDark ? "#17151C" : "#ffffff");
+                  borderColor = isSelected ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE");
                   borderWidth = isSelected ? 2 : 1;
                 } else if (isCorrectOption) {
                   bgColor = isDark ? "#14532d" : "#dcfce7";
-                  borderColor = "#22c55e";
+                  borderColor = "#2E9A5E";
                   borderWidth = 2;
                 } else if (isSelected) {
                   bgColor = isDark ? "#450a0a" : "#fee2e2";
-                  borderColor = "#ef4444";
+                  borderColor = "#D93F55";
                   borderWidth = 2;
                 } else {
-                  bgColor = isDark ? "#1e293b" : "#ffffff";
-                  borderColor = isDark ? "#334155" : "#e5e7eb";
+                  bgColor = isDark ? "#17151C" : "#ffffff";
+                  borderColor = isDark ? "#2B2733" : "#E5DFEE";
                   borderWidth = 1;
                 }
 
@@ -280,20 +281,20 @@ const QuestionOptions = ({
                       {isAnswered && isCorrectOption && (
                         <CheckCircle
                           size={20}
-                          color="#22c55e"
+                          color="#2E9A5E"
                           style={{ position: "absolute", top: 8, right: 8 }}
                         />
                       )}
                       {isAnswered && !isCorrectOption && isSelected && (
                         <XCircle
                           size={20}
-                          color="#ef4444"
+                          color="#D93F55"
                           style={{ position: "absolute", top: 8, right: 8 }}
                         />
                       )}
                       <Text
                         style={{
-                          color: isDark ? "#ffffff" : "#1f2937",
+                          color: isDark ? "#F4F1F8" : "#0B0A0F",
                           fontWeight: "400",
                           fontSize: 18,
                         }}
@@ -320,21 +321,21 @@ const QuestionOptions = ({
 
                 if (!isAnswered) {
                   bgColor = isSelected
-                    ? (isDark ? "#1e293b" : "#ffffff")
-                    : (isDark ? "#1e293b" : "#ffffff");
-                  borderColor = isSelected ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb");
+                    ? (isDark ? "#17151C" : "#ffffff")
+                    : (isDark ? "#17151C" : "#ffffff");
+                  borderColor = isSelected ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE");
                   borderWidth = isSelected ? 2 : 1;
                 } else if (isCorrectOption) {
                   bgColor = isDark ? "#14532d" : "#dcfce7";
-                  borderColor = "#22c55e";
+                  borderColor = "#2E9A5E";
                   borderWidth = 2;
                 } else if (isSelected) {
                   bgColor = isDark ? "#450a0a" : "#fee2e2";
-                  borderColor = "#ef4444";
+                  borderColor = "#D93F55";
                   borderWidth = 2;
                 } else {
-                  bgColor = isDark ? "#1e293b" : "#ffffff";
-                  borderColor = isDark ? "#334155" : "#e5e7eb";
+                  bgColor = isDark ? "#17151C" : "#ffffff";
+                  borderColor = isDark ? "#2B2733" : "#E5DFEE";
                   borderWidth = 1;
                 }
 
@@ -363,20 +364,20 @@ const QuestionOptions = ({
                       {isAnswered && isCorrectOption && (
                         <CheckCircle
                           size={20}
-                          color="#22c55e"
+                          color="#2E9A5E"
                           style={{ position: "absolute", top: 8, right: 8 }}
                         />
                       )}
                       {isAnswered && !isCorrectOption && isSelected && (
                         <XCircle
                           size={20}
-                          color="#ef4444"
+                          color="#D93F55"
                           style={{ position: "absolute", top: 8, right: 8 }}
                         />
                       )}
                       <Text
                         style={{
-                          color: isDark ? "#ffffff" : "#1f2937",
+                          color: isDark ? "#F4F1F8" : "#0B0A0F",
                           fontWeight: "400",
                           fontSize: 18,
                         }}
@@ -405,21 +406,21 @@ const QuestionOptions = ({
 
         if (!isAnswered) {
           bgColor = isSelected
-            ? (isDark ? "#1e293b" : "#ffffff")
-            : (isDark ? "#1e293b" : "#ffffff");
-          borderColor = isSelected ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb");
+            ? (isDark ? "#17151C" : "#ffffff")
+            : (isDark ? "#17151C" : "#ffffff");
+          borderColor = isSelected ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE");
           borderWidth = isSelected ? 2 : 1;
         } else if (isCorrectOption) {
           bgColor = isDark ? "#14532d" : "#dcfce7";
-          borderColor = "#22c55e";
+          borderColor = "#2E9A5E";
           borderWidth = 2;
         } else if (isSelected) {
           bgColor = isDark ? "#450a0a" : "#fee2e2";
-          borderColor = "#ef4444";
+          borderColor = "#D93F55";
           borderWidth = 2;
         } else {
-          bgColor = isDark ? "#1e293b" : "#ffffff";
-          borderColor = isDark ? "#334155" : "#e5e7eb";
+          bgColor = isDark ? "#17151C" : "#ffffff";
+          borderColor = isDark ? "#2B2733" : "#E5DFEE";
           borderWidth = 1;
         }
 
@@ -447,14 +448,14 @@ const QuestionOptions = ({
               }}
             >
               {isAnswered && isCorrectOption && (
-                <CheckCircle size={20} color="#22c55e" />
+                <CheckCircle size={20} color="#2E9A5E" />
               )}
               {isAnswered && !isCorrectOption && isSelected && (
-                <XCircle size={20} color="#ef4444" />
+                <XCircle size={20} color="#D93F55" />
               )}
               <Text style={{
                 flex: 1,
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 fontWeight: "500",
                 fontSize: 15,
                 lineHeight: 22,

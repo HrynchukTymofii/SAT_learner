@@ -16,29 +16,29 @@ export default function WhatIsSATPage() {
       icon: Clock,
       title: "3 hours",
       subtitle: "Test Duration",
-      bgColor: isDark ? "#1e293b" : "#ffffff",
-      iconColor: "#06B6D4",
+      bgColor: isDark ? "#17151C" : "#ffffff",
+      iconColor: "#8A5CE6",
     },
     {
       icon: Target,
       title: "1600",
       subtitle: "Max Score",
-      bgColor: isDark ? "#1e293b" : "#ffffff",
-      iconColor: "#10B981",
+      bgColor: isDark ? "#17151C" : "#ffffff",
+      iconColor: "#2E9A5E",
     },
     {
       icon: BookOpen,
       title: "2 Sections",
       subtitle: "Main Areas",
-      bgColor: isDark ? "#1e293b" : "#ffffff",
-      iconColor: "#8B5CF6",
+      bgColor: isDark ? "#17151C" : "#ffffff",
+      iconColor: "#8A5CE6",
     },
     {
       icon: Users,
       title: "1.5M+",
       subtitle: "Annual Test Takers",
-      bgColor: isDark ? "#1e293b" : "#ffffff",
-      iconColor: "#F59E0B",
+      bgColor: isDark ? "#17151C" : "#ffffff",
+      iconColor: "#E5A50A",
     },
   ];
 
@@ -50,7 +50,7 @@ export default function WhatIsSATPage() {
         "Writing and Language Test: 44 questions, 35 minutes",
         "Score Range: 200-800",
       ],
-      color: "#06B6D4",
+      color: "#8A5CE6",
     },
     {
       title: "Math",
@@ -59,21 +59,21 @@ export default function WhatIsSATPage() {
         "No Calculator Section: 20 questions, 25 minutes",
         "Score Range: 200-800",
       ],
-      color: "#10B981",
+      color: "#2E9A5E",
     },
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View
         style={{
           paddingTop: insets.top + 12,
           paddingBottom: 16,
           paddingHorizontal: 16,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         {/* Back Button */}
@@ -86,15 +86,15 @@ export default function WhatIsSATPage() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text
             style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "600",
               marginLeft: 6,
               fontSize: 14,
@@ -110,7 +110,7 @@ export default function WhatIsSATPage() {
             style={{
               padding: 12,
               borderRadius: 12,
-              backgroundColor: "#06B6D4",
+              backgroundColor: "#8A5CE6",
               marginRight: 12,
             }}
           >
@@ -121,13 +121,13 @@ export default function WhatIsSATPage() {
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 marginBottom: 4,
               }}
             >
               What is SAT?
             </Text>
-            <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+            <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
               A comprehensive guide to the SAT exam
             </Text>
           </View>
@@ -145,7 +145,7 @@ export default function WhatIsSATPage() {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 16,
             }}
           >
@@ -170,7 +170,7 @@ export default function WhatIsSATPage() {
                     padding: 20,
                     alignItems: "center",
                     borderWidth: 1,
-                    borderColor: isDark ? "#334155" : "#e5e7eb",
+                    borderColor: isDark ? "#2B2733" : "#E5DFEE",
                     shadowColor: "#000",
                     shadowOffset: { width: 0, height: 2 },
                     shadowOpacity: 0.1,
@@ -183,7 +183,7 @@ export default function WhatIsSATPage() {
                     style={{
                       fontSize: 20,
                       fontWeight: "800",
-                      color: isDark ? "#ffffff" : "#1f2937",
+                      color: isDark ? "#F4F1F8" : "#0B0A0F",
                       marginBottom: 4,
                     }}
                   >
@@ -192,7 +192,7 @@ export default function WhatIsSATPage() {
                   <Text
                     style={{
                       fontSize: 12,
-                      color: isDark ? "#9ca3af" : "#6b7280",
+                      color: isDark ? "#9C95A8" : "#6B6577",
                       textAlign: "center",
                     }}
                   >
@@ -207,12 +207,12 @@ export default function WhatIsSATPage() {
         {/* Introduction */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 16,
             padding: 20,
             marginBottom: 24,
             borderLeftWidth: 4,
-            borderLeftColor: "#06B6D4",
+            borderLeftColor: "#8A5CE6",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -224,7 +224,7 @@ export default function WhatIsSATPage() {
             style={{
               fontSize: 18,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 12,
             }}
           >
@@ -233,7 +233,7 @@ export default function WhatIsSATPage() {
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               lineHeight: 22,
               marginBottom: 16,
             }}
@@ -245,18 +245,18 @@ export default function WhatIsSATPage() {
           </Text>
           <View
             style={{
-              backgroundColor: isDark ? "#0f172a" : "#f0f9ff",
+              backgroundColor: isDark ? "#0B0A0F" : "#f0f9ff",
               borderRadius: 12,
               padding: 16,
               borderWidth: 1,
-              borderColor: isDark ? "#334155" : "#bae6fd",
+              borderColor: isDark ? "#2B2733" : "#bae6fd",
             }}
           >
             <Text
               style={{
                 fontSize: 14,
                 fontWeight: "600",
-                color: isDark ? "#06B6D4" : "#0891B2",
+                color: isDark ? "#C9AAFB" : "#7A4BDB",
                 marginBottom: 8,
               }}
             >
@@ -265,7 +265,7 @@ export default function WhatIsSATPage() {
             <Text
               style={{
                 fontSize: 14,
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 lineHeight: 20,
               }}
             >
@@ -282,7 +282,7 @@ export default function WhatIsSATPage() {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 16,
             }}
           >
@@ -293,7 +293,7 @@ export default function WhatIsSATPage() {
             <View
               key={index}
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -310,7 +310,7 @@ export default function WhatIsSATPage() {
                 style={{
                   fontSize: 16,
                   fontWeight: "700",
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                   marginBottom: 12,
                 }}
               >
@@ -329,7 +329,7 @@ export default function WhatIsSATPage() {
                   <Text
                     style={{
                       fontSize: 14,
-                      color: isDark ? "#9ca3af" : "#6b7280",
+                      color: isDark ? "#9C95A8" : "#6B6577",
                       flex: 1,
                       lineHeight: 20,
                     }}
@@ -345,11 +345,11 @@ export default function WhatIsSATPage() {
         {/* Important Note */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#fffbeb",
+            backgroundColor: isDark ? "#17151C" : "#fffbeb",
             borderRadius: 16,
             padding: 16,
             borderWidth: 1,
-            borderColor: isDark ? "#334155" : "#fde68a",
+            borderColor: isDark ? "#2B2733" : "#fde68a",
             marginBottom: 24,
           }}
         >
@@ -357,7 +357,7 @@ export default function WhatIsSATPage() {
             style={{
               fontSize: 14,
               fontWeight: "600",
-              color: isDark ? "#fbbf24" : "#d97706",
+              color: isDark ? "#F2C94C" : "#d97706",
               marginBottom: 8,
             }}
           >
@@ -366,7 +366,7 @@ export default function WhatIsSATPage() {
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? "#9ca3af" : "#78716c",
+              color: isDark ? "#9C95A8" : "#78716c",
               lineHeight: 20,
             }}
           >
@@ -379,7 +379,7 @@ export default function WhatIsSATPage() {
         <TouchableOpacity
           onPress={() => router.push("/info/articles/how-sat-scored" as any)}
           style={{
-            backgroundColor: "#06B6D4",
+            backgroundColor: "#8A5CE6",
             borderRadius: 16,
             padding: 16,
             flexDirection: "row",

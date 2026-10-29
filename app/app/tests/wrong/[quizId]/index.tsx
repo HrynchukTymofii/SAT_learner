@@ -3,7 +3,7 @@ import { View, Text } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import {  fetchWrongQuestions } from "@/lib/api/quiz"
 import { useAuth } from "@/context/AuthContext"
-import TestsPage from "@/components/TestsPage"
+import QuizScreen from "@/components/quiz/QuizScreen"
 import { useQuizDatabase } from "@/lib/db/quiz"
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader"
 
@@ -12,8 +12,6 @@ const WrongQuizScreen = () => {
   const router = useRouter()
   const { token } = useAuth()
   const { fetchWrongQuestionsLocal } = useQuizDatabase();
-
-  if (!token || !quizId) return null;
 
   const [quizData, setQuizData] = useState<any>(null)
   const [loading, setLoading] = useState(true)
@@ -43,6 +41,9 @@ const WrongQuizScreen = () => {
     loadQuiz()
   }, [quizId, token])
 
+  // After the hooks: returning earlier changed the hook count when token became null (logout)
+  if (!token || !quizId) return null;
+
   if (loading) {
     return (
       <GraduationCap3DLoader />
@@ -58,7 +59,7 @@ const WrongQuizScreen = () => {
   }
 
   return (
-    <TestsPage
+    <QuizScreen
       quiz={{
         id: quizData.id,
         title: quizData.quizTitle,

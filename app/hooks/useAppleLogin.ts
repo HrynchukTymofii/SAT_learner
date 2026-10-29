@@ -1,4 +1,5 @@
 import { UserType } from "@/context/AuthContext";
+import { LoadUserResult } from "@/lib/user";
 import * as AppleAuthentication from "expo-apple-authentication";
 import * as SecureStore from "expo-secure-store";
 import Toast from "react-native-toast-message";
@@ -11,10 +12,10 @@ export async function handleAppleLogin({
   loadUserInBackground,
 }: {
   setToken: (token: string) => void;
-  setUser: (user: UserType) => void;
+  setUser: (user: UserType | null) => void;
   router: any;
   safeReturnUrl: string;
-  loadUserInBackground: (opts: { token: string; setUser: (user: UserType) => void; forceSync?: boolean }) => Promise<void>;
+  loadUserInBackground: (opts: { token: string; setUser: (user: UserType | null) => void; setToken?: (token: string | null) => void; forceSync?: boolean }) => Promise<LoadUserResult>;
 }) {
   try {
     const credential = await AppleAuthentication.signInAsync({

@@ -155,16 +155,16 @@ export default function DayPlanningScreen() {
   const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View
         style={{
           paddingTop: insets.top + 12,
           paddingBottom: 16,
           paddingHorizontal: 16,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         {/* Back Button */}
@@ -177,15 +177,15 @@ export default function DayPlanningScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text
             style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "600",
               marginLeft: 6,
               fontSize: 14,
@@ -200,13 +200,13 @@ export default function DayPlanningScreen() {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            color: isDark ? "#ffffff" : "#1f2937",
+            color: isDark ? "#F4F1F8" : "#0B0A0F",
             marginBottom: 4,
           }}
         >
           Study Plan
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           {formatDate(selectedDate)}
         </Text>
       </View>
@@ -220,12 +220,12 @@ export default function DayPlanningScreen() {
         {totalTasks > 0 && (
           <View
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
               borderRadius: 16,
               padding: 16,
               marginBottom: 20,
               borderLeftWidth: 4,
-              borderLeftColor: "#06B6D4",
+              borderLeftColor: "#8A5CE6",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -245,7 +245,7 @@ export default function DayPlanningScreen() {
                 style={{
                   fontSize: 16,
                   fontWeight: "600",
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                 }}
               >
                 Daily Progress
@@ -254,7 +254,7 @@ export default function DayPlanningScreen() {
                 style={{
                   fontSize: 18,
                   fontWeight: "bold",
-                  color: "#06B6D4",
+                  color: "#8A5CE6",
                 }}
               >
                 {completedTasks}/{totalTasks}
@@ -264,7 +264,7 @@ export default function DayPlanningScreen() {
               style={{
                 height: 8,
                 borderRadius: 4,
-                backgroundColor: isDark ? "#0f172a" : "#f3f4f6",
+                backgroundColor: isDark ? "#0B0A0F" : "#EFEAF7",
                 overflow: "hidden",
               }}
             >
@@ -272,7 +272,7 @@ export default function DayPlanningScreen() {
                 style={{
                   height: "100%",
                   width: `${progressPercentage}%`,
-                  backgroundColor: "#06B6D4",
+                  backgroundColor: "#8A5CE6",
                   borderRadius: 4,
                 }}
               />
@@ -286,7 +286,7 @@ export default function DayPlanningScreen() {
             style={{
               fontSize: 18,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 12,
             }}
           >
@@ -299,17 +299,17 @@ export default function DayPlanningScreen() {
             multiline
             numberOfLines={4}
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
-              color: isDark ? "#ffffff" : "#1f2937",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               borderWidth: 1,
-              borderColor: isDark ? "#334155" : "#e5e7eb",
+              borderColor: isDark ? "#2B2733" : "#E5DFEE",
               borderRadius: 12,
               padding: 16,
               fontSize: 16,
               textAlignVertical: "top",
               minHeight: 100,
             }}
-            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
           />
         </View>
 
@@ -319,7 +319,7 @@ export default function DayPlanningScreen() {
             style={{
               fontSize: 18,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 12,
             }}
           >
@@ -335,9 +335,9 @@ export default function DayPlanningScreen() {
                 paddingVertical: 10,
                 paddingHorizontal: 12,
                 borderRadius: 10,
-                backgroundColor: newTaskType === "lesson" ? "#06B6D4" : isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: newTaskType === "lesson" ? "#8A5CE6" : isDark ? "#17151C" : "#ffffff",
                 borderWidth: 1,
-                borderColor: newTaskType === "lesson" ? "#06B6D4" : isDark ? "#334155" : "#e5e7eb",
+                borderColor: newTaskType === "lesson" ? "#8A5CE6" : isDark ? "#2B2733" : "#E5DFEE",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
@@ -348,7 +348,7 @@ export default function DayPlanningScreen() {
               <Text style={{
                 fontSize: 14,
                 fontWeight: newTaskType === "lesson" ? "600" : "400",
-                color: newTaskType === "lesson" ? "#ffffff" : isDark ? "#9ca3af" : "#6b7280"
+                color: newTaskType === "lesson" ? "#ffffff" : isDark ? "#9C95A8" : "#6B6577"
               }}>
                 Lesson
               </Text>
@@ -361,9 +361,9 @@ export default function DayPlanningScreen() {
                 paddingVertical: 10,
                 paddingHorizontal: 12,
                 borderRadius: 10,
-                backgroundColor: newTaskType === "quiz" ? "#06B6D4" : isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: newTaskType === "quiz" ? "#8A5CE6" : isDark ? "#17151C" : "#ffffff",
                 borderWidth: 1,
-                borderColor: newTaskType === "quiz" ? "#06B6D4" : isDark ? "#334155" : "#e5e7eb",
+                borderColor: newTaskType === "quiz" ? "#8A5CE6" : isDark ? "#2B2733" : "#E5DFEE",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
@@ -374,7 +374,7 @@ export default function DayPlanningScreen() {
               <Text style={{
                 fontSize: 14,
                 fontWeight: newTaskType === "quiz" ? "600" : "400",
-                color: newTaskType === "quiz" ? "#ffffff" : isDark ? "#9ca3af" : "#6b7280"
+                color: newTaskType === "quiz" ? "#ffffff" : isDark ? "#9C95A8" : "#6B6577"
               }}>
                 Quiz
               </Text>
@@ -387,9 +387,9 @@ export default function DayPlanningScreen() {
                 paddingVertical: 10,
                 paddingHorizontal: 12,
                 borderRadius: 10,
-                backgroundColor: newTaskType === "review" ? "#06B6D4" : isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: newTaskType === "review" ? "#8A5CE6" : isDark ? "#17151C" : "#ffffff",
                 borderWidth: 1,
-                borderColor: newTaskType === "review" ? "#06B6D4" : isDark ? "#334155" : "#e5e7eb",
+                borderColor: newTaskType === "review" ? "#8A5CE6" : isDark ? "#2B2733" : "#E5DFEE",
                 flexDirection: "row",
                 alignItems: "center",
                 justifyContent: "center",
@@ -400,7 +400,7 @@ export default function DayPlanningScreen() {
               <Text style={{
                 fontSize: 14,
                 fontWeight: newTaskType === "review" ? "600" : "400",
-                color: newTaskType === "review" ? "#ffffff" : isDark ? "#9ca3af" : "#6b7280"
+                color: newTaskType === "review" ? "#ffffff" : isDark ? "#9C95A8" : "#6B6577"
               }}>
                 Review
               </Text>
@@ -423,21 +423,21 @@ export default function DayPlanningScreen() {
               returnKeyType="done"
               style={{
                 flex: 1,
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
-                color: isDark ? "#ffffff" : "#1f2937",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 borderWidth: 1,
-                borderColor: isDark ? "#334155" : "#e5e7eb",
+                borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
                 fontSize: 16,
               }}
-              placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+              placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
             />
             <TouchableOpacity
               onPress={addTask}
               style={{
-                backgroundColor: "#06B6D4",
+                backgroundColor: "#8A5CE6",
                 borderRadius: 12,
                 paddingHorizontal: 16,
                 paddingVertical: 12,
@@ -454,20 +454,20 @@ export default function DayPlanningScreen() {
           {tasks.length === 0 ? (
             <View
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 12,
                 padding: 32,
                 alignItems: "center",
                 borderWidth: 1,
-                borderColor: isDark ? "#334155" : "#e5e7eb",
+                borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 borderStyle: "dashed",
               }}
             >
-              <BookOpen size={32} color={isDark ? "#6b7280" : "#9ca3af"} style={{ marginBottom: 12 }} />
+              <BookOpen size={32} color={isDark ? "#7E7889" : "#9C95A8"} style={{ marginBottom: 12 }} />
               <Text
                 style={{
                   fontSize: 14,
-                  color: isDark ? "#6b7280" : "#9ca3af",
+                  color: isDark ? "#7E7889" : "#9C95A8",
                   textAlign: "center",
                 }}
               >
@@ -479,14 +479,14 @@ export default function DayPlanningScreen() {
               <View
                 key={task.id}
                 style={{
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  backgroundColor: isDark ? "#17151C" : "#ffffff",
                   borderRadius: 12,
                   padding: 12,
                   marginBottom: 8,
                   flexDirection: "row",
                   alignItems: "center",
                   borderWidth: 1,
-                  borderColor: isDark ? "#334155" : "#e5e7eb",
+                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 }}
               >
                 {/* Checkbox */}
@@ -496,9 +496,9 @@ export default function DayPlanningScreen() {
                   activeOpacity={0.7}
                 >
                   {task.completed ? (
-                    <CheckCircle2 size={24} color="#06B6D4" />
+                    <CheckCircle2 size={24} color="#8A5CE6" />
                   ) : (
-                    <Circle size={24} color="#06B6D4" />
+                    <Circle size={24} color="#8A5CE6" />
                   )}
                 </TouchableOpacity>
 
@@ -516,11 +516,11 @@ export default function DayPlanningScreen() {
                     fontSize: 16,
                     color: task.completed
                       ? isDark
-                        ? "#6b7280"
-                        : "#9ca3af"
+                        ? "#7E7889"
+                        : "#9C95A8"
                       : isDark
-                      ? "#ffffff"
-                      : "#1f2937",
+                      ? "#F4F1F8"
+                      : "#0B0A0F",
                     textDecorationLine: task.completed ? "line-through" : "none",
                   }}
                 >
@@ -533,11 +533,11 @@ export default function DayPlanningScreen() {
                   style={{
                     padding: 8,
                     borderRadius: 8,
-                    backgroundColor: isDark ? "#0f172a" : "#fef2f2",
+                    backgroundColor: isDark ? "#0B0A0F" : "#fef2f2",
                   }}
                   activeOpacity={0.7}
                 >
-                  <Trash2 size={16} color="#ef4444" />
+                  <Trash2 size={16} color="#D93F55" />
                 </TouchableOpacity>
               </View>
             ))
@@ -549,7 +549,7 @@ export default function DayPlanningScreen() {
           onPress={savePlan}
           disabled={isSaving}
           style={{
-            backgroundColor: "#06B6D4",
+            backgroundColor: "#8A5CE6",
             borderRadius: 12,
             paddingVertical: 16,
             alignItems: "center",
@@ -575,14 +575,14 @@ export default function DayPlanningScreen() {
           style={{
             marginTop: 16,
             padding: 16,
-            backgroundColor: isDark ? "#1e293b20" : "#06B6D410",
+            backgroundColor: isDark ? "#17151C20" : "#7A4BDB10",
             borderRadius: 12,
           }}
         >
           <Text
             style={{
               fontSize: 13,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               textAlign: "center",
               lineHeight: 18,
             }}
@@ -598,7 +598,7 @@ export default function DayPlanningScreen() {
             <View
               style={{
                 width: '90%',
-                backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                backgroundColor: isDark ? '#17151C' : '#ffffff',
                 borderRadius: 12,
                 padding: 16,
                 flexDirection: 'row',
@@ -609,7 +609,7 @@ export default function DayPlanningScreen() {
                 shadowRadius: 8,
                 elevation: 3,
                 borderLeftWidth: 4,
-                borderLeftColor: '#06B6D4',
+                borderLeftColor: '#8A5CE6',
               }}
             >
               <View
@@ -617,7 +617,7 @@ export default function DayPlanningScreen() {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: '#06B6D420',
+                  backgroundColor: '#8A5CE620',
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginRight: 12,
@@ -626,10 +626,10 @@ export default function DayPlanningScreen() {
                 <Text style={{ fontSize: 20 }}>✓</Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#ffffff' : '#1f2937', marginBottom: 2 }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#F4F1F8' : '#0B0A0F', marginBottom: 2 }}>
                   {props.text1}
                 </Text>
-                <Text style={{ fontSize: 14, color: isDark ? '#9ca3af' : '#6b7280' }}>
+                <Text style={{ fontSize: 14, color: isDark ? '#9C95A8' : '#6B6577' }}>
                   {props.text2}
                 </Text>
               </View>
@@ -639,7 +639,7 @@ export default function DayPlanningScreen() {
             <View
               style={{
                 width: '90%',
-                backgroundColor: isDark ? '#1e293b' : '#ffffff',
+                backgroundColor: isDark ? '#17151C' : '#ffffff',
                 borderRadius: 12,
                 padding: 16,
                 flexDirection: 'row',
@@ -650,7 +650,7 @@ export default function DayPlanningScreen() {
                 shadowRadius: 8,
                 elevation: 3,
                 borderLeftWidth: 4,
-                borderLeftColor: '#ef4444',
+                borderLeftColor: '#D93F55',
               }}
             >
               <View
@@ -658,7 +658,7 @@ export default function DayPlanningScreen() {
                   width: 40,
                   height: 40,
                   borderRadius: 20,
-                  backgroundColor: '#ef444420',
+                  backgroundColor: '#D93F5520',
                   justifyContent: 'center',
                   alignItems: 'center',
                   marginRight: 12,
@@ -667,10 +667,10 @@ export default function DayPlanningScreen() {
                 <Text style={{ fontSize: 20 }}>✕</Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#ffffff' : '#1f2937', marginBottom: 2 }}>
+                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#F4F1F8' : '#0B0A0F', marginBottom: 2 }}>
                   {props.text1}
                 </Text>
-                <Text style={{ fontSize: 14, color: isDark ? '#9ca3af' : '#6b7280' }}>
+                <Text style={{ fontSize: 14, color: isDark ? '#9C95A8' : '#6B6577' }}>
                   {props.text2}
                 </Text>
               </View>

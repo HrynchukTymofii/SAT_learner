@@ -27,7 +27,7 @@ export const LoginRequiredModal = ({ isOpen, onClose }: Props) => {
       >
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             padding: 16,
             borderRadius: 16,
             width: "100%",
@@ -48,12 +48,12 @@ export const LoginRequiredModal = ({ isOpen, onClose }: Props) => {
               right: 16,
               zIndex: 10,
               padding: 8,
-              backgroundColor: isDark ? "#334155" : "#f3f4f6",
+              backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
               borderRadius: 8,
             }}
             activeOpacity={0.7}
           >
-            <X size={20} color={isDark ? "#ffffff" : "#1f2937"} />
+            <X size={20} color={isDark ? "#F4F1F8" : "#0B0A0F"} />
           </TouchableOpacity>
 
           {/* Title */}
@@ -62,7 +62,7 @@ export const LoginRequiredModal = ({ isOpen, onClose }: Props) => {
               fontSize: 20,
               fontWeight: "700",
               marginBottom: 20,
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               paddingLeft: 8,
             }}
           >
@@ -75,7 +75,7 @@ export const LoginRequiredModal = ({ isOpen, onClose }: Props) => {
               textAlign: "center",
               fontSize: 16,
               lineHeight: 24,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               marginBottom: 24,
               paddingHorizontal: 8,
             }}
@@ -90,7 +90,7 @@ export const LoginRequiredModal = ({ isOpen, onClose }: Props) => {
               router.push("/login");
             }}
             style={{
-              backgroundColor: "#06B6D4",
+              backgroundColor: "#8A5CE6",
               borderRadius: 12,
               paddingVertical: 14,
               alignItems: "center",
@@ -125,7 +125,7 @@ export const LoginRequiredModal = ({ isOpen, onClose }: Props) => {
           >
             <Text
               style={{
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 fontWeight: "600",
                 fontSize: 14,
               }}

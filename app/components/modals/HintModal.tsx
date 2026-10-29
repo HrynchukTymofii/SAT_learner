@@ -41,7 +41,7 @@ export const HintModal = ({
       >
         <View
           style={{
-            backgroundColor: isDark ? "#0f172a" : "#ffffff",
+            backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
             padding: 20,
             borderRadius: 16,
             width: "100%",
@@ -64,12 +64,12 @@ export const HintModal = ({
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Lightbulb size={24} color="#f59e0b" fill="#f59e0b" />
+              <Lightbulb size={24} color="#E5A50A" fill="#E5A50A" />
               <Text
                 style={{
                   fontSize: 20,
                   fontWeight: "800",
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                   marginLeft: 8,
                 }}
               >
@@ -80,11 +80,11 @@ export const HintModal = ({
               onPress={onClose}
               style={{
                 padding: 8,
-                backgroundColor: isDark ? "#1e293b" : "#f3f4f6",
+                backgroundColor: isDark ? "#17151C" : "#EFEAF7",
                 borderRadius: 8,
               }}
             >
-              <X size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+              <X size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
             </Pressable>
           </View>
 
@@ -110,11 +110,11 @@ export const HintModal = ({
             onPress={onClose}
             style={{
               marginTop: 16,
-              backgroundColor: "#06B6D4",
+              backgroundColor: "#8A5CE6",
               paddingVertical: 12,
               borderRadius: 12,
               alignItems: "center",
-              shadowColor: "#06B6D4",
+              shadowColor: "#8A5CE6",
               shadowOffset: { width: 0, height: 4 },
               shadowOpacity: 0.3,
               shadowRadius: 8,

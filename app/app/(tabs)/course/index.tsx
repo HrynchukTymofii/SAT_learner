@@ -58,12 +58,12 @@ const calculateChapterProgress = (chapter: ChapterWithItems) => {
 };
 
 const getChapterColor = (progress: number) => {
-  if (progress >= 90) return "#10B981"; // Green
-  if (progress >= 70) return "#EAB308"; // Yellow
-  if (progress >= 50) return "#8B5CF6"; // Purple
-  if (progress >= 30) return "#06B6D4"; // Blue/Cyan
-  if (progress >= 10) return "#EF4444"; // Red
-  return "#6B7280"; // Neutral gray
+  if (progress >= 90) return "#2E9A5E"; // Green
+  if (progress >= 70) return "#E5A50A"; // Yellow
+  if (progress >= 50) return "#8A5CE6"; // Purple
+  if (progress >= 30) return "#8A5CE6"; // Blue/Cyan
+  if (progress >= 10) return "#D93F55"; // Red
+  return "#7E7889"; // Neutral gray
 };
 
 export default function HomeScreen() {
@@ -239,26 +239,26 @@ export default function HomeScreen() {
   const chooseTopicInfo = getTourStepInfo(TOUR_STEPS.CHOOSE_TOPIC);
 
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? "#111827" : "#f9fafb" }]}>
+    <View style={[styles.container, { backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }]}>
       {/* Header */}
       <View
         style={[
           styles.header,
           {
             paddingTop: insets.top + 12,
-            backgroundColor: isDark ? "#111827" : "#ffffff",
-            borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+            backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
+            borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
           },
         ]}
       >
         {/* Title and Progress */}
         <View style={styles.headerTitleRow}>
-          <Text style={[styles.headerTitle, { color: isDark ? "#ffffff" : "#1f2937" }]}>
+          <Text style={[styles.headerTitle, { color: isDark ? "#F4F1F8" : "#0B0A0F" }]}>
             SAT Math Course
           </Text>
           {token && (
-            <View style={[styles.progressBadge, { backgroundColor: isDark ? "#1f2937" : "#f3f4f6" }]}>
-              <Text style={[styles.progressBadgeText, { color: isDark ? "#06B6D4" : "#0891B2" }]}>
+            <View style={[styles.progressBadge, { backgroundColor: isDark ? "#17151C" : "#EFEAF7" }]}>
+              <Text style={[styles.progressBadgeText, { color: isDark ? "#C9AAFB" : "#7A4BDB" }]}>
                 {courseProgress}% Complete
               </Text>
             </View>
@@ -266,18 +266,18 @@ export default function HomeScreen() {
         </View>
 
         {/* Search Bar */}
-        <View style={[styles.searchBar, { backgroundColor: isDark ? "#1f2937" : "#f3f4f6" }]}>
-          <Search size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+        <View style={[styles.searchBar, { backgroundColor: isDark ? "#17151C" : "#EFEAF7" }]}>
+          <Search size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
           <TextInput
-            style={[styles.searchInput, { color: isDark ? "#ffffff" : "#1f2937" }]}
+            style={[styles.searchInput, { color: isDark ? "#F4F1F8" : "#0B0A0F" }]}
             placeholder="Search chapters..."
-            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
             value={searchQuery}
             onChangeText={setSearchQuery}
           />
           {searchQuery.length > 0 && (
             <TouchableOpacity activeOpacity={0.7} onPress={clearSearch} style={styles.clearButton}>
-              <X size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+              <X size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
             </TouchableOpacity>
           )}
         </View>
@@ -291,7 +291,7 @@ export default function HomeScreen() {
       >
         {filteredCourse.length === 0 ? (
           <View style={styles.emptyState}>
-            <Text style={[styles.emptyStateText, { color: isDark ? "#9ca3af" : "#6b7280" }]}>
+            <Text style={[styles.emptyStateText, { color: isDark ? "#9C95A8" : "#6B6577" }]}>
               No chapters found matching "{searchQuery}"
             </Text>
           </View>
@@ -316,7 +316,7 @@ export default function HomeScreen() {
                 style={[
                   styles.chapterCard,
                   {
-                    backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                    backgroundColor: isDark ? "#17151C" : "#ffffff",
                     borderLeftColor: chapterColor,
                   },
                 ]}
@@ -326,7 +326,7 @@ export default function HomeScreen() {
                   <Text
                     style={[
                       styles.chapterTitle,
-                      { color: isDark ? "#ffffff" : "#1f2937" },
+                      { color: isDark ? "#F4F1F8" : "#0B0A0F" },
                     ]}
                   >
                     {chapter.title}
@@ -346,7 +346,7 @@ export default function HomeScreen() {
                 <Text
                   style={[
                     styles.statsText,
-                    { color: isDark ? "#94a3b8" : "#6b7280" },
+                    { color: isDark ? "#9C95A8" : "#6B6577" },
                   ]}
                 >
                   {lessonsCount} lessons · {quizzesCount} quizzes
@@ -358,14 +358,14 @@ export default function HomeScreen() {
                   <View
                     style={[
                       styles.badge,
-                      { backgroundColor: isDark ? "#334155" : "#f3f4f6" },
+                      { backgroundColor: isDark ? "#2B2733" : "#EFEAF7" },
                     ]}
                   >
-                    <BookMarked size={14} color={isDark ? "#94a3b8" : "#6b7280"} />
+                    <BookMarked size={14} color={isDark ? "#9C95A8" : "#6B6577"} />
                     <Text
                       style={[
                         styles.badgeText,
-                        { color: isDark ? "#94a3b8" : "#6b7280" },
+                        { color: isDark ? "#9C95A8" : "#6B6577" },
                       ]}
                     >
                       {chapter.items.length} items
@@ -375,7 +375,7 @@ export default function HomeScreen() {
                  
                   <View style={styles.actionsRow}>
                     {isLocked && (
-                      <Lock size={16} color="#2563eb" style={styles.lockIcon} />
+                      <Lock size={16} color="#8A5CE6" style={styles.lockIcon} />
                     )}
                    
                   </View>
@@ -562,9 +562,9 @@ const styles = StyleSheet.create({
 
 //   const isDark = colorScheme === "dark";
 
-//   const bgColor = isDark ? "#0f172a" : "#f8fafc";
-//   const textColor = isDark ? "#f1f5f9" : "#1f2937";
-//   const subTextColor = isDark ? "#cbd5e1" : "#6b7280";
+//   const bgColor = isDark ? "#0B0A0F" : "#F4F1F9";
+//   const textColor = isDark ? "#EFEAF7" : "#0B0A0F";
+//   const subTextColor = isDark ? "#CFC9DA" : "#6B6577";
 
 //   useEffect(() => {
 //     const load = async () => {
@@ -654,7 +654,7 @@ const styles = StyleSheet.create({
 //   if (loading) {
 //     return (
 //       <SafeAreaView style={{ flex: 1, backgroundColor: bgColor, justifyContent: "center", alignItems: "center" }}>
-//         <ActivityIndicator size="large" color="#22d3ee" />
+//         <ActivityIndicator size="large" color="#8A5CE6" />
 //       </SafeAreaView>
 //     );
 //   }
@@ -677,7 +677,7 @@ const styles = StyleSheet.create({
 //             paddingHorizontal: 16,
 //             borderBottomLeftRadius: 32,
 //             borderBottomRightRadius: 32,
-//             backgroundColor: isDark ? "#0f172a" : "#f8fafc",
+//             backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
 //             shadowColor: "#000",
 //             shadowOffset: { width: 0, height: 5 },
 //             shadowOpacity: 0.1,
@@ -688,7 +688,7 @@ const styles = StyleSheet.create({
 //           }}
 //         >
 //           <LinearGradient
-//             colors={["#6366F1", "#8B5CF6", "#22d3ee"]}
+//             colors={["#8A5CE6", "#8A5CE6", "#8A5CE6"]}
 //             start={{ x: 0, y: 0 }}
 //             end={{ x: 1, y: 1 }}
 //             style={StyleSheet.absoluteFill}
@@ -704,15 +704,15 @@ const styles = StyleSheet.create({
 //                 cx={radius + strokeWidth / 2}
 //                 cy={radius + strokeWidth / 2}
 //                 r={radius}
-//                 stroke={isDark ? "#334155" : "#e5e7eb"}
+//                 stroke={isDark ? "#2B2733" : "#E5DFEE"}
 //                 strokeWidth={strokeWidth}
 //                 fill="none"
 //               />
 //               <Defs>
 //                 <LinearGradientSvg id="grad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
-//                   <Stop offset="0%" stopColor="#6366F1" />
-//                   <Stop offset="50%" stopColor="#8B5CF6" />
-//                   <Stop offset="100%" stopColor="#22d3ee" />
+//                   <Stop offset="0%" stopColor="#8A5CE6" />
+//                   <Stop offset="50%" stopColor="#8A5CE6" />
+//                   <Stop offset="100%" stopColor="#8A5CE6" />
 //                 </LinearGradientSvg>
 //               </Defs>
 //               <Circle
@@ -763,20 +763,20 @@ const styles = StyleSheet.create({
 //                 const gradientColors: [string, string, ...string[]] =
 //                   item.type === "lesson"
 //                     ? item.progress?.length
-//                       ? ["#6366F1", "#8B5CF6"] // completed lesson
+//                       ? ["#8A5CE6", "#8A5CE6"] // completed lesson
 //                       : ["#E5E7EB", "#F3F4F6"] // incomplete lesson
 //                     : item.results?.length
-//                     ? ["#10B981", "#059669"] // completed quiz
+//                     ? ["#2E9A5E", "#2E9A5E"] // completed quiz
 //                     : ["#D1FAE5", "#A7F3D0"];
 
 //                 const textCol =
 //                   item.type === "lesson"
 //                     ? item.progress?.length
 //                       ? "#fff"
-//                       : "#1f2937"
+//                       : "#0B0A0F"
 //                     : item.results?.length
 //                     ? "#fff"
-//                     : "#1f2937";
+//                     : "#0B0A0F";
 
 //                 return (
 //                   <TouchableOpacity

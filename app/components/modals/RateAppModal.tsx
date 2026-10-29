@@ -65,8 +65,8 @@ export default function RateApp({ userPoints }: RateAppProps) {
       // ✅ Close immediately so it won't reopen
       await handleRated();
       if (Platform.OS === "ios") {
-        const appStoreLink = "itms-apps://itunes.apple.com/app/6751187640";
-        const webLink = "https://apps.apple.com/app/id6751187640";
+        const appStoreLink = "itms-apps://itunes.apple.com/app/id6751471394";
+        const webLink = "https://apps.apple.com/us/app/sat-math-learner/id6751471394";
 
         Linking.openURL(appStoreLink).catch(() => {
           Linking.openURL(webLink).catch(() => {
@@ -125,7 +125,7 @@ export default function RateApp({ userPoints }: RateAppProps) {
                 <Text
                   style={{
                     fontSize: 32,
-                    color: star <= selectedStars ? "#22c55e" : "#d1d5db",
+                    color: star <= selectedStars ? "#2E9A5E" : "#d1d5db",
                     marginHorizontal: 4,
                   }}
                 >
@@ -260,7 +260,7 @@ export default function RateApp({ userPoints }: RateAppProps) {
 //       await handleRated();
 //       const url =
 //         Platform.OS === "ios"
-//           ? "itms-apps://itunes.apple.com/app/6751187640"
+//           ? "itms-apps://itunes.apple.com/app/id6751471394"
 //           : "market://details?id=com.hrynchuk.satprepapp";
 
 //       Linking.openURL(url).catch(() => {
@@ -307,7 +307,7 @@ export default function RateApp({ userPoints }: RateAppProps) {
 //                 <Text
 //                   style={{
 //                     fontSize: 32,
-//                     color: star <= selectedStars ? "#22c55e" : "#d1d5db",
+//                     color: star <= selectedStars ? "#2E9A5E" : "#d1d5db",
 //                     marginHorizontal: 4,
 //                   }}
 //                 >

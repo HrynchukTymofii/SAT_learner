@@ -16,25 +16,25 @@ export default function HowSATScoredPage() {
       range: "1400-1600",
       label: "Excellent",
       description: "Competitive for top-tier universities",
-      color: "#10B981",
+      color: "#2E9A5E",
     },
     {
       range: "1200-1390",
       label: "Good",
       description: "Strong for most colleges",
-      color: "#06B6D4",
+      color: "#8A5CE6",
     },
     {
       range: "1000-1190",
       label: "Average",
       description: "Acceptable for many colleges",
-      color: "#F59E0B",
+      color: "#E5A50A",
     },
     {
       range: "Below 1000",
       label: "Below Average",
       description: "May need improvement",
-      color: "#EF4444",
+      color: "#D93F55",
     },
   ];
 
@@ -47,16 +47,16 @@ export default function HowSATScoredPage() {
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View
         style={{
           paddingTop: insets.top + 12,
           paddingBottom: 16,
           paddingHorizontal: 16,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         {/* Back Button */}
@@ -69,15 +69,15 @@ export default function HowSATScoredPage() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text
             style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "600",
               marginLeft: 6,
               fontSize: 14,
@@ -93,7 +93,7 @@ export default function HowSATScoredPage() {
             style={{
               padding: 12,
               borderRadius: 12,
-              backgroundColor: "#10B981",
+              backgroundColor: "#2E9A5E",
               marginRight: 12,
             }}
           >
@@ -104,13 +104,13 @@ export default function HowSATScoredPage() {
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 marginBottom: 4,
               }}
             >
               How SAT is Scored
             </Text>
-            <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+            <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
               Understanding the SAT scoring system
             </Text>
           </View>
@@ -125,12 +125,12 @@ export default function HowSATScoredPage() {
         {/* Scoring Overview */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 16,
             padding: 20,
             marginBottom: 24,
             borderLeftWidth: 4,
-            borderLeftColor: "#10B981",
+            borderLeftColor: "#2E9A5E",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -142,7 +142,7 @@ export default function HowSATScoredPage() {
             style={{
               fontSize: 18,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 12,
             }}
           >
@@ -151,7 +151,7 @@ export default function HowSATScoredPage() {
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               lineHeight: 22,
               marginBottom: 16,
             }}
@@ -168,11 +168,11 @@ export default function HowSATScoredPage() {
                 marginBottom: 8,
               }}
             >
-              <Check size={16} color="#10B981" style={{ marginRight: 8, marginTop: 2 }} />
+              <Check size={16} color="#2E9A5E" style={{ marginRight: 8, marginTop: 2 }} />
               <Text
                 style={{
                   fontSize: 14,
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   flex: 1,
                   lineHeight: 20,
                 }}
@@ -189,7 +189,7 @@ export default function HowSATScoredPage() {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 16,
             }}
           >
@@ -200,7 +200,7 @@ export default function HowSATScoredPage() {
             <View
               key={index}
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -245,7 +245,7 @@ export default function HowSATScoredPage() {
               <Text
                 style={{
                   fontSize: 14,
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   lineHeight: 20,
                 }}
               >
@@ -258,12 +258,12 @@ export default function HowSATScoredPage() {
         {/* How Scores are Calculated */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 16,
             padding: 20,
             marginBottom: 24,
             borderLeftWidth: 4,
-            borderLeftColor: "#06B6D4",
+            borderLeftColor: "#8A5CE6",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -272,12 +272,12 @@ export default function HowSATScoredPage() {
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 12 }}>
-            <TrendingUp size={20} color="#06B6D4" style={{ marginRight: 8 }} />
+            <TrendingUp size={20} color="#8A5CE6" style={{ marginRight: 8 }} />
             <Text
               style={{
                 fontSize: 18,
                 fontWeight: "700",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
               }}
             >
               How Scores are Calculated
@@ -289,7 +289,7 @@ export default function HowSATScoredPage() {
               style={{
                 fontSize: 14,
                 fontWeight: "600",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 marginBottom: 8,
               }}
             >
@@ -298,7 +298,7 @@ export default function HowSATScoredPage() {
             <Text
               style={{
                 fontSize: 14,
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 lineHeight: 20,
                 marginBottom: 12,
               }}
@@ -310,7 +310,7 @@ export default function HowSATScoredPage() {
               style={{
                 fontSize: 14,
                 fontWeight: "600",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 marginBottom: 8,
               }}
             >
@@ -319,7 +319,7 @@ export default function HowSATScoredPage() {
             <Text
               style={{
                 fontSize: 14,
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 lineHeight: 20,
                 marginBottom: 12,
               }}
@@ -331,7 +331,7 @@ export default function HowSATScoredPage() {
               style={{
                 fontSize: 14,
                 fontWeight: "600",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 marginBottom: 8,
               }}
             >
@@ -340,7 +340,7 @@ export default function HowSATScoredPage() {
             <Text
               style={{
                 fontSize: 14,
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 lineHeight: 20,
               }}
             >
@@ -352,21 +352,21 @@ export default function HowSATScoredPage() {
         {/* Percentile Rankings */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#fffbeb",
+            backgroundColor: isDark ? "#17151C" : "#fffbeb",
             borderRadius: 16,
             padding: 16,
             borderWidth: 1,
-            borderColor: isDark ? "#334155" : "#fde68a",
+            borderColor: isDark ? "#2B2733" : "#fde68a",
             marginBottom: 24,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-            <Award size={20} color={isDark ? "#fbbf24" : "#d97706"} style={{ marginRight: 8 }} />
+            <Award size={20} color={isDark ? "#F2C94C" : "#d97706"} style={{ marginRight: 8 }} />
             <Text
               style={{
                 fontSize: 14,
                 fontWeight: "600",
-                color: isDark ? "#fbbf24" : "#d97706",
+                color: isDark ? "#F2C94C" : "#d97706",
               }}
             >
               Percentile Rankings
@@ -375,7 +375,7 @@ export default function HowSATScoredPage() {
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? "#9ca3af" : "#78716c",
+              color: isDark ? "#9C95A8" : "#78716c",
               lineHeight: 20,
             }}
           >
@@ -387,7 +387,7 @@ export default function HowSATScoredPage() {
         <TouchableOpacity
           onPress={() => router.push("/info/articles/test-dates" as any)}
           style={{
-            backgroundColor: "#06B6D4",
+            backgroundColor: "#8A5CE6",
             borderRadius: 16,
             padding: 16,
             flexDirection: "row",

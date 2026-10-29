@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAT Learner Home v3</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap">
+<style>
+/* Black frame + light panel. The frame "drips" into the panel under the active link (top notch) and rises into it at the footer (bottom bump). */
+:root{
+  --frame:#0B0A0F;--frame-ink:#FFFFFF;--frame-mut:#9C95A8;
+  --bg:#F4F1F9;--surface:#FFFFFF;--surface-2:#EFEAF7;--ink:#0B0A0F;--muted:#6B6577;--line:#E5DFEE;
+  --lav:#E4CDFF;--lav-2:#C9AAFB;--butter:#FEE7A6;--mint:#CDEFD9;--on-pastel:#0B0A0F;--accent-text:#7A4BDB;
+  --grid:rgba(11,10,15,.07);
+  --display:"Outfit",system-ui,sans-serif;--sans:"Manrope",system-ui,sans-serif;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --frame:#000;--bg:#121016;--surface:#1B1821;--surface-2:#24202B;--ink:#F4F1F8;--muted:#9C95A8;--line:#2C2834;
+  --lav:#DCC3FC;--lav-2:#BE9BF6;--butter:#F7DF9C;--mint:#BFE8CD;--accent-text:#C9AAFB;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --frame:#000;--bg:#121016;--surface:#1B1821;--surface-2:#24202B;--ink:#F4F1F8;--muted:#9C95A8;--line:#2C2834;
+  --lav:#DCC3FC;--lav-2:#BE9BF6;--butter:#F7DF9C;--mint:#BFE8CD;--accent-text:#C9AAFB;color-scheme:dark}
+*{box-sizing:border-box}
+html{background:var(--frame)}
+body{margin:0;background:var(--frame);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.55}
+a{color:inherit;text-decoration:none}
+button{font:inherit;cursor:pointer;border:0;background:none;color:inherit;padding:0}
+a:focus-visible,button:focus-visible{outline:2px solid var(--lav-2);outline-offset:3px;border-radius:8px}
+h1,h2,h3{font-family:var(--display);margin:0;letter-spacing:-.025em;font-weight:600;line-height:1.05}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.paper{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:22px 22px}
+.pastel{color:var(--on-pastel);--grid:rgba(11,10,15,.07)}
+.lav{background-color:var(--lav)}.lav2{background-color:var(--lav-2)}.butter{background-color:var(--butter)}.mint{background-color:var(--mint)}
+.wrap{max-width:1200px;margin:0 auto;padding:0 16px}
+
+/* header */
+.hd{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:20px 24px 18px;max-width:1360px;margin:0 auto;color:var(--frame-ink)}
+.logo{display:flex;gap:10px;align-items:center;font-family:var(--display);font-weight:700;font-size:22px;letter-spacing:-.02em}
+.logo i{width:34px;height:34px;border-radius:11px;background:var(--lav);color:#0B0A0F;display:grid;place-items:center;font-style:normal;font-size:15px}
+.links{display:flex;gap:6px;position:relative}
+.links a{padding:9px 16px;border-radius:999px;color:var(--frame-mut);font-weight:600;font-size:15px;display:flex;gap:8px;align-items:center}
+.links a[aria-current]{color:var(--frame-ink)}
+.links a:hover{color:var(--frame-ink)}
+.hd-r{display:flex;gap:8px;align-items:center}
+.ghost{padding:10px 18px;border-radius:999px;font-weight:700;font-size:14.5px;color:var(--frame-ink);border:1.5px solid #34303B}
+.solid{padding:10px 8px 10px 18px;border-radius:999px;font-weight:700;font-size:14.5px;background:var(--lav);color:#0B0A0F;display:flex;gap:10px;align-items:center}
+.solid i{width:26px;height:26px;border-radius:50%;background:#0B0A0F;color:#fff;display:grid;place-items:center}
+.solid svg.i{width:15px;height:15px}
+.theme{display:flex;background:#1E1B24;border-radius:999px;padding:3px}
+.theme button{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;color:var(--frame-mut)}
+.theme button[aria-pressed="true"]{background:#fff;color:#0B0A0F}
+.theme svg.i{width:16px;height:16px}
+
+/* panel + notches */
+.panel{background:var(--bg);border-radius:40px 40px 0 0;position:relative;max-width:1360px;margin:0 auto;padding-top:40px}
+.notch{position:absolute;top:-1px;left:50%;transform:translateX(-50%);width:150px;height:26px;color:var(--frame)}
+.notch-dot{position:absolute;top:2px;left:50%;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--lav)}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;padding:30px 0 60px}
+.eyebrow{display:inline-flex;gap:8px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:6px 14px 6px 6px;font-weight:700;font-size:13.5px}
+.eyebrow b{background:var(--butter);color:#0B0A0F;border-radius:999px;padding:2px 10px;font-size:12px}
+.hero h1{font-size:clamp(44px,6.4vw,84px);margin:20px 0 18px}
+.hero h1 mark{background:none;color:inherit;position:relative;white-space:nowrap}
+.hero h1 mark::after{content:"";position:absolute;left:-2px;right:-2px;bottom:-.06em;height:.13em;background:var(--lav-2);z-index:-1;border-radius:6px}
+.hero h1 mark{z-index:0;isolation:isolate}
+.hero p{font-size:18.5px;color:var(--muted);max-width:46ch;margin:0 0 28px}
+.ctas{display:flex;gap:12px;flex-wrap:wrap}
+.big-btn{display:flex;align-items:center;gap:14px;background:var(--ink);color:var(--bg);border-radius:999px;padding:8px 8px 8px 24px;font-weight:700;font-size:16.5px}
+.big-btn i{width:44px;height:44px;border-radius:50%;background:var(--lav);color:#0B0A0F;display:grid;place-items:center}
+.out-btn{display:flex;align-items:center;gap:10px;border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:0 22px;height:60px;font-weight:700}
+.proof{display:flex;gap:14px;align-items:center;margin-top:28px;color:var(--muted);font-weight:600;font-size:14px}
+.stack{display:flex}
+.stack span{width:36px;height:36px;border-radius:50%;border:3px solid var(--bg);margin-left:-10px;display:grid;place-items:center;font-weight:800;font-size:12px;color:#0B0A0F}
+.stack span:first-child{margin-left:0}
+
+/* hero collage */
+.collage{position:relative;height:520px}
+.cc{position:absolute;border-radius:30px;box-shadow:0 30px 50px -30px rgba(40,20,80,.45)}
+.c1{left:4%;top:20px;width:60%;padding:24px;transform:rotate(-5deg)}
+.c1 h3{font-size:30px;max-width:8ch;margin-bottom:8px}
+.c1 small{font-weight:700;font-size:13px}
+.c1 .pill{margin-top:60px;display:inline-flex;gap:8px;align-items:center;background:#fff;border-radius:999px;padding:8px 14px;font-weight:700;font-size:14px}
+.c1 .play{position:absolute;right:22px;top:22px;width:64px;height:64px;border-radius:50%;background:#fff;display:grid;place-items:center;box-shadow:0 0 0 12px rgba(255,255,255,.4)}
+.c1 .play svg{width:30px;height:30px}
+.c2{right:0;top:120px;width:56%;background:var(--surface);border:1px solid var(--line);padding:20px;transform:rotate(3deg);color:var(--ink)}
+.c2 .t{display:flex;justify-content:space-between;font-weight:700;font-size:12.5px;color:var(--muted);margin-bottom:12px}
+.c2 p{font-family:var(--display);font-size:18px;line-height:1.35;margin:0 0 14px;font-weight:500}
+.c2 var{font-family:"Times New Roman",serif}
+.c2 .o{display:flex;gap:10px;align-items:center;border:1.5px solid var(--line);border-radius:14px;padding:8px 12px;font-weight:700;margin-top:7px;font-size:14.5px}
+.c2 .o i{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;font-style:normal;font-size:12px}
+.c2 .o.ok{background:var(--mint);border-color:transparent;color:#0B0A0F}.c2 .o.ok i{background:#0B0A0F;color:#fff;border-color:#0B0A0F}
+.c3{left:12%;bottom:6px;width:46%;padding:20px;transform:rotate(-2deg)}
+.c3 small{font-weight:700;font-size:13px}
+.c3 b{display:block;font-family:var(--display);font-size:58px;line-height:1;letter-spacing:-.03em;margin:4px 0}
+.c3 .bars{display:flex;gap:6px;align-items:end;height:64px;margin-top:8px}
+.c3 .bars i{flex:1;background:rgba(11,10,15,.15);border-radius:6px}
+.c3 .bars i:last-child{background:#0B0A0F}
+.sticker{position:absolute;right:8%;bottom:70px;background:var(--ink);color:var(--bg);border-radius:999px;padding:10px 16px;font-weight:800;font-size:14px;transform:rotate(-8deg)}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;padding-bottom:90px}
+.st{border-radius:26px;padding:22px 24px}
+.st b{display:block;font-family:var(--display);font-size:46px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.st span{font-weight:700;font-size:14px}
+.st.dash{border:2px dashed var(--line);color:var(--ink)}
+.st.dash span{color:var(--muted)}
+
+/* section heads */
+.sh{display:flex;justify-content:space-between;align-items:end;gap:20px;flex-wrap:wrap;margin-bottom:34px}
+.sh h2{font-size:clamp(34px,4.4vw,54px);max-width:16ch}
+.sh p{color:var(--muted);max-width:44ch;margin:0;font-size:17px}
+
+/* path (learning plan with dashed connectors) */
+.path{display:grid;grid-template-columns:repeat(3,1fr);gap:56px;position:relative;padding-bottom:110px}
+.step{background:var(--surface);border:1px solid var(--line);border-radius:30px;padding:26px;position:relative;display:grid;gap:12px;align-content:start}
+.step:nth-child(2){margin-top:44px}.step:nth-child(3){margin-top:88px}
+.step .n{position:absolute;right:20px;top:-18px;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;color:#0B0A0F;font-family:var(--display);font-weight:700}
+.step h3{font-size:28px}
+.step p{margin:0;color:var(--muted)}
+.step .bdg{justify-self:start;border-radius:999px;padding:6px 14px;font-weight:700;font-size:13px;color:#0B0A0F}
+.step:not(:last-child)::after{content:"";position:absolute;right:-58px;top:70px;width:58px;height:46px;border-top:2px dashed #47B375;border-right:2px dashed #47B375;border-radius:0 18px 0 0}
+.step:not(:last-child)::before{content:"";position:absolute;right:-5px;top:65px;width:10px;height:10px;border-radius:50%;background:#47B375;z-index:1}
+
+/* syllabus */
+.syl{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-bottom:110px}
+.ch{display:flex;gap:16px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:24px;padding:14px 20px 14px 14px}
+.ch .th{width:62px;height:62px;border-radius:18px;display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:21px;color:#0B0A0F;flex:none}
+.ch div{flex:1;min-width:0}
+.ch b{display:block;font-size:17px;font-family:var(--display);font-weight:600}
+.ch small{color:var(--muted);font-weight:600;font-size:13.5px}
+.ch .free{background:var(--mint);color:#0B0A0F;border-radius:999px;padding:4px 10px;font-weight:800;font-size:11.5px;letter-spacing:.04em}
+.more-row{grid-column:1/-1;display:flex;justify-content:center;margin-top:10px}
+
+/* split: phone + web */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding-bottom:110px}
+.sp{border-radius:36px;padding:36px;position:relative;overflow:hidden;min-height:380px;display:grid;align-content:start;gap:14px}
+.sp h3{font-size:38px;max-width:12ch}
+.sp p{margin:0;max-width:34ch;font-weight:600}
+.sp .stores{display:flex;gap:10px;margin-top:10px;flex-wrap:wrap}
+.store{background:#0B0A0F;color:#fff;border-radius:14px;padding:10px 16px;font-weight:700;font-size:14px;display:flex;gap:8px;align-items:center}
+.mini-phone{position:absolute;right:30px;bottom:-60px;width:170px;height:300px;border-radius:30px;border:7px solid #0B0A0F;background:#fff;padding:22px 12px;display:grid;gap:8px;align-content:start;transform:rotate(8deg)}
+.mini-phone i{display:block;height:12px;border-radius:6px;background:#EFEAF7}
+.mini-phone i.y{height:90px;border-radius:16px;background:var(--butter)}
+.mini-phone i.l{height:60px;border-radius:16px;background:var(--lav)}
+.mini-web{position:absolute;right:-30px;bottom:-30px;width:300px;height:200px;border-radius:20px;background:#0B0A0F;padding:12px;display:grid;grid-template-columns:50px 1fr;gap:10px}
+.mini-web i{border-radius:10px;background:#24202B}
+.mini-web b{border-radius:10px;background:#fff;display:grid;gap:8px;padding:10px;align-content:start}
+.mini-web b span{height:40px;border-radius:8px;background:var(--lav)}.mini-web b span+span{background:var(--butter);height:24px}
+
+/* pricing */
+.price{display:grid;grid-template-columns:1fr 1fr;gap:16px;max-width:900px;margin:0 auto;padding-bottom:140px}
+.pl{border-radius:32px;padding:30px;display:grid;gap:16px;align-content:start;background:var(--surface);border:1px solid var(--line)}
+.pl.pro{background:var(--lav);color:#0B0A0F;border:0;position:relative}
+.pl h3{font-size:24px}
+.pl .amt{font-family:var(--display);font-size:54px;font-weight:600;letter-spacing:-.03em;line-height:1}
+.pl .amt small{font-size:16px;font-weight:600;letter-spacing:0;opacity:.7}
+.pl ul{list-style:none;margin:0;padding:0;display:grid;gap:10px;font-weight:600}
+.pl li{display:flex;gap:10px;align-items:center}
+.pl li svg{width:18px;height:18px}
+.pl .go{margin-top:8px;border-radius:999px;padding:16px;text-align:center;font-weight:800;background:var(--surface-2)}
+.pl.pro .go{background:#0B0A0F;color:#fff}
+.pl.pro .flag{position:absolute;top:-14px;right:26px;background:var(--butter);border-radius:999px;padding:6px 14px;font-weight:800;font-size:12.5px;border:3px solid var(--bg)}
+
+/* footer with bump rising into the panel */
+.ft{background:var(--frame);color:var(--frame-ink);position:relative;max-width:1360px;margin:0 auto;padding:70px 24px 40px}
+.bump{position:absolute;left:50%;transform:translateX(-50%);top:-62px;width:420px;max-width:92%;height:64px;color:var(--frame)}
+.bump-cta{position:absolute;left:50%;transform:translateX(-50%);top:-44px;display:flex;gap:8px;z-index:1}
+.bump-cta a{width:46px;height:46px;border-radius:50%;display:grid;place-items:center;color:#0B0A0F}
+.bump-cta a.go{width:auto;padding:0 20px;background:#fff;font-weight:800;font-size:14.5px;border-radius:999px}
+.ft-in{display:flex;justify-content:space-between;gap:30px;flex-wrap:wrap;max-width:1200px;margin:0 auto}
+.ft h2{font-size:clamp(34px,5vw,64px);max-width:12ch}
+.ft nav{display:grid;grid-template-columns:repeat(2,auto);gap:10px 40px;color:var(--frame-mut);font-weight:600;align-content:start}
+.ft small{display:block;max-width:1200px;margin:40px auto 0;color:var(--frame-mut);font-weight:600}
+
+@media (max-width:980px){
+  .links{display:none}.ghost{display:none}
+  .hero{grid-template-columns:1fr}.collage{height:460px;max-width:520px}
+  .stats{grid-template-columns:1fr 1fr}
+  .path{grid-template-columns:1fr;gap:24px}.step:nth-child(n){margin-top:0}.step::after,.step::before{display:none}
+  .syl,.split,.price{grid-template-columns:1fr}
+  .notch{display:none}
+}
+@media (max-width:560px){
+  .hd{padding:16px}.panel{border-radius:28px 28px 0 0;padding-top:20px}
+  .solid span{display:none}.solid{padding:8px}
+  .collage{height:420px}.c1{width:78%}.c2{width:70%;top:150px}.c3{width:60%;left:2%}.sticker{display:none}
+  .c1 .play{width:52px;height:52px}
+  .sp{padding:26px;min-height:300px}.mini-phone{right:-30px;bottom:-120px;opacity:.5}.sp h3{font-size:30px}
+  .bump{width:300px}.bump-cta a:not(.go){display:none}
+}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-6-6 6 6-6 6"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M8 5.5v13l10.5-6.5z" fill="currentColor"/></symbol>
+  <symbol id="cap" viewBox="0 0 24 24"><path d="m2.5 9 9.5-4.5L21.5 9 12 13.5zM6.5 11v5c1.6 1.5 3.4 2.2 5.5 2.2s3.9-.7 5.5-2.2v-5"/></symbol>
+  <symbol id="tick" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5"/></symbol>
+  <symbol id="sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2.5v2M12 19.5v2M4.6 4.6 6 6M18 18l1.4 1.4M2.5 12h2M19.5 12h2M4.6 19.4 6 18M18 6l1.4-1.4"/></symbol>
+  <symbol id="moon" viewBox="0 0 24 24"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z"/></symbol>
+  <symbol id="auto" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><path d="M12 4v16a8 8 0 0 0 0-16z" fill="currentColor"/></symbol>
+  <symbol id="lock" viewBox="0 0 24 24"><rect x="5" y="10.5" width="14" height="9.5" rx="2.5"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5"/></symbol>
+</svg>
+
+<header class="hd">
+  <a class="logo" href="#"><i>∑</i>SAT Learner</a>
+  <nav class="links" aria-label="Main">
+    <a href="#" aria-current="page"><svg class="i"><use href="#cap"/></svg>Home</a>
+    <a href="#">SAT course</a><a href="#">Practice tests</a><a href="#">Pricing</a>
+  </nav>
+  <div class="hd-r">
+    <div class="theme" role="group" aria-label="Theme">
+      <button data-t="light" aria-label="Light"><svg class="i"><use href="#sun"/></svg></button>
+      <button data-t="dark" aria-label="Dark"><svg class="i"><use href="#moon"/></svg></button>
+      <button data-t="auto" aria-label="System"><svg class="i"><use href="#auto"/></svg></button>
+    </div>
+    <a class="ghost" href="#">Log in</a>
+    <a class="solid" href="#"><span>Start free</span><i><svg class="i"><use href="#arrow"/></svg></i></a>
+  </div>
+</header>
+
+<div class="panel">
+  <svg class="notch" viewBox="0 0 150 26" preserveAspectRatio="none" aria-hidden="true"><path d="M0 0C28 0 34 26 75 26S122 0 150 0Z" fill="currentColor"/></svg>
+
+  <div class="wrap">
+    <section class="hero">
+      <div>
+        <span class="eyebrow"><b>New</b>Full practice exams, scored like the real thing</span>
+        <h1>Score <mark>750+</mark> on SAT Math.</h1>
+        <p>Short lessons, topic drills and full exams in one course. Learn on the web or in the app, and pick up where you stopped.</p>
+        <div class="ctas">
+          <a class="big-btn" href="#">Start learning free <i><svg class="i"><use href="#arrow"/></svg></i></a>
+          <a class="out-btn" href="#"><svg class="i"><use href="#play"/></svg>See the course</a>
+        </div>
+        <div class="proof"><div class="stack"><span class="lav">MK</span><span class="butter">JS</span><span class="mint">AR</span><span style="background:#0B0A0F;color:#fff">+9k</span></div>students learning this month</div>
+      </div>
+      <div class="collage" aria-hidden="true">
+        <div class="cc c1 lav paper pastel">
+          <small>Chapter 3 · Lesson 2</small>
+          <h3>Quadratics &amp; parabolas</h3>
+          <div class="play"><svg class="i"><use href="#play"/></svg></div>
+          <span class="pill">⏱ 6 min lesson</span>
+        </div>
+        <div class="cc c2">
+          <div class="t"><span>Question 7 of 15</span><span>14:32</span></div>
+          <p>If <var>f</var>(2) = 9 and <var>f</var>(<var>x</var>) = 2<var>x</var>² − 3<var>x</var> + <var>k</var>, find <var>k</var>.</p>
+          <div class="o"><i>B</i>5</div>
+          <div class="o ok"><i>C</i>7</div>
+        </div>
+        <div class="cc c3 butter paper pastel">
+          <small>Predicted math score</small>
+          <b>760</b>
+          <div class="bars"><i style="height:40%"></i><i style="height:55%"></i><i style="height:50%"></i><i style="height:72%"></i><i style="height:100%"></i></div>
+        </div>
+        <span class="sticker">+120 in 6 weeks</span>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="st lav paper pastel"><b>64</b><span>video lessons</span></div>
+      <div class="st butter paper pastel"><b>1,200+</b><span>practice questions</span></div>
+      <div class="st mint paper pastel"><b>6</b><span>full math exams</span></div>
+      <div class="st dash"><b>27</b><span>topics from the official SAT outline</span></div>
+    </section>
+
+    <section>
+      <div class="sh"><h2>A plan that moves you forward</h2><p>Each step unlocks the next, so you always know what to do today.</p></div>
+      <div class="path">
+        <div class="step"><span class="n lav">1</span><h3>Learn the idea</h3><p>A short video and a worked example for one topic at a time.</p><span class="bdg lav">6 min average</span></div>
+        <div class="step"><span class="n butter">2</span><h3>Drill the topic</h3><p>Questions on just that topic, with a full explanation after each answer.</p><span class="bdg butter">Instant feedback</span></div>
+        <div class="step"><span class="n mint">3</span><h3>Take a full exam</h3><p>Timed like the real test. Mistakes go into your review list.</p><span class="bdg mint">Scored 200–800</span></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sh"><h2>What the course covers</h2><p>8 chapters. The first lesson in each one is free.</p></div>
+      <div class="syl">
+        <div class="ch"><span class="th lav paper pastel">01</span><div><b>Linear equations</b><small>9 lessons · 3 quizzes</small></div><span class="free">FREE</span></div>
+        <div class="ch"><span class="th butter paper pastel">02</span><div><b>Systems of equations</b><small>7 lessons · 2 quizzes</small></div><svg class="i" style="color:var(--muted)"><use href="#lock"/></svg></div>
+        <div class="ch"><span class="th mint paper pastel">03</span><div><b>Quadratics &amp; parabolas</b><small>11 lessons · 4 quizzes</small></div><svg class="i" style="color:var(--muted)"><use href="#lock"/></svg></div>
+        <div class="ch"><span class="th lav paper pastel">04</span><div><b>Functions &amp; graphs</b><small>8 lessons · 3 quizzes</small></div><svg class="i" style="color:var(--muted)"><use href="#lock"/></svg></div>
+        <div class="ch"><span class="th butter paper pastel">05</span><div><b>Ratios, rates &amp; percents</b><small>6 lessons · 3 quizzes</small></div><svg class="i" style="color:var(--muted)"><use href="#lock"/></svg></div>
+        <div class="ch"><span class="th mint paper pastel">06</span><div><b>Geometry &amp; trigonometry</b><small>10 lessons · 4 quizzes</small></div><svg class="i" style="color:var(--muted)"><use href="#lock"/></svg></div>
+        <div class="more-row"><a class="out-btn" href="#">See all 8 chapters <svg class="i"><use href="#arrow"/></svg></a></div>
+      </div>
+    </section>
+
+    <section class="split">
+      <div class="sp butter paper pastel">
+        <h3>Practice on the bus</h3>
+        <p>The iOS and Android app works offline and syncs your progress when you're back online.</p>
+        <div class="stores"><span class="store"> App Store</span><span class="store">▶ Google Play</span></div>
+        <div class="mini-phone" aria-hidden="true"><i style="width:60%"></i><i class="y"></i><i class="l"></i><i></i></div>
+      </div>
+      <div class="sp lav paper pastel">
+        <h3>Study on a big screen</h3>
+        <p>Same account, same progress. Open the platform in any browser.</p>
+        <div class="stores"><span class="store">Open the platform →</span></div>
+        <div class="mini-web" aria-hidden="true"><i></i><b><span></span><span></span></b></div>
+      </div>
+    </section>
+
+    <section>
+      <div class="sh" style="justify-content:center;text-align:center"><h2 style="margin:0 auto">Simple pricing</h2></div>
+      <div class="price">
+        <div class="pl"><h3>Free</h3><div class="amt">$0</div>
+          <ul><li><svg class="i"><use href="#tick"/></svg>First lesson of every chapter</li><li><svg class="i"><use href="#tick"/></svg>Topic drills, 10 per day</li><li><svg class="i"><use href="#tick"/></svg>1 full practice exam</li></ul>
+          <a class="go" href="#">Start free</a></div>
+        <div class="pl pro paper pastel"><span class="flag">Most students pick this</span><h3>PRO</h3><div class="amt">$9.99 <small>/ month</small></div>
+          <ul><li><svg class="i"><use href="#tick"/></svg>All 64 lessons</li><li><svg class="i"><use href="#tick"/></svg>Unlimited drills and all 6 exams</li><li><svg class="i"><use href="#tick"/></svg>Mistake review and study planner</li></ul>
+          <a class="go" href="#">Get PRO</a></div>
+      </div>
+    </section>
+  </div>
+</div>
+
+<footer class="ft">
+  <svg class="bump" viewBox="0 0 420 64" preserveAspectRatio="none" aria-hidden="true"><path d="M0 64C50 64 60 0 120 0H300C360 0 370 64 420 64Z" fill="currentColor"/></svg>
+  <div class="bump-cta">
+    <a class="lav" href="#" aria-label="Course"><svg class="i"><use href="#cap"/></svg></a>
+    <a class="go" href="#">Start learning free</a>
+    <a class="butter" href="#" aria-label="Practice"><svg class="i"><use href="#play"/></svg></a>
+  </div>
+  <div class="ft-in">
+    <h2>Your 750 starts with one lesson.</h2>
+    <nav aria-label="Footer"><a href="#">SAT course</a><a href="#">Privacy policy</a><a href="#">Practice tests</a><a href="#">Terms of service</a><a href="#">Download the app</a><a href="#">Contact</a></nav>
+  </div>
+  <small>© 2026 SAT Learner. SAT is a trademark of the College Board, which is not affiliated with this site.</small>
+</footer>
+
+<script>
+const root=document.documentElement,btns=document.querySelectorAll('.theme button');
+function setT(t){if(t==='auto')root.removeAttribute('data-theme');else root.setAttribute('data-theme',t);btns.forEach(b=>b.setAttribute('aria-pressed',b.dataset.t===t));try{localStorage.setItem('v3-theme',t)}catch(e){}}
+btns.forEach(b=>b.onclick=()=>setT(b.dataset.t));
+let s='auto';try{s=localStorage.getItem('v3-theme')||'auto'}catch(e){}setT(s);
+// keep the notch under the active link
+const notch=document.querySelector('.notch'),panel=document.querySelector('.panel');
+function placeNotch(){const a=document.querySelector('.links a[aria-current]');if(!a||!a.offsetParent)return;const r=a.getBoundingClientRect(),p=panel.getBoundingClientRect();notch.style.left=(r.left+r.width/2-p.left)+'px'}
+document.querySelectorAll('.links a').forEach(a=>a.onclick=e=>{e.preventDefault();document.querySelector('.links a[aria-current]')?.removeAttribute('aria-current');a.setAttribute('aria-current','page');placeNotch()});
+notch.style.transition='left .35s cubic-bezier(.3,1.4,.5,1)';
+addEventListener('resize',placeNotch);document.fonts.ready.then(placeNotch);placeNotch();
+</script>
+</body>
+</html>

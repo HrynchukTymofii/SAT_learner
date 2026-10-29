@@ -150,14 +150,14 @@ export default function CalendarScreen() {
             padding: 4,
             borderRadius: 12,
             backgroundColor: isSelected
-              ? "#06B6D4"
+              ? "#8A5CE6"
               : isSATDay
-              ? "#f59e0b"
+              ? "#E5A50A"
               : isDark
-              ? "#1e293b"
+              ? "#17151C"
               : "#ffffff",
             borderWidth: isCurrentDay ? 2 : 0,
-            borderColor: "#06B6D4",
+            borderColor: "#8A5CE6",
             paddingBottom: 10
           }}
           activeOpacity={0.7}
@@ -166,7 +166,7 @@ export default function CalendarScreen() {
             style={{
               fontSize: 14,
               fontWeight: isSATDay || isSelected || isCurrentDay ? "700" : "400",
-              color: isSelected || isSATDay ? "#ffffff" : isDark ? "#ffffff" : "#1f2937",
+              color: isSelected || isSATDay ? "#ffffff" : isDark ? "#F4F1F8" : "#0B0A0F",
             }}
           >
             {day}
@@ -180,13 +180,13 @@ export default function CalendarScreen() {
                 minWidth: 16,
                 height: 16,
                 borderRadius: 8,
-                backgroundColor: isSelected ? "#ffffff" : "#06B6D4",
+                backgroundColor: isSelected ? "#ffffff" : "#8A5CE6",
                 justifyContent: "center",
                 alignItems: "center",
                 paddingHorizontal: 4,
               }}
             >
-              <Text style={{ fontSize: 10, fontWeight: "700", color: isSelected ? "#06B6D4" : "#ffffff" }}>
+              <Text style={{ fontSize: 10, fontWeight: "700", color: isSelected ? "#8A5CE6" : "#ffffff" }}>
                 {taskCount!.total}
               </Text>
             </View>
@@ -199,16 +199,16 @@ export default function CalendarScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View
         style={{
           paddingTop: insets.top + 12,
           paddingBottom: 16,
           paddingHorizontal: 16,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         {/* Back Button */}
@@ -221,15 +221,15 @@ export default function CalendarScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text
             style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "600",
               marginLeft: 6,
               fontSize: 14,
@@ -244,13 +244,13 @@ export default function CalendarScreen() {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            color: isDark ? "#ffffff" : "#1f2937",
+            color: isDark ? "#F4F1F8" : "#0B0A0F",
             marginBottom: 4,
           }}
         >
           Study Calendar
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           Plan your SAT preparation journey
         </Text>
       </View>
@@ -264,12 +264,12 @@ export default function CalendarScreen() {
         {satDate ? (
           <View
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
               borderRadius: 16,
               padding: 16,
               marginBottom: 20,
               borderLeftWidth: 4,
-              borderLeftColor: "#f59e0b",
+              borderLeftColor: "#E5A50A",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -282,17 +282,17 @@ export default function CalendarScreen() {
                 style={{
                   padding: 8,
                   borderRadius: 8,
-                  backgroundColor: "#f59e0b20",
+                  backgroundColor: "#E5A50A20",
                   marginRight: 12,
                 }}
               >
-                <CalendarIcon size={20} color="#f59e0b" />
+                <CalendarIcon size={20} color="#E5A50A" />
               </View>
               <Text
                 style={{
                   fontSize: 16,
                   fontWeight: "700",
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                 }}
               >
                 Your SAT Date
@@ -302,7 +302,7 @@ export default function CalendarScreen() {
               style={{
                 fontSize: 20,
                 fontWeight: "bold",
-                color: "#f59e0b",
+                color: "#E5A50A",
                 marginBottom: 8,
               }}
             >
@@ -314,7 +314,7 @@ export default function CalendarScreen() {
               })}
             </Text>
             <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+              <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
                 {Math.ceil((new Date(satDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
               </Text>
               <TouchableOpacity
@@ -323,11 +323,11 @@ export default function CalendarScreen() {
                   paddingHorizontal: 12,
                   paddingVertical: 6,
                   borderRadius: 8,
-                  backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                  backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                 }}
                 activeOpacity={0.7}
               >
-                <Text style={{ color: "#06B6D4", fontWeight: "600", fontSize: 12 }}>
+                <Text style={{ color: "#8A5CE6", fontWeight: "600", fontSize: 12 }}>
                   Change Date
                 </Text>
               </TouchableOpacity>
@@ -337,12 +337,12 @@ export default function CalendarScreen() {
           <TouchableOpacity
             onPress={() => router.push("/edit-profile" as any)}
             style={{
-              backgroundColor: isDark ? "#1e293b" : "#ffffff",
+              backgroundColor: isDark ? "#17151C" : "#ffffff",
               borderRadius: 16,
               padding: 16,
               marginBottom: 20,
               borderLeftWidth: 4,
-              borderLeftColor: "#ef4444",
+              borderLeftColor: "#D93F55",
               shadowColor: "#000",
               shadowOffset: { width: 0, height: 2 },
               shadowOpacity: 0.1,
@@ -356,17 +356,17 @@ export default function CalendarScreen() {
                 style={{
                   padding: 8,
                   borderRadius: 8,
-                  backgroundColor: "#ef444420",
+                  backgroundColor: "#D93F5520",
                   marginRight: 12,
                 }}
               >
-                <AlertCircle size={20} color="#ef4444" />
+                <AlertCircle size={20} color="#D93F55" />
               </View>
               <Text
                 style={{
                   fontSize: 16,
                   fontWeight: "700",
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                 }}
               >
                 Set Your SAT Date
@@ -375,7 +375,7 @@ export default function CalendarScreen() {
             <Text
               style={{
                 fontSize: 14,
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 marginBottom: 8,
               }}
             >
@@ -383,13 +383,13 @@ export default function CalendarScreen() {
             </Text>
             <View
               style={{
-                backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                 paddingVertical: 8,
                 borderRadius: 8,
                 alignItems: "center",
               }}
             >
-              <Text style={{ color: "#06B6D4", fontWeight: "600", fontSize: 14 }}>
+              <Text style={{ color: "#8A5CE6", fontWeight: "600", fontSize: 14 }}>
                 Set Date Now
               </Text>
             </View>
@@ -399,7 +399,7 @@ export default function CalendarScreen() {
         {/* Calendar */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 16,
             padding: 16,
             shadowColor: "#000",
@@ -423,18 +423,18 @@ export default function CalendarScreen() {
               style={{
                 padding: 8,
                 borderRadius: 8,
-                backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
               }}
               activeOpacity={0.7}
             >
-              <ChevronLeft size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+              <ChevronLeft size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
             </TouchableOpacity>
 
             <Text
               style={{
                 fontSize: 18,
                 fontWeight: "700",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
               }}
             >
               {formatMonthYear(currentMonth)}
@@ -445,11 +445,11 @@ export default function CalendarScreen() {
               style={{
                 padding: 8,
                 borderRadius: 8,
-                backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
               }}
               activeOpacity={0.7}
             >
-              <ChevronRight size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+              <ChevronRight size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
             </TouchableOpacity>
           </View>
 
@@ -461,7 +461,7 @@ export default function CalendarScreen() {
                   style={{
                     fontSize: 12,
                     fontWeight: "600",
-                    color: isDark ? "#9ca3af" : "#6b7280",
+                    color: isDark ? "#9C95A8" : "#6B6577",
                   }}
                 >
                   {day}
@@ -476,29 +476,29 @@ export default function CalendarScreen() {
           </View>
 
           {/* Legend */}
-          <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: isDark ? "#334155" : "#e5e7eb" }}>
+          <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: isDark ? "#2B2733" : "#E5DFEE" }}>
             <View style={{ flexDirection: "row", justifyContent: "space-around", flexWrap: "wrap" }}>
               <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#06B6D4", marginRight: 6 }} />
-                <Text style={{ fontSize: 12, color: isDark ? "#9ca3af" : "#6b7280" }}>Today</Text>
+                <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#8A5CE6", marginRight: 6 }} />
+                <Text style={{ fontSize: 12, color: isDark ? "#9C95A8" : "#6B6577" }}>Today</Text>
               </View>
               {satDate && (
                 <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#f59e0b", marginRight: 6 }} />
-                  <Text style={{ fontSize: 12, color: isDark ? "#9ca3af" : "#6b7280" }}>SAT Date</Text>
+                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#E5A50A", marginRight: 6 }} />
+                  <Text style={{ fontSize: 12, color: isDark ? "#9C95A8" : "#6B6577" }}>SAT Date</Text>
                 </View>
               )}
               <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#06B6D4", marginRight: 6 }} />
-                <Text style={{ fontSize: 12, color: isDark ? "#9ca3af" : "#6b7280" }}>Selected</Text>
+                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#8A5CE6", marginRight: 6 }} />
+                <Text style={{ fontSize: 12, color: isDark ? "#9C95A8" : "#6B6577" }}>Selected</Text>
               </View>
             </View>
           </View>
         </View>
 
         {/* Helper Text */}
-        <View style={{ marginTop: 16, padding: 16, backgroundColor: isDark ? "#1e293b20" : "#06B6D410", borderRadius: 12 }}>
-          <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", textAlign: "center" }}>
+        <View style={{ marginTop: 16, padding: 16, backgroundColor: isDark ? "#17151C20" : "#7A4BDB10", borderRadius: 12 }}>
+          <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577", textAlign: "center" }}>
             Tap any date to create a study plan for that day
           </Text>
         </View>

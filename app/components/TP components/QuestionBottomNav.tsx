@@ -1,7 +1,6 @@
 import React from "react";
 import { View, Text, TouchableOpacity, ActivityIndicator } from "react-native";
 import { ArrowLeft, ArrowRight } from "lucide-react-native";
-import { useRouter } from "expo-router";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
@@ -14,13 +13,10 @@ interface QuestionBottomNavProps {
   enableFinishSaved: boolean;
   isCompleted: boolean;
   isSubmitting: boolean;
-  isConfirmedAS: boolean;
   currentIconColor: string;
-  currentQuestionId: string;
   previousQuestion: () => void;
   handleNextQuestion: () => void;
-  setIsConfirmedAS: (state: boolean) => void;
-  handleExamAnswerSelect: (option: string) => void;
+  finishReview: () => void;
 }
 
 export default function QuestionBottomNav({
@@ -32,15 +28,11 @@ export default function QuestionBottomNav({
   enableFinishSaved,
   isSubmitting,
   isCompleted,
-  isConfirmedAS,
   currentIconColor,
-  currentQuestionId,
   previousQuestion,
   handleNextQuestion,
-  setIsConfirmedAS,
-  handleExamAnswerSelect,
+  finishReview,
 }: QuestionBottomNavProps) {
-  const router = useRouter();
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const insets = useSafeAreaInsets();
@@ -53,12 +45,12 @@ export default function QuestionBottomNav({
           bottom: 0,
           left: 0,
           right: 0,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           paddingTop: 16,
           paddingBottom: insets.bottom + 16,
           paddingHorizontal: 16,
           borderTopWidth: 1,
-          borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderTopColor: isDark ? "#17151C" : "#E5DFEE",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.1,
@@ -67,17 +59,17 @@ export default function QuestionBottomNav({
         }}
       >
         <TouchableOpacity
-          onPress={() => router.back()}
+          onPress={finishReview}
           activeOpacity={0.7}
           style={{
             width: "100%",
-            backgroundColor: "#06B6D4",
+            backgroundColor: "#8A5CE6",
             paddingVertical: 16,
             borderRadius: 12,
             flexDirection: "row",
             justifyContent: "center",
             alignItems: "center",
-            shadowColor: "#06B6D4",
+            shadowColor: "#8A5CE6",
             shadowOffset: { width: 0, height: 4 },
             shadowOpacity: 0.3,
             shadowRadius: 8,
@@ -100,12 +92,12 @@ export default function QuestionBottomNav({
         bottom: 0,
         left: 0,
         right: 0,
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
         paddingTop: 16,
         paddingBottom: insets.bottom + 16,
         paddingHorizontal: 16,
         borderTopWidth: 1,
-        borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
+        borderTopColor: isDark ? "#17151C" : "#E5DFEE",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: -4 },
         shadowOpacity: 0.1,
@@ -122,7 +114,7 @@ export default function QuestionBottomNav({
         disabled={currentQuestionIndex === 0}
         activeOpacity={0.7}
         style={{
-          backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+          backgroundColor: isDark ? "#17151C" : "#EFEAF7",
           paddingHorizontal: 20,
           paddingVertical: 12,
           borderRadius: 12,
@@ -130,13 +122,13 @@ export default function QuestionBottomNav({
           alignItems: "center",
           opacity: currentQuestionIndex === 0 ? 0.4 : 1,
           borderWidth: 1,
-          borderColor: isDark ? "#374155" : "#e5e7eb",
+          borderColor: isDark ? "#2B2733" : "#E5DFEE",
         }}
       >
-        <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+        <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
         <Text
           style={{
-            color: isDark ? "#06B6D4" : "#0891B2",
+            color: isDark ? "#C9AAFB" : "#7A4BDB",
             fontWeight: "600",
             marginLeft: 8,
           }}
@@ -148,28 +140,21 @@ export default function QuestionBottomNav({
       {/* Next / Answer / Finish */}
       <TouchableOpacity
         disabled={isSubmitting}
-        onPress={() => {
-          if (pageType === "exam") {
-            const qId = questions[currentQuestionIndex].id;
-            const selected = selectedAnswers[qId]?.[0];
-            handleExamAnswerSelect(selected);
-          }
-          handleNextQuestion();
-        }}
+        onPress={handleNextQuestion}
         activeOpacity={0.7}
         style={{
           backgroundColor: isSubmitting
             ? isDark
-              ? "#334155"
-              : "#d1d5db"
-            : "#06B6D4",
+              ? "#2B2733"
+              : "#D9D2E5"
+            : "#8A5CE6",
           paddingHorizontal: 24,
           paddingVertical: 12,
           borderRadius: 12,
           flexDirection: "row",
           alignItems: "center",
           justifyContent: "center",
-          shadowColor: isSubmitting ? "#000" : "#06B6D4",
+          shadowColor: isSubmitting ? "#000" : "#8A5CE6",
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
@@ -229,7 +214,7 @@ function getNextButtonLabel({
     const totalAnswered = Object.keys(answeredQuestions).length;
 
     if (
-      totalAnswered === 5 &&
+      totalAnswered === questions.length &&
       questionId in answeredQuestions &&
       selectedOption
     ) {

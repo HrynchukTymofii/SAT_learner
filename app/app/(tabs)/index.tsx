@@ -138,7 +138,7 @@ export default function ExploreScreen() {
     const result = await getRecentChapters();
     if (result.success && result.chapters) {
       // Assign colors to chapters
-      const colors = ["#10b981", "#ef4444", "#3b82f6", "#f59e0b", "#8b5cf6"];
+      const colors = ["#2E9A5E", "#D93F55", "#8A5CE6", "#E5A50A", "#8A5CE6"];
       const chaptersWithColors = result.chapters.map((chapter, index) => ({
         id: chapter.id,
         title: chapter.title,
@@ -308,7 +308,7 @@ export default function ExploreScreen() {
     <SafeAreaView
       style={[
         styles.container,
-        { backgroundColor: isDark ? "#111827" : "#f9fafb" },
+        { backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" },
       ]}
       edges={["bottom"]}
     >
@@ -322,8 +322,8 @@ export default function ExploreScreen() {
             styles.header,
             {
               paddingTop: insets.top + 16,
-              backgroundColor: isDark ? "#111827" : "#ffffff",
-              borderBottomColor: isDark ? "#1f2937" : "#f3f4f6",
+              backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
+              borderBottomColor: isDark ? "#17151C" : "#EFEAF7",
             },
           ]}
         >
@@ -343,14 +343,14 @@ export default function ExploreScreen() {
             <Text
               style={[
                 styles.headerTitle,
-                { color: isDark ? "#ffffff" : "#1f2937" },
+                { color: isDark ? "#F4F1F8" : "#0B0A0F" },
               ]}
             >
               Explore
             </Text>
 
             {/* <TouchableOpacity activeOpacity={0.7}>
-              <MoreVertical size={24} color={isDark ? "#ffffff" : "#000000"} />
+              <MoreVertical size={24} color={isDark ? "#F4F1F8" : "#0B0A0F"} />
             </TouchableOpacity> */}
           </View>
         </View>
@@ -359,7 +359,7 @@ export default function ExploreScreen() {
           {/* Premium Upgrade Banner */}
           {user && !user.isPro && (
             <LinearGradient
-              colors={["#06B6D4", "#0891B2"]}
+              colors={["#8A5CE6", "#8A5CE6"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={styles.premiumBanner}
@@ -397,7 +397,7 @@ export default function ExploreScreen() {
               <Text
                 style={[
                   styles.sectionTitle,
-                  { color: isDark ? "#ffffff" : "#1f2937" },
+                  { color: isDark ? "#F4F1F8" : "#0B0A0F" },
                 ]}
               >
                 Recent Chapters
@@ -414,13 +414,13 @@ export default function ExploreScreen() {
               <View
                 style={[
                   styles.loadingContainer,
-                  { backgroundColor: isDark ? "#1f2937" : "#ffffff" },
+                  { backgroundColor: isDark ? "#17151C" : "#ffffff" },
                 ]}
               >
                 <Text
                   style={[
                     styles.loadingText,
-                    { color: isDark ? "#9ca3af" : "#6b7280" },
+                    { color: isDark ? "#9C95A8" : "#6B6577" },
                   ]}
                 >
                   Loading chapters...
@@ -430,13 +430,13 @@ export default function ExploreScreen() {
               <View
                 style={[
                   styles.emptyContainer,
-                  { backgroundColor: isDark ? "#1f2937" : "#ffffff" },
+                  { backgroundColor: isDark ? "#17151C" : "#ffffff" },
                 ]}
               >
                 <Text
                   style={[
                     styles.emptyTitle,
-                    { color: isDark ? "#ffffff" : "#1f2937" },
+                    { color: isDark ? "#F4F1F8" : "#0B0A0F" },
                   ]}
                 >
                   No chapters started yet
@@ -444,7 +444,7 @@ export default function ExploreScreen() {
                 <Text
                   style={[
                     styles.emptySubtitle,
-                    { color: isDark ? "#9ca3af" : "#6b7280" },
+                    { color: isDark ? "#9C95A8" : "#6B6577" },
                   ]}
                 >
                   Start learning to see your recent progress here
@@ -472,7 +472,7 @@ export default function ExploreScreen() {
                     style={[
                       styles.chapterCard,
                       {
-                        backgroundColor: isDark ? "#1f2937" : "#ffffff",
+                        backgroundColor: isDark ? "#17151C" : "#ffffff",
                         borderLeftColor: chapter.color,
                       },
                     ]}
@@ -483,7 +483,7 @@ export default function ExploreScreen() {
                         numberOfLines={1}
                         style={[
                           styles.chapterTitle,
-                          { color: isDark ? "#ffffff" : "#1f2937" },
+                          { color: isDark ? "#F4F1F8" : "#0B0A0F" },
                         ]}
                       >
                         {chapter.title}
@@ -504,7 +504,7 @@ export default function ExploreScreen() {
                     <View
                       style={[
                         styles.chapterProgressBar,
-                        { backgroundColor: isDark ? "#374151" : "#e5e7eb" },
+                        { backgroundColor: isDark ? "#2B2733" : "#E5DFEE" },
                       ]}
                     >
                       <View
@@ -571,12 +571,12 @@ export default function ExploreScreen() {
                     }`}
                     style={{
                       backgroundColor: isSATDay
-                        ? "#f59e0b"
+                        ? "#E5A50A"
                         : isDark
-                          ? "#1f2937"
+                          ? "#17151C"
                           : "#fff",
                       borderBottomWidth: today ? 3 : 0,
-                      borderBottomColor: "#06B6D4",
+                      borderBottomColor: "#8A5CE6",
                     }}
                   >
                     <Text
@@ -614,7 +614,7 @@ export default function ExploreScreen() {
                           minWidth: 16,
                           height: 16,
                           borderRadius: 8,
-                          backgroundColor: "#06B6D4",
+                          backgroundColor: "#8A5CE6",
                           justifyContent: "center",
                           alignItems: "center",
                           paddingHorizontal: 4,
@@ -644,11 +644,11 @@ export default function ExploreScreen() {
                 }`}
                 style={{
                   borderWidth: 2,
-                  borderColor: "#06B6D4",
+                  borderColor: "#8A5CE6",
                   borderStyle: "dashed",
                 }}
               >
-                <Calendar size={32} color="#06B6D4" />
+                <Calendar size={32} color="#8A5CE6" />
                 <Text
                   className={`text-sm mt-2 font-semibold ${
                     isDark ? "text-cyan-400" : "text-cyan-600"
@@ -711,7 +711,7 @@ export default function ExploreScreen() {
                   }}
                   className="flex-row items-center"
                 >
-                  <Edit3 size={16} color="#06B6D4" />
+                  <Edit3 size={16} color="#8A5CE6" />
                   <Text className="text-cyan-500 font-semibold ml-1 text-sm">
                     {hasCustomPlan ? "Edit Plan" : "Create Plan"}
                   </Text>
@@ -782,9 +782,9 @@ export default function ExploreScreen() {
                         onPress={() => toggleTask(task.id)}
                       >
                         {task.completed ? (
-                          <CheckCircle2 size={24} color="#06B6D4" />
+                          <CheckCircle2 size={24} color="#8A5CE6" />
                         ) : (
-                          <Circle size={24} color="#06B6D4" />
+                          <Circle size={24} color="#8A5CE6" />
                         )}
                       </TouchableOpacity>
                       {index < todayTasks.length - 1 && (
@@ -839,7 +839,7 @@ export default function ExploreScreen() {
         activeOpacity={0.8}
         className="absolute bottom-32 right-6 bg-cyan-500 w-14 h-14 rounded-full items-center justify-center shadow-lg z-10"
         style={{
-          shadowColor: "#06B6D4",
+          shadowColor: "#8A5CE6",
           shadowOffset: { width: 0, height: 4 },
           shadowOpacity: 0.3,
           shadowRadius: 8,
@@ -932,7 +932,7 @@ const styles = StyleSheet.create({
     alignSelf: "flex-start",
   },
   premiumBannerButtonText: {
-    color: "#06B6D4",
+    color: "#8A5CE6",
     fontWeight: "600",
   },
   premiumBannerImage: {
@@ -958,7 +958,7 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   viewAllButton: {
-    color: "#06B6D4",
+    color: "#8A5CE6",
     fontWeight: "600",
   },
 
@@ -987,7 +987,7 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   emptyButton: {
-    backgroundColor: "#06B6D4",
+    backgroundColor: "#8A5CE6",
     borderRadius: 20,
     paddingHorizontal: 24,
     paddingVertical: 8,
@@ -1095,7 +1095,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     marginRight: 48,
     borderWidth: 2,
-    borderColor: "#06B6D4",
+    borderColor: "#8A5CE6",
     borderStyle: "dashed",
   },
   calendarButtonText: {
@@ -1124,7 +1124,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   studyPlanEditText: {
-    color: "#06B6D4",
+    color: "#8A5CE6",
     fontWeight: "600",
     marginLeft: 4,
     fontSize: 14,

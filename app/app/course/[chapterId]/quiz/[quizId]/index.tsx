@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import { View, Text } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { useAuth } from "@/context/AuthContext"
-import TestsPage from "@/components/TestsPage"
+import QuizScreen from "@/components/quiz/QuizScreen"
 import { useQuizDatabase } from "@/lib/db/quiz"
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader"
 
@@ -57,7 +57,7 @@ const QuizByTopicScreen = () => {
   }
 
   return (
-    <TestsPage
+    <QuizScreen
       quiz={{
         id: quizData.quiz.id,
         title: quizData.quiz.title,
@@ -162,7 +162,7 @@ export default QuizByTopicScreen
 //           flex: 1,
 //           justifyContent: "center",
 //           alignItems: "center",
-//           backgroundColor: isDark ? "#0f172a" : "#f8fafc",
+//           backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
 //         }}
 //       >
 //         <GraduationCap3DLoader />
@@ -213,14 +213,14 @@ export default QuizByTopicScreen
 //   };
 
 //   return (
-//     <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? "#0f172a" : "#f8fafc" }}>
+//     <SafeAreaView style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
 //       {!isDark && <TopBlur />}
 
 //       {/* Header */}
 //       <View style={{ flexDirection: "row", alignItems: "center", padding: 12 }}>
 //         <TouchableOpacity onPress={() => router.back()} style={{ borderRadius: 12, overflow: "hidden" }}>
 //           <LinearGradient
-//             colors={isDark ? ["#1e3a8a", "#2563eb"] : ["#3b82f6", "#2563eb"]}
+//             colors={isDark ? ["#1e3a8a", "#8A5CE6"] : ["#8A5CE6", "#8A5CE6"]}
 //             start={{ x: 0, y: 0 }}
 //             end={{ x: 1, y: 1 }}
 //             style={{ flexDirection: "row", alignItems: "center", paddingVertical: 6, paddingHorizontal: 12, borderRadius: 12 }}
@@ -233,7 +233,7 @@ export default QuizByTopicScreen
 
 //       {/* Quiz Content */}
 //       <ScrollView contentContainerStyle={{ padding: 12 }}>
-//         <Text style={{ fontSize: 22, fontWeight: "700", color: isDark ? "#f1f5f9" : "#1f2937", marginBottom: 12 }}>
+//         <Text style={{ fontSize: 22, fontWeight: "700", color: isDark ? "#EFEAF7" : "#0B0A0F", marginBottom: 12 }}>
 //           Question {currentIndex + 1} of {questions.length}
 //         </Text>
 
@@ -247,7 +247,7 @@ export default QuizByTopicScreen
 //               bottom: 0,
 //               justifyContent: "center",
 //               alignItems: "center",
-//               backgroundColor: isDark ? "#0f172a" : "#f8fafc",
+//               backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
 //               zIndex: 10,
 //             }}
 //           >
@@ -274,15 +274,15 @@ export default QuizByTopicScreen
 //             const selected = userAnswer === opt;
 //             const correct = question.answers.includes(opt);
 
-//             let bgColor = isDark ? "#1e293b" : "#fff";
-//             let borderColor = isDark ? "#334155" : "#d1d5db";
+//             let bgColor = isDark ? "#17151C" : "#fff";
+//             let borderColor = isDark ? "#2B2733" : "#D9D2E5";
 
 //             if (selected) {
-//               if (correct) bgColor = "#22c55e33";
-//               else bgColor = "#ef444433";
+//               if (correct) bgColor = "#2E9A5E33";
+//               else bgColor = "#D93F5533";
 //             } else if (isCompleted && correct) {
 //               // ✅ highlight correct even if not selected
-//               bgColor = "#22c55e22";
+//               bgColor = "#2E9A5E22";
 //             }
 
 //             return (
@@ -299,7 +299,7 @@ export default QuizByTopicScreen
 //                   backgroundColor: bgColor,
 //                 }}
 //               >
-//                 <Text style={{ color: isDark ? "#f1f5f9" : "#1f2937", fontWeight: "600" }}>{opt}</Text>
+//                 <Text style={{ color: isDark ? "#EFEAF7" : "#0B0A0F", fontWeight: "600" }}>{opt}</Text>
 //               </TouchableOpacity>
 //             );
 //           })}
@@ -308,7 +308,7 @@ export default QuizByTopicScreen
 //           <Text
 //             style={{
 //               marginTop: 10,
-//               color: feedback[currentIndex]?.includes("✅") ? "#16a34a" : "#dc2626",
+//               color: feedback[currentIndex]?.includes("✅") ? "#2E9A5E" : "#D93F55",
 //               fontWeight: "600",
 //             }}
 //           >
@@ -326,7 +326,7 @@ export default QuizByTopicScreen
 //               marginRight: 6,
 //               paddingVertical: 12,
 //               borderRadius: 12,
-//               backgroundColor: currentIndex === 0 ? "#64748b55" : isDark ? "#334155" : "#3b82f6",
+//               backgroundColor: currentIndex === 0 ? "#7E788955" : isDark ? "#2B2733" : "#7A4BDB",
 //               alignItems: "center",
 //             }}
 //           >
@@ -340,7 +340,7 @@ export default QuizByTopicScreen
 //               marginLeft: 6,
 //               paddingVertical: 12,
 //               borderRadius: 12,
-//               backgroundColor: isDark ? "#10b981" : "#2563eb",
+//               backgroundColor: isDark ? "#2E9A5E" : "#7A4BDB",
 //               alignItems: "center",
 //             }}
 //           >
@@ -368,15 +368,15 @@ export default QuizByTopicScreen
 //             style={{
 //               width: "100%",
 //               borderRadius: 20,
-//               backgroundColor: isDark ? "#1e293b" : "#fff",
+//               backgroundColor: isDark ? "#17151C" : "#fff",
 //               padding: 24,
 //               alignItems: "center",
 //             }}
 //           >
-//             <Text style={{ fontSize: 24, fontWeight: "700", color: isDark ? "#f1f5f9" : "#1f2937" }}>
+//             <Text style={{ fontSize: 24, fontWeight: "700", color: isDark ? "#EFEAF7" : "#0B0A0F" }}>
 //               🎓 Quiz Completed!
 //             </Text>
-//             <Text style={{ fontSize: 18, marginVertical: 12, color: isDark ? "#cbd5e1" : "#374151" }}>
+//             <Text style={{ fontSize: 18, marginVertical: 12, color: isDark ? "#CFC9DA" : "#2E2A35" }}>
 //               Your score: {finalScore} / {questions.reduce((a: number, q: any) => a + q.points, 0)}
 //             </Text>
 
@@ -386,7 +386,7 @@ export default QuizByTopicScreen
 //                 setCurrentIndex(0);
 //               }}
 //               style={{
-//                 backgroundColor: isDark ? "#10b981" : "#2563eb",
+//                 backgroundColor: isDark ? "#2E9A5E" : "#7A4BDB",
 //                 paddingVertical: 12,
 //                 paddingHorizontal: 32,
 //                 borderRadius: 12,
@@ -399,13 +399,13 @@ export default QuizByTopicScreen
 //             <TouchableOpacity
 //               onPress={() => router.back()}
 //               style={{
-//                 backgroundColor: isDark ? "#334155" : "#e5e7eb",
+//                 backgroundColor: isDark ? "#2B2733" : "#E5DFEE",
 //                 paddingVertical: 10,
 //                 paddingHorizontal: 28,
 //                 borderRadius: 12,
 //               }}
 //             >
-//               <Text style={{ color: isDark ? "#f1f5f9" : "#1f2937", fontWeight: "600" }}>Back</Text>
+//               <Text style={{ color: isDark ? "#EFEAF7" : "#0B0A0F", fontWeight: "600" }}>Back</Text>
 //             </TouchableOpacity>
 //           </View>
 //         </View>

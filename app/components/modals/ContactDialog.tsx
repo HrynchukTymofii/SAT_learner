@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Modal } from "react-native";
 import { sendMessage } from "@/lib/api/user";
-import { useRoute } from "@react-navigation/native";
+import { useRoute } from "expo-router/react-navigation";
 import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
 import { X } from "lucide-react-native";
@@ -78,7 +78,7 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
       }}>
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             padding: 16,
             borderRadius: 16,
             shadowColor: "#000",
@@ -97,12 +97,12 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
               right: 16,
               zIndex: 10,
               padding: 8,
-              backgroundColor: isDark ? "#334155" : "#f3f4f6",
+              backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
               borderRadius: 8,
             }}
             activeOpacity={0.7}
           >
-            <X size={20} color={isDark ? "#ffffff" : "#1f2937"} />
+            <X size={20} color={isDark ? "#F4F1F8" : "#0B0A0F"} />
           </TouchableOpacity>
 
           {/* Title */}
@@ -110,7 +110,7 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
             fontSize: 20,
             fontWeight: "700",
             marginBottom: 20,
-            color: isDark ? "#ffffff" : "#1f2937",
+            color: isDark ? "#F4F1F8" : "#0B0A0F",
             paddingLeft: 8
           }}>
             Contact Support
@@ -119,7 +119,7 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
           {/* Topic Selection */}
           <Text style={{
             fontSize: 14,
-            color: isDark ? "#9ca3af" : "#6b7280",
+            color: isDark ? "#9C95A8" : "#6B6577",
             marginBottom: 8,
             paddingLeft: 8
           }}>
@@ -138,14 +138,14 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
                 paddingVertical: 12,
                 borderRadius: 12,
                 borderWidth: 2,
-                borderColor: topic === "mistake" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
-                backgroundColor: topic === "mistake" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
+                borderColor: topic === "mistake" ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
+                backgroundColor: topic === "mistake" ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
               }}
               activeOpacity={0.7}
             >
               <Text style={{
                 fontWeight: "600",
-                color: topic === "mistake" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                color: topic === "mistake" ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
               }}>
                 Test Error
               </Text>
@@ -158,14 +158,14 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
                 paddingVertical: 12,
                 borderRadius: 12,
                 borderWidth: 2,
-                borderColor: topic === "problem" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
-                backgroundColor: topic === "problem" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
+                borderColor: topic === "problem" ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
+                backgroundColor: topic === "problem" ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
               }}
               activeOpacity={0.7}
             >
               <Text style={{
                 fontWeight: "600",
-                color: topic === "problem" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                color: topic === "problem" ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
               }}>
                 System Issue
               </Text>
@@ -178,14 +178,14 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
                 paddingVertical: 12,
                 borderRadius: 12,
                 borderWidth: 2,
-                borderColor: topic === "other" ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
-                backgroundColor: topic === "other" ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
+                borderColor: topic === "other" ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
+                backgroundColor: topic === "other" ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
               }}
               activeOpacity={0.7}
             >
               <Text style={{
                 fontWeight: "600",
-                color: topic === "other" ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                color: topic === "other" ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
               }}>
                 Other
               </Text>
@@ -196,18 +196,18 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
           <TextInput
             multiline
             placeholder="Your message..."
-            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
             value={message}
             onChangeText={setMessage}
             style={{
               minHeight: 150,
               borderWidth: 1,
-              borderColor: isDark ? "#334155" : "#e5e7eb",
+              borderColor: isDark ? "#2B2733" : "#E5DFEE",
               borderRadius: 12,
               padding: 16,
               textAlignVertical: "top",
-              color: isDark ? "#ffffff" : "#1f2937",
-              backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
+              backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
               marginBottom: 16,
               fontSize: 16,
             }}
@@ -218,7 +218,7 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
             onPress={handleSubmit}
             disabled={loading || !topic || !message}
             style={{
-              backgroundColor: loading || !topic || !message ? (isDark ? "#334155" : "#d1d5db") : "#06B6D4",
+              backgroundColor: loading || !topic || !message ? (isDark ? "#2B2733" : "#D9D2E5") : "#8A5CE6",
               borderRadius: 12,
               paddingVertical: 14,
               alignItems: "center",
@@ -234,7 +234,7 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
               <ActivityIndicator color="#ffffff" />
             ) : (
               <Text style={{
-                color: loading || !topic || !message ? (isDark ? "#9ca3af" : "#6b7280") : "#ffffff",
+                color: loading || !topic || !message ? (isDark ? "#9C95A8" : "#6B6577") : "#ffffff",
                 fontWeight: "600",
                 fontSize: 16,
               }}>

@@ -105,25 +105,25 @@ const QuestionNumberButton = ({
   let backgroundColor, borderColor, borderWidth, textColor;
 
   if (isLocked) {
-    backgroundColor = isDark ? "#374155" : "#9ca3af";
+    backgroundColor = isDark ? "#2B2733" : "#9C95A8";
     borderColor = "transparent";
     borderWidth = 0;
-    textColor = isDark ? "#6b7280" : "#e5e7eb";
+    textColor = isDark ? "#7E7889" : "#E5DFEE";
   } else if (isAnswered) {
-    backgroundColor = isCorrect ? "#22c55e" : "#ef4444";
+    backgroundColor = isCorrect ? "#2E9A5E" : "#D93F55";
     borderColor = "transparent";
     borderWidth = 0;
     textColor = "#ffffff";
   } else if (isCurrent) {
-    backgroundColor = isDark ? "#1e293b" : "#ffffff";
-    borderColor = "#06B6D4";
+    backgroundColor = isDark ? "#17151C" : "#ffffff";
+    borderColor = "#8A5CE6";
     borderWidth = 2;
-    textColor = "#06B6D4";
+    textColor = "#8A5CE6";
   } else {
-    backgroundColor = isDark ? "#1f2937" : "#f3f4f6";
-    borderColor = isDark ? "#374155" : "#e5e7eb";
+    backgroundColor = isDark ? "#17151C" : "#EFEAF7";
+    borderColor = isDark ? "#2B2733" : "#E5DFEE";
     borderWidth = 1;
-    textColor = isDark ? "#9ca3af" : "#6b7280";
+    textColor = isDark ? "#9C95A8" : "#6B6577";
   }
 
   return (

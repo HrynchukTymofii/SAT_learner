@@ -84,15 +84,15 @@ export default function SavedQuizzesScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View style={{
         paddingTop: insets.top + 12,
         paddingBottom: 16,
         paddingHorizontal: 16,
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+        borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
       }}>
         {/* Back Button */}
         <TouchableOpacity
@@ -104,22 +104,22 @@ export default function SavedQuizzesScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
-          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
+          <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
             Back
           </Text>
         </TouchableOpacity>
 
         {/* Title */}
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 8 }}>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 8 }}>
           Saved Questions
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           Your saved questions for quick review
         </Text>
 
@@ -127,21 +127,21 @@ export default function SavedQuizzesScreen() {
         {/* <View style={{
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+          backgroundColor: isDark ? "#17151C" : "#EFEAF7",
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 6,
         }}>
-          <Search size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+          <Search size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
           <TextInput
             style={{
               flex: 1,
               marginLeft: 12,
               fontSize: 16,
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
             }}
             placeholder="Search questions..."
-            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
             value={searchTerm}
             onChangeText={setSearchTerm}
           />
@@ -151,7 +151,7 @@ export default function SavedQuizzesScreen() {
               onPress={clearSearch}
               style={{ marginLeft: 8 }}
             >
-              <X size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+              <X size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
             </TouchableOpacity>
           )}
         </View> */}
@@ -169,7 +169,7 @@ export default function SavedQuizzesScreen() {
             activeOpacity={0.7}
             style={{
               marginBottom: 20,
-              backgroundColor: "#10B981",
+              backgroundColor: "#2E9A5E",
               borderRadius: 16,
               padding: 16,
               flexDirection: "row",
@@ -198,11 +198,11 @@ export default function SavedQuizzesScreen() {
               activeOpacity={0.7}
               style={{
                 marginBottom: 16,
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 16,
                 borderLeftWidth: 4,
-                borderLeftColor: "#EC4899",
+                borderLeftColor: "#8A5CE6",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -213,12 +213,12 @@ export default function SavedQuizzesScreen() {
               {/* Title and Icon */}
               <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                 <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
-                  <Heart size={24} color="#EC4899" fill="#EC4899" style={{ marginRight: 12 }} />
+                  <Heart size={24} color="#8A5CE6" fill="#8A5CE6" style={{ marginRight: 12 }} />
                   <Text
                     style={{
                       fontSize: 16,
                       fontWeight: "bold",
-                      color: isDark ? "#ffffff" : "#1f2937",
+                      color: isDark ? "#F4F1F8" : "#0B0A0F",
                       flex: 1,
                     }}
                     numberOfLines={2}
@@ -229,19 +229,19 @@ export default function SavedQuizzesScreen() {
               </View>
 
               {/* Stats */}
-              <Text style={{ fontSize: 14, color: isDark ? "#94a3b8" : "#6b7280", marginLeft: 36 }}>
+              <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577", marginLeft: 36 }}>
                 {quiz.savedCount} saved question{quiz.savedCount > 1 ? 's' : ''}
               </Text>
             </TouchableOpacity>
           ))
         ) : (
           <View style={{ alignItems: "center", justifyContent: "center", marginTop: 48 }}>
-            <Heart size={40} color={isDark ? "#9ca3af" : "#6b7280"} />
-            <Text style={{ fontSize: 16, color: isDark ? "#9ca3af" : "#6b7280", marginTop: 8, textAlign: "center" }}>
+            <Heart size={40} color={isDark ? "#9C95A8" : "#6B6577"} />
+            <Text style={{ fontSize: 16, color: isDark ? "#9C95A8" : "#6B6577", marginTop: 8, textAlign: "center" }}>
               {searchTerm ? `No questions found matching "${searchTerm}"` : "No saved questions yet"}
             </Text>
             {!searchTerm && (
-              <Text style={{ fontSize: 14, color: isDark ? "#6b7280" : "#9ca3af", marginTop: 4, textAlign: "center", paddingHorizontal: 32 }}>
+              <Text style={{ fontSize: 14, color: isDark ? "#7E7889" : "#9C95A8", marginTop: 4, textAlign: "center", paddingHorizontal: 32 }}>
                 Save questions while taking tests for quick access later
               </Text>
             )}

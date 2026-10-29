@@ -11,22 +11,22 @@ const ArticlesPage = () => {
       title: "What is SAT?",
       description: "Learn about the SAT exam, its purpose, structure, and importance for college admissions.",
       icon: BookOpen,
-      href: "/articles/what-is-sat",
-      color: "from-blue-500 to-purple-600",
+      href: "/info/what-is-sat",
+      color: "bg-lav",
     },
     {
       title: "How SAT is Scored",
       description: "Understand the SAT scoring system, score ranges, and how your performance is evaluated.",
       icon: Target,
-      href: "/articles/how-sat-is-scored",
-      color: "from-green-500 to-blue-500",
+      href: "/info/how-sat-is-scored",
+      color: "bg-butter",
     },
     {
       title: "Test Dates & Registration",
       description: "Find out about SAT test dates, registration process, deadlines, and important information.",
       icon: Calendar,
-      href: "/articles/test-dates-registration",
-      color: "from-purple-500 to-pink-500",
+      href: "/info/test-dates-registration",
+      color: "bg-mint",
     },
   ]
 
@@ -46,16 +46,15 @@ const ArticlesPage = () => {
           {articles.map((article) => (
             <Card
               key={article.href}
-              className="group hover:shadow-xl transition-all duration-300 border-0 bg-card overflow-hidden pb-6"
+              className="group transition-colors hover:border-lav-2 bg-card overflow-hidden py-6"
             >
-              <div className={`h-2 bg-gradient-to-r ${article.color}`} />
-              <CardHeader className="pb-4">
+                            <CardHeader className="pb-4">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className={`p-3 rounded-lg bg-gradient-to-r ${article.color}`}>
-                    <article.icon className="h-6 w-6 text-white" />
+                  <div className={`paper p-3 rounded-2xl ${article.color}`}>
+                    <article.icon className="h-6 w-6" />
                   </div>
                 </div>
-                <CardTitle className="text-xl font-bold text-foreground group-hover:text-primary transition-colors">
+                <CardTitle className="text-xl font-bold text-foreground group-hover:text-brand transition-colors">
                   {article.title}
                 </CardTitle>
               </CardHeader>

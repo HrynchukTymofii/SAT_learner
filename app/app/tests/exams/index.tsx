@@ -82,10 +82,10 @@ export default function TestsByTopicScreen() {
   };
 
   const getScoreColor = (score: number) => {
-    if (score >= 700) return "#10B981"; // Green
-    if (score >= 550) return "#EAB308"; // Yellow
-    if (score >= 450) return "#F59E0B"; // Orange
-    return "#EF4444"; // Red
+    if (score >= 700) return "#2E9A5E"; // Green
+    if (score >= 550) return "#E5A50A"; // Yellow
+    if (score >= 450) return "#E5A50A"; // Orange
+    return "#D93F55"; // Red
   };
 
   const formatDate = (dateString?: string) => {
@@ -99,16 +99,16 @@ export default function TestsByTopicScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View
         style={{
           paddingTop: insets.top + 12,
           paddingBottom: 16,
           paddingHorizontal: 16,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         {/* Back Button */}
@@ -121,15 +121,15 @@ export default function TestsByTopicScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text
             style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "600",
               marginLeft: 6,
               fontSize: 14,
@@ -144,13 +144,13 @@ export default function TestsByTopicScreen() {
           style={{
             fontSize: 24,
             fontWeight: "bold",
-            color: isDark ? "#ffffff" : "#1f2937",
+            color: isDark ? "#F4F1F8" : "#0B0A0F",
             marginBottom: 8,
           }}
         >
           SAT Math Exams
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           Full-length practice tests with 44 questions
         </Text>
       </View>
@@ -168,8 +168,8 @@ export default function TestsByTopicScreen() {
             const scoreColor = satScore
               ? getScoreColor(satScore)
               : isDark
-                ? "#9ca3af"
-                : "#6b7280";
+                ? "#9C95A8"
+                : "#6B6577";
             const hasAttempt = quiz.attemptCount > 0;
 
             return (
@@ -179,11 +179,11 @@ export default function TestsByTopicScreen() {
                 activeOpacity={0.7}
                 style={{
                   marginBottom: 20,
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  backgroundColor: isDark ? "#17151C" : "#ffffff",
                   borderRadius: 16,
                   padding: 20,
                   borderLeftWidth: 4,
-                  borderLeftColor: hasAttempt ? scoreColor : "#06B6D4",
+                  borderLeftColor: hasAttempt ? scoreColor : "#8A5CE6",
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,
@@ -205,7 +205,7 @@ export default function TestsByTopicScreen() {
                       style={{
                         fontSize: 18,
                         fontWeight: "bold",
-                        color: isDark ? "#ffffff" : "#1f2937",
+                        color: isDark ? "#F4F1F8" : "#0B0A0F",
                         marginBottom: 4,
                       }}
                     >
@@ -215,7 +215,7 @@ export default function TestsByTopicScreen() {
                       <Text
                         style={{
                           fontSize: 12,
-                          color: isDark ? "#9ca3af" : "#6b7280",
+                          color: isDark ? "#9C95A8" : "#6B6577",
                         }}
                       >
                         {quiz.attemptCount} attempt
@@ -226,7 +226,7 @@ export default function TestsByTopicScreen() {
                   {isLocked && (
                     <Lock
                       size={20}
-                      color="#2563eb"
+                      color="#8A5CE6"
                       style={{ marginLeft: 12 }}
                     />
                   )}
@@ -239,7 +239,7 @@ export default function TestsByTopicScreen() {
                       {/* SAT Score */}
                       <View
                         style={{
-                          backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                          backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                           borderRadius: 12,
                           padding: 16,
                           marginBottom: 12,
@@ -263,7 +263,7 @@ export default function TestsByTopicScreen() {
                           <Text
                             style={{
                               fontSize: 14,
-                              color: isDark ? "#9ca3af" : "#6b7280",
+                              color: isDark ? "#9C95A8" : "#6B6577",
                               fontWeight: "600",
                             }}
                           >
@@ -282,7 +282,7 @@ export default function TestsByTopicScreen() {
                         <Text
                           style={{
                             fontSize: 12,
-                            color: isDark ? "#6b7280" : "#9ca3af",
+                            color: isDark ? "#7E7889" : "#9C95A8",
                             marginTop: 4,
                           }}
                         >
@@ -302,7 +302,7 @@ export default function TestsByTopicScreen() {
                         <View
                           style={{
                             flex: 1,
-                            backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                            backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                             borderRadius: 12,
                             padding: 12,
                           }}
@@ -316,13 +316,13 @@ export default function TestsByTopicScreen() {
                           >
                             <CheckCircle2
                               size={16}
-                              color="#10B981"
+                              color="#2E9A5E"
                               style={{ marginRight: 6 }}
                             />
                             <Text
                               style={{
                                 fontSize: 12,
-                                color: isDark ? "#9ca3af" : "#6b7280",
+                                color: isDark ? "#9C95A8" : "#6B6577",
                               }}
                             >
                               Correct
@@ -339,7 +339,7 @@ export default function TestsByTopicScreen() {
                               style={{
                                 fontSize: 20,
                                 fontWeight: "bold",
-                                color: isDark ? "#ffffff" : "#1f2937",
+                                color: isDark ? "#F4F1F8" : "#0B0A0F",
                               }}
                             >
                               {Math.round(
@@ -349,7 +349,7 @@ export default function TestsByTopicScreen() {
                             <Text
                               style={{
                                 fontSize: 11,
-                                color: isDark ? "#6b7280" : "#9ca3af",
+                                color: isDark ? "#7E7889" : "#9C95A8",
                                 paddingBottom: 2,
                               }}
                             >
@@ -362,7 +362,7 @@ export default function TestsByTopicScreen() {
                         <View
                           style={{
                             flex: 1,
-                            backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                            backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                             borderRadius: 12,
                             padding: 12,
                             justifyContent: "center",
@@ -378,10 +378,10 @@ export default function TestsByTopicScreen() {
                               size={14}
                               color={
                                 quiz.progress >= 80
-                                  ? "#10b981"
+                                  ? "#2E9A5E"
                                   : quiz.progress >= 60
-                                    ? "#f59e0b"
-                                    : "#3b82f6"
+                                    ? "#E5A50A"
+                                    : "#8A5CE6"
                               }
                               style={{ marginRight: 6 }}
                             />
@@ -390,7 +390,7 @@ export default function TestsByTopicScreen() {
                               style={{
                                 fontSize: 12, // reduced font size
                                 fontWeight: "600",
-                                color: isDark ? "#ffffff" : "#1f2937",
+                                color: isDark ? "#F4F1F8" : "#0B0A0F",
                               }}
                             >
                               {quiz.progress >= 85
@@ -412,18 +412,18 @@ export default function TestsByTopicScreen() {
                           alignItems: "center",
                           paddingTop: 12,
                           borderTopWidth: 1,
-                          borderTopColor: isDark ? "#334155" : "#e5e7eb",
+                          borderTopColor: isDark ? "#2B2733" : "#E5DFEE",
                         }}
                       >
                         <Calendar
                           size={14}
-                          color={isDark ? "#9ca3af" : "#6b7280"}
+                          color={isDark ? "#9C95A8" : "#6B6577"}
                           style={{ marginRight: 6 }}
                         />
                         <Text
                           style={{
                             fontSize: 12,
-                            color: isDark ? "#9ca3af" : "#6b7280",
+                            color: isDark ? "#9C95A8" : "#6B6577",
                           }}
                         >
                           Last attempt: {formatDate(quiz.lastAttempt)}
@@ -434,7 +434,7 @@ export default function TestsByTopicScreen() {
                 ) : (
                   <View
                     style={{
-                      backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                      backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                       borderRadius: 12,
                       padding: 16,
                       alignItems: "center",
@@ -442,14 +442,14 @@ export default function TestsByTopicScreen() {
                   >
                     <Clock
                       size={32}
-                      color={isDark ? "#06B6D4" : "#0891B2"}
+                      color={isDark ? "#C9AAFB" : "#7A4BDB"}
                       style={{ marginBottom: 12 }}
                     />
                     <Text
                       style={{
                         fontSize: 16,
                         fontWeight: "600",
-                        color: isDark ? "#ffffff" : "#1f2937",
+                        color: isDark ? "#F4F1F8" : "#0B0A0F",
                         marginBottom: 4,
                       }}
                     >
@@ -458,7 +458,7 @@ export default function TestsByTopicScreen() {
                     <Text
                       style={{
                         fontSize: 14,
-                        color: isDark ? "#9ca3af" : "#6b7280",
+                        color: isDark ? "#9C95A8" : "#6B6577",
                         textAlign: "center",
                       }}
                     >
@@ -477,11 +477,11 @@ export default function TestsByTopicScreen() {
               marginTop: 48,
             }}
           >
-            <Target size={40} color={isDark ? "#9ca3af" : "#6b7280"} />
+            <Target size={40} color={isDark ? "#9C95A8" : "#6B6577"} />
             <Text
               style={{
                 fontSize: 16,
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 marginTop: 8,
                 textAlign: "center",
               }}

@@ -23,9 +23,9 @@ export default function GraduationCap3DLoader() {
 
   // Golden color for PRO users, cyan for free users
   const isPro = user?.isPro;
-  const strokeColor = isPro ? "#FFD700" : "#06B6D4";
-  const fillColor = isPro ? "#FFD70022" : "#06B6D422";
-  const fillColor2 = isPro ? "#FFD70033" : "#06B6D433";
+  const strokeColor = isPro ? "#FFD700" : "#8A5CE6";
+  const fillColor = isPro ? "#FFD70022" : "#8A5CE622";
+  const fillColor2 = isPro ? "#FFD70033" : "#8A5CE633";
 
   useEffect(() => {
     progress.value = withRepeat(
@@ -62,7 +62,7 @@ export default function GraduationCap3DLoader() {
         flex: 1,
         alignItems: "center",
         justifyContent: "center",
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
       }}
     >
       <Svg width={140} height={120} viewBox="0 0 140 120">

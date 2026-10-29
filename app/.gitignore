@@ -41,3 +41,6 @@ app-example
 
 ios/
 android/
+# local env files
+.env
+.env*.local

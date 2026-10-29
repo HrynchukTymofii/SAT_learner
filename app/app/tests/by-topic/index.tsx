@@ -83,12 +83,12 @@ export default function TestsByTopicScreen() {
   }
 
   const getProgressColor = (p: number) => {
-    if (p >= 90) return "#10B981"; // Green
-    if (p >= 70) return "#EAB308"; // Yellow
-    if (p >= 50) return "#8B5CF6"; // Purple
-    if (p >= 30) return "#06B6D4"; // Blue/Cyan
-    if (p >= 10) return "#EF4444"; // Red
-    return "#6B7280"; // Neutral gray
+    if (p >= 90) return "#2E9A5E"; // Green
+    if (p >= 70) return "#E5A50A"; // Yellow
+    if (p >= 50) return "#8A5CE6"; // Purple
+    if (p >= 30) return "#8A5CE6"; // Blue/Cyan
+    if (p >= 10) return "#D93F55"; // Red
+    return "#7E7889"; // Neutral gray
   };
 
   const clearSearch = () => {
@@ -105,15 +105,15 @@ export default function TestsByTopicScreen() {
     
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View style={{
         paddingTop: insets.top + 12,
         paddingBottom: 16,
         paddingHorizontal: 16,
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+        borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
       }}>
         {/* Back Button */}
         <TouchableOpacity
@@ -125,22 +125,22 @@ export default function TestsByTopicScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
-          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
+          <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
             Back
           </Text>
         </TouchableOpacity>
 
         {/* Title */}
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 8 }}>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 8 }}>
           Practice by Topic
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280", marginBottom: 16 }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577", marginBottom: 16 }}>
           Focus on specific topics to improve your skills
         </Text>
 
@@ -148,21 +148,21 @@ export default function TestsByTopicScreen() {
         <View style={{
           flexDirection: "row",
           alignItems: "center",
-          backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+          backgroundColor: isDark ? "#17151C" : "#EFEAF7",
           borderRadius: 12,
           paddingHorizontal: 16,
           paddingVertical: 6,
         }}>
-          <Search size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+          <Search size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
           <TextInput
             style={{
               flex: 1,
               marginLeft: 12,
               fontSize: 16,
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
             }}
             placeholder="Search topics..."
-            placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
             value={search}
             onChangeText={setSearch}
           />
@@ -172,7 +172,7 @@ export default function TestsByTopicScreen() {
               onPress={clearSearch}
               style={{ marginLeft: 8 }}
             >
-              <X size={20} color={isDark ? "#9ca3af" : "#6b7280"} />
+              <X size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
             </TouchableOpacity>
           )}
         </View>
@@ -195,7 +195,7 @@ export default function TestsByTopicScreen() {
                 activeOpacity={0.7}
                 style={{
                   marginBottom: 16,
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  backgroundColor: isDark ? "#17151C" : "#ffffff",
                   borderRadius: 16,
                   padding: 16,
                   borderLeftWidth: 4,
@@ -211,15 +211,15 @@ export default function TestsByTopicScreen() {
                 <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 12 }}>
                   <View style={{ flex: 1, flexDirection: "row", alignItems: "center" }}>
                     {quiz.progress > 0 ? (
-                      <BookCheck size={24} color={isDark ? "#06B6D4" : "#0891B2"} style={{ marginRight: 12 }} />
+                      <BookCheck size={24} color={isDark ? "#C9AAFB" : "#7A4BDB"} style={{ marginRight: 12 }} />
                     ) : (
-                      <Book size={24} color={isDark ? "#9ca3af" : "#6b7280"} style={{ marginRight: 12 }} />
+                      <Book size={24} color={isDark ? "#9C95A8" : "#6B6577"} style={{ marginRight: 12 }} />
                     )}
                     <Text
                       style={{
                         fontSize: 16,
                         fontWeight: "bold",
-                        color: isDark ? "#ffffff" : "#1f2937",
+                        color: isDark ? "#F4F1F8" : "#0B0A0F",
                         flex: 1,
                       }}
                       numberOfLines={2}
@@ -228,7 +228,7 @@ export default function TestsByTopicScreen() {
                     </Text>
                   </View>
                   <View style={{ marginLeft: 8, flexDirection: "row", alignItems: "center" }}>
-                    {isLocked && <Lock size={16} color="#2563eb" style={{ marginRight: 8 }} />}
+                    {isLocked && <Lock size={16} color="#8A5CE6" style={{ marginRight: 8 }} />}
                     <Text style={{ fontSize: 18, fontWeight: "bold", color: progressColor }}>
                       {quiz.progress}%
                     </Text>
@@ -236,7 +236,7 @@ export default function TestsByTopicScreen() {
                 </View>
 
                 {/* Stats */}
-                <Text style={{ fontSize: 14, color: isDark ? "#94a3b8" : "#6b7280" }}>
+                <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
                   {quiz.questionCount} questions
                   {quiz.attemptCount > 0 && ` · ${quiz.attemptCount} attempt${quiz.attemptCount > 1 ? 's' : ''}`}
                 </Text>
@@ -245,8 +245,8 @@ export default function TestsByTopicScreen() {
           })
         ) : (
           <View style={{ alignItems: "center", justifyContent: "center", marginTop: 48 }}>
-            <Book size={40} color={isDark ? "#9ca3af" : "#6b7280"} />
-            <Text style={{ fontSize: 16, color: isDark ? "#9ca3af" : "#6b7280", marginTop: 8, textAlign: "center" }}>
+            <Book size={40} color={isDark ? "#9C95A8" : "#6B6577"} />
+            <Text style={{ fontSize: 16, color: isDark ? "#9C95A8" : "#6B6577", marginTop: 8, textAlign: "center" }}>
               {search ? `No topics found matching "${search}"` : "No available topics"}
             </Text>
           </View>

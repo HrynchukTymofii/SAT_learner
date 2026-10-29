@@ -1,11 +1,11 @@
 export default function TermsOfService() {
   return (
-    <div className="mx-auto max-w-4xl px-4 py-8 text-gray-900">
+    <div className="mx-auto max-w-4xl px-4 py-8 text-foreground">
       <div className="mb-6">
         <h1 className="mb-2 text-3xl font-bold">
           Terms of Service (Terms of Use)
         </h1>
-        <p className="text-sm text-gray-500">
+        <p className="text-sm text-muted-foreground">
           <strong>Last updated:</strong> 16.12.2025
         </p>
       </div>

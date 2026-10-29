@@ -303,11 +303,11 @@ export default function RegisterScreen() {
           <View className="mb-4">
             <Text className="text-gray-700 mb-2 font-medium">Email</Text>
             <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-              <Mail size={20} color="#6B7280" />
+              <Mail size={20} color="#7E7889" />
               <TextInput
                 className="flex-1 ml-3 text-gray-900"
                 placeholder="andrew.ainsley@yourdomain.com"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#9C95A8"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -321,11 +321,11 @@ export default function RegisterScreen() {
           <View className="mb-6">
             <Text className="text-gray-700 mb-2 font-medium">Password</Text>
             <View className="flex-row items-center bg-gray-50 border border-gray-200 rounded-xl px-4 py-3">
-              <Lock size={20} color="#6B7280" />
+              <Lock size={20} color="#7E7889" />
               <TextInput
                 className="flex-1 ml-3 text-gray-900"
                 placeholder="••••••••••••"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#9C95A8"
                 secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
@@ -335,9 +335,9 @@ export default function RegisterScreen() {
                 activeOpacity={0.7}
               >
                 {showPassword ? (
-                  <EyeOff size={20} color="#6B7280" />
+                  <EyeOff size={20} color="#7E7889" />
                 ) : (
-                  <Eye size={20} color="#6B7280" />
+                  <Eye size={20} color="#7E7889" />
                 )}
               </TouchableOpacity>
             </View>
@@ -398,7 +398,7 @@ export default function RegisterScreen() {
               className="w-20 h-20 rounded-full border border-gray-200 items-center justify-center bg-white"
             >
               {googleLoading ? (
-                <ActivityIndicator size="small" color="#06B6D4" />
+                <ActivityIndicator size="small" color="#8A5CE6" />
               ) : (
                 <Image
                   source={require("@/assets/images/google-logo.webp")}

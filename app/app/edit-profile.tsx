@@ -96,15 +96,15 @@ export default function EditProfileScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View style={{
         paddingTop: insets.top + 12,
         paddingBottom: 16,
         paddingHorizontal: 16,
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+        borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
       }}>
         {/* Back Button */}
         <TouchableOpacity
@@ -116,22 +116,22 @@ export default function EditProfileScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
-          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
+          <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
             Back
           </Text>
         </TouchableOpacity>
 
         {/* Title */}
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 4 }}>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 4 }}>
           Edit Profile
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           Update your account information
         </Text>
       </View>
@@ -147,7 +147,7 @@ export default function EditProfileScreen() {
               style={{
                 fontSize: 16,
                 fontWeight: "600",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 marginBottom: 8,
               }}
             >
@@ -161,16 +161,16 @@ export default function EditProfileScreen() {
                 value={answers[step.key]}
                 onChangeText={(text) => handleAnswer(step.key, text)}
                 style={{
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
-                  color: isDark ? "#ffffff" : "#1f2937",
-                  borderColor: isDark ? "#334155" : "#e5e7eb",
+                  backgroundColor: isDark ? "#17151C" : "#ffffff",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
+                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
                   borderWidth: 1,
                   borderRadius: 12,
                   paddingHorizontal: 16,
                   paddingVertical: 12,
                   fontSize: 16,
                 }}
-                placeholderTextColor={isDark ? "#6b7280" : "#9ca3af"}
+                placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
               />
             )}
 
@@ -178,11 +178,11 @@ export default function EditProfileScreen() {
             {step.type === "select" && (
               <View
                 style={{
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  backgroundColor: isDark ? "#17151C" : "#ffffff",
                   borderRadius: 12,
                   padding: 12,
                   borderWidth: 1,
-                  borderColor: isDark ? "#334155" : "#e5e7eb",
+                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 }}
               >
                 {step.options?.map((option) => (
@@ -195,7 +195,7 @@ export default function EditProfileScreen() {
                       marginBottom: 8,
                       backgroundColor:
                         answers[step.key] === option
-                          ? "#06B6D4"
+                          ? "#8A5CE6"
                           : "transparent",
                     }}
                     onPress={() => handleAnswer(step.key, option)}
@@ -204,7 +204,7 @@ export default function EditProfileScreen() {
                     <Text
                       style={{
                         color:
-                          answers[step.key] === option ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                          answers[step.key] === option ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
                         fontWeight: answers[step.key] === option ? "600" : "400",
                       }}
                     >
@@ -225,8 +225,8 @@ export default function EditProfileScreen() {
                       padding: 16,
                       borderRadius: 16,
                       borderWidth: 3,
-                      borderColor: answers[step.key] === emoji ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
-                      backgroundColor: answers[step.key] === emoji ? "#06B6D410" : (isDark ? "#1e293b" : "#ffffff"),
+                      borderColor: answers[step.key] === emoji ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
+                      backgroundColor: answers[step.key] === emoji ? "#8A5CE610" : (isDark ? "#17151C" : "#ffffff"),
                     }}
                     onPress={() => handleAnswer(step.key, emoji)}
                     activeOpacity={0.7}
@@ -243,16 +243,16 @@ export default function EditProfileScreen() {
                 <TouchableOpacity
                   onPress={() => setShowDatePicker(true)}
                   style={{
-                    backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                    backgroundColor: isDark ? "#17151C" : "#ffffff",
                     borderWidth: 1,
-                    borderColor: isDark ? "#334155" : "#e5e7eb",
+                    borderColor: isDark ? "#2B2733" : "#E5DFEE",
                     padding: 16,
                     borderRadius: 12,
                   }}
                   activeOpacity={0.7}
                 >
                   <Text style={{
-                    color: answers[step.key] ? (isDark ? "#ffffff" : "#1f2937") : (isDark ? "#6b7280" : "#9ca3af"),
+                    color: answers[step.key] ? (isDark ? "#F4F1F8" : "#0B0A0F") : (isDark ? "#7E7889" : "#9C95A8"),
                     fontSize: 16,
                   }}>
                     {answers[step.key]
@@ -290,15 +290,15 @@ export default function EditProfileScreen() {
                       paddingHorizontal: 16,
                       paddingVertical: 8,
                       borderRadius: 20,
-                      backgroundColor: answers[step.key] === p ? "#06B6D4" : (isDark ? "#1e293b" : "#ffffff"),
+                      backgroundColor: answers[step.key] === p ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
                       borderWidth: 1,
-                      borderColor: answers[step.key] === p ? "#06B6D4" : (isDark ? "#334155" : "#e5e7eb"),
+                      borderColor: answers[step.key] === p ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
                     }}
                     activeOpacity={0.7}
                   >
                     <Text
                       style={{
-                        color: answers[step.key] === p ? "#ffffff" : (isDark ? "#ffffff" : "#1f2937"),
+                        color: answers[step.key] === p ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
                         fontWeight: answers[step.key] === p ? "600" : "400",
                       }}
                     >
@@ -315,7 +315,7 @@ export default function EditProfileScreen() {
         <TouchableOpacity
           onPress={handleSave}
           style={{
-            backgroundColor: "#06B6D4",
+            backgroundColor: "#8A5CE6",
             borderRadius: 12,
             paddingVertical: 16,
             alignItems: "center",

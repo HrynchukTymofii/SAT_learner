@@ -54,7 +54,7 @@ const AllTasksDialog = ({
       >
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 20,
             padding: 24,
             width: "100%",
@@ -76,14 +76,14 @@ const AllTasksDialog = ({
               marginBottom: 20,
               paddingBottom: 16,
               borderBottomWidth: 1,
-              borderBottomColor: isDark ? "#334155" : "#e5e7eb",
+              borderBottomColor: isDark ? "#2B2733" : "#E5DFEE",
             }}
           >
             <Text
               style={{
                 fontSize: 22,
                 fontWeight: "800",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
               }}
             >
               All Questions
@@ -91,12 +91,12 @@ const AllTasksDialog = ({
             <TouchableOpacity
               onPress={onClose}
               style={{
-                backgroundColor: isDark ? "#334155" : "#f3f4f6",
+                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
                 borderRadius: 10,
                 padding: 8,
               }}
             >
-              <X size={24} color={isDark ? "#ffffff" : "#1f2937"} />
+              <X size={24} color={isDark ? "#F4F1F8" : "#0B0A0F"} />
             </TouchableOpacity>
           </View>
 
@@ -110,11 +110,11 @@ const AllTasksDialog = ({
             }}
           >
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <CheckCircle size={16} color="#22c55e" />
+              <CheckCircle size={16} color="#2E9A5E" />
               <Text
                 style={{
                   fontSize: 12,
-                  color: isDark ? "#94a3b8" : "#64748b",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   fontWeight: "600",
                 }}
               >
@@ -122,11 +122,11 @@ const AllTasksDialog = ({
               </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <XCircle size={16} color="#ef4444" />
+              <XCircle size={16} color="#D93F55" />
               <Text
                 style={{
                   fontSize: 12,
-                  color: isDark ? "#94a3b8" : "#64748b",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   fontWeight: "600",
                 }}
               >
@@ -134,11 +134,11 @@ const AllTasksDialog = ({
               </Text>
             </View>
             <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-              <Circle size={16} color={isDark ? "#64748b" : "#94a3b8"} />
+              <Circle size={16} color={isDark ? "#7E7889" : "#9C95A8"} />
               <Text
                 style={{
                   fontSize: 12,
-                  color: isDark ? "#94a3b8" : "#64748b",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   fontWeight: "600",
                 }}
               >
@@ -168,21 +168,21 @@ const AllTasksDialog = ({
                 let bgColor, borderColor, icon;
 
                 if (isCurrent) {
-                  bgColor = isDark ? "#1e40af" : "#dbeafe";
-                  borderColor = "#3b82f6";
+                  bgColor = isDark ? "#1e40af" : "#E4CDFF";
+                  borderColor = "#8A5CE6";
                 } else if (isAnswered) {
                   if (isCorrect) {
                     bgColor = isDark ? "#14532d" : "#dcfce7";
-                    borderColor = "#22c55e";
-                    icon = <CheckCircle size={16} color="#22c55e" />;
+                    borderColor = "#2E9A5E";
+                    icon = <CheckCircle size={16} color="#2E9A5E" />;
                   } else {
                     bgColor = isDark ? "#450a0a" : "#fee2e2";
-                    borderColor = "#ef4444";
-                    icon = <XCircle size={16} color="#ef4444" />;
+                    borderColor = "#D93F55";
+                    icon = <XCircle size={16} color="#D93F55" />;
                   }
                 } else {
-                  bgColor = isDark ? "#1e293b" : "#ffffff";
-                  borderColor = isDark ? "#475569" : "#cbd5e1";
+                  bgColor = isDark ? "#17151C" : "#ffffff";
+                  borderColor = isDark ? "#3A3542" : "#D9D2E5";
                 }
 
                 return (
@@ -212,10 +212,10 @@ const AllTasksDialog = ({
                         fontSize: 16,
                         fontWeight: "700",
                         color: isCurrent
-                          ? "#3b82f6"
+                          ? "#8A5CE6"
                           : isDark
-                          ? "#ffffff"
-                          : "#1f2937",
+                          ? "#F4F1F8"
+                          : "#0B0A0F",
                       }}
                     >
                       {index + 1}
@@ -250,7 +250,7 @@ const AllTasksDialog = ({
                             width: 6,
                             height: 6,
                             borderRadius: 3,
-                            backgroundColor: "#3b82f6",
+                            backgroundColor: "#8A5CE6",
                           }}
                         />
                       </View>
@@ -267,7 +267,7 @@ const AllTasksDialog = ({
               marginTop: 16,
               paddingTop: 16,
               borderTopWidth: 1,
-              borderTopColor: isDark ? "#334155" : "#e5e7eb",
+              borderTopColor: isDark ? "#2B2733" : "#E5DFEE",
               flexDirection: "row",
               justifyContent: "space-around",
             }}
@@ -277,7 +277,7 @@ const AllTasksDialog = ({
                 style={{
                   fontSize: 24,
                   fontWeight: "800",
-                  color: isDark ? "#ffffff" : "#1f2937",
+                  color: isDark ? "#F4F1F8" : "#0B0A0F",
                 }}
               >
                 {Object.keys(answeredQuestions).length}
@@ -285,7 +285,7 @@ const AllTasksDialog = ({
               <Text
                 style={{
                   fontSize: 12,
-                  color: isDark ? "#94a3b8" : "#64748b",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   marginTop: 2,
                 }}
               >
@@ -297,7 +297,7 @@ const AllTasksDialog = ({
                 style={{
                   fontSize: 24,
                   fontWeight: "800",
-                  color: "#22c55e",
+                  color: "#2E9A5E",
                 }}
               >
                 {
@@ -308,7 +308,7 @@ const AllTasksDialog = ({
               <Text
                 style={{
                   fontSize: 12,
-                  color: isDark ? "#94a3b8" : "#64748b",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   marginTop: 2,
                 }}
               >
@@ -320,7 +320,7 @@ const AllTasksDialog = ({
                 style={{
                   fontSize: 24,
                   fontWeight: "800",
-                  color: "#ef4444",
+                  color: "#D93F55",
                 }}
               >
                 {
@@ -331,7 +331,7 @@ const AllTasksDialog = ({
               <Text
                 style={{
                   fontSize: 12,
-                  color: isDark ? "#94a3b8" : "#64748b",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   marginTop: 2,
                 }}
               >

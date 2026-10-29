@@ -2,8 +2,9 @@ import {
   DarkTheme,
   DefaultTheme,
   ThemeProvider,
-} from "@react-navigation/native";
+} from "expo-router/react-navigation";
 import { useFonts } from "expo-font";
+import { Outfit_600SemiBold, Outfit_700Bold } from "@expo-google-fonts/outfit";
 import { Redirect, Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
@@ -11,6 +12,7 @@ import "../global.css";
 import Toast from "react-native-toast-message";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { TourProvider } from "@/context/TourContext";
+import RatePromptSheet from "@/components/modals/RatePromptSheet";
 import { ThemeProvider as CustomThemeProvider } from "@/context/ThemeContext";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as SecureStore from "expo-secure-store";
@@ -25,7 +27,7 @@ import {
 import Purchases, { LOG_LEVEL } from "react-native-purchases";
 import { AppState, Platform, useColorScheme } from "react-native";
 import { useLoadUserInBackground } from "@/lib/user";
-import { processOfflineQueue } from "@/lib/offlineQueue";
+import { getUserSession } from "@/lib/session";
 import { upgradeToPro, removePro } from "@/lib/api/user";
 import { scheduleDailyStudyReminder } from "@/lib/notifications";
 
@@ -35,12 +37,31 @@ configureReanimatedLogger({
 });
 
 function AppSyncWrapper({ children }: { children: React.ReactNode }) {
-  const { token, user, setUser } = useAuth();
+  const { token, setToken, user, setUser } = useAuth();
   const [isOffline, setIsOffline] = useState(false);
   const { loadUserInBackground } = useLoadUserInBackground();
 
+  // The AppState listener keeps the syncIfOnline from the render it was created in,
+  // so read the latest user through a ref instead of the closure
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+  }, [user]);
+
+  // Configure RevenueCat before the first sync touches it (effects run in order)
+  useEffect(() => {
+    Purchases.setLogLevel(__DEV__ ? LOG_LEVEL.VERBOSE : LOG_LEVEL.WARN);
+
+    if (Platform.OS === "ios") {
+      Purchases.configure({ apiKey: "appl_plYVBUscFYEJQnxkmHBsnMRhbIa" });
+    } else if (Platform.OS === "android") {
+      Purchases.configure({ apiKey: "goog_RDVEiwhMsfMcTDNFxFdGkPiMLes" });
+    }
+  }, []);
+
   const syncIfOnline = async () => {
     if (!token) return;
+    const startedSession = getUserSession();
 
     try {
       const networkState = await Network.getNetworkStateAsync();
@@ -50,75 +71,51 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
       }
 
       setIsOffline(false);
-      await loadUserInBackground({ token, setUser });
-      await processOfflineQueue(token);
+      const { tokenValid, user: freshUser } = await loadUserInBackground({ token, setUser, setToken });
+      if (!tokenValid) return;
 
-      if (user) {
+      // Prefer the user just loaded from the server; fall back to the latest local one
+      const currentUser = freshUser ?? userRef.current;
+
+      if (currentUser) {
         try {
-          // Get RevenueCat customer info
+          // Logged out meanwhile: don't bring the old user back with setUser
+          const loggedOut = () => startedSession !== getUserSession();
+
+          // If RevenueCat login failed we'd be looking at the anonymous user
+          // (no entitlements) and would wrongly remove PRO
+          if (await Purchases.isAnonymous()) return;
+
+          // Get fresh info from RevenueCat, not the cached one
+          await Purchases.invalidateCustomerInfoCache();
           const customerInfo = await Purchases.getCustomerInfo();
 
-          // Check for yearly PRO
-          const proForYear = customerInfo.entitlements.all["PRO Yearly"];
+          // RevenueCat decides what is active (handles expiry, renewals, trials, grace periods, refunds)
+          const active = customerInfo.entitlements.active;
 
-          // Check for monthly PRO
-          const proForMonth = customerInfo.entitlements.all["PRO Monthly"];
-
-          let shouldHavePro = false;
           let plan: string | null = null;
-
-          // Priority 1: Check for yearly PRO
-          if (proForYear && proForYear.latestPurchaseDate) {
-            const purchaseDate = new Date(proForYear.latestPurchaseDate);
-            const today = new Date();
-
-            // Calculate expiration: purchase date + 1 year + 1 day
-            const expirationDate = new Date(purchaseDate);
-            expirationDate.setFullYear(expirationDate.getFullYear() + 1);
-            expirationDate.setDate(expirationDate.getDate() + 1);
-
-            // Check if still valid
-            if (today < expirationDate) {
-              shouldHavePro = true;
-              plan = "PRO Yearly";
-            }
-          }
-          // Priority 2: Check for monthly PRO
-          else if (proForMonth && proForMonth.latestPurchaseDate) {
-            const purchaseDate = new Date(proForMonth.latestPurchaseDate);
-            const today = new Date();
-
-            // Calculate expiration: purchase date + 1 month + 1 day
-            const expirationDate = new Date(purchaseDate);
-            expirationDate.setMonth(expirationDate.getMonth() + 1);
-            expirationDate.setDate(expirationDate.getDate() + 1);
-
-            // Check if still valid
-            if (today < expirationDate) {
-              shouldHavePro = true;
-              plan = "PRO Monthly";
-            }
+          if (active["PRO Yearly"]) {
+            plan = "PRO Yearly";
+          } else if (active["PRO Monthly"]) {
+            plan = "PRO Monthly";
           }
 
           // Now sync with backend and local state
-          if (shouldHavePro && plan) {
+          if (plan) {
             // User should have PRO based on RevenueCat
-            if (!user.isPro) {
-              // Try to sync to backend
+            if (!currentUser.isPro) {
               const res = await upgradeToPro(token, plan);
 
-              if (res.success) {
-                setUser({ ...user, isPro: true });
-                //console.log("✅ User upgraded to PRO via RevenueCat sync");
+              if (res.success && !loggedOut()) {
+                setUser({ ...currentUser, isPro: true });
               } else {
                 console.warn("❌ Failed to sync PRO status:", res.error);
               }
             }
           } else {
             // User should NOT have PRO
-            if (user.isPro) {
-              //console.log("⚠️ PRO expired, removing access");
-              setUser({ ...user, isPro: false });
+            if (currentUser.isPro && !loggedOut()) {
+              setUser({ ...currentUser, isPro: false });
               await removePro(token);
             }
           }
@@ -148,16 +145,6 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
     return () => subscription.remove();
   }, [token]);
 
-  useEffect(() => {
-    Purchases.setLogLevel(LOG_LEVEL.VERBOSE);
-
-    if (Platform.OS === "ios") {
-      Purchases.configure({ apiKey: "appl_plYVBUscFYEJQnxkmHBsnMRhbIa" });
-    } else if (Platform.OS === "android") {
-      Purchases.configure({ apiKey: "goog_RDVEiwhMsfMcTDNFxFdGkPiMLes" });
-    }
-  }, []);
-
   // Setup daily study reminder notification
   useEffect(() => {
     const setupNotifications = async () => {
@@ -180,6 +167,8 @@ export default function RootLayout() {
   const router = useRouter();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Outfit_600SemiBold,
+    Outfit_700Bold,
   });
 
   const [onboardingDone, setOnboardingDone] = useState<boolean>(true);
@@ -251,6 +240,7 @@ export default function RootLayout() {
                     {/* Not found */}
                     <Stack.Screen name="+not-found" />
                   </Stack>
+                  <RatePromptSheet />
                   <Toast />
                   <StatusBar style="auto" />
                 </CustomThemeProvider>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Curriculum & Topic Drills — SAT Prep</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors">
+
+  <!-- TOP APP NAV -->
+  <header class="sticky top-0 z-40 bg-white/90 dark:bg-slate-900/90 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <!-- Logo -->
+      <a href="index.html" class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-xl bg-indigo-600 text-white flex items-center justify-center font-black text-sm">S</div>
+        <span class="font-bold text-base tracking-tight text-slate-900 dark:text-white">SAT<span class="text-indigo-600 dark:text-indigo-400">Learner</span></span>
+      </a>
+
+      <!-- Primary Nav -->
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600 dark:text-slate-300">
+        <a href="dashboard.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Dashboard</a>
+        <a href="course.html" class="text-indigo-600 dark:text-indigo-400 font-semibold flex items-center gap-1.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+          <span>Course Syllabus</span>
+        </a>
+        <a href="exam-runner.html" class="hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors">Mock Exams</a>
+      </nav>
+
+      <!-- User Profile & Actions -->
+      <div class="flex items-center gap-3">
+        <button onclick="toggleTheme()" class="p-2 rounded-lg text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"/></svg>
+        </button>
+
+        <a href="exam-runner.html" class="text-xs font-semibold px-3 py-2 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white transition-colors">
+          Practice Drill
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- SYLLABUS HEADER -->
+  <section class="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 py-8">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400 uppercase tracking-wider">Digital SAT Curriculum</span>
+          <h1 class="text-3xl font-extrabold text-slate-950 dark:text-white mt-1">Complete SAT Study Path</h1>
+          <p class="text-sm text-slate-600 dark:text-slate-400 mt-1 max-w-2xl">
+            18 comprehensive modules covering both Math and Reading & Writing. Master core concepts through concise lesson cards and targeted drill quizzes.
+          </p>
+        </div>
+
+        <!-- Filter Tabs -->
+        <div class="flex items-center gap-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl self-start">
+          <button onclick="filterDomain('all')" class="domain-tab px-3.5 py-1.5 rounded-lg text-xs font-bold bg-white dark:bg-slate-900 text-slate-900 dark:text-white shadow-sm">All</button>
+          <button onclick="filterDomain('math')" class="domain-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Math Only</button>
+          <button onclick="filterDomain('rw')" class="domain-tab px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">Reading & Writing</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CHAPTERS & LESSONS LIST -->
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6">
+
+    <!-- CHAPTER 1: Heart of Algebra -->
+    <div class="chapter-card domain-math bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div onclick="toggleChapter(1)" class="p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950 text-indigo-600 dark:text-indigo-400 font-extrabold text-sm flex items-center justify-center font-mono">
+            01
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">Math Domain 1</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">88% Mastered</span>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white mt-0.5">Heart of Algebra: Linear Equations & Systems</h2>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-slate-500 hidden sm:inline">4 Lessons &bull; 2 Quizzes</span>
+          <svg id="chevron-1" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+      </div>
+
+      <!-- Lessons Drawer -->
+      <div id="drawer-1" class="border-t border-slate-100 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+        <!-- Lesson 1 -->
+        <a href="exam-runner.html" class="p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">&check;</span>
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">1.1 Solving Linear Equations in One Variable</span>
+          </div>
+          <span class="text-xs text-slate-400 font-mono">10 min &bull; Completed</span>
+        </a>
+
+        <!-- Lesson 2 -->
+        <a href="exam-runner.html" class="p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">&check;</span>
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">1.2 Linear Inequalities & Graphing Solutions</span>
+          </div>
+          <span class="text-xs text-slate-400 font-mono">12 min &bull; Completed</span>
+        </a>
+
+        <!-- Quiz Drill -->
+        <a href="exam-runner.html" class="p-4 sm:px-6 bg-indigo-50/40 dark:bg-indigo-950/20 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 transition-colors flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] font-bold">&starf;</span>
+            <span class="text-sm font-bold text-indigo-700 dark:text-indigo-300">Drill: Heart of Algebra Practice Quiz</span>
+          </div>
+          <span class="text-xs font-semibold text-indigo-600 dark:text-indigo-400">10 Questions &bull; Start Drill &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- CHAPTER 2: Advanced Math -->
+    <div class="chapter-card domain-math bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div onclick="toggleChapter(2)" class="p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-violet-100 dark:bg-violet-950 text-violet-600 dark:text-violet-400 font-extrabold text-sm flex items-center justify-center font-mono">
+            02
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-violet-600 dark:text-violet-400">Math Domain 2</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">62% In Progress</span>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white mt-0.5">Passport to Advanced Math: Quadratics & Polynomials</h2>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-slate-500 hidden sm:inline">5 Lessons &bull; 3 Quizzes</span>
+          <svg id="chevron-2" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+      </div>
+
+      <div id="drawer-2" class="border-t border-slate-100 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+        <a href="exam-runner.html" class="p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">&check;</span>
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200">2.1 Quadratic Equations & Vertex Form</span>
+          </div>
+          <span class="text-xs text-slate-400 font-mono">15 min &bull; Completed</span>
+        </a>
+
+        <a href="exam-runner.html" class="p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full border border-slate-300 dark:border-slate-700 flex items-center justify-center text-[10px] text-slate-400">&bull;</span>
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200">2.2 Rational Expressions & Asymptotes</span>
+          </div>
+          <span class="text-xs text-indigo-600 font-semibold">Start &rarr;</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- CHAPTER 3: Reading & Writing Conventions -->
+    <div class="chapter-card domain-rw bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+      <div onclick="toggleChapter(3)" class="p-6 cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-800/40 transition-colors flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 font-extrabold text-sm flex items-center justify-center font-mono">
+            03
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400">RW Domain 1</span>
+              <span class="text-[10px] font-bold px-2 py-0.5 rounded bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">92% Mastered</span>
+            </div>
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white mt-0.5">Standard English Conventions: Grammar & Punctuation Rules</h2>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <span class="text-xs text-slate-500 hidden sm:inline">6 Lessons &bull; 2 Quizzes</span>
+          <svg id="chevron-3" class="w-5 h-5 text-slate-400 transform transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+        </div>
+      </div>
+
+      <div id="drawer-3" class="border-t border-slate-100 dark:border-slate-800 divide-y divide-slate-100 dark:divide-slate-800">
+        <a href="exam-runner.html" class="p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">&check;</span>
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200">3.1 Semicolons, Colons, and Dashes on Digital SAT</span>
+          </div>
+          <span class="text-xs text-slate-400 font-mono">10 min &bull; Completed</span>
+        </a>
+
+        <a href="exam-runner.html" class="p-4 sm:px-6 hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors flex items-center justify-between group">
+          <div class="flex items-center gap-3">
+            <span class="w-5 h-5 rounded-full bg-emerald-500 text-white flex items-center justify-center text-[10px] font-bold">&check;</span>
+            <span class="text-sm font-medium text-slate-800 dark:text-slate-200">3.2 Dangling Modifiers & Parallel Structure</span>
+          </div>
+          <span class="text-xs text-slate-400 font-mono">12 min &bull; Completed</span>
+        </a>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    function toggleChapter(id) {
+      const drawer = document.getElementById(`drawer-${id}`);
+      const chevron = document.getElementById(`chevron-${id}`);
+      drawer.classList.toggle('hidden');
+      chevron.classList.toggle('rotate-180');
+    }
+
+    function filterDomain(type) {
+      document.querySelectorAll('.domain-tab').forEach(t => {
+        t.classList.remove('bg-white', 'dark:bg-slate-900', 'text-slate-900', 'dark:text-white', 'shadow-sm');
+        t.classList.add('text-slate-600', 'dark:text-slate-400');
+      });
+      event.target.classList.add('bg-white', 'dark:bg-slate-900', 'text-slate-900', 'dark:text-white', 'shadow-sm');
+
+      document.querySelectorAll('.chapter-card').forEach(card => {
+        if (type === 'all') {
+          card.classList.remove('hidden');
+        } else if (type === 'math') {
+          card.classList.toggle('hidden', !card.classList.contains('domain-math'));
+        } else if (type === 'rw') {
+          card.classList.toggle('hidden', !card.classList.contains('domain-rw'));
+        }
+      });
+    }
+
+    function toggleTheme() {
+      document.documentElement.classList.toggle('dark');
+    }
+  </script>
+</body>
+</html>

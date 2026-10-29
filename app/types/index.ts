@@ -35,6 +35,8 @@ export interface QuizQuestion {
 
 export interface Question {
   id: string;
+  // Set on the "all wrong answers" page, where questions come from many quizzes
+  quizId?: string;
   question: string;
   questionType?: string;
   imageHeight: number;

@@ -255,11 +255,11 @@ export default function AuthScreen() {
         const errData = await loginRes.json().catch(() => ({}));
         const errText = errData.error || "Unknown error";
 
-        if (errText === "User not found") {
+        if (loginRes.status === 401) {
           Toast.show({
             type: "error",
-            text1: "User not found",
-            text2: "Please check your email or register first",
+            text1: "Invalid email or password",
+            text2: "Check your details or register first",
           });
         } else {
           Toast.show({
@@ -335,7 +335,7 @@ export default function AuthScreen() {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#ffffff" }}
+      style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#ffffff" }}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -349,18 +349,18 @@ export default function AuthScreen() {
             activeOpacity={0.7}
             style={{ marginBottom: 24 }}
           >
-            <ArrowLeft size={24} color="#06B6D4" />
+            <ArrowLeft size={24} color="#8A5CE6" />
           </TouchableOpacity>
 
           <Text style={{
             fontSize: 36,
             fontWeight: "bold",
-            color: isDark ? "#ffffff" : "#111827"
+            color: isDark ? "#F4F1F8" : "#0B0A0F"
           }}>
             {mode === "login" ? "Welcome Back! 👋" : "Start Your Journey ✨"}
           </Text>
           <Text style={{
-            color: isDark ? "#d1d5db" : "#4b5563",
+            color: isDark ? "#CFC9DA" : "#4F4A5A",
             marginTop: 12,
             paddingRight: 24,
             lineHeight: 24
@@ -376,25 +376,25 @@ export default function AuthScreen() {
           {/* Email Input */}
           <View style={{ marginBottom: 16 }}>
             <Text style={{
-              color: isDark ? "#d1d5db" : "#374151",
+              color: isDark ? "#CFC9DA" : "#2E2A35",
               marginBottom: 8,
               fontWeight: "500"
             }}>Email</Text>
             <View style={{
               flexDirection: "row",
               alignItems: "center",
-              backgroundColor: isDark ? "#1f2937" : "#f9fafb",
+              backgroundColor: isDark ? "#17151C" : "#F4F1F9",
               borderWidth: 1,
-              borderColor: isDark ? "#374155" : "#e5e7eb",
+              borderColor: isDark ? "#2B2733" : "#E5DFEE",
               borderRadius: 12,
               paddingHorizontal: 16,
               paddingVertical: Platform.OS === 'ios' ? 16 : 8
             }}>
-              <Mail size={20} color="#06B6D4" />
+              <Mail size={20} color="#8A5CE6" />
               <TextInput
-                style={{ flex: 1, marginLeft: 12, color: isDark ? "#ffffff" : "#111827" }}
+                style={{ flex: 1, marginLeft: 12, color: isDark ? "#F4F1F8" : "#0B0A0F" }}
                 placeholder="Your email"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#9C95A8"
                 value={email}
                 onChangeText={setEmail}
                 keyboardType="email-address"
@@ -407,25 +407,25 @@ export default function AuthScreen() {
           {/* Password Input */}
           <View style={{ marginBottom: 16 }}>
             <Text style={{
-              color: isDark ? "#d1d5db" : "#374151",
+              color: isDark ? "#CFC9DA" : "#2E2A35",
               marginBottom: 8,
               fontWeight: "500"
             }}>Password</Text>
             <View style={{
               flexDirection: "row",
               alignItems: "center",
-              backgroundColor: isDark ? "#1f2937" : "#f9fafb",
+              backgroundColor: isDark ? "#17151C" : "#F4F1F9",
               borderWidth: 1,
-              borderColor: isDark ? "#374155" : "#e5e7eb",
+              borderColor: isDark ? "#2B2733" : "#E5DFEE",
               borderRadius: 12,
               paddingHorizontal: 16,
               paddingVertical: Platform.OS === 'ios' ? 16 : 8
             }}>
-              <Lock size={20} color="#06B6D4" />
+              <Lock size={20} color="#8A5CE6" />
               <TextInput
-                style={{ flex: 1, marginLeft: 12, color: isDark ? "#ffffff" : "#111827" }}
+                style={{ flex: 1, marginLeft: 12, color: isDark ? "#F4F1F8" : "#0B0A0F" }}
                 placeholder="Your password"
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor="#9C95A8"
                 secureTextEntry={!showPassword}
                 value={password}
                 onChangeText={setPassword}
@@ -435,9 +435,9 @@ export default function AuthScreen() {
                 activeOpacity={0.7}
               >
                 {showPassword ? (
-                  <EyeOff size={20} color="#06B6D4" />
+                  <EyeOff size={20} color="#8A5CE6" />
                 ) : (
-                  <Eye size={20} color="#06B6D4" />
+                  <Eye size={20} color="#8A5CE6" />
                 )}
               </TouchableOpacity>
             </View>
@@ -472,8 +472,8 @@ export default function AuthScreen() {
                     height: 20,
                     borderRadius: 4,
                     borderWidth: 2,
-                    borderColor: agreeToTerms ? "#06B6D4" : (isDark ? "#4b5563" : "#d1d5db"),
-                    backgroundColor: agreeToTerms ? "#06B6D4" : (isDark ? "#1f2937" : "#ffffff"),
+                    borderColor: agreeToTerms ? "#8A5CE6" : (isDark ? "#3A3542" : "#D9D2E5"),
+                    backgroundColor: agreeToTerms ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
                     alignItems: "center",
                     justifyContent: "center"
                   }}
@@ -481,10 +481,10 @@ export default function AuthScreen() {
                   {agreeToTerms && <Text style={{ color: "#ffffff", fontSize: 12 }}>✓</Text>}
                 </View>
               </TouchableOpacity>
-              <Text style={{ flex: 1, color: isDark ? "#d1d5db" : "#374151", fontSize: 14 }}>
+              <Text style={{ flex: 1, color: isDark ? "#CFC9DA" : "#2E2A35", fontSize: 14 }}>
                 I agree to SAT Math Learner{" "}
                 <Text
-                  style={{ color: isDark ? "#22d3ee" : "#06B6D4", fontWeight: "500" }}
+                  style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "500" }}
                   onPress={() => Linking.openURL("https://www.satlearner.com/terms-of-service")}
                 >
                   Terms & Conditions
@@ -500,7 +500,7 @@ export default function AuthScreen() {
             disabled={loading}
             activeOpacity={0.8}
             style={{
-              backgroundColor: "#06B6D4",
+              backgroundColor: "#8A5CE6",
               borderRadius: 24,
               paddingVertical: 16,
               alignItems: "center",
@@ -519,9 +519,9 @@ export default function AuthScreen() {
 
           {/* Divider */}
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24 }}>
-            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#374155" : "#e5e7eb" }} />
-            <Text style={{ marginHorizontal: 16, color: isDark ? "#9ca3af" : "#6b7280" }}>or continue with</Text>
-            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#374155" : "#e5e7eb" }} />
+            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#2B2733" : "#E5DFEE" }} />
+            <Text style={{ marginHorizontal: 16, color: isDark ? "#9C95A8" : "#6B6577" }}>or continue with</Text>
+            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#2B2733" : "#E5DFEE" }} />
           </View>
 
           {/* Social Login Buttons */}
@@ -535,14 +535,14 @@ export default function AuthScreen() {
                 height: 64,
                 borderRadius: 48,
                 borderWidth: 1,
-                borderColor: isDark ? "#374155" : "#e5e7eb",
+                borderColor: isDark ? "#2B2733" : "#E5DFEE",
                 alignItems: "center",
                 justifyContent: "center",
-                backgroundColor: isDark ? "#1f2937" : "#ffffff"
+                backgroundColor: isDark ? "#17151C" : "#ffffff"
               }}
             >
               {googleLoading ? (
-                <ActivityIndicator size="small" color="#06B6D4" />
+                <ActivityIndicator size="small" color="#8A5CE6" />
               ) : (
                 <Image
                   source={require("@/assets/images/google-logo.webp")}
@@ -568,10 +568,10 @@ export default function AuthScreen() {
                   height: 64,
                   borderRadius: 48,
                   borderWidth: 1,
-                  borderColor: isDark ? "#374155" : "#e5e7eb",
+                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: isDark ? "#1f2937" : "#ffffff"
+                  backgroundColor: isDark ? "#17151C" : "#ffffff"
                 }}
               >
                 <Image
@@ -583,7 +583,7 @@ export default function AuthScreen() {
           </View>
           {/* Toggle to other mode */}
           <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: "auto", marginBottom: 96 }}>
-            <Text style={{ color: isDark ? "#9ca3af" : "#4b5563" }}>
+            <Text style={{ color: isDark ? "#9C95A8" : "#4F4A5A" }}>
               {mode === "login"
                 ? "Don't have an account? "
                 : "Already have an account? "}
@@ -592,7 +592,7 @@ export default function AuthScreen() {
               onPress={() => setMode(mode === "login" ? "register" : "login")}
               activeOpacity={0.7}
             >
-              <Text style={{ color: isDark ? "#22d3ee" : "#06B6D4", fontWeight: "500" }}>
+              <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "500" }}>
                 {mode === "login" ? "Sign up" : "Sign in"}
               </Text>
             </TouchableOpacity>

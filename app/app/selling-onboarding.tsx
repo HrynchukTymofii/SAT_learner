@@ -46,7 +46,7 @@ const onboardingSlides: SlideType[] = [
       description:
         "You're staring at the clock. 70 minutes. 44 questions. Your heart races as you realize you're only halfway through and time is slipping away...",
       emotion: "The SAT math section isn't just a test—it's a battle against time, stress, and self-doubt.",
-      gradient: ["#EF4444", "#DC2626"],
+      gradient: ["#D93F55", "#D93F55"],
     },
   },
   {
@@ -59,7 +59,7 @@ const onboardingSlides: SlideType[] = [
       description:
         "You practice, but keep making the same errors. Quadratic equations? Still confusing. Word problems? They twist your mind. You don't know WHAT you don't know.",
       emotion: "That sinking feeling when you see the same question type and your mind goes blank... again.",
-      gradient: ["#F59E0B", "#D97706"],
+      gradient: ["#E5A50A", "#D97706"],
     },
   },
   {
@@ -72,7 +72,7 @@ const onboardingSlides: SlideType[] = [
       description:
         "You can see it—walking through campus, proud acceptance letter in hand. But you need a 700+. Maybe 750. And right now? You're not there yet.",
       emotion: "Every point matters. Every question could be the difference between acceptance and rejection.",
-      gradient: ["#8B5CF6", "#7C3AED"],
+      gradient: ["#8A5CE6", "#8A5CE6"],
     },
   },
   {
@@ -85,7 +85,7 @@ const onboardingSlides: SlideType[] = [
       description: "When are you planning to take the SAT? This helps us build your unique study plan.",
       placeholder: "e.g., March 2025",
       inputKey: "testDate",
-      gradient: ["#06B6D4", "#0891B2"],
+      gradient: ["#8A5CE6", "#8A5CE6"],
     },
   },
   {
@@ -98,7 +98,7 @@ const onboardingSlides: SlideType[] = [
       description: "What's your goal score for SAT Math? Let's make it official.",
       placeholder: "e.g., 750",
       inputKey: "targetScore",
-      gradient: ["#10B981", "#059669"],
+      gradient: ["#2E9A5E", "#2E9A5E"],
     },
   },
   {
@@ -109,12 +109,12 @@ const onboardingSlides: SlideType[] = [
       title: "Students Like You\nAre Winning",
       subtitle: "Real results. Real transformations.",
       stats: [
-        { label: "Average Score Increase", value: "+180 pts", color: "#10B981" },
-        { label: "Students Reaching Goals", value: "94%", color: "#06B6D4" },
-        { label: "Study Time Saved", value: "50hrs", color: "#8B5CF6" },
+        { label: "Average Score Increase", value: "+180 pts", color: "#2E9A5E" },
+        { label: "Students Reaching Goals", value: "94%", color: "#8A5CE6" },
+        { label: "Study Time Saved", value: "50hrs", color: "#8A5CE6" },
       ],
       description: "Our students don't just pass—they excel. Imagine seeing your score jump by 180 points.",
-      gradient: ["#10B981", "#059669"],
+      gradient: ["#2E9A5E", "#2E9A5E"],
     },
   },
   {
@@ -125,14 +125,14 @@ const onboardingSlides: SlideType[] = [
       title: "Everything You Need\nIn One Place",
       subtitle: "No more scattered resources",
       features: [
-        { icon: "📚", text: "400+ Official SAT-Style Problems", color: "#06B6D4" },
-        { icon: "🎯", text: "AI-Powered Weakness Detection", color: "#8B5CF6" },
-        { icon: "⏱️", text: "Timed Practice Tests (Real Exam Feel)", color: "#F59E0B" },
-        { icon: "💡", text: "Step-by-Step Video Explanations", color: "#10B981" },
-        { icon: "📊", text: "Progress Tracking Dashboard", color: "#EF4444" },
-        { icon: "🔄", text: "Wrong Answer Recovery System", color: "#EC4899" },
+        { icon: "📚", text: "400+ Official SAT-Style Problems", color: "#8A5CE6" },
+        { icon: "🎯", text: "AI-Powered Weakness Detection", color: "#8A5CE6" },
+        { icon: "⏱️", text: "Timed Practice Tests (Real Exam Feel)", color: "#E5A50A" },
+        { icon: "💡", text: "Step-by-Step Video Explanations", color: "#2E9A5E" },
+        { icon: "📊", text: "Progress Tracking Dashboard", color: "#D93F55" },
+        { icon: "🔄", text: "Wrong Answer Recovery System", color: "#8A5CE6" },
       ],
-      gradient: ["#06B6D4", "#0891B2"],
+      gradient: ["#8A5CE6", "#8A5CE6"],
     },
   },
   {
@@ -147,7 +147,7 @@ const onboardingSlides: SlideType[] = [
         { name: "James K.", score: "550 → 720", quote: "The timed tests made all the difference." },
         { name: "Maya P.", score: "680 → 800", quote: "Got into my dream school. Worth every second!" },
       ],
-      gradient: ["#EC4899", "#DB2777"],
+      gradient: ["#8A5CE6", "#DB2777"],
     },
   },
   {
@@ -166,7 +166,7 @@ const onboardingSlides: SlideType[] = [
       ],
       urgency: "🔥 23 students joined in the last hour",
       priceNote: "One-time investment. Lifetime impact.",
-      gradient: ["#8B5CF6", "#7C3AED"],
+      gradient: ["#8A5CE6", "#8A5CE6"],
     },
   },
 ];
@@ -478,7 +478,7 @@ export default function SellingOnboardingScreen() {
             <TextInput
               className="text-center text-2xl font-bold text-gray-900 dark:text-white py-4"
               placeholder={placeholder}
-              placeholderTextColor={isDark ? "#9CA3AF" : "#6B7280"}
+              placeholderTextColor={isDark ? "#9C95A8" : "#6B6577"}
               value={answers[inputKey] || ""}
               onChangeText={(text) => handleAnswer(inputKey, text)}
               style={{ outlineStyle: "none" } as any}
@@ -530,7 +530,7 @@ export default function SellingOnboardingScreen() {
           <View className="space-y-3 mb-6">
             {benefits.map((benefit: string, idx: number) => (
               <View key={idx} className="flex-row items-start">
-                <CheckCircle2 size={24} color="#10B981" className="mr-3 mt-0.5" />
+                <CheckCircle2 size={24} color="#2E9A5E" className="mr-3 mt-0.5" />
                 <Text className="flex-1 text-base text-gray-800 dark:text-white leading-6">
                   {benefit}
                 </Text>
@@ -656,7 +656,7 @@ export default function SellingOnboardingScreen() {
             activeOpacity={0.8}
           >
             <LinearGradient
-              colors={["#8B5CF6", "#7C3AED"]}
+              colors={["#8A5CE6", "#8A5CE6"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={{
@@ -675,7 +675,7 @@ export default function SellingOnboardingScreen() {
             activeOpacity={0.7}
           >
             <LinearGradient
-              colors={["#14B8A6", "#06B6D4"]}
+              colors={["#14B8A6", "#8A5CE6"]}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 0 }}
               style={{

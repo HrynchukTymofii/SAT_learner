@@ -1,0 +1,490 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#05070D">
+<title>SAT Learner — High-Scoring Digital SAT Prep (Genesis Architecture)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#05070D;
+  --surface:#10131D;
+  --surface2:#171B28;
+  --line:rgba(255,255,255,.08);
+  --text:#F3F5FB;
+  --muted:#8D94AB;
+  --dim:#5E657B;
+  --blue:#4F74FF;
+  --teal:#3CC6B4;
+  --ink:#0F1E2B;
+  --cta:linear-gradient(90deg,#3CC6B4 0%,#4F74FF 100%);
+  --card:radial-gradient(130% 85% at 50% 115%,#2F6BFF 0%,#1B3FAE 32%,#0E1633 66%,#0A0D19 100%);
+  --amber:#FFD27A;
+  --green:#5FD6A2;
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Bai Jamjuree',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  overflow-x:hidden;
+}
+a,button{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+
+/* Nav */
+.navbar{
+  width:100%;
+  max-width:1160px;
+  padding:20px 24px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  border-bottom:1px solid var(--line);
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-size:18px;
+  font-weight:700;
+  text-decoration:none;
+}
+.brand-dot{width:12px;height:12px;border-radius:50%;background:var(--cta)}
+.nav-links{display:flex;gap:24px;align-items:center}
+.nav-link{
+  color:var(--muted);
+  text-decoration:none;
+  font-size:14.5px;
+  font-weight:500;
+  transition:.2s;
+}
+.nav-link:hover{color:#fff}
+.nav-cta{
+  background:var(--cta);
+  color:#fff;
+  border:0;
+  padding:10px 20px;
+  border-radius:20px;
+  font-weight:600;
+  font-size:14px;
+  text-decoration:none;
+  transition:transform .15s;
+}
+.nav-cta:active{transform:scale(.98)}
+
+/* Hero Section */
+.hero{
+  width:100%;
+  max-width:1160px;
+  padding:80px 24px 60px;
+  display:grid;
+  grid-template-columns:1.1fr .9fr;
+  gap:48px;
+  align-items:center;
+}
+@media(max-width:880px){
+  .hero{grid-template-columns:1fr;padding:40px 20px;gap:36px}
+}
+.tag-badge{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  background:rgba(60,198,180,.1);
+  border:1px solid rgba(60,198,180,.3);
+  padding:6px 14px;
+  border-radius:20px;
+  font-size:13px;
+  font-weight:600;
+  color:var(--teal);
+  margin-bottom:18px;
+}
+.hero h1{
+  font-size:48px;
+  line-height:1.15;
+  font-weight:700;
+  letter-spacing:-.02em;
+}
+.hero p{
+  color:var(--muted);
+  font-size:17.5px;
+  line-height:1.55;
+  margin-top:18px;
+  max-width:48ch;
+}
+.hero-actions{
+  display:flex;
+  gap:14px;
+  margin-top:28px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.hero-btn{
+  background:var(--cta);
+  color:#fff;
+  border:0;
+  padding:15px 28px;
+  border-radius:26px;
+  font-weight:600;
+  font-size:16px;
+  text-decoration:none;
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  transition:transform .15s;
+  box-shadow:0 10px 25px -10px rgba(79,116,255,.7);
+}
+.hero-btn:active{transform:scale(.98)}
+.hero-secondary{
+  background:var(--surface);
+  border:1px solid var(--line);
+  color:var(--text);
+  padding:15px 24px;
+  border-radius:26px;
+  font-weight:600;
+  font-size:15px;
+  text-decoration:none;
+  transition:background .2s;
+}
+.hero-secondary:hover{background:var(--surface2)}
+
+/* Hero Interactive Card */
+.hero-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:28px;
+  padding:28px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+  box-shadow:0 24px 60px -20px rgba(0,0,0,.8);
+  position:relative;
+}
+
+/* Genesis Nori Blob */
+.blob{position:relative;width:var(--s,84px);height:var(--s,84px);flex:none}
+.blob-glow{
+  position:absolute;inset:-22%;border-radius:50%;
+  background:radial-gradient(circle,var(--c2,#AEDDF7) 0%,transparent 62%);
+  opacity:.45;filter:blur(calc(var(--s,84px)*.1));
+}
+.blob-body{
+  position:absolute;inset:0;
+  background:radial-gradient(circle at 36% 28%,var(--c1,#F4FCFF) 0%,var(--c2,#AEDDF7) 50%,var(--c3,#5BA6DF) 100%);
+  border-radius:46% 54% 52% 48%/52% 46% 54% 48%;
+  animation:morph 7s ease-in-out infinite,bob 4.2s ease-in-out infinite;
+  box-shadow:inset 0 calc(var(--s,84px)*-.07) calc(var(--s,84px)*.14) rgba(0,0,0,.16),0 0 calc(var(--s,84px)*.08) var(--c2,#AEDDF7);
+  transition:background .5s;
+}
+.grad-cap{
+  position:absolute;top:-11%;left:50%;transform:translateX(-50%) rotate(-6deg);
+  width:calc(var(--s,84px)*.44);height:calc(var(--s,84px)*.14);background:#0E1424;border-radius:3px;
+  box-shadow:0 3px 8px rgba(0,0,0,.45);z-index:4;
+}
+.grad-cap::before{content:"";position:absolute;bottom:-4px;left:26%;width:48%;height:6px;background:#090D18;border-radius:0 0 5px 5px}
+.cap-tassel{position:absolute;right:14%;top:50%;width:2px;height:calc(var(--s,84px)*.2);background:#FFD27A}
+.cap-tassel::after{content:"";position:absolute;bottom:0;left:-2px;width:6px;height:6px;border-radius:50%;background:#FFD27A}
+.face{
+  position:absolute;left:50%;top:38%;width:52%;transform:translateX(-50%);
+  display:grid;grid-template-columns:1fr 1fr;justify-items:center;row-gap:calc(var(--s,84px)*.035);z-index:3;
+}
+.eye{
+  display:block;width:calc(var(--s,84px)*.11);height:calc(var(--s,84px)*.065);border:calc(var(--s,84px)*.026) solid var(--ink);border-bottom:0;
+  border-radius:calc(var(--s,84px)*.1) calc(var(--s,84px)*.1) 0 0;animation:blink 5.5s infinite;transform-origin:50% 100%;
+}
+.mouth{
+  grid-column:1/3;display:block;width:calc(var(--s,84px)*.12);height:calc(var(--s,84px)*.06);border:calc(var(--s,84px)*.026) solid var(--ink);border-top:0;
+  border-radius:0 0 calc(var(--s,84px)*.12) calc(var(--s,84px)*.12);transition:.3s;
+}
+.glasses{
+  position:absolute;top:30%;left:50%;transform:translateX(-50%);width:68%;display:flex;align-items:center;justify-content:space-between;z-index:2;pointer-events:none;
+}
+.lens{
+  width:calc(var(--s,84px)*.26);height:calc(var(--s,84px)*.26);border-radius:50%;border:1.6px solid rgba(15,30,43,.85);background:rgba(255,255,255,.18);backdrop-filter:blur(1px);position:relative;
+}
+.lens::after{content:"";position:absolute;top:16%;right:20%;width:22%;height:22%;border-radius:50%;background:rgba(255,255,255,.75)}
+.glass-bridge{width:calc(var(--s,84px)*.1);height:1.6px;background:rgba(15,30,43,.85);margin-top:-2px}
+
+@keyframes morph{
+  0%,100%{border-radius:46% 54% 52% 48%/52% 46% 54% 48%}
+  33%{border-radius:54% 46% 44% 56%/46% 56% 44% 54%}
+  66%{border-radius:50% 50% 56% 44%/56% 50% 50% 44%}
+}
+@keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(-5%)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}95%{transform:scaleY(.12)}}
+
+/* Features Grid */
+.section{
+  width:100%;
+  max-width:1160px;
+  padding:60px 24px;
+}
+.section-head{
+  text-align:center;
+  margin-bottom:44px;
+}
+.section-head h2{
+  font-size:34px;
+  font-weight:700;
+  letter-spacing:-.01em;
+}
+.section-head p{
+  color:var(--muted);
+  font-size:16.5px;
+  margin-top:10px;
+}
+.grid-3{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+}
+@media(max-width:880px){.grid-3{grid-template-columns:1fr}}
+.feature-box{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:28px 24px;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.feature-icon{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:var(--surface2);
+  border:1px solid var(--line);
+  display:grid;
+  place-items:center;
+  font-size:20px;
+}
+.feature-box h3{
+  font-size:18px;
+  font-weight:600;
+}
+.feature-box p{
+  color:var(--muted);
+  font-size:14.5px;
+  line-height:1.5;
+}
+
+/* Pricing Grid */
+.pricing-grid{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:20px;
+  max-width:960px;
+  margin:0 auto;
+}
+@media(max-width:768px){.pricing-grid{grid-template-columns:1fr}}
+.price-card{
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:24px;
+  padding:28px 22px;
+  display:flex;
+  flex-direction:column;
+  position:relative;
+}
+.price-card.featured{
+  border-color:var(--blue);
+  background:linear-gradient(180deg,#101934 0%,#0E1220 100%);
+}
+.pop-badge{
+  position:absolute;
+  top:-12px;
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--cta);
+  color:#fff;
+  padding:4px 12px;
+  border-radius:10px;
+  font-size:11.5px;
+  font-weight:700;
+}
+.price-val{
+  font-size:38px;
+  font-weight:700;
+  font-family:'JetBrains Mono',monospace;
+  margin:14px 0 6px;
+}
+
+/* Footer */
+.footer{
+  width:100%;
+  max-width:1160px;
+  padding:40px 24px;
+  border-top:1px solid var(--line);
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:13.5px;
+  color:var(--dim);
+  flex-wrap:wrap;
+  gap:12px;
+  margin-top:60px;
+}
+</style>
+</head>
+<body>
+
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <a href="website-landing.html" class="brand">
+      <div class="brand-dot"></div>
+      <span>SAT Learner</span>
+    </a>
+    
+    <div class="nav-links">
+      <a href="#curriculum" class="nav-link">Syllabus</a>
+      <a href="#vault" class="nav-link">Mistake Vault</a>
+      <a href="#pricing" class="nav-link">Pricing</a>
+      <a href="app-screens.html" class="nav-link" style="color:var(--teal)">Mobile App &rarr;</a>
+      <a href="index.html" class="nav-cta">Take Diagnostic</a>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div>
+      <span class="tag-badge">&check; Official 2026 Digital SAT Aligned</span>
+      <h1>The quiet, focused way to score 1500+ on the Digital SAT.</h1>
+      <p>
+        Personalized daily micro-practice, an adaptive College Board Bluebook exam simulator, and a gentle AI companion that ensures you never miss the same problem twice.
+      </p>
+
+      <div class="hero-actions">
+        <a href="index.html" class="hero-btn">Start 2-Minute Diagnostic &rarr;</a>
+        <a href="app-screens.html" class="hero-secondary">View Mobile App</a>
+      </div>
+    </div>
+
+    <!-- Companion & Live Score Card -->
+    <div class="hero-card">
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="blob" style="--s:80px">
+          <div class="blob-glow"></div>
+          <div class="blob-body">
+            <div class="grad-cap"><div class="cap-tassel"></div></div>
+            <div class="glasses"><div class="lens"></div><div class="glass-bridge"></div><div class="lens"></div></div>
+            <div class="face"><i class="eye"></i><i class="eye"></i><i class="mouth"></i></div>
+          </div>
+        </div>
+        <div>
+          <b style="font-size:18px;display:block">Meet Nori</b>
+          <span style="font-size:13.5px;color:var(--muted)">Your personal Digital SAT study companion</span>
+        </div>
+      </div>
+
+      <!-- Projection curve -->
+      <div style="background:var(--surface2);border:1px solid var(--line);border-radius:18px;padding:16px">
+        <div style="display:flex;justify-content:space-between;align-items:baseline">
+          <span style="font-size:12.5px;color:var(--muted)">DIAGNOSTIC &rarr; GOAL</span>
+          <span style="font-size:13px;color:var(--teal);font-weight:700">+340 pts projected</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:baseline;margin-top:6px">
+          <span style="font-size:28px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--muted)">1180</span>
+          <span style="font-size:36px;font-weight:700;font-family:'JetBrains Mono',monospace;color:#fff">1520+</span>
+        </div>
+        <!-- Progress bar -->
+        <div style="height:6px;border-radius:3px;background:rgba(255,255,255,.08);margin-top:10px;overflow:hidden">
+          <div style="width:82%;height:100%;border-radius:3px;background:var(--cta)"></div>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- 3 PRODUCT PILLARS -->
+  <section class="section" id="curriculum">
+    <div class="section-head">
+      <h2>Everything needed for a top 1% score.</h2>
+      <p>Built strictly for the Digital SAT format without unnecessary clutter.</p>
+    </div>
+
+    <div class="grid-3">
+      <div class="feature-box">
+        <div class="feature-icon">📐</div>
+        <h3>Digital SAT Syllabus</h3>
+        <p>18 structured chapters covering Heart of Algebra, Advanced Quadratics, Grammar Conventions, and Reading Craft & Structure.</p>
+      </div>
+
+      <div class="feature-box" id="vault">
+        <div class="feature-icon">🔁</div>
+        <h3>The Mistake Vault</h3>
+        <p>Axiomatically captures every question you get wrong. Spaced repetition prompts you to repeat them until your accuracy reaches 100%.</p>
+      </div>
+
+      <div class="feature-box">
+        <div class="feature-icon">⏱️</div>
+        <h3>Bluebook Simulator</h3>
+        <p>Practice in the exact interface of the real exam: built-in Desmos graphing calculator, countdown timer, and formula reference sheets.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING SECTION -->
+  <section class="section" id="pricing">
+    <div class="section-head">
+      <h2>Simple, transparent membership.</h2>
+      <p>Zero commitments. Cancel anytime with a 30-day money-back guarantee.</p>
+    </div>
+
+    <div class="pricing-grid">
+      <!-- 1-Week -->
+      <div class="price-card">
+        <span style="font-size:15px;font-weight:600;color:var(--muted)">1-Week Pass</span>
+        <div class="price-val">$6.99</div>
+        <span style="font-size:12.5px;color:var(--dim)">Billed weekly</span>
+        <p style="font-size:13.5px;color:var(--muted);margin-top:16px;line-height:1.4">
+          Ideal for last-minute cramming before an upcoming test date.
+        </p>
+        <a href="index.html" class="nav-cta" style="margin-top:24px;text-align:center">Get Started</a>
+      </div>
+
+      <!-- 4-Week Intensive (Featured) -->
+      <div class="price-card featured">
+        <div class="pop-badge">MOST POPULAR</div>
+        <span style="font-size:15px;font-weight:600;color:#8FB4FF">4-Week Plan</span>
+        <div class="price-val" style="color:#fff">$19.99</div>
+        <span style="font-size:12.5px;color:var(--dim)">$4.99 / week &bull; Billed monthly</span>
+        <p style="font-size:13.5px;color:#C9D2EE;margin-top:16px;line-height:1.4">
+          Complete syllabus access, all 6 full mock exams, and unlimited Mistake Vault clearing.
+        </p>
+        <a href="index.html" class="nav-cta" style="margin-top:24px;text-align:center">Start 4-Week Plan</a>
+      </div>
+
+      <!-- 12-Week Mastery -->
+      <div class="price-card">
+        <span style="font-size:15px;font-weight:600;color:var(--muted)">12-Week Semester</span>
+        <div class="price-val">$39.99</div>
+        <span style="font-size:12.5px;color:var(--dim)">$3.33 / week &bull; Best value</span>
+        <p style="font-size:13.5px;color:var(--muted);margin-top:16px;line-height:1.4">
+          Guaranteed 1500+ score trajectory or 100% full refund.
+        </p>
+        <a href="index.html" class="nav-cta" style="margin-top:24px;text-align:center">Start 12-Week Plan</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div>&copy; 2026 SAT Learner Inc. Digital SAT is a trademark registered by the College Board.</div>
+    <div style="display:flex;gap:18px">
+      <a href="app-screens.html" style="color:var(--muted);text-decoration:none">Mobile App</a>
+      <a href="index.html" style="color:var(--muted);text-decoration:none">Diagnostic Funnel</a>
+      <a href="exam-runner.html" style="color:var(--muted);text-decoration:none">Exam Simulator</a>
+    </div>
+  </footer>
+
+</body>
+</html>

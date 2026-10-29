@@ -1,36 +1,23 @@
-import HeroSection from "@/components/home-ui/hero-section"
-import TasteFirstSection from "@/components/home-ui/taste-first-section"
-import AboutCourseSection from "@/components/home-ui/about-course-section"
-import AboutSatSection from "@/components/home-ui/about-sat-section"
-import { ReviewsSection } from "@/components/home-ui/reviews-section"
-import { TipsSection } from "@/components/home-ui/tips-section"
-import { FAQSection } from "@/components/home-ui/faq-section"
-import { PricingSection } from "@/components/home-ui/pricing-section"
-import { CTASection } from "@/components/home-ui/cta-section"
-import { ContactSection } from "@/components/home-ui/contact-section"
-import { Footer } from "@/components/footer"
+import { getCourseOutline } from "@/lib/course-outline"
+import { Hero } from "@/components/home/hero"
+import { AboutSat, Devices, Faq, Path, Plans, Stats, Syllabus } from "@/components/home/sections"
 
-export default function SATHomepage() {
+// Static page, rebuilt hourly. Logged-in students never see it: middleware sends them to the platform
+export const revalidate = 3600
+
+export default async function HomePage() {
+  const outline = await getCourseOutline()
+
   return (
-    <div className="min-h-screen w-full">
-      {/* Floating gradient orbs for ambient background */}
-      <div className="fixed top-0 left-0 w-[600px] h-[600px] bg-gradient-to-br from-cyan-500/10 to-blue-500/10 dark:from-cyan-500/5 dark:to-blue-500/5 rounded-full blur-3xl -z-10" />
-      <div className="fixed bottom-0 right-0 w-[800px] h-[800px] bg-gradient-to-br from-purple-500/10 to-pink-500/10 dark:from-purple-500/5 dark:to-pink-500/5 rounded-full blur-3xl -z-10" />
-      <div className="fixed top-1/2 left-1/2 w-[400px] h-[400px] bg-gradient-to-br from-blue-500/10 to-cyan-500/10 dark:from-blue-500/5 dark:to-cyan-500/5 rounded-full blur-3xl -z-10 transform -translate-x-1/2 -translate-y-1/2" />
-
-      <div className="max-w-7xl mx-auto px-4 pt-4 relative">
-        <HeroSection />
-        <TasteFirstSection />
-        <AboutCourseSection />
-        <AboutSatSection />
-        <ReviewsSection />
-        <TipsSection />
-        <FAQSection />
-        <PricingSection />
-        <CTASection />
-        <ContactSection />
-        <Footer />
-      </div>
-    </div>
+    <>
+      <Hero lessonCount={outline?.lessonCount ?? 0} />
+      <Stats outline={outline} />
+      <Path />
+      <Syllabus outline={outline} />
+      <Devices />
+      <Plans />
+      <AboutSat />
+      <Faq />
+    </>
   )
 }

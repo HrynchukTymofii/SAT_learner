@@ -1,0 +1,787 @@
+<title>SAT Learner Home Redesigns</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=Bricolage+Grotesque:opsz,wght@12..96,500..800&family=Caveat:wght@500;700&family=Figtree:wght@400..800&family=IBM+Plex+Mono:wght@400;600&family=JetBrains+Mono:wght@400;600&family=Lexend:wght@300..700&family=Nunito+Sans:opsz,wght@6..12,400..800&family=Rubik:wght@400..900&family=Unbounded:wght@500..800&display=swap">
+<style>
+/* Gallery: header, then two sections (app phones in a wrapping grid, websites stacked full width). Each variant is its own visual world. */
+:root{
+  --g-bg:#f2f4f7;--g-fg:#171b22;--g-muted:#5b6474;--g-line:#d9dee6;--g-chip:#ffffff;--g-accent:#2f5bea;--g-bezel:#1b1f27;
+  --g-sans:"Figtree",system-ui,sans-serif;--g-mono:"JetBrains Mono",ui-monospace,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--g-bg:#12151b;--g-fg:#e8ebf0;--g-muted:#97a0b0;--g-line:#2a303b;--g-chip:#1b2029;--g-accent:#7d9bff;--g-bezel:#000;color-scheme:dark}}
+:root[data-theme="dark"]{--g-bg:#12151b;--g-fg:#e8ebf0;--g-muted:#97a0b0;--g-line:#2a303b;--g-chip:#1b2029;--g-accent:#7d9bff;--g-bezel:#000;color-scheme:dark}
+*{box-sizing:border-box}
+body{background:var(--g-bg);color:var(--g-fg);font-family:var(--g-sans);font-size:15px;line-height:1.5;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:32px 64px}
+.g-wrap{max-width:1240px;margin:0 auto;display:grid;gap:48px}
+.g-head{display:grid;gap:12px;max-width:70ch}
+.g-head h1{font-size:clamp(28px,4vw,40px);line-height:1.1;margin:0;text-wrap:balance;letter-spacing:-.02em}
+.g-head p{margin:0;color:var(--g-muted)}
+.g-nav{display:flex;flex-wrap:wrap;gap:8px}
+.g-nav a{font-family:var(--g-mono);font-size:12px;text-decoration:none;color:var(--g-fg);background:var(--g-chip);border:1px solid var(--g-line);padding:6px 12px;border-radius:999px}
+.g-nav a:hover,.g-nav a:focus-visible{border-color:var(--g-accent);outline:none}
+.g-sec{display:grid;gap:24px;scroll-margin-top:16px}
+.g-sec>h2{margin:0;font-size:22px;letter-spacing:-.01em;display:flex;gap:12px;align-items:baseline;flex-wrap:wrap}
+.g-sec>h2 small{font-family:var(--g-mono);font-size:12px;color:var(--g-muted);font-weight:400}
+.g-apps{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,395px),1fr));gap:40px 24px;justify-items:center}
+.g-item{display:grid;gap:12px;align-content:start;min-width:0;width:100%}
+.g-apps .g-item{max-width:395px}
+.g-label{display:grid;gap:2px}
+.g-label b{font-size:16px}
+.g-label b span{font-family:var(--g-mono);font-size:12px;color:var(--g-accent);margin-right:8px;font-weight:600}
+.g-label p{margin:0;color:var(--g-muted);font-size:13.5px}
+.g-webs{display:grid;gap:56px}
+.browser{border:1px solid var(--g-line);border-radius:14px;overflow:hidden;background:var(--g-chip);box-shadow:0 20px 50px -30px rgba(0,0,0,.35)}
+.browser-bar{display:flex;align-items:center;gap:8px;padding:10px 14px;border-bottom:1px solid var(--g-line);font-family:var(--g-mono);font-size:11.5px;color:var(--g-muted)}
+.browser-bar i{width:10px;height:10px;border-radius:50%;background:var(--g-line);display:inline-block}
+.browser-bar span{margin-left:8px;background:var(--g-bg);padding:3px 10px;border-radius:6px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.site{container-type:inline-size}
+
+/* phone shell shared by all app variants */
+.phone{width:375px;max-width:100%;border:10px solid var(--g-bezel);border-radius:46px;overflow:hidden;box-shadow:0 30px 60px -30px rgba(0,0,0,.45)}
+.screen{display:flex;flex-direction:column;min-height:780px}
+.sb{display:flex;justify-content:space-between;padding:12px 26px 6px;font-size:13px;font-weight:600}
+.body{flex:1;display:grid;gap:16px;align-content:start;padding:8px 18px 18px}
+.tabs{display:grid;grid-template-columns:repeat(4,1fr);padding:10px 8px 22px;font-size:10.5px;text-align:center}
+.tabs div{display:grid;justify-items:center;gap:3px}
+.tabs svg,.ic{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+button{font:inherit;cursor:pointer}
+button:focus-visible,a:focus-visible{outline:2px solid var(--g-accent);outline-offset:2px}
+
+/* ============ 1 · SCORE LINE (app) ============ */
+.a1{--ink:#0f1b33;--mut:#5d6b84;--bg:#f5f7fb;--card:#fff;--line:#e3e8f1;--blue:#2f5bea;--blue-soft:#e8eefe;--ok:#16a06a;
+  background:var(--bg);color:var(--ink);font-family:"Figtree",sans-serif;
+  .disp{font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+  .mono{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.04em;color:var(--mut);text-transform:uppercase}
+  .hi{display:flex;justify-content:space-between;align-items:center}
+  .hi h3{margin:2px 0 0;font-size:26px;line-height:1.1}
+  .pts{background:var(--card);border:1px solid var(--line);border-radius:999px;padding:6px 12px;font-weight:700;font-size:13px}
+  .score{background:var(--ink);color:#fff;border-radius:22px;padding:18px;display:grid;gap:14px}
+  .score .mono{color:#9fb0d0}
+  .big{font-size:56px;line-height:.9;font-weight:800}
+  .big small{font-size:15px;font-weight:600;color:#9fb0d0;margin-left:6px;letter-spacing:0;font-family:"Figtree",sans-serif}
+  .ruler{position:relative;height:44px}
+  .track{position:absolute;left:0;right:0;top:14px;height:6px;border-radius:3px;background:#24345a}
+  .fill{position:absolute;left:0;top:14px;height:6px;border-radius:3px;background:linear-gradient(90deg,#5b7cff,#8fb0ff);width:78.3%}
+  .mk{position:absolute;top:6px;width:3px;height:22px;background:#fff;border-radius:2px;transform:translateX(-50%)}
+  .goal{position:absolute;top:2px;transform:translateX(-50%);font-size:10px;font-family:"JetBrains Mono",monospace;color:#ffd166}
+  .goal:after{content:"";display:block;width:2px;height:24px;background:#ffd166;margin:2px auto 0}
+  .ticks{position:absolute;left:0;right:0;bottom:0;display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:10px;color:#7d8fb3}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .split div{background:#1a2846;border-radius:12px;padding:8px 10px;font-size:12px;color:#b9c6e3}
+  .split b{display:block;color:#fff;font-size:18px}
+  h4{margin:0;font-size:15px;display:flex;justify-content:space-between;align-items:baseline}
+  h4 a{font-size:12.5px;color:var(--blue);text-decoration:none;font-weight:600}
+  .list{background:var(--card);border:1px solid var(--line);border-radius:18px;overflow:hidden}
+  .row{display:flex;gap:12px;align-items:center;padding:12px 14px;border-top:1px solid var(--line);font-size:14px}
+  .row:first-child{border-top:0}
+  .row .bx{width:20px;height:20px;border-radius:6px;border:2px solid #c3cddd;flex:none}
+  .row.done .bx{background:var(--ok);border-color:var(--ok)}
+  .row.done span{text-decoration:line-through;color:var(--mut)}
+  .row em{margin-left:auto;font-style:normal;color:var(--mut);font-size:12px;font-family:"JetBrains Mono",monospace}
+  .cont{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:14px;display:grid;gap:10px}
+  .bar{height:6px;border-radius:3px;background:var(--blue-soft)}
+  .bar i{display:block;height:100%;width:58%;background:var(--blue);border-radius:3px}
+  .btn{background:var(--blue);color:#fff;border:0;border-radius:12px;padding:11px;font-weight:700}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .tile{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px;display:grid;gap:4px;font-size:13px;color:var(--mut)}
+  .tile b{color:var(--ink);font-size:14.5px}
+  .tile .ic{color:var(--blue);width:20px;height:20px}
+  .tabs{background:var(--card);border-top:1px solid var(--line);color:var(--mut)}
+  .tabs .on{color:var(--blue);font-weight:700}
+}
+
+/* ============ 2 · ANSWER SHEET (app) ============ */
+.a2{--ink:#1d1d1b;--mut:#6b6a63;--bg:#ffffff;--yel:#f6c945;--line:#1d1d1b;--soft:#f3f2ee;
+  background:var(--bg);color:var(--ink);font-family:"Archivo",sans-serif;
+  .cond{font-stretch:68%;font-weight:800;text-transform:uppercase;letter-spacing:.01em}
+  .mono{font-family:"IBM Plex Mono",monospace;font-size:11px}
+  .top{background:var(--yel);margin:-8px -18px 0;padding:6px 18px 18px;display:grid;gap:8px;border-bottom:2px solid var(--line)}
+  .top h3{margin:0;font-size:40px;line-height:.9}
+  .cd{display:flex;justify-content:space-between;align-items:end}
+  .cd b{font-size:46px;line-height:.85;font-stretch:75%}
+  .bub{display:flex;gap:7px}
+  .bub span{width:30px;height:30px;border-radius:50%;border:2px solid var(--line);display:grid;place-items:center;font-size:11px;font-weight:700;font-family:"IBM Plex Mono",monospace;background:#fff}
+  .bub span.f{background:var(--ink);color:var(--yel)}
+  .sec{display:grid;gap:8px}
+  .sec>.mono{display:flex;justify-content:space-between;border-bottom:2px solid var(--line);padding-bottom:4px;font-weight:600}
+  .q{display:grid;grid-template-columns:26px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px dashed #c9c7bd;font-size:14.5px}
+  .q .n{font-family:"IBM Plex Mono",monospace;font-weight:600}
+  .q .o{width:18px;height:18px;border-radius:50%;border:2px solid var(--line)}
+  .q.done .o{background:var(--ink)}
+  .q small{display:block;color:var(--mut);font-size:12px}
+  .card{border:2px solid var(--line);border-radius:4px;padding:14px;display:grid;gap:10px;box-shadow:4px 4px 0 var(--ink)}
+  .card h4{margin:0;font-size:24px;line-height:1}
+  .meter{display:grid;grid-template-columns:repeat(12,1fr);gap:3px}
+  .meter i{height:10px;border:1.5px solid var(--line);border-radius:2px}
+  .meter i.f{background:var(--ink)}
+  .btn{background:var(--ink);color:var(--yel);border:0;padding:12px;font-weight:800;text-transform:uppercase;font-stretch:80%;font-size:16px;letter-spacing:.04em}
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .two div{background:var(--soft);padding:10px;display:grid;gap:2px;font-size:12.5px;color:var(--mut)}
+  .two b{color:var(--ink);font-size:20px;font-stretch:75%;text-transform:uppercase}
+  .tabs{border-top:2px solid var(--line);font-family:"IBM Plex Mono",monospace;font-size:10px;text-transform:uppercase}
+  .tabs .on{background:var(--yel);margin:-10px 4px 0;padding-top:10px}
+}
+
+/* ============ 3 · NIGHT DESK (app, dark by design) ============ */
+.a3{--ink:#e9eef7;--mut:#8a97ad;--bg:#0c121d;--card:#141d2c;--line:#22304a;--amb:#f5b54a;--amb-soft:rgba(245,181,74,.14);--teal:#62d3c4;
+  background:radial-gradient(120% 50% at 80% 0%,rgba(245,181,74,.18),transparent 60%),var(--bg);color:var(--ink);font-family:"Nunito Sans",sans-serif;
+  .disp{font-family:"Unbounded",sans-serif;letter-spacing:-.02em}
+  .mut{color:var(--mut)}
+  .hd{display:flex;justify-content:space-between;align-items:center}
+  .hd h3{margin:0;font-size:21px;font-weight:600}
+  .chip{background:var(--amb-soft);color:var(--amb);border-radius:999px;padding:6px 11px;font-weight:800;font-size:12.5px}
+  .ring{display:grid;grid-template-columns:132px 1fr;gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:24px;padding:16px}
+  .ring svg{width:132px;height:132px}
+  .ring .t{font-family:"Unbounded",sans-serif;font-size:26px;fill:var(--ink)}
+  .ring .s{font-size:11px;fill:var(--mut)}
+  .ring p{margin:0;font-size:13.5px;color:var(--mut)}
+  .ring b{color:var(--ink)}
+  .btn{margin-top:10px;background:var(--amb);color:#1d1404;border:0;border-radius:14px;padding:11px 14px;font-weight:800;width:100%}
+  h4{margin:0;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--mut);font-weight:700}
+  .tl{display:grid;gap:0;position:relative;padding-left:22px}
+  .tl:before{content:"";position:absolute;left:6px;top:8px;bottom:8px;width:2px;background:var(--line)}
+  .tl div{position:relative;padding:8px 0;display:flex;justify-content:space-between;gap:10px;font-size:14.5px}
+  .tl div:before{content:"";position:absolute;left:-21px;top:13px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--line)}
+  .tl .d:before{background:var(--teal);border-color:var(--teal)}
+  .tl .now:before{background:var(--amb);border-color:var(--amb);box-shadow:0 0 0 5px var(--amb-soft)}
+  .tl small{color:var(--mut);font-size:12px;white-space:nowrap}
+  .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+  .c{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:13px;display:grid;gap:6px;font-size:12.5px;color:var(--mut)}
+  .c b{color:var(--ink);font-size:14.5px}
+  .c .ic{color:var(--amb)}
+  .wk{display:flex;gap:6px;align-items:end;height:46px}
+  .wk i{flex:1;background:#2a3a58;border-radius:4px}
+  .wk i.h{background:var(--teal)}
+  .tabs{background:#0a0f18;border-top:1px solid var(--line);color:var(--mut)}
+  .tabs .on{color:var(--amb)}
+}
+
+/* ============ 4 · GRAPH NOTEBOOK (app) ============ */
+.a4{--ink:#1c2b4a;--mut:#5f6f8c;--paper:#fdfdfb;--grid:#dfe8f3;--red:#e2574c;--hl:#ffe45c;--pen:#2456c8;
+  background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:20px 20px;color:var(--ink);font-family:"Lexend",sans-serif;
+  .hand{font-family:"Caveat",cursive;color:var(--pen)}
+  .body{border-left:2px solid rgba(226,87,76,.55);margin-left:26px;padding-left:14px}
+  .date{font-size:12px;color:var(--mut);font-weight:300}
+  h3{margin:0;font-size:26px;font-weight:600;line-height:1.15}
+  .mark{background:linear-gradient(transparent 55%,var(--hl) 55%)}
+  .goal{display:flex;align-items:center;gap:10px;font-size:15px}
+  .goal .hand{font-size:34px;font-weight:700;line-height:1}
+  .circ{border:2.5px solid var(--red);border-radius:50% 46% 52% 48%;padding:0 8px;transform:rotate(-3deg);display:inline-block}
+  .chk{display:grid;gap:10px;font-size:15px}
+  .chk div{display:flex;gap:10px;align-items:start}
+  .chk .b{width:20px;height:20px;border:2px solid var(--ink);border-radius:3px;flex:none;position:relative;margin-top:2px;background:var(--paper)}
+  .chk .d .b:after{content:"✓";position:absolute;left:1px;top:-12px;font-family:"Caveat",cursive;font-size:30px;color:var(--pen)}
+  .chk .d span{color:var(--mut)}
+  .chk small{display:block;color:var(--mut);font-size:12px;font-weight:300}
+  .card{background:#fff;border:1.5px solid var(--ink);border-radius:6px;padding:14px;display:grid;gap:8px;box-shadow:3px 3px 0 var(--grid)}
+  .card .lab{font-size:11px;text-transform:uppercase;letter-spacing:.1em;color:var(--red);font-weight:600}
+  .formula{font-size:20px;font-weight:500;letter-spacing:.02em}
+  .note{font-size:20px;line-height:1.1}
+  .idx{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .idx div{background:#fff;border:1.5px solid var(--ink);padding:10px;font-size:12.5px;color:var(--mut);display:grid;gap:2px;border-top:6px solid var(--pen)}
+  .idx div:nth-child(2){transform:rotate(1deg);border-top-color:var(--red)}
+  .idx div:nth-child(3){transform:rotate(-1deg);border-top-color:#2f9e6e}
+  .idx div:nth-child(4){border-top-color:#e6a419}
+  .idx b{color:var(--ink);font-size:14.5px;font-weight:600}
+  .btn{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:11px;font-weight:500}
+  .tabs{background:var(--paper);border-top:1.5px solid var(--ink);color:var(--mut)}
+  .tabs .on{color:var(--pen);font-weight:600}
+}
+
+/* ============ 5 · STREAK QUEST (app) ============ */
+.a5{--ink:#0e3b2e;--mut:#4f7366;--bg:#eefaf3;--card:#fff;--coral:#ff5a36;--coral-d:#d63e1d;--sun:#ffc83d;--sky:#4fb3ff;--leaf:#2fbf71;--leaf-d:#1f9356;--line:#cfe8da;
+  background:var(--bg);color:var(--ink);font-family:"Rubik",sans-serif;
+  .stats{display:flex;justify-content:space-between;gap:8px;font-weight:800;font-size:15px}
+  .stats span{display:flex;align-items:center;gap:5px;background:var(--card);border:2px solid var(--line);border-radius:14px;padding:6px 10px}
+  .fl{color:var(--coral)} .xp{color:#c58a00} .lg{color:var(--sky)}
+  .unit{background:var(--leaf);color:#fff;border-radius:20px;padding:14px 16px;box-shadow:0 5px 0 var(--leaf-d);display:flex;justify-content:space-between;align-items:center}
+  .unit small{opacity:.85;font-weight:600;font-size:12px;text-transform:uppercase;letter-spacing:.06em}
+  .unit b{display:block;font-size:20px;font-weight:800}
+  .path{display:grid;justify-items:center;gap:14px;padding:6px 0}
+  .nd{width:64px;height:58px;border-radius:50%;display:grid;place-items:center;font-weight:900;font-size:20px;color:#fff;background:var(--leaf);box-shadow:0 6px 0 var(--leaf-d)}
+  .nd.l{background:#dbe7e1;color:#97b0a5;box-shadow:0 6px 0 #c3d4cb}
+  .nd.cur{width:78px;height:70px;background:var(--coral);box-shadow:0 7px 0 var(--coral-d),0 0 0 8px rgba(255,90,54,.18)}
+  .p1{transform:translateX(-50px)} .p2{transform:translateX(-80px)} .p3{transform:translateX(-30px)} .p4{transform:translateX(40px)} .p5{transform:translateX(70px)}
+  .start{background:#fff;border:2px solid var(--line);color:var(--coral);font-weight:800;border-radius:12px;padding:5px 12px;font-size:13px;transform:translateX(-30px)}
+  .quest{background:var(--card);border:2px solid var(--line);border-radius:18px;padding:12px 14px;display:grid;gap:10px}
+  .quest h4{margin:0;font-size:16px;font-weight:800}
+  .qr{display:grid;grid-template-columns:1fr auto;gap:6px 10px;font-size:14px;font-weight:600}
+  .pb{grid-column:1/-1;height:12px;border-radius:6px;background:#e3efe8;overflow:hidden}
+  .pb i{display:block;height:100%;background:var(--sun);border-radius:6px}
+  .btn{background:var(--coral);color:#fff;border:0;border-radius:16px;padding:13px;font-weight:800;font-size:16px;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 5px 0 var(--coral-d)}
+  .tabs{background:var(--card);border-top:2px solid var(--line);color:var(--mut);font-weight:600}
+  .tabs .on{color:var(--coral)}
+}
+
+/* ============ websites ============ */
+.w{--pad:clamp(20px,5cqi,64px)}
+.w .in{padding-inline:var(--pad)}
+.w .two{display:grid;grid-template-columns:1fr;gap:32px;align-items:center}
+@container (min-width:860px){.w .two{grid-template-columns:1.1fr .9fr}.w .three{grid-template-columns:repeat(3,1fr)!important}}
+.w .three{display:grid;grid-template-columns:1fr;gap:16px}
+.w nav{display:flex;justify-content:space-between;align-items:center;gap:16px;padding-block:18px;flex-wrap:wrap}
+.w nav ul{display:flex;gap:22px;list-style:none;margin:0;padding:0;font-size:14px;flex-wrap:wrap}
+.w h1,.w h2{text-wrap:balance}
+.qopt{display:flex;gap:12px;align-items:center;width:100%;text-align:left;background:none}
+
+/* W1 Score Line */
+.w1{--ink:#0f1b33;--mut:#5d6b84;--bg:#f5f7fb;--card:#fff;--line:#e3e8f1;--blue:#2f5bea;--blue-soft:#e8eefe;--gold:#ffb703;
+  background:var(--bg);color:var(--ink);font-family:"Figtree",sans-serif;
+  .disp{font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.03em}
+  .logo{font-family:"Bricolage Grotesque",sans-serif;font-weight:800;font-size:20px}
+  .logo i{font-style:normal;color:var(--blue)}
+  nav li{color:var(--mut)}
+  .cta{background:var(--blue);color:#fff;border:0;border-radius:12px;padding:12px 18px;font-weight:700}
+  .ghost{background:transparent;border:1.5px solid var(--line);color:var(--ink);border-radius:12px;padding:11px 18px;font-weight:700}
+  .hero{padding-block:40px 56px}
+  .hero h1{font-size:clamp(38px,6.2cqi,68px);line-height:1;margin:0 0 18px;font-weight:800}
+  .hero h1 em{font-style:normal;color:var(--blue)}
+  .hero p{font-size:18px;color:var(--mut);max-width:46ch;margin:0 0 26px}
+  .acts{display:flex;gap:12px;flex-wrap:wrap}
+  .panel{background:var(--ink);color:#fff;border-radius:24px;padding:24px;display:grid;gap:18px}
+  .panel .mono{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:#9fb0d0}
+  .panel .big{font-family:"Bricolage Grotesque",sans-serif;font-size:72px;font-weight:800;line-height:.9}
+  .scale{position:relative;height:56px}
+  .scale .tr{position:absolute;inset:18px 0 auto;height:8px;border-radius:4px;background:#24345a}
+  .scale .seg{position:absolute;top:18px;height:8px;border-radius:4px;background:#5b7cff}
+  .scale .t{position:absolute;bottom:0;font-family:"JetBrains Mono",monospace;font-size:10.5px;color:#7d8fb3;transform:translateX(-50%)}
+  .scale .p{position:absolute;top:0;font-size:11px;font-family:"JetBrains Mono",monospace;transform:translateX(-50%);white-space:nowrap}
+  .rows{display:grid;gap:8px;font-size:14px}
+  .rows div{display:grid;grid-template-columns:110px 1fr 44px;gap:10px;align-items:center;color:#b9c6e3}
+  .rows i{height:6px;border-radius:3px;background:#24345a;position:relative;overflow:hidden}
+  .rows i:after{content:"";position:absolute;inset:0 auto 0 0;width:var(--w);background:#8fb0ff;border-radius:3px}
+  .rows b{color:#fff;text-align:right;font-variant-numeric:tabular-nums}
+  .steps{padding-block:56px;border-top:1px solid var(--line)}
+  .steps h2{font-size:clamp(28px,4cqi,40px);margin:0 0 28px;font-family:"Bricolage Grotesque",sans-serif;letter-spacing:-.02em}
+  .st{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:20px;display:grid;gap:8px;align-content:start}
+  .st .n{font-family:"JetBrains Mono",monospace;font-size:12px;color:var(--blue);font-weight:600}
+  .st h3{margin:0;font-size:19px}
+  .st p{margin:0;color:var(--mut);font-size:14.5px}
+  .try{padding-block:0 56px}
+  .qbox{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;gap:14px}
+  .qbox .mono{font-family:"JetBrains Mono",monospace;font-size:11.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.05em}
+  .qbox p{margin:0;font-size:18px}
+  .opts{display:grid;gap:8px}
+  @container (min-width:700px){.opts{grid-template-columns:1fr 1fr}}
+  .qopt{border:1.5px solid var(--line);border-radius:12px;padding:12px 14px;color:var(--ink);font-size:15px}
+  .qopt b{width:26px;height:26px;border-radius:50%;background:var(--blue-soft);color:var(--blue);display:grid;place-items:center;font-size:13px;flex:none}
+  .qopt.ok{border-color:#16a06a;background:#e9f8f1} .qopt.ok b{background:#16a06a;color:#fff}
+  .qopt.no{border-color:#e0534a;background:#fdeeed} .qopt.no b{background:#e0534a;color:#fff}
+  .fb{font-size:14px;color:var(--mut);min-height:1.5em;margin:0}
+  footer{border-top:1px solid var(--line);padding-block:20px;font-size:13px;color:var(--mut);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px}
+}
+
+/* W2 Answer Sheet */
+.w2{--ink:#1d1d1b;--mut:#5f5e57;--bg:#fff;--yel:#f6c945;--soft:#f3f2ee;
+  background:var(--bg);color:var(--ink);font-family:"Archivo",sans-serif;
+  .cond{font-stretch:66%;font-weight:900;text-transform:uppercase;letter-spacing:-.005em}
+  .mono{font-family:"IBM Plex Mono",monospace}
+  .hero{background:var(--yel);border-bottom:3px solid var(--ink)}
+  nav{border-bottom:2px solid var(--ink)}
+  nav .logo{font-size:22px}
+  nav li{font-family:"IBM Plex Mono",monospace;font-size:12px;text-transform:uppercase}
+  .cta{background:var(--ink);color:var(--yel);border:0;padding:13px 20px;font-weight:800;text-transform:uppercase;font-stretch:80%;font-size:16px;letter-spacing:.05em}
+  .hgrid{padding-block:36px 48px}
+  h1{font-size:clamp(54px,10.5cqi,132px);line-height:.82;margin:0 0 20px}
+  .hero p{font-size:18px;max-width:42ch;margin:0 0 24px}
+  .sheet{background:#fff;border:3px solid var(--ink);padding:20px;display:grid;gap:12px;box-shadow:8px 8px 0 var(--ink)}
+  .sheet .mono{font-size:11.5px;display:flex;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:6px}
+  .sheet p{margin:0;font-size:17px}
+  .qopt{border:0;border-bottom:1px dashed #c9c7bd;padding:10px 2px;color:var(--ink);font-size:15.5px}
+  .qopt b{width:30px;height:30px;border-radius:50%;border:2.5px solid var(--ink);display:grid;place-items:center;font-family:"IBM Plex Mono",monospace;font-size:13px;flex:none}
+  .qopt:hover b{background:var(--soft)}
+  .qopt.ok b{background:var(--ink);color:var(--yel)}
+  .qopt.no b{background:repeating-linear-gradient(45deg,var(--ink) 0 2px,transparent 2px 5px)}
+  .fb{font-family:"IBM Plex Mono",monospace;font-size:12.5px;margin:0;min-height:1.5em}
+  .fmt{padding-block:48px}
+  .fmt h2{font-size:clamp(36px,6cqi,64px);line-height:.9;margin:0 0 24px}
+  .sec{border:3px solid var(--ink);padding:18px;display:grid;gap:6px}
+  .sec .mono{font-size:12px;text-transform:uppercase}
+  .sec b{font-size:34px;line-height:1;font-stretch:70%;text-transform:uppercase;font-weight:900}
+  .sec p{margin:0;color:var(--mut);font-size:14.5px}
+  .sec.y{background:var(--yel)}
+  .band{background:var(--ink);color:#fff;padding-block:26px;display:flex}
+  .band .in{display:flex;justify-content:space-between;align-items:center;gap:16px;flex-wrap:wrap;width:100%}
+  .band b{font-size:clamp(26px,4cqi,40px);font-stretch:70%;text-transform:uppercase;font-weight:900}
+  .band .cta{background:var(--yel);color:var(--ink)}
+}
+
+/* W3 Night Desk */
+.w3{--ink:#e9eef7;--mut:#8a97ad;--bg:#0c121d;--card:#141d2c;--line:#22304a;--amb:#f5b54a;--teal:#62d3c4;
+  background:radial-gradient(70% 60% at 85% 10%,rgba(245,181,74,.2),transparent 60%),radial-gradient(50% 50% at 0% 100%,rgba(98,211,196,.08),transparent 70%),var(--bg);color:var(--ink);font-family:"Nunito Sans",sans-serif;
+  .disp{font-family:"Unbounded",sans-serif;letter-spacing:-.03em}
+  nav li{color:var(--mut)}
+  .logo{font-family:"Unbounded",sans-serif;font-weight:700;font-size:17px}
+  .logo i{font-style:normal;color:var(--amb)}
+  .cta{background:var(--amb);color:#1d1404;border:0;border-radius:14px;padding:13px 20px;font-weight:800}
+  .ghost{background:transparent;color:var(--ink);border:1px solid var(--line);border-radius:14px;padding:12px 20px;font-weight:700}
+  .hero{padding-block:48px 64px}
+  .hero h1{font-size:clamp(34px,5.6cqi,62px);line-height:1.04;margin:0 0 18px;font-weight:600}
+  .hero h1 em{font-style:normal;color:var(--amb)}
+  .hero p{font-size:18px;color:var(--mut);max-width:44ch;margin:0 0 26px}
+  .acts{display:flex;gap:12px;flex-wrap:wrap}
+  .desk{background:var(--card);border:1px solid var(--line);border-radius:26px;padding:22px;display:grid;gap:16px;box-shadow:0 40px 80px -40px rgba(245,181,74,.35)}
+  .desk .top{display:flex;justify-content:space-between;font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.1em;font-weight:700}
+  .timer{font-family:"Unbounded",sans-serif;font-size:60px;font-weight:500;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+  .seg{display:flex;gap:6px}
+  .seg i{flex:1;height:8px;border-radius:4px;background:#2a3a58}
+  .seg i.d{background:var(--teal)} .seg i.n{background:var(--amb)}
+  .plan{display:grid;gap:8px;font-size:14.5px}
+  .plan div{display:flex;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:12px;background:#101827}
+  .plan small{color:var(--mut)}
+  .fs{padding-block:0 64px}
+  .f{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:20px;display:grid;gap:8px;align-content:start}
+  .f .ic{color:var(--amb);width:26px;height:26px}
+  .f h3{margin:0;font-size:17px;font-family:"Unbounded",sans-serif;font-weight:500}
+  .f p{margin:0;color:var(--mut);font-size:14.5px}
+  footer{border-top:1px solid var(--line);padding-block:20px;font-size:13px;color:var(--mut)}
+}
+
+/* W4 Graph Notebook */
+.w4{--ink:#1c2b4a;--mut:#5f6f8c;--paper:#fdfdfb;--grid:#e3ebf5;--red:#e2574c;--hl:#ffe45c;--pen:#2456c8;
+  background-color:var(--paper);background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:24px 24px;color:var(--ink);font-family:"Lexend",sans-serif;
+  .hand{font-family:"Caveat",cursive;color:var(--pen)}
+  nav{border-bottom:1.5px solid var(--ink)}
+  nav .logo{font-weight:600;font-size:19px}
+  nav li{color:var(--mut);font-weight:300}
+  .cta{background:var(--ink);color:#fff;border:0;border-radius:6px;padding:12px 18px;font-weight:500}
+  .hero{padding-block:44px 56px;position:relative}
+  .hero h1{font-size:clamp(36px,5.8cqi,64px);line-height:1.05;margin:0 0 18px;font-weight:600;letter-spacing:-.02em}
+  .mark{background:linear-gradient(transparent 58%,var(--hl) 58%)}
+  .hero p{font-size:18px;color:var(--mut);max-width:44ch;margin:0 0 24px;font-weight:300}
+  .ann{font-size:26px;transform:rotate(-4deg);display:inline-block;margin-left:8px}
+  .work{background:#fff;border:1.5px solid var(--ink);border-radius:6px;padding:22px 22px 22px 54px;position:relative;box-shadow:6px 6px 0 var(--grid)}
+  .work:before{content:"";position:absolute;left:38px;top:0;bottom:0;width:2px;background:rgba(226,87,76,.6)}
+  .work .lab{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--red);font-weight:600}
+  .work p{margin:8px 0 14px;font-size:17px}
+  .ln{display:grid;grid-template-columns:1fr auto;gap:12px;align-items:baseline;font-size:19px;padding:6px 0;border-bottom:1px solid var(--grid)}
+  .ln .hand{font-size:21px;text-align:right}
+  .ans{margin-top:14px;font-size:19px}
+  .ans .circ{border:2.5px solid var(--red);border-radius:50% 46% 52% 48%;padding:0 10px;display:inline-block;transform:rotate(-3deg)}
+  .notes{padding-block:0 56px}
+  .notes h2{font-size:clamp(26px,3.6cqi,36px);margin:0 0 22px;font-weight:600}
+  .nt{background:#fff;border:1.5px solid var(--ink);padding:18px;display:grid;gap:6px;border-top:7px solid var(--pen);align-content:start}
+  .nt:nth-child(2){border-top-color:var(--red);transform:rotate(.6deg)}
+  .nt:nth-child(3){border-top-color:#2f9e6e;transform:rotate(-.6deg)}
+  .nt h3{margin:0;font-size:17px;font-weight:600}
+  .nt p{margin:0;color:var(--mut);font-size:14.5px;font-weight:300}
+  .nt .hand{font-size:20px}
+  footer{border-top:1.5px solid var(--ink);padding-block:18px;font-size:13px;color:var(--mut);font-weight:300}
+}
+
+/* W5 Streak Quest */
+.w5{--ink:#0e3b2e;--mut:#4f7366;--bg:#eefaf3;--card:#fff;--coral:#ff5a36;--coral-d:#d63e1d;--sun:#ffc83d;--sky:#4fb3ff;--leaf:#2fbf71;--leaf-d:#1f9356;--line:#cfe8da;
+  background:var(--bg);color:var(--ink);font-family:"Rubik",sans-serif;
+  nav .logo{font-weight:900;font-size:22px;color:var(--leaf-d)}
+  nav li{font-weight:600;color:var(--mut)}
+  .cta{background:var(--coral);color:#fff;border:0;border-radius:16px;padding:14px 22px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 5px 0 var(--coral-d)}
+  .ghost{background:#fff;color:var(--ink);border:2px solid var(--line);border-radius:16px;padding:12px 20px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;box-shadow:0 4px 0 var(--line)}
+  .hero{padding-block:40px 60px}
+  .hero h1{font-size:clamp(38px,6.4cqi,72px);line-height:.98;margin:0 0 18px;font-weight:900;letter-spacing:-.025em}
+  .hero h1 em{font-style:normal;color:var(--coral)}
+  .hero p{font-size:19px;color:var(--mut);max-width:42ch;margin:0 0 26px}
+  .acts{display:flex;gap:14px;flex-wrap:wrap}
+  .board{background:var(--card);border:3px solid var(--line);border-radius:28px;padding:22px;display:grid;gap:14px;max-width:100%}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;font-weight:800}
+  .chips span{border:2px solid var(--line);border-radius:12px;padding:6px 10px}
+  .map{display:grid;justify-items:center;gap:12px;padding:6px 0}
+  .nd{width:62px;height:56px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#fff;background:var(--leaf);box-shadow:0 6px 0 var(--leaf-d);font-size:20px}
+  .nd.cur{background:var(--coral);box-shadow:0 6px 0 var(--coral-d),0 0 0 8px rgba(255,90,54,.18);width:74px;height:66px}
+  .nd.l{background:#dbe7e1;color:#97b0a5;box-shadow:0 6px 0 #c3d4cb}
+  .m1{transform:translateX(-40px)} .m2{transform:translateX(-70px)} .m3{transform:translateX(-20px)} .m4{transform:translateX(45px)}
+  .feat{padding-block:0 60px}
+  .ft{background:var(--card);border:3px solid var(--line);border-radius:24px;padding:20px;display:grid;gap:8px;align-content:start}
+  .ft .em{width:48px;height:48px;border-radius:14px;display:grid;place-items:center;color:#fff;font-weight:900;font-size:20px}
+  .ft h3{margin:0;font-size:20px;font-weight:800}
+  .ft p{margin:0;color:var(--mut);font-size:15px}
+  footer{padding-block:20px;font-size:13px;color:var(--mut);border-top:2px solid var(--line)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<svg class="sr" aria-hidden="true">
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/></symbol>
+  <symbol id="i-test" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8l2 2 4-4M8 15h8"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9 9l6 6M15 9l-6 6"/></symbol>
+  <symbol id="i-save" viewBox="0 0 24 24"><path d="M6 3h12v18l-6-4-6 4z"/></symbol>
+  <symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></symbol>
+  <symbol id="i-chart" viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></symbol>
+</svg>
+
+<div class="g-wrap">
+  <header class="g-head">
+    <h1>SAT Learner home redesigns</h1>
+    <p>Five directions for the app home screen and five for the website home page. Each app design has a matching website design with the same number, so you can pick a direction and mix details between them. All names, scores and dates are example content.</p>
+    <nav class="g-nav" aria-label="Jump to">
+      <a href="#app">App home · 5</a><a href="#web">Website home · 5</a>
+    </nav>
+  </header>
+
+  <section class="g-sec" id="app">
+    <h2>App home screen <small>375 × 812 · iPhone</small></h2>
+    <div class="g-apps">
+
+      <!-- A1 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>A1</span>Score Line</b><p>The predicted score on the real 400–1600 scale is the hero, with the goal marked on it. Calm, data-first, closest to today's app.</p></div>
+        <div class="phone"><div class="screen a1">
+          <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+          <div class="body">
+            <div class="hi"><div><div class="mono">Tue · Oct 28 · 39 days to test</div><h3 class="disp">Morning, Maya</h3></div><span class="pts">1,240 pts</span></div>
+            <div class="score">
+              <div class="mono">Predicted score · from your last exam</div>
+              <div class="big disp">1340<small>+60 this month</small></div>
+              <div class="ruler" aria-label="Score 1340 on a 400 to 1600 scale, goal 1450">
+                <div class="track"></div><div class="fill"></div>
+                <div class="mk" style="left:78.3%"></div>
+                <div class="goal" style="left:87.5%">GOAL 1450</div>
+                <div class="ticks"><span>400</span><span>800</span><span>1200</span><span>1600</span></div>
+              </div>
+              <div class="split"><div>Reading &amp; Writing<b>680</b></div><div>Math<b>660</b></div></div>
+            </div>
+            <h4>Today's plan <a href="#app">Planner</a></h4>
+            <div class="list">
+              <div class="row done"><i class="bx"></i><span>Lesson: Systems of equations</span><em>12 min</em></div>
+              <div class="row"><i class="bx"></i><span>Topic test: Linear functions</span><em>0/15</em></div>
+              <div class="row"><i class="bx"></i><span>Redo 6 wrong answers</span><em>~8 min</em></div>
+            </div>
+            <div class="cont">
+              <div class="mono">Continue · Chapter 4</div>
+              <b>Quadratic functions</b>
+              <div class="bar"><i></i></div>
+              <div style="display:flex;justify-content:space-between;font-size:12.5px;color:var(--mut)"><span>7 of 12 lessons</span><span>Next: Vertex form</span></div>
+              <button class="btn">Continue lesson</button>
+            </div>
+            <div class="grid">
+              <div class="tile"><svg class="ic"><use href="#i-test"/></svg><b>Topic tests</b>32 topics</div>
+              <div class="tile"><svg class="ic"><use href="#i-clock"/></svg><b>Full exam</b>44 Q · 70 min</div>
+              <div class="tile"><svg class="ic"><use href="#i-x"/></svg><b>Wrong answers</b>14 to redo</div>
+              <div class="tile"><svg class="ic"><use href="#i-save"/></svg><b>Saved</b>9 questions</div>
+            </div>
+          </div>
+          <div class="tabs"><div class="on"><svg><use href="#i-home"/></svg>Home</div><div><svg><use href="#i-book"/></svg>Course</div><div><svg><use href="#i-test"/></svg>Tests</div><div><svg><use href="#i-user"/></svg>Profile</div></div>
+        </div></div>
+      </div>
+
+      <!-- A2 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>A2</span>Answer Sheet</b><p>Built on the bubble answer sheet and the #2 pencil: pencil yellow, graphite, filled bubbles for streaks and progress. Loud and memorable.</p></div>
+        <div class="phone"><div class="screen a2">
+          <div class="sb" style="background:var(--yel)"><span>9:41</span><span>●●● 100%</span></div>
+          <div class="body">
+            <div class="top">
+              <div class="cd"><h3 class="cond">Hi Maya.<br>Keep filling<br>them in.</h3><div style="text-align:right"><b class="cond">39</b><div class="mono">DAYS TO DEC 6</div></div></div>
+              <div class="bub" aria-label="Studied 5 of 7 days this week"><span class="f">M</span><span class="f">T</span><span class="f">W</span><span class="f">T</span><span class="f">F</span><span>S</span><span>S</span></div>
+            </div>
+            <div class="sec">
+              <div class="mono"><span>TODAY · 3 ITEMS</span><span>1/3</span></div>
+              <div class="q done"><span class="n">01</span><div>Systems of equations<small>Lesson · 12 min</small></div><i class="o"></i></div>
+              <div class="q"><span class="n">02</span><div>Linear functions<small>Topic test · 15 questions</small></div><i class="o"></i></div>
+              <div class="q"><span class="n">03</span><div>Wrong answers<small>Redo 6 questions</small></div><i class="o"></i></div>
+            </div>
+            <div class="card">
+              <div class="mono">SECTION 2 · MATH · CHAPTER 4</div>
+              <h4 class="cond">Quadratic functions</h4>
+              <div class="meter" aria-label="7 of 12 lessons"><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i class="f"></i><i></i><i></i><i></i><i></i><i></i></div>
+              <button class="btn">Continue · lesson 8</button>
+            </div>
+            <div class="two">
+              <div>Last exam<b>1340</b>R&amp;W 680 · M 660</div>
+              <div>Full exam<b>70 min</b>44 questions</div>
+            </div>
+          </div>
+          <div class="tabs"><div class="on"><svg><use href="#i-home"/></svg>Home</div><div><svg><use href="#i-book"/></svg>Course</div><div><svg><use href="#i-test"/></svg>Tests</div><div><svg><use href="#i-user"/></svg>Profile</div></div>
+        </div></div>
+      </div>
+
+      <!-- A3 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>A3</span>Night Desk</b><p>Dark by design, for evening study. A daily-minutes ring and a timeline of tonight's session, lit by a warm desk-lamp amber.</p></div>
+        <div class="phone"><div class="screen a3">
+          <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+          <div class="body">
+            <div class="hd"><div><div class="mut" style="font-size:13px">Tuesday evening</div><h3 class="disp">Ready, Maya?</h3></div><span class="chip">12 nights</span></div>
+            <div class="ring">
+              <svg viewBox="0 0 132 132" aria-label="25 of 40 minutes today">
+                <circle cx="66" cy="66" r="56" fill="none" stroke="#22304a" stroke-width="10"/>
+                <circle cx="66" cy="66" r="56" fill="none" stroke="#f5b54a" stroke-width="10" stroke-linecap="round" stroke-dasharray="351.9" stroke-dashoffset="132" transform="rotate(-90 66 66)"/>
+                <text x="66" y="68" text-anchor="middle" class="t">25</text>
+                <text x="66" y="88" text-anchor="middle" class="s">of 40 min</text>
+              </svg>
+              <div><p><b>15 minutes</b> left for today's goal. One topic test will do it.</p><button class="btn">Start session</button></div>
+            </div>
+            <h4>Tonight</h4>
+            <div class="tl">
+              <div class="d"><span>Lesson · Systems of equations</span><small>done</small></div>
+              <div class="now"><span>Topic test · Linear functions</span><small>15 Q</small></div>
+              <div><span>Redo 6 wrong answers</span><small>8 min</small></div>
+            </div>
+            <div class="cards">
+              <div class="c"><svg class="ic"><use href="#i-chart"/></svg><b>This week</b>
+                <div class="wk" aria-label="Minutes studied per day"><i style="height:60%" class="h"></i><i style="height:85%" class="h"></i><i style="height:40%" class="h"></i><i style="height:100%" class="h"></i><i style="height:62%" class="h"></i><i style="height:12%"></i><i style="height:12%"></i></div>
+              </div>
+              <div class="c"><svg class="ic"><use href="#i-clock"/></svg><b>Full exam</b>Math · 44 questions · 70 min<span style="color:var(--amb);font-weight:700">Last: 1340</span></div>
+            </div>
+          </div>
+          <div class="tabs"><div class="on"><svg><use href="#i-home"/></svg>Home</div><div><svg><use href="#i-book"/></svg>Course</div><div><svg><use href="#i-test"/></svg>Tests</div><div><svg><use href="#i-user"/></svg>Profile</div></div>
+        </div></div>
+      </div>
+
+      <!-- A4 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>A4</span>Graph Notebook</b><p>A math notebook page: graph-paper grid, red margin, highlighter, and handwritten notes from a tutor. Friendly and study-like.</p></div>
+        <div class="phone"><div class="screen a4">
+          <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+          <div class="body">
+            <div class="date">Tue, Oct 28 · page 23</div>
+            <h3>Today, finish <span class="mark">Chapter 4</span>, Maya.</h3>
+            <div class="goal"><span class="hand circ">1340</span><span class="hand" style="font-size:28px">→</span><span class="hand">1450</span><span style="font-size:12.5px;color:var(--mut)">110 to go</span></div>
+            <div class="chk">
+              <div class="d"><i class="b"></i><span>Lesson: Systems of equations<small>12 min</small></span></div>
+              <div><i class="b"></i><span>Topic test: Linear functions<small>15 questions</small></span></div>
+              <div><i class="b"></i><span>Redo 6 wrong answers<small>about 8 min</small></span></div>
+            </div>
+            <div class="card">
+              <div class="lab">Formula of the day</div>
+              <div class="formula">y = a(x − h)² + k</div>
+              <div class="hand note">vertex is (h, k), so read it straight off!</div>
+              <button class="btn">Continue Chapter 4 · lesson 8</button>
+            </div>
+            <div class="idx">
+              <div><b>Topic tests</b>32 topics</div>
+              <div><b>Full exam</b>44 Q · 70 min</div>
+              <div><b>Wrong answers</b>14 to redo</div>
+              <div><b>Saved</b>9 questions</div>
+            </div>
+          </div>
+          <div class="tabs"><div class="on"><svg><use href="#i-home"/></svg>Home</div><div><svg><use href="#i-book"/></svg>Course</div><div><svg><use href="#i-test"/></svg>Tests</div><div><svg><use href="#i-user"/></svg>Profile</div></div>
+        </div></div>
+      </div>
+
+      <!-- A5 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>A5</span>Streak Quest</b><p>Gamified, Duolingo-style: a lesson path for the chapter, daily quests, streak and points up top, chunky pressable buttons.</p></div>
+        <div class="phone"><div class="screen a5">
+          <div class="sb"><span>9:41</span><span>●●● 100%</span></div>
+          <div class="body">
+            <div class="stats"><span class="fl">▲ 12</span><span class="xp">★ 1,240</span><span class="lg">◆ Silver #4</span></div>
+            <div class="unit"><div><small>Chapter 4 · Math</small><b>Quadratic functions</b></div><svg class="ic" style="width:28px;height:28px"><use href="#i-book"/></svg></div>
+            <div class="path" aria-label="Lesson path, lesson 8 is next">
+              <div class="nd p1">✓</div>
+              <div class="nd p2">✓</div>
+              <div class="start">START</div>
+              <div class="nd cur p3">8</div>
+              <div class="nd l p4">9</div>
+              <div class="nd l p5">★</div>
+            </div>
+            <div class="quest">
+              <h4>Daily quests</h4>
+              <div class="qr"><span>Answer 20 questions</span><span>12/20</span><div class="pb"><i style="width:60%"></i></div></div>
+              <div class="qr"><span>Fix 5 wrong answers</span><span>1/5</span><div class="pb"><i style="width:20%"></i></div></div>
+            </div>
+            <button class="btn">Start lesson 8</button>
+          </div>
+          <div class="tabs"><div class="on"><svg><use href="#i-home"/></svg>Home</div><div><svg><use href="#i-book"/></svg>Course</div><div><svg><use href="#i-test"/></svg>Tests</div><div><svg><use href="#i-user"/></svg>Profile</div></div>
+        </div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="g-sec" id="web">
+    <h2>Website home page <small>responsive · try a narrow window</small></h2>
+    <div class="g-webs">
+
+      <!-- W1 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>W1</span>Score Line</b><p>Pairs with A1. Leads with the score scale and the three steps of the product, then a real question to try.</p></div>
+        <div class="browser"><div class="browser-bar"><i></i><i></i><i></i><span>satlearner.com</span></div>
+        <div class="site"><div class="w w1">
+          <div class="in"><nav><span class="logo">SAT<i>/</i>Learner</span><ul><li>Course</li><li>Practice tests</li><li>Planner</li><li>Pricing</li></ul><button class="ghost">Log in</button></nav></div>
+          <div class="in hero"><div class="two">
+            <div><h1 class="disp">Know your score <em>before</em> test day.</h1>
+              <p>Lessons, topic tests and timed full exams for the Digital SAT. Every exam you take updates your predicted score, so you always know how far you are from your goal.</p>
+              <div class="acts"><button class="cta">Start free</button><button class="ghost">Get the app</button></div></div>
+            <div class="panel" aria-label="Example score panel">
+              <div class="mono">Example · predicted score</div>
+              <div class="big">1340</div>
+              <div class="scale">
+                <div class="tr"></div><div class="seg" style="left:0;width:78.3%"></div>
+                <div class="p" style="left:78.3%;color:#fff">YOU 1340</div>
+                <div class="p" style="left:87.5%;color:var(--gold);top:30px">GOAL 1450</div>
+                <span class="t" style="left:2%">400</span><span class="t" style="left:33.3%">800</span><span class="t" style="left:66.6%">1200</span><span class="t" style="left:97%">1600</span>
+              </div>
+              <div class="rows">
+                <div>Reading &amp; Writing<i style="--w:80%"></i><b>680</b></div>
+                <div>Math<i style="--w:76.6%"></i><b>660</b></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="in steps">
+            <h2>How it works</h2>
+            <div class="three">
+              <div class="st"><span class="n">STEP 1</span><h3>Learn the topic</h3><p>Short lessons with worked examples for every Math and Reading &amp; Writing skill.</p></div>
+              <div class="st"><span class="n">STEP 2</span><h3>Practice it</h3><p>Topic tests explain each answer. Wrong answers are saved so you can redo them later.</p></div>
+              <div class="st"><span class="n">STEP 3</span><h3>Take a timed exam</h3><p>Full exams on the real clock: 70 minutes for 44 Math questions. Your score updates right away.</p></div>
+            </div>
+          </div>
+          <div class="in try">
+            <div class="qbox" data-q>
+              <span class="mono">Try one · Math · Linear equations</span>
+              <p>If 3x + 7 = 22, what is the value of 6x − 4?</p>
+              <div class="opts">
+                <button class="qopt" data-ok><b>A</b>26</button><button class="qopt"><b>B</b>30</button><button class="qopt"><b>C</b>34</button><button class="qopt"><b>D</b>38</button>
+              </div>
+              <p class="fb" aria-live="polite">Pick an answer to check it.</p>
+            </div>
+          </div>
+          <div class="in"><footer><span>SAT Learner</span><span>iOS · Android · Web</span></footer></div>
+        </div></div></div>
+      </div>
+
+      <!-- W2 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>W2</span>Answer Sheet</b><p>Pairs with A2. A giant condensed headline, an answer sheet you can fill in, and the test format laid out like an exam booklet.</p></div>
+        <div class="browser"><div class="browser-bar"><i></i><i></i><i></i><span>satlearner.com</span></div>
+        <div class="site"><div class="w w2">
+          <div class="hero">
+            <div class="in"><nav><span class="logo cond">SAT Learner</span><ul><li>Course</li><li>Tests</li><li>Pricing</li><li>Log in</li></ul></nav></div>
+            <div class="in hgrid"><div class="two">
+              <div><h1 class="cond">Fill in the right bubble.</h1>
+                <p>Lessons and practice for every question type on the Digital SAT, with an explanation for every answer. On your phone and on the web.</p>
+                <button class="cta">Start free</button></div>
+              <div class="sheet" data-q>
+                <div class="mono"><span>SECTION 2 · MATH</span><span>QUESTION 7 OF 44</span></div>
+                <p>If 3x + 7 = 22, what is the value of 6x − 4?</p>
+                <div>
+                  <button class="qopt" data-ok><b>A</b>26</button><button class="qopt"><b>B</b>30</button><button class="qopt"><b>C</b>34</button><button class="qopt"><b>D</b>38</button>
+                </div>
+                <p class="fb" aria-live="polite">Fill in one bubble.</p>
+              </div>
+            </div></div>
+          </div>
+          <div class="in fmt">
+            <h2 class="cond">Two sections. Four modules. One score.</h2>
+            <div class="three">
+              <div class="sec y"><span class="mono">Section 1</span><b>Reading &amp; Writing</b><p>54 questions · 64 minutes · 200–800</p></div>
+              <div class="sec"><span class="mono">Section 2</span><b>Math</b><p>44 questions · 70 minutes · 200–800</p></div>
+              <div class="sec"><span class="mono">Total</span><b>400–1600</b><p>Each section has two adaptive modules. We practice both.</p></div>
+            </div>
+          </div>
+          <div class="band"><div class="in"><b>PRO unlocks every topic test and full exam.</b><button class="cta">See plans</button></div></div>
+        </div></div></div>
+      </div>
+
+      <!-- W3 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>W3</span>Night Desk</b><p>Pairs with A3. A dark, calm page that sells the study routine: a session timer, tonight's plan, and the planner.</p></div>
+        <div class="browser"><div class="browser-bar"><i></i><i></i><i></i><span>satlearner.com</span></div>
+        <div class="site"><div class="w w3">
+          <div class="in"><nav><span class="logo">sat<i>.</i>learner</span><ul><li>Course</li><li>Practice</li><li>Planner</li><li>Pricing</li></ul><button class="ghost">Log in</button></nav></div>
+          <div class="in hero"><div class="two">
+            <div><h1 class="disp">Forty minutes a night is <em>a plan.</em></h1>
+              <p>Tell us your test date and goal score. SAT Learner builds a nightly plan of lessons, topic tests and exams, and moves it when life gets in the way.</p>
+              <div class="acts"><button class="cta">Build my plan</button><button class="ghost">See the course</button></div></div>
+            <div class="desk" aria-label="Example study session">
+              <div class="top"><span>Tonight · example</span><span>12-night streak</span></div>
+              <div class="timer">24:18</div>
+              <div class="seg"><i class="d"></i><i class="d"></i><i class="n"></i><i></i></div>
+              <div class="plan">
+                <div><span>Lesson · Systems of equations</span><small>done</small></div>
+                <div style="outline:1px solid var(--amb)"><span>Topic test · Linear functions</span><small>now</small></div>
+                <div><span>Redo 6 wrong answers</span><small>8 min</small></div>
+              </div>
+            </div>
+          </div></div>
+          <div class="in fs"><div class="three">
+            <div class="f"><svg class="ic"><use href="#i-cal"/></svg><h3>Planner</h3><p>Daily tasks counted back from your test date, with reminders.</p></div>
+            <div class="f"><svg class="ic"><use href="#i-test"/></svg><h3>Practice</h3><p>Topic tests by skill, plus your wrong and saved questions to redo.</p></div>
+            <div class="f"><svg class="ic"><use href="#i-clock"/></svg><h3>Timed exams</h3><p>Full exams on the real clock, scored on the 200–800 scale.</p></div>
+          </div></div>
+          <div class="in"><footer>SAT Learner · iOS, Android and web</footer></div>
+        </div></div></div>
+      </div>
+
+      <!-- W4 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>W4</span>Graph Notebook</b><p>Pairs with A4. The hero is a worked solution with margin notes, so the page shows how the lessons teach.</p></div>
+        <div class="browser"><div class="browser-bar"><i></i><i></i><i></i><span>satlearner.com</span></div>
+        <div class="site"><div class="w w4">
+          <div class="in"><nav><span class="logo">SAT Learner</span><ul><li>Course</li><li>Practice tests</li><li>Planner</li><li>Pricing</li></ul><button class="cta">Start free</button></nav></div>
+          <div class="in hero"><div class="two">
+            <div><h1>SAT prep that <span class="mark">shows its work.</span></h1>
+              <p>Every lesson and every answer comes with a step-by-step solution, written the way a tutor would explain it.</p>
+              <button class="cta">Start the free chapter</button><span class="hand ann">← takes 10 min</span></div>
+            <div class="work" aria-label="Worked example">
+              <div class="lab">Worked example · Linear equations</div>
+              <p>If 3x + 7 = 22, what is the value of 6x − 4?</p>
+              <div class="ln"><span>3x + 7 = 22</span><span class="hand">start here</span></div>
+              <div class="ln"><span>3x = 15</span><span class="hand">−7 both sides</span></div>
+              <div class="ln"><span>6x = 30</span><span class="hand">don't solve for x, double it!</span></div>
+              <div class="ln"><span>6x − 4 = 26</span><span class="hand">−4</span></div>
+              <div class="ans">Answer: <span class="circ">A) 26</span></div>
+            </div>
+          </div></div>
+          <div class="in notes">
+            <h2>What's in the notebook</h2>
+            <div class="three">
+              <div class="nt"><h3>Course</h3><p>Chapters for every Math and Reading &amp; Writing skill, in a sensible order.</p><span class="hand">start with Chapter 1</span></div>
+              <div class="nt"><h3>Practice tests</h3><p>Topic tests, full timed exams, and your wrong answers to redo.</p><span class="hand">redo what you miss</span></div>
+              <div class="nt"><h3>Planner</h3><p>A daily plan from today to your test date, on the web and in the app.</p><span class="hand">set your test date</span></div>
+            </div>
+          </div>
+          <div class="in"><footer>SAT Learner · iOS, Android and web</footer></div>
+        </div></div></div>
+      </div>
+
+      <!-- W5 -->
+      <div class="g-item">
+        <div class="g-label"><b><span>W5</span>Streak Quest</b><p>Pairs with A5. Sells the habit: streaks, points and a lesson path. Aimed at younger students who need motivation more than information.</p></div>
+        <div class="browser"><div class="browser-bar"><i></i><i></i><i></i><span>satlearner.com</span></div>
+        <div class="site"><div class="w w5">
+          <div class="in"><nav><span class="logo">satlearner</span><ul><li>Course</li><li>Tests</li><li>Pricing</li></ul><button class="ghost">Log in</button></nav></div>
+          <div class="in hero"><div class="two">
+            <div><h1>SAT prep you'll <em>actually</em> open every day.</h1>
+              <p>Ten-minute lessons, daily quests and a streak to protect. Points for every right answer, and a full exam when you're ready.</p>
+              <div class="acts"><button class="cta">Start my streak</button><button class="ghost">I have an account</button></div></div>
+            <div class="board" aria-label="Example lesson path">
+              <div class="chips"><span style="color:var(--coral)">▲ 12 days</span><span style="color:#c58a00">★ 1,240</span><span style="color:var(--sky)">◆ Silver league</span></div>
+              <div class="map">
+                <div class="nd m1">✓</div><div class="nd m2">✓</div><div class="nd cur m3">8</div><div class="nd l m4">9</div>
+              </div>
+            </div>
+          </div></div>
+          <div class="in feat"><div class="three">
+            <div class="ft"><div class="em" style="background:var(--coral)">▲</div><h3>Streaks</h3><p>Study a little every day. Miss one and you start again.</p></div>
+            <div class="ft"><div class="em" style="background:var(--sun);color:var(--ink)">★</div><h3>Points</h3><p>Every right answer, finished test and passed exam adds to your total.</p></div>
+            <div class="ft"><div class="em" style="background:var(--sky)">◆</div><h3>Leagues</h3><p>Compare your week with other students preparing for the same test date.</p></div>
+          </div></div>
+          <div class="in"><footer>SAT Learner · iOS, Android and web</footer></div>
+        </div></div></div>
+      </div>
+
+    </div>
+  </section>
+</div>
+
+<script>
+document.querySelectorAll("[data-q]").forEach(function (box) {
+  var fb = box.querySelector(".fb");
+  box.querySelectorAll(".qopt").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      box.querySelectorAll(".qopt").forEach(function (b) { b.classList.remove("ok", "no"); });
+      var right = btn.hasAttribute("data-ok");
+      btn.classList.add(right ? "ok" : "no");
+      if (!right) box.querySelector("[data-ok]").classList.add("ok");
+      fb.textContent = right
+        ? "Correct. 3x = 15, so 6x = 30 and 6x − 4 = 26."
+        : "Not quite. 3x = 15, so 6x = 30 and 6x − 4 = 26. The answer is A.";
+    });
+  });
+});
+</script>

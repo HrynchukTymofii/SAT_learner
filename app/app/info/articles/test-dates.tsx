@@ -44,33 +44,33 @@ export default function TestDatesPage() {
       title: "Register Early",
       description: "Test centers fill up quickly. Register as early as possible to secure your preferred location.",
       icon: Clock,
-      color: "#06B6D4",
+      color: "#8A5CE6",
     },
     {
       title: "Fee Waivers Available",
       description: "Low-income students may qualify for fee waivers covering registration, score reports, and more.",
       icon: DollarSign,
-      color: "#10B981",
+      color: "#2E9A5E",
     },
     {
       title: "Late Registration",
       description: "Late registration is available for an additional fee, typically 1-2 weeks after the regular deadline.",
       icon: AlertCircle,
-      color: "#F59E0B",
+      color: "#E5A50A",
     },
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View
         style={{
           paddingTop: insets.top + 12,
           paddingBottom: 16,
           paddingHorizontal: 16,
-          backgroundColor: isDark ? "#111827" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         }}
       >
         {/* Back Button */}
@@ -83,15 +83,15 @@ export default function TestDatesPage() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text
             style={{
-              color: isDark ? "#06B6D4" : "#0891B2",
+              color: isDark ? "#C9AAFB" : "#7A4BDB",
               fontWeight: "600",
               marginLeft: 6,
               fontSize: 14,
@@ -107,7 +107,7 @@ export default function TestDatesPage() {
             style={{
               padding: 12,
               borderRadius: 12,
-              backgroundColor: "#8B5CF6",
+              backgroundColor: "#8A5CE6",
               marginRight: 12,
             }}
           >
@@ -118,13 +118,13 @@ export default function TestDatesPage() {
               style={{
                 fontSize: 24,
                 fontWeight: "bold",
-                color: isDark ? "#ffffff" : "#1f2937",
+                color: isDark ? "#F4F1F8" : "#0B0A0F",
                 marginBottom: 4,
               }}
             >
               Test Dates & Registration
             </Text>
-            <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+            <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
               Plan your SAT test schedule
             </Text>
           </View>
@@ -142,7 +142,7 @@ export default function TestDatesPage() {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 16,
             }}
           >
@@ -153,12 +153,12 @@ export default function TestDatesPage() {
             <View
               key={index}
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 12,
                 borderLeftWidth: 4,
-                borderLeftColor: "#8B5CF6",
+                borderLeftColor: "#8A5CE6",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -174,7 +174,7 @@ export default function TestDatesPage() {
                   style={{
                     fontSize: 18,
                     fontWeight: "700",
-                    color: isDark ? "#ffffff" : "#1f2937",
+                    color: isDark ? "#F4F1F8" : "#0B0A0F",
                     marginBottom: 4,
                   }}
                 >
@@ -183,13 +183,13 @@ export default function TestDatesPage() {
                 <Text
                   style={{
                     fontSize: 14,
-                    color: isDark ? "#9ca3af" : "#6b7280",
+                    color: isDark ? "#9C95A8" : "#6B6577",
                   }}
                 >
                   Registration Deadline: {item.registration}
                 </Text>
               </View>
-              <Calendar size={24} color="#8B5CF6" />
+              <Calendar size={24} color="#8A5CE6" />
             </View>
           ))}
         </View>
@@ -200,7 +200,7 @@ export default function TestDatesPage() {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 16,
             }}
           >
@@ -211,12 +211,12 @@ export default function TestDatesPage() {
             <View
               key={index}
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 12,
                 borderLeftWidth: 4,
-                borderLeftColor: "#06B6D4",
+                borderLeftColor: "#8A5CE6",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -232,7 +232,7 @@ export default function TestDatesPage() {
                   style={{
                     fontSize: 18,
                     fontWeight: "700",
-                    color: isDark ? "#ffffff" : "#1f2937",
+                    color: isDark ? "#F4F1F8" : "#0B0A0F",
                     marginBottom: 4,
                   }}
                 >
@@ -241,13 +241,13 @@ export default function TestDatesPage() {
                 <Text
                   style={{
                     fontSize: 14,
-                    color: isDark ? "#9ca3af" : "#6b7280",
+                    color: isDark ? "#9C95A8" : "#6B6577",
                   }}
                 >
                   Registration Deadline: {item.registration}
                 </Text>
               </View>
-              <Calendar size={24} color="#06B6D4" />
+              <Calendar size={24} color="#8A5CE6" />
             </View>
           ))}
         </View>
@@ -258,7 +258,7 @@ export default function TestDatesPage() {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 16,
             }}
           >
@@ -269,12 +269,12 @@ export default function TestDatesPage() {
             <View
               key={index}
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 12,
                 borderLeftWidth: 4,
-                borderLeftColor: "#10B981",
+                borderLeftColor: "#2E9A5E",
                 shadowColor: "#000",
                 shadowOffset: { width: 0, height: 2 },
                 shadowOpacity: 0.1,
@@ -290,7 +290,7 @@ export default function TestDatesPage() {
                   style={{
                     fontSize: 18,
                     fontWeight: "700",
-                    color: isDark ? "#ffffff" : "#1f2937",
+                    color: isDark ? "#F4F1F8" : "#0B0A0F",
                     marginBottom: 4,
                   }}
                 >
@@ -299,13 +299,13 @@ export default function TestDatesPage() {
                 <Text
                   style={{
                     fontSize: 14,
-                    color: isDark ? "#9ca3af" : "#6b7280",
+                    color: isDark ? "#9C95A8" : "#6B6577",
                   }}
                 >
                   Registration Deadline: {item.registration}
                 </Text>
               </View>
-              <Calendar size={24} color="#10B981" />
+              <Calendar size={24} color="#2E9A5E" />
             </View>
           ))}
         </View>
@@ -313,12 +313,12 @@ export default function TestDatesPage() {
         {/* Registration Process */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 16,
             padding: 20,
             marginBottom: 24,
             borderLeftWidth: 4,
-            borderLeftColor: "#06B6D4",
+            borderLeftColor: "#8A5CE6",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -330,7 +330,7 @@ export default function TestDatesPage() {
             style={{
               fontSize: 18,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 12,
             }}
           >
@@ -339,7 +339,7 @@ export default function TestDatesPage() {
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               lineHeight: 22,
               marginBottom: 16,
             }}
@@ -361,7 +361,7 @@ export default function TestDatesPage() {
                   width: 24,
                   height: 24,
                   borderRadius: 12,
-                  backgroundColor: "#06B6D4",
+                  backgroundColor: "#8A5CE6",
                   alignItems: "center",
                   justifyContent: "center",
                   marginRight: 12,
@@ -374,7 +374,7 @@ export default function TestDatesPage() {
               <Text
                 style={{
                   fontSize: 14,
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   flex: 1,
                   lineHeight: 20,
                 }}
@@ -391,7 +391,7 @@ export default function TestDatesPage() {
             style={{
               fontSize: 20,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 16,
             }}
           >
@@ -404,7 +404,7 @@ export default function TestDatesPage() {
               <View
                 key={index}
                 style={{
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  backgroundColor: isDark ? "#17151C" : "#ffffff",
                   borderRadius: 16,
                   padding: 20,
                   marginBottom: 16,
@@ -423,7 +423,7 @@ export default function TestDatesPage() {
                     style={{
                       fontSize: 16,
                       fontWeight: "700",
-                      color: isDark ? "#ffffff" : "#1f2937",
+                      color: isDark ? "#F4F1F8" : "#0B0A0F",
                     }}
                   >
                     {tip.title}
@@ -432,7 +432,7 @@ export default function TestDatesPage() {
                 <Text
                   style={{
                     fontSize: 14,
-                    color: isDark ? "#9ca3af" : "#6b7280",
+                    color: isDark ? "#9C95A8" : "#6B6577",
                     lineHeight: 20,
                   }}
                 >
@@ -446,12 +446,12 @@ export default function TestDatesPage() {
         {/* Test Day Requirements */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#ffffff",
+            backgroundColor: isDark ? "#17151C" : "#ffffff",
             borderRadius: 16,
             padding: 20,
             marginBottom: 24,
             borderLeftWidth: 4,
-            borderLeftColor: "#10B981",
+            borderLeftColor: "#2E9A5E",
             shadowColor: "#000",
             shadowOffset: { width: 0, height: 2 },
             shadowOpacity: 0.1,
@@ -463,7 +463,7 @@ export default function TestDatesPage() {
             style={{
               fontSize: 18,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 12,
             }}
           >
@@ -485,11 +485,11 @@ export default function TestDatesPage() {
                 marginBottom: 8,
               }}
             >
-              <Check size={16} color="#10B981" style={{ marginRight: 8, marginTop: 2 }} />
+              <Check size={16} color="#2E9A5E" style={{ marginRight: 8, marginTop: 2 }} />
               <Text
                 style={{
                   fontSize: 14,
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   flex: 1,
                   lineHeight: 20,
                 }}
@@ -503,21 +503,21 @@ export default function TestDatesPage() {
         {/* College Board Link */}
         <View
           style={{
-            backgroundColor: isDark ? "#1e293b" : "#f0f9ff",
+            backgroundColor: isDark ? "#17151C" : "#f0f9ff",
             borderRadius: 16,
             padding: 16,
             borderWidth: 1,
-            borderColor: isDark ? "#334155" : "#bae6fd",
+            borderColor: isDark ? "#2B2733" : "#bae6fd",
             marginBottom: 24,
           }}
         >
           <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-            <ExternalLink size={20} color={isDark ? "#06B6D4" : "#0891B2"} style={{ marginRight: 8 }} />
+            <ExternalLink size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} style={{ marginRight: 8 }} />
             <Text
               style={{
                 fontSize: 14,
                 fontWeight: "600",
-                color: isDark ? "#06B6D4" : "#0891B2",
+                color: isDark ? "#C9AAFB" : "#7A4BDB",
               }}
             >
               Official Registration
@@ -526,7 +526,7 @@ export default function TestDatesPage() {
           <Text
             style={{
               fontSize: 14,
-              color: isDark ? "#9ca3af" : "#6b7280",
+              color: isDark ? "#9C95A8" : "#6B6577",
               lineHeight: 20,
             }}
           >
@@ -538,7 +538,7 @@ export default function TestDatesPage() {
         <TouchableOpacity
           onPress={() => router.push("/info" as any)}
           style={{
-            backgroundColor: "#06B6D4",
+            backgroundColor: "#8A5CE6",
             borderRadius: 16,
             padding: 16,
             flexDirection: "row",

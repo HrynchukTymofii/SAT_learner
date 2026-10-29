@@ -148,7 +148,7 @@ export default function ChapterScreen() {
 
     const fromCompleted = isCompleted(items[fromIndex]);
     const toCompleted = isCompleted(items[toIndex]);
-    const pathColor = (fromCompleted && toCompleted) ? "#06B6D4" : (isDark ? "#374151" : "#d1d5db");
+    const pathColor = (fromCompleted && toCompleted) ? "#8A5CE6" : (isDark ? "#2B2733" : "#D9D2E5");
 
     const startX = from.x + CARD_WIDTH / 2;
     const startY = from.y + 60;
@@ -211,15 +211,15 @@ export default function ChapterScreen() {
   const contentHeight = items.length * VERTICAL_SPACING + 200;
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View style={{
         paddingTop: insets.top + 12,
         paddingBottom: 16,
         paddingHorizontal: 16,
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+        borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
         zIndex: 10,
       }}>
         {/* Back Button */}
@@ -232,22 +232,22 @@ export default function ChapterScreen() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
-          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
+          <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
             Back
           </Text>
         </TouchableOpacity>
 
         {/* Title */}
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 4 }}>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 4 }}>
           {chapterTitle}
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           {items.length} items · {items.filter(isCompleted).length} completed
         </Text>
       </View>
@@ -306,15 +306,15 @@ export default function ChapterScreen() {
                 <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
                   <View style={{ flexDirection: "row", alignItems: "center" }}>
                     {completed ? (
-                      <CheckCircle2 size={24} color="#10B981" />
+                      <CheckCircle2 size={24} color="#2E9A5E" />
                     ) : isLesson ? (
                       (item.videoUrl) ? (
-                        <Play size={24} color={isDark ? "#06B6D4" : "#0891B2"} fill={isDark ? "#06B6D4" : "#0891B2"} />
+                        <Play size={24} color={isDark ? "#C9AAFB" : "#7A4BDB"} fill={isDark ? "#C9AAFB" : "#7A4BDB"} />
                       ) : (
-                        <BookOpen size={24} color={isDark ? "#06B6D4" : "#0891B2"} />
+                        <BookOpen size={24} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
                       )
                     ) : (
-                      <Trophy size={24} color={isDark ? "#8B5CF6" : "#7C3AED"} />
+                      <Trophy size={24} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
                     )}
                   </View>
                   <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
@@ -322,12 +322,12 @@ export default function ChapterScreen() {
                       <Text style={{
                         fontSize: 16,
                         fontWeight: "bold",
-                        color: isDark ? "#8B5CF6" : "#7C3AED",
+                        color: isDark ? "#C9AAFB" : "#7A4BDB",
                       }}>
                         {quizProgress}%
                       </Text>
                     )}
-                    {isLocked && <Lock size={16} color={isDark ? "#6b7280" : "#9ca3af"} />}
+                    {isLocked && <Lock size={16} color={isDark ? "#7E7889" : "#9C95A8"} />}
                   </View>
                 </View>
 
@@ -336,7 +336,7 @@ export default function ChapterScreen() {
                   style={{
                     fontSize: 14,
                     fontWeight: "600",
-                    color: isDark ? "#ffffff" : "#1f2937",
+                    color: isDark ? "#F4F1F8" : "#0B0A0F",
                     marginBottom: 4,
                   }}
                   numberOfLines={1}
@@ -350,12 +350,12 @@ export default function ChapterScreen() {
                     paddingHorizontal: 8,
                     paddingVertical: 4,
                     borderRadius: 8,
-                    backgroundColor: completed ? "#10B98110" : (isLesson ? "#06B6D410" : "#8B5CF610"),
+                    backgroundColor: completed ? "#2E9A5E10" : (isLesson ? "#8A5CE610" : "#8A5CE610"),
                   }}>
                     <Text style={{
                       fontSize: 11,
                       fontWeight: "600",
-                      color: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
+                      color: completed ? "#2E9A5E" : (isLesson ? "#8A5CE6" : "#8A5CE6"),
                     }}>
                       {item.type.toUpperCase()}
                     </Text>
@@ -366,7 +366,7 @@ export default function ChapterScreen() {
                     <Text style={{
                       fontSize: 11,
                       fontWeight: "500",
-                      color: isDark ? "#9ca3af" : "#6b7280",
+                      color: isDark ? "#9C95A8" : "#6B6577",
                     }}>
                       • {item.questionCount} {item.questionCount === 1 ? 'question' : 'questions'}
                     </Text>
@@ -408,11 +408,11 @@ export default function ChapterScreen() {
                       activeOpacity={isLocked ? 1 : 0.7}
                       style={{
                         width: CARD_WIDTH,
-                        backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                        backgroundColor: isDark ? "#17151C" : "#ffffff",
                         borderRadius: 16,
                         padding: 16,
                         borderLeftWidth: 4,
-                        borderLeftColor: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
+                        borderLeftColor: completed ? "#2E9A5E" : (isLesson ? "#8A5CE6" : "#8A5CE6"),
                         shadowColor: "#000",
                         shadowOffset: { width: 0, height: 2 },
                         shadowOpacity: 0.1,
@@ -439,11 +439,11 @@ export default function ChapterScreen() {
                   left: pos.x,
                   top: pos.y,
                   width: CARD_WIDTH,
-                  backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                  backgroundColor: isDark ? "#17151C" : "#ffffff",
                   borderRadius: 16,
                   padding: 16,
                   borderLeftWidth: 4,
-                  borderLeftColor: completed ? "#10B981" : (isLesson ? "#06B6D4" : "#8B5CF6"),
+                  borderLeftColor: completed ? "#2E9A5E" : (isLesson ? "#8A5CE6" : "#8A5CE6"),
                   shadowColor: "#000",
                   shadowOffset: { width: 0, height: 2 },
                   shadowOpacity: 0.1,

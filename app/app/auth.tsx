@@ -184,7 +184,7 @@ export default function AuthLandingScreen() {
             {googleLoading ? (
               <ActivityIndicator
                 size="small"
-                color="#06B6D4"
+                color="#8A5CE6"
                 className="mr-4"
               />
             ) : (
@@ -209,7 +209,7 @@ export default function AuthLandingScreen() {
               {appleLoading ? (
                 <ActivityIndicator
                   size="small"
-                  color="#06B6D4"
+                  color="#8A5CE6"
                   className="mr-4"
                 />
               ) : (
@@ -230,7 +230,7 @@ export default function AuthLandingScreen() {
             activeOpacity={0.7}
             className="flex-row items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 shadow-sm"
           >
-            <Mail size={24} color="#06B6D4" style={{ marginRight: 16 }} />
+            <Mail size={24} color="#8A5CE6" style={{ marginRight: 16 }} />
             <Text className="text-gray-900 dark:text-white font-medium text-base flex-1">
               Continue with Email
             </Text>

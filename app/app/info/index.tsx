@@ -18,7 +18,7 @@ export default function ArticlesPage() {
         "Learn about the SAT exam, its purpose, structure, and importance for college admissions.",
       icon: BookOpen,
       route: "info/articles/what-is-sat",
-      bgColor: "#06B6D4",
+      bgColor: "#8A5CE6",
       iconColor: "#ffffff",
     },
     {
@@ -27,7 +27,7 @@ export default function ArticlesPage() {
         "Understand the SAT scoring system, score ranges, and how your performance is evaluated.",
       icon: Target,
       route: "info/articles/how-sat-scored",
-      bgColor: "#10B981",
+      bgColor: "#2E9A5E",
       iconColor: "#ffffff",
     },
     {
@@ -36,21 +36,21 @@ export default function ArticlesPage() {
         "Find out about SAT test dates, registration process, deadlines, and important information.",
       icon: Calendar,
       route: "info/articles/test-dates",
-      bgColor: "#8B5CF6",
+      bgColor: "#8A5CE6",
       iconColor: "#ffffff",
     },
   ];
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#111827" : "#f9fafb" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
       {/* Header */}
       <View style={{
         paddingTop: insets.top + 12,
         paddingBottom: 16,
         paddingHorizontal: 16,
-        backgroundColor: isDark ? "#111827" : "#ffffff",
+        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
         borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#1f2937" : "#e5e7eb",
+        borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
       }}>
         {/* Back Button */}
         <TouchableOpacity
@@ -62,22 +62,22 @@ export default function ArticlesPage() {
             alignSelf: "flex-start",
             paddingHorizontal: 12,
             paddingVertical: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             borderRadius: 12,
           }}
           activeOpacity={0.7}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
-          <Text style={{ color: isDark ? "#06B6D4" : "#0891B2", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
+          <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
             Back
           </Text>
         </TouchableOpacity>
 
         {/* Title */}
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#ffffff" : "#1f2937", marginBottom: 4 }}>
+        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 4 }}>
           SAT Resources
         </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9ca3af" : "#6b7280" }}>
+        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
           Everything you need to know about the SAT exam
         </Text>
       </View>
@@ -95,7 +95,7 @@ export default function ArticlesPage() {
               activeOpacity={0.7}
               onPress={() => {router.push(article.route as any)}}
               style={{
-                backgroundColor: isDark ? "#1e293b" : "#ffffff",
+                backgroundColor: isDark ? "#17151C" : "#ffffff",
                 borderRadius: 16,
                 padding: 20,
                 marginBottom: 16,
@@ -124,7 +124,7 @@ export default function ArticlesPage() {
                     fontSize: 18,
                     fontWeight: "700",
                     marginLeft: 12,
-                    color: isDark ? "#ffffff" : "#1f2937",
+                    color: isDark ? "#F4F1F8" : "#0B0A0F",
                     flex: 1,
                   }}
                 >
@@ -136,7 +136,7 @@ export default function ArticlesPage() {
               <Text
                 style={{
                   fontSize: 14,
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                   marginBottom: 12,
                   lineHeight: 20,
                 }}
@@ -147,7 +147,7 @@ export default function ArticlesPage() {
               {/* Learn More Badge */}
               <View
                 style={{
-                  backgroundColor: isDark ? "#0f172a" : "#f9fafb",
+                  backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
                   paddingVertical: 8,
                   borderRadius: 8,
                   alignItems: "center",
@@ -155,7 +155,7 @@ export default function ArticlesPage() {
               >
                 <Text
                   style={{
-                    color: isDark ? "#06B6D4" : "#0891B2",
+                    color: isDark ? "#C9AAFB" : "#7A4BDB",
                     fontWeight: "600",
                     fontSize: 14,
                   }}

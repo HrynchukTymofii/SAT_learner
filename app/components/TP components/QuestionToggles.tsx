@@ -61,17 +61,17 @@ const QuestionToggles = ({
       onPress={onHintPress}
       activeOpacity={0.7}
       style={{
-        backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+        backgroundColor: isDark ? "#17151C" : "#EFEAF7",
         padding: 10,
         borderRadius: 12,
         borderWidth: 1,
-        borderColor: isDark ? "#374155" : "#e5e7eb",
+        borderColor: isDark ? "#2B2733" : "#E5DFEE",
       }}
     >
       <Lightbulb
         size={20}
-        color="#f59e0b"
-        fill="#f59e0b"
+        color="#E5A50A"
+        fill="#E5A50A"
       />
     </TouchableOpacity>
   ) : null;
@@ -82,20 +82,20 @@ const QuestionToggles = ({
       activeOpacity={0.7}
       style={{
         backgroundColor: currentQuestion.isSaved
-          ? (isDark ? "#1e40af" : "#dbeafe")
-          : (isDark ? "#1f2937" : "#f3f4f6"),
+          ? (isDark ? "#1e40af" : "#E4CDFF")
+          : (isDark ? "#17151C" : "#EFEAF7"),
         padding: 10,
         borderRadius: 12,
         borderWidth: 1,
         borderColor: currentQuestion.isSaved
-          ? "#06B6D4"
-          : (isDark ? "#374155" : "#e5e7eb"),
+          ? "#8A5CE6"
+          : (isDark ? "#2B2733" : "#E5DFEE"),
       }}
     >
       <Bookmark
         size={20}
-        color={currentQuestion.isSaved ? "#06B6D4" : (isDark ? "#9ca3af" : "#6b7280")}
-        fill={currentQuestion.isSaved ? "#06B6D4" : "transparent"}
+        color={currentQuestion.isSaved ? "#8A5CE6" : (isDark ? "#9C95A8" : "#6B6577")}
+        fill={currentQuestion.isSaved ? "#8A5CE6" : "transparent"}
       />
     </TouchableOpacity>
   );

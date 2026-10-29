@@ -22,7 +22,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-manrope);
+  --font-display: var(--font-outfit);
   --font-mono: var(--font-geist-mono);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -53,99 +54,151 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  /* Brand palette: lavender, butter, black. Pastels keep dark ink (on-pastel) in both themes */
+  --color-frame: var(--frame);
+  --color-frame-foreground: var(--frame-foreground);
+  --color-frame-muted: var(--frame-muted);
+  --color-frame-line: var(--frame-line);
+  --color-lav: var(--lav);
+  --color-lav-2: var(--lav-2);
+  --color-butter: var(--butter);
+  --color-mint: var(--mint);
+  --color-rose: var(--rose);
+  --color-on-pastel: var(--on-pastel);
+  --color-brand: var(--brand);
+  --color-success: var(--success);
+  --color-warn: var(--warn);
+  --radius-sm: calc(var(--radius) - 8px);
+  --radius-md: calc(var(--radius) - 4px);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 6px);
+  --radius-2xl: calc(var(--radius) + 10px);
+  --radius-3xl: calc(var(--radius) + 16px);
 }
 
 :root {
-  --radius: 0.625rem;
-  /* Light mode - Clean whites with cyan accent */
-  --background: #ffffff;
-  --foreground: #11181C;
-  --card: #ffffff;
-  --card-foreground: #11181C;
-  --popover: #ffffff;
-  --popover-foreground: #11181C;
-  /* Primary: Cyan like app */
-  --primary: #06B6D4;
-  --primary-foreground: #ffffff;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #f1f5f9;
-  --accent-foreground: #0f172a;
-  --destructive: #ef4444;
-  --border: #e2e8f0;
-  --input: #e2e8f0;
-  --ring: #06B6D4;
-  /* Chart colors */
-  --chart-1: #06B6D4;
-  --chart-2: #10b981;
-  --chart-3: #f97316;
-  --chart-4: #8b5cf6;
-  --chart-5: #ec4899;
-  /* Chapter colors for progress */
-  --chapter-1: #10b981;
-  --chapter-2: #ef4444;
-  --chapter-3: #3b82f6;
-  --chapter-4: #f97316;
-  --chapter-5: #a855f7;
-  /* Sidebar */
-  --sidebar: #f8fafc;
-  --sidebar-foreground: #11181C;
-  --sidebar-primary: #06B6D4;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #f1f5f9;
-  --sidebar-accent-foreground: #0f172a;
-  --sidebar-border: #e2e8f0;
-  --sidebar-ring: #06B6D4;
+  --radius: 1rem;
+  --background: #F4F1F9;
+  --foreground: #0B0A0F;
+  --card: #FFFFFF;
+  --card-foreground: #0B0A0F;
+  --popover: #FFFFFF;
+  --popover-foreground: #0B0A0F;
+  --primary: #0B0A0F;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EFEAF7;
+  --secondary-foreground: #0B0A0F;
+  --muted: #EFEAF7;
+  --muted-foreground: #6B6577;
+  --accent: #EFE4FF;
+  --accent-foreground: #0B0A0F;
+  --destructive: #D93F55;
+  --border: #E5DFEE;
+  --input: #E5DFEE;
+  --ring: #C9AAFB;
+  --chart-1: #C9AAFB;
+  --chart-2: #47B375;
+  --chart-3: #F2C94C;
+  --chart-4: #0B0A0F;
+  --chart-5: #F38BA0;
+  --chapter-1: #C9AAFB;
+  --chapter-2: #F2C94C;
+  --chapter-3: #47B375;
+  --chapter-4: #F38BA0;
+  --chapter-5: #0B0A0F;
+  --sidebar: #0B0A0F;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #E4CDFF;
+  --sidebar-primary-foreground: #0B0A0F;
+  --sidebar-accent: #1E1B24;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #24212A;
+  --sidebar-ring: #C9AAFB;
+
+  --frame: #0B0A0F;
+  --frame-foreground: #FFFFFF;
+  --frame-muted: #8E879A;
+  --frame-line: #24212A;
+  --lav: #E4CDFF;
+  --lav-2: #C9AAFB;
+  --butter: #FEE7A6;
+  --mint: #CDEFD9;
+  --rose: #FFD6DE;
+  --on-pastel: #0B0A0F;
+  --brand: #7A4BDB;
+  --success: #2E9A5E;
+  --warn: #A86A00;
+  --grid-line: rgba(11, 10, 15, 0.07);
 }
 
 .dark {
-  /* Dark mode - App style dark backgrounds */
-  --background: #111827;
-  --foreground: #ECEDEE;
-  --card: #1f2937;
-  --card-foreground: #ECEDEE;
-  --popover: #1f2937;
-  --popover-foreground: #ECEDEE;
-  /* Primary: Cyan stays prominent */
-  --primary: #06B6D4;
-  --primary-foreground: #ffffff;
-  --secondary: #374151;
-  --secondary-foreground: #ECEDEE;
-  --muted: #374151;
-  --muted-foreground: #9ca3af;
-  --accent: #374151;
-  --accent-foreground: #ECEDEE;
-  --destructive: #f87171;
-  --border: #374151;
-  --input: #374151;
-  --ring: #06B6D4;
-  /* Chart colors - brighter for dark mode */
-  --chart-1: #22d3ee;
-  --chart-2: #34d399;
-  --chart-3: #fb923c;
-  --chart-4: #a78bfa;
-  --chart-5: #f472b6;
-  /* Chapter colors */
-  --chapter-1: #10b981;
-  --chapter-2: #ef4444;
-  --chapter-3: #3b82f6;
-  --chapter-4: #f97316;
-  --chapter-5: #a855f7;
-  /* Sidebar */
-  --sidebar: #1f2937;
-  --sidebar-foreground: #ECEDEE;
-  --sidebar-primary: #22d3ee;
-  --sidebar-primary-foreground: #111827;
-  --sidebar-accent: #374151;
-  --sidebar-accent-foreground: #ECEDEE;
-  --sidebar-border: #374151;
-  --sidebar-ring: #22d3ee;
+  --background: #121016;
+  --foreground: #F4F1F8;
+  --card: #1B1821;
+  --card-foreground: #F4F1F8;
+  --popover: #1B1821;
+  --popover-foreground: #F4F1F8;
+  --primary: #E4CDFF;
+  --primary-foreground: #0B0A0F;
+  --secondary: #24202B;
+  --secondary-foreground: #F4F1F8;
+  --muted: #24202B;
+  --muted-foreground: #9C95A8;
+  --accent: #2E2838;
+  --accent-foreground: #F4F1F8;
+  --destructive: #F0707F;
+  --border: #2C2834;
+  --input: #2C2834;
+  --ring: #BE9BF6;
+  --chart-1: #BE9BF6;
+  --chart-2: #6FCF97;
+  --chart-3: #F7DF9C;
+  --chart-4: #F4F1F8;
+  --chart-5: #F9A8B8;
+  --chapter-1: #BE9BF6;
+  --chapter-2: #F7DF9C;
+  --chapter-3: #6FCF97;
+  --chapter-4: #F9A8B8;
+  --chapter-5: #F4F1F8;
+  --sidebar: #000000;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #E4CDFF;
+  --sidebar-primary-foreground: #0B0A0F;
+  --sidebar-accent: #1E1B24;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: #24212A;
+  --sidebar-ring: #BE9BF6;
+
+  --frame: #000000;
+  --lav: #DCC3FC;
+  --lav-2: #BE9BF6;
+  --butter: #F7DF9C;
+  --mint: #BFE8CD;
+  --rose: #F9C9D3;
+  --brand: #C9AAFB;
+  --success: #6FCF97;
+  --warn: #F7DF9C;
+}
+
+/* Pastel surfaces look the same in both themes: inside them, text uses the light-theme
+   colors, so text-foreground / text-muted-foreground / text-brand stay readable in dark mode */
+.bg-lav, .bg-lav-2, .bg-butter, .bg-mint, .bg-rose {
+  --foreground: #0B0A0F;
+  --card-foreground: #0B0A0F;
+  --muted-foreground: #4F4A5A;
+  --brand: #6A3BCB;
+  --success: #1E7A47;
+  --warn: #8A5600;
+  --destructive: #B4233F;
+  --border: rgba(11, 10, 15, 0.12);
+  color: var(--on-pastel);
+}
+
+/* Graph-paper texture used on pastel cards */
+@utility paper {
+  background-image: linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: 20px 20px;
 }
 
 :root {
@@ -170,7 +223,10 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
+  }
+  h1, h2, h3 {
+    @apply font-display tracking-tight;
   }
 }
 

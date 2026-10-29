@@ -1,21 +1,22 @@
 'use client'
 
-import { Navbar } from '@/components/navbar';
-import ToasterProvider from '@/components/toaster-provider';
-import { SessionProvider } from 'next-auth/react';
-import React, { Suspense } from 'react'
+import { SessionProvider } from 'next-auth/react'
+import React from 'react'
+import ToasterProvider from '@/components/toaster-provider'
+import { SiteHeader } from '@/components/site/site-header'
+import { SiteFooter } from '@/components/site/site-footer'
 
-const MainLayout =  ({ children }: { children: React.ReactNode;}) => {
+// Marketing site: black frame (header + footer) around a light, rounded panel
+const MainLayout = ({ children }: { children: React.ReactNode }) => {
   return (
     <SessionProvider>
       <ToasterProvider />
-    <div className='max-w-7xl mx-auto'>
-        <Suspense fallback={null}>
-          <Navbar />
-        </Suspense>
-        <main className='flex justify-center max-w-7xl mx-auto h-full'>
-          {children}
-        </main>
+      <div className="min-h-screen bg-frame">
+        <SiteHeader />
+        <div className="mx-auto min-h-[60vh] max-w-[1360px] overflow-x-clip rounded-t-[28px] bg-background pb-24 sm:rounded-t-[40px]">
+          <main className="mx-auto w-full max-w-6xl px-4 sm:px-6">{children}</main>
+        </div>
+        <SiteFooter />
       </div>
     </SessionProvider>
   )

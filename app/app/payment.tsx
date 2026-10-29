@@ -101,6 +101,17 @@ export default function PaywallScreen() {
     fetchOfferings();
   }, []);
 
+  const showLoginToActivate = () => {
+    Toast.show({
+      type: "success",
+      text1: "Purchase found! 🎉",
+      text2: "Log in to activate PRO on your account",
+      position: "top",
+      visibilityTime: 3000,
+    });
+    router.replace({ pathname: "/login", params: { returnUrl: "/" } });
+  };
+
   const handleSubscribe = async () => {
     const pkg = selectedPlan === "monthly" ? packages.monthly : packages.yearly;
     if (!pkg) return;
@@ -114,15 +125,19 @@ export default function PaywallScreen() {
         customerInfo.entitlements.active["PRO Yearly"] ||
         customerInfo.entitlements.active["PRO Monthly"]
       ) {
-        // Determine plan name based on active entitlement
-        let planName = "PRO Yearly"; // default
-        if (customerInfo.entitlements.active["PRO Monthly"]) {
-          planName = "PRO Monthly";
-        } else if (customerInfo.entitlements.active["PRO Yearly"]) {
-          planName = "PRO Yearly";
+        // Guest purchase: RevenueCat moves it to the account on login,
+        // and the background sync in _layout then grants PRO
+        if (!token) {
+          showLoginToActivate();
+          return;
         }
 
-        const result = await upgradeToPro(token!, planName);
+        // Determine plan name based on active entitlement (yearly first, same as the sync)
+        const planName = customerInfo.entitlements.active["PRO Yearly"]
+          ? "PRO Yearly"
+          : "PRO Monthly";
+
+        const result = await upgradeToPro(token, planName);
         if (result.success) {
           if (user) setUser({ ...user, isPro: true });
           Toast.show({
@@ -167,13 +182,23 @@ export default function PaywallScreen() {
         customerInfo.entitlements.active["PRO Monthly"];
 
       if (hasPro) {
-        let planName = "PRO Yearly";
-        if (customerInfo.entitlements.active["PRO Monthly"]) {
-          planName = "PRO Monthly";
+        if (!token) {
+          showLoginToActivate();
+          return;
         }
 
-        const result = await upgradeToPro(token!, planName);
-        if (result.success) {
+        const planName = customerInfo.entitlements.active["PRO Yearly"]
+          ? "PRO Yearly"
+          : "PRO Monthly";
+
+        const result = await upgradeToPro(token, planName);
+        if (!result.success) {
+          Toast.show({
+            type: "error",
+            text1: result.error,
+            position: "top",
+          });
+        } else {
           if (user) setUser({ ...user, isPro: true });
 
           Toast.show({
@@ -285,14 +310,14 @@ export default function PaywallScreen() {
   };
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#0f172a" : "#ffffff" }}>
+    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#ffffff" }}>
       <ScrollView
         contentContainerStyle={{ paddingBottom: 150 }}
         showsVerticalScrollIndicator={false}
       >
         {/* Header with SAT Theme Gradient */}
         <LinearGradient
-          colors={["#06B6D4", "#0891B2", "#0e7490"]}
+          colors={["#8A5CE6", "#8A5CE6", "#8A5CE6"]}
           style={{
             height: 150,
             position: "relative",
@@ -374,7 +399,7 @@ export default function PaywallScreen() {
                 elevation: 5,
               }}
             >
-              <GraduationCap size={42} color="#06B6D4" />
+              <GraduationCap size={42} color="#8A5CE6" />
             </View>
           </View>
 
@@ -411,7 +436,7 @@ export default function PaywallScreen() {
               alignSelf: "flex-start",
               flexDirection: "row",
               alignItems: "center",
-              backgroundColor: "#06B6D4",
+              backgroundColor: "#8A5CE6",
               paddingHorizontal: 12,
               paddingVertical: 6,
               borderRadius: 20,
@@ -430,7 +455,7 @@ export default function PaywallScreen() {
             style={{
               fontSize: 32,
               fontWeight: "700",
-              color: isDark ? "#ffffff" : "#1f2937",
+              color: isDark ? "#F4F1F8" : "#0B0A0F",
               marginBottom: 24,
               lineHeight: 38,
             }}
@@ -440,7 +465,7 @@ export default function PaywallScreen() {
 
           {/* <Text style={{
             fontSize: 16,
-            color: isDark ? '#9ca3af' : '#6b7280',
+            color: isDark ? '#9C95A8' : '#6B6577',
             marginBottom: 24,
             lineHeight: 24,
           }}>
@@ -460,7 +485,7 @@ export default function PaywallScreen() {
               >
                 <View
                   style={{
-                    backgroundColor: "#06B6D4",
+                    backgroundColor: "#8A5CE6",
                     borderRadius: 6,
                     padding: 4,
                     marginRight: 12,
@@ -473,7 +498,7 @@ export default function PaywallScreen() {
                   style={{
                     flex: 1,
                     fontSize: 16,
-                    color: isDark ? "#ffffff" : "#1f2937",
+                    color: isDark ? "#F4F1F8" : "#0B0A0F",
                     lineHeight: 24,
                   }}
                 >
@@ -492,12 +517,12 @@ export default function PaywallScreen() {
                   alignItems: "center",
                 }}
               >
-                <ActivityIndicator size="large" color="#06B6D4" />
+                <ActivityIndicator size="large" color="#8A5CE6" />
                 <Text
                   style={{
                     marginTop: 12,
                     fontSize: 14,
-                    color: isDark ? "#9ca3af" : "#6b7280",
+                    color: isDark ? "#9C95A8" : "#6B6577",
                   }}
                 >
                   Loading plans...
@@ -516,11 +541,11 @@ export default function PaywallScreen() {
                     borderWidth: selectedPlan === "yearly" ? 3 : 2,
                     borderColor:
                       selectedPlan === "yearly"
-                        ? "#06B6D4"
+                        ? "#8A5CE6"
                         : isDark
-                          ? "#334155"
-                          : "#e5e7eb",
-                    backgroundColor: isDark ? "#1e293b" : "#FFF",
+                          ? "#2B2733"
+                          : "#E5DFEE",
+                    backgroundColor: isDark ? "#17151C" : "#FFF",
                     marginBottom: packages.monthly ? 16 : 0,
                     position: "relative",
                     paddingTop: packages.monthly ? 30 : 20,
@@ -546,7 +571,7 @@ export default function PaywallScreen() {
                         style={{
                           fontSize: 11,
                           fontWeight: "700",
-                          color: "#1f2937",
+                          color: "#0B0A0F",
                           letterSpacing: 0.5,
                         }}
                       >
@@ -562,7 +587,7 @@ export default function PaywallScreen() {
                         position: "absolute",
                         top: -12,
                         right: 16,
-                        backgroundColor: "#10B981",
+                        backgroundColor: "#2E9A5E",
                         paddingHorizontal: 12,
                         paddingVertical: 4,
                         borderRadius: 12,
@@ -593,7 +618,7 @@ export default function PaywallScreen() {
                       style={{
                         fontSize: 18,
                         fontWeight: "600",
-                        color: isDark ? "#ffffff" : "#1f2937",
+                        color: isDark ? "#F4F1F8" : "#0B0A0F",
                         marginBottom: 4,
                       }}
                     >
@@ -604,7 +629,7 @@ export default function PaywallScreen() {
                         style={{
                           fontSize: 12,
                           fontWeight: "600",
-                          color: isDark ? "#ffffff" : "#1f2937",
+                          color: isDark ? "#F4F1F8" : "#0B0A0F",
                         }}
                       >
                         {new Intl.NumberFormat(undefined, {
@@ -635,7 +660,7 @@ export default function PaywallScreen() {
                           <Text
                             style={{
                               fontSize: 14,
-                              color: isDark ? "#6b7280" : "#9ca3af",
+                              color: isDark ? "#7E7889" : "#9C95A8",
                               textDecorationLine: "line-through",
                             }}
                           >
@@ -646,7 +671,7 @@ export default function PaywallScreen() {
                           style={{
                             fontSize: 16,
                             fontWeight: "600",
-                            color: isDark ? "#ffffff" : "#1f2937",
+                            color: isDark ? "#F4F1F8" : "#0B0A0F",
                           }}
                         >
                           {packages.yearly.product.introPrice?.priceString ||
@@ -663,13 +688,13 @@ export default function PaywallScreen() {
                           borderWidth: 2,
                           borderColor:
                             selectedPlan === "yearly"
-                              ? "#06B6D4"
+                              ? "#8A5CE6"
                               : isDark
-                                ? "#6b7280"
-                                : "#d1d5db",
+                                ? "#7E7889"
+                                : "#D9D2E5",
                           backgroundColor:
                             selectedPlan === "yearly"
-                              ? "#06B6D4"
+                              ? "#8A5CE6"
                               : "transparent",
                           justifyContent: "center",
                           alignItems: "center",
@@ -695,11 +720,11 @@ export default function PaywallScreen() {
                       borderWidth: selectedPlan === "monthly" ? 3 : 2,
                       borderColor:
                         selectedPlan === "monthly"
-                          ? "#06B6D4"
+                          ? "#8A5CE6"
                           : isDark
-                            ? "#334155"
-                            : "#e5e7eb",
-                      backgroundColor: isDark ? "#1e293b" : "#FFF",
+                            ? "#2B2733"
+                            : "#E5DFEE",
+                      backgroundColor: isDark ? "#17151C" : "#FFF",
                     }}
                     onPress={() => setSelectedPlan("monthly")}
                     activeOpacity={0.7}
@@ -709,7 +734,7 @@ export default function PaywallScreen() {
                         style={{
                           fontSize: 18,
                           fontWeight: "600",
-                          color: isDark ? "#ffffff" : "#1f2937",
+                          color: isDark ? "#F4F1F8" : "#0B0A0F",
                         }}
                       >
                         Monthly
@@ -728,7 +753,7 @@ export default function PaywallScreen() {
                           style={{
                             fontSize: 16,
                             fontWeight: "600",
-                            color: isDark ? "#ffffff" : "#1f2937",
+                            color: isDark ? "#F4F1F8" : "#0B0A0F",
                           }}
                         >
                           {packages.monthly.product.priceString} / MO
@@ -742,13 +767,13 @@ export default function PaywallScreen() {
                           borderWidth: 2,
                           borderColor:
                             selectedPlan === "monthly"
-                              ? "#06B6D4"
+                              ? "#8A5CE6"
                               : isDark
-                                ? "#6b7280"
-                                : "#d1d5db",
+                                ? "#7E7889"
+                                : "#D9D2E5",
                           backgroundColor:
                             selectedPlan === "monthly"
-                              ? "#06B6D4"
+                              ? "#8A5CE6"
                               : "transparent",
                           justifyContent: "center",
                           alignItems: "center",
@@ -776,7 +801,7 @@ export default function PaywallScreen() {
               style={{
                 fontSize: 12,
                 textAlign: "center",
-                color: isDark ? "#9ca3af" : "#6b7280",
+                color: isDark ? "#9C95A8" : "#6B6577",
                 lineHeight: 18,
               }}
             >
@@ -802,7 +827,7 @@ export default function PaywallScreen() {
                 <Text
                   style={{
                     fontSize: 12,
-                    color: "#06B6D4",
+                    color: "#8A5CE6",
                     fontWeight: "500",
                   }}
                 >
@@ -814,7 +839,7 @@ export default function PaywallScreen() {
                 style={{
                   fontSize: 12,
                   marginHorizontal: 6,
-                  color: isDark ? "#9ca3af" : "#6b7280",
+                  color: isDark ? "#9C95A8" : "#6B6577",
                 }}
               >
                 •
@@ -828,7 +853,7 @@ export default function PaywallScreen() {
                 <Text
                   style={{
                     fontSize: 12,
-                    color: "#06B6D4",
+                    color: "#8A5CE6",
                     fontWeight: "500",
                   }}
                 >
@@ -847,7 +872,7 @@ export default function PaywallScreen() {
               <Text
                 style={{
                   fontSize: 15,
-                  color: "#06B6D4",
+                  color: "#8A5CE6",
                   fontWeight: "600",
                   textAlign: "center",
                   textDecorationLine: "underline",
@@ -867,12 +892,12 @@ export default function PaywallScreen() {
           bottom: 0,
           left: 0,
           right: 0,
-          backgroundColor: isDark ? "#0f172a" : "#ffffff",
+          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
           paddingHorizontal: 20,
           paddingTop: 12,
           paddingBottom: insets.bottom + 12,
           borderTopWidth: 1,
-          borderTopColor: isDark ? "#1f2937" : "#e5e7eb",
+          borderTopColor: isDark ? "#17151C" : "#E5DFEE",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: -4 },
           shadowOpacity: 0.1,
@@ -891,7 +916,7 @@ export default function PaywallScreen() {
           activeOpacity={0.8}
         >
           <LinearGradient
-            colors={loading ? ["#9ca3af", "#9ca3af"] : ["#06B6D4", "#0891B2"]}
+            colors={loading ? ["#9C95A8", "#9C95A8"] : ["#8A5CE6", "#8A5CE6"]}
             style={{
               paddingVertical: 16,
               alignItems: "center",
@@ -919,7 +944,7 @@ export default function PaywallScreen() {
         <Text
           style={{
             fontSize: 12,
-            color: isDark ? "#6b7280" : "#9ca3af",
+            color: isDark ? "#7E7889" : "#9C95A8",
             textAlign: "center",
             lineHeight: 16,
           }}
@@ -948,7 +973,7 @@ export default function PaywallScreen() {
           padding: 24,
         }}>
           <View style={{
-            backgroundColor: isDark ? '#1e293b' : '#FFF',
+            backgroundColor: isDark ? '#17151C' : '#FFF',
             borderRadius: 24,
             padding: 24,
             width: '100%',
@@ -958,7 +983,7 @@ export default function PaywallScreen() {
             <Text style={{
               fontSize: 28,
               fontWeight: '700',
-              color: isDark ? '#ffffff' : '#1f2937',
+              color: isDark ? '#F4F1F8' : '#0B0A0F',
               marginBottom: 8,
               textAlign: 'center',
             }}>
@@ -967,7 +992,7 @@ export default function PaywallScreen() {
 
       {/* <Text style={{
               fontSize: 16,
-              color: isDark ? '#9ca3af' : '#6b7280',
+              color: isDark ? '#9C95A8' : '#6B6577',
               marginBottom: 24,
               textAlign: 'center',
             }}>
@@ -990,7 +1015,7 @@ export default function PaywallScreen() {
                 borderTopWidth: 18,
                 borderLeftColor: 'transparent',
                 borderRightColor: 'transparent',
-                borderTopColor: '#EF4444',
+                borderTopColor: '#D93F55',
               }} /> */}
 
       {/* <Animated.View style={{
@@ -1012,12 +1037,12 @@ export default function PaywallScreen() {
               }}> */}
       {/* Wheel segments */}
       {/* {[
-                  { discount: 5, color: '#EF4444' },
-                  { discount: 10, color: '#F59E0B' },
-                  { discount: 15, color: '#10B981' },
-                  { discount: 20, color: '#3B82F6' },
-                  { discount: 25, color: '#8B5CF6' },
-                  { discount: 30, color: '#EC4899' },
+                  { discount: 5, color: '#D93F55' },
+                  { discount: 10, color: '#E5A50A' },
+                  { discount: 15, color: '#2E9A5E' },
+                  { discount: 20, color: '#8A5CE6' },
+                  { discount: 25, color: '#8A5CE6' },
+                  { discount: 30, color: '#8A5CE6' },
                 ].map((segment, idx) => {
                   const rotation = idx * 60;
 
@@ -1083,7 +1108,7 @@ export default function PaywallScreen() {
                   width: 100,
                   height: 100,
                   borderRadius: 50,
-                  backgroundColor: isDark ? '#1e293b' : '#FFF',
+                  backgroundColor: isDark ? '#17151C' : '#FFF',
                   borderWidth: 5,
                   borderColor: '#FCD34D',
                   justifyContent: 'center',
@@ -1099,7 +1124,7 @@ export default function PaywallScreen() {
                     <Text style={{
                       fontSize: 26,
                       fontWeight: '800',
-                      color: '#10B981',
+                      color: '#2E9A5E',
                     }}>
                       {currentDiscount}%
                     </Text>
@@ -1111,7 +1136,7 @@ export default function PaywallScreen() {
       {/* Spins Left */}
       {/* <Text style={{
               fontSize: 14,
-              color: isDark ? '#9ca3af' : '#6b7280',
+              color: isDark ? '#9C95A8' : '#6B6577',
               marginBottom: 16,
             }}>
               {spinsLeft > 0 ? `${spinsLeft} spin${spinsLeft > 1 ? 's' : ''} remaining` : 'No spins left'}
@@ -1136,7 +1161,7 @@ export default function PaywallScreen() {
                 <Text style={{
                   fontSize: 16,
                   fontWeight: '700',
-                  color: '#1f2937',
+                  color: '#0B0A0F',
                 }}>
                   Best Discount: {finalDiscount}% OFF!
                 </Text>
@@ -1153,7 +1178,7 @@ export default function PaywallScreen() {
                 }}
               >
                 <LinearGradient
-                  colors={['#FCD34D', '#F59E0B']}
+                  colors={['#FCD34D', '#E5A50A']}
                   style={{
                     paddingVertical: 16,
                     borderRadius: 16,
@@ -1165,7 +1190,7 @@ export default function PaywallScreen() {
                   <Text style={{
                     fontSize: 18,
                     fontWeight: '700',
-                    color: '#1f2937',
+                    color: '#0B0A0F',
                   }}>
                     Spin the Wheel! 🎯
                   </Text>
@@ -1180,7 +1205,7 @@ export default function PaywallScreen() {
                 }}
               >
                 <LinearGradient
-                  colors={['#06B6D4', '#0891B2']}
+                  colors={['#8A5CE6', '#8A5CE6']}
                   style={{
                     paddingVertical: 16,
                     borderRadius: 16,
@@ -1212,7 +1237,7 @@ export default function PaywallScreen() {
             >
               <Text style={{
                 fontSize: 14,
-                color: isDark ? '#9ca3af' : '#6b7280',
+                color: isDark ? '#9C95A8' : '#6B6577',
               }}>
                 No thanks, I'll pass
               </Text>
@@ -1223,240 +1248,3 @@ export default function PaywallScreen() {
     </View>
   );
 }
-
-// import { useEffect, useState, useRef } from "react";
-// import {
-//   ScrollView,
-//   TouchableOpacity,
-//   ActivityIndicator,
-//   Animated,
-//   View,
-//   Text,
-//   Pressable,
-//   Image,
-//   Platform,
-// } from "react-native";
-// import { useRouter } from "expo-router";
-// import Purchases, { PurchasesPackage } from "react-native-purchases";
-// import { SafeAreaView } from "react-native-safe-area-context";
-// import Toast from "react-native-toast-message";
-// import { LinearGradient } from "expo-linear-gradient";
-// import { useAuth } from "@/context/AuthContext";
-// import { upgradeToPro } from "@/lib/api/user";
-// import { FontAwesome5 } from "@expo/vector-icons";
-// import { BlurView } from "expo-blur";
-// import { ArrowLeft } from "lucide-react-native";
-
-// const proFeatures = [
-//   "Access to all SAT practice exams",
-//   "Full SAT course unlocked",
-//   "Track saved and wrong questions",
-//   "400+ SAT-grade problems",
-// ];
-
-// export default function PaywallScreen() {
-//   const router = useRouter();
-//   const { token, user, setUser } = useAuth();
-
-//   const [proPackage, setProPackage] = useState<PurchasesPackage | null>(null);
-//   const [loading, setLoading] = useState(false);
-//   const scaleAnim = useRef(new Animated.Value(1)).current;
-
-//   // Fetch single plan offering
-//   useEffect(() => {
-//     const fetchOfferings = async () => {
-//       try {
-//         const offerings = await Purchases.getOfferings();
-//         const pkg = offerings.current?.availablePackages?.[0];
-//         if (pkg) setProPackage(pkg);
-//         else console.warn("No active offering found");
-//       } catch (e) {
-//         console.log("Error fetching offerings:", e);
-//       }
-//     };
-//     fetchOfferings();
-//   }, []);
-
-//   // Button animation
-//   useEffect(() => {
-//     Animated.loop(
-//       Animated.sequence([
-//         Animated.timing(scaleAnim, {
-//           toValue: 0.95,
-//           duration: 1300,
-//           useNativeDriver: true,
-//         }),
-//         Animated.timing(scaleAnim, {
-//           toValue: 1,
-//           duration: 1300,
-//           useNativeDriver: true,
-//         }),
-//       ])
-//     ).start();
-//   }, []);
-
-//   const handleSubscribe = async (pkg: PurchasesPackage) => {
-//     try {
-//       setLoading(true);
-//       const { customerInfo } = await Purchases.purchasePackage(pkg);
-
-//       if (customerInfo.entitlements.active["PRO for year"]) {
-//         const result = await upgradeToPro(token!, pkg.identifier);
-//         if (result.success) {
-//           if (user) setUser({ ...user, isPro: true });
-//           Toast.show({
-//             type: "success",
-//             text1: "Thanks for upgrading to PRO 🎉",
-//             position: "top",
-//             visibilityTime: 3000,
-//           });
-//           router.push("/");
-//         } else {
-//           Toast.show({
-//             type: "error",
-//             text1: result.error,
-//             position: "top",
-//             visibilityTime: 3000,
-//           });
-//         }
-//       }
-//     } catch (e: any) {
-//       console.log("Purchase error:", e);
-//       if (!e.userCancelled)
-//         Toast.show({
-//           type: "error",
-//           text1: "Purchase failed. Please try again later.",
-//           position: "top",
-//           visibilityTime: 3000,
-//         });
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <SafeAreaView
-//       className="flex-1 bg-white dark:bg-[#0f172a]"
-//       edges={["bottom"]}
-//     >
-//       {/* Header Section */}
-//       <View className="flex-1 relative -mb-10">
-//         <Image
-//           source={require("@/assets/images/paywall.png")} //satCourseImg.jpg
-//           className="w-full h-full"
-//           resizeMode="cover"
-//         />
-
-//         {/* Dark overlay */}
-//         <View className="absolute inset-0 bg-black/50 rounded-xl" />
-
-//         {/* Glass Back Button */}
-//         <View className="absolute top-12 left-4 z-20">
-//           <BlurView
-//             intensity={90}
-//             tint="dark"
-//             className="rounded-xl overflow-hidden"
-//           >
-//             <Pressable
-//               onPress={() => {
-//                 if (router.canGoBack()) {
-//                   router.back();
-//                 } else {
-//                   router.push("/");
-//                 }
-//               }}
-//               className="p-2"
-//             >
-//               <ArrowLeft size={22} color="white" />
-//             </Pressable>
-//           </BlurView>
-//         </View>
-//       </View>
-
-//       {/* Main Content */}
-//       <LinearGradient
-//         colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
-//         start={[0, 0]}
-//         end={[1, 1]}
-//         style={{
-//           height: 600,
-//           borderTopLeftRadius: 30,
-//           borderTopRightRadius: 30,
-//           padding: 24,
-//         }}
-//       >
-//         <ScrollView showsVerticalScrollIndicator={false}>
-//           <Text className="text-3xl font-extrabold text-white text-center mb-4">
-//             Unlock Your Full Potential 🚀
-//           </Text>
-
-//           <Text className="text-gray-100 text-base text-center mb-8">
-//             Get unlimited access to all tests, lessons.
-//           </Text>
-
-//           {/* Feature list */}
-//           <View className="mb-6">
-//             {proFeatures.map((feature, idx) => (
-//               <View
-//                 key={idx}
-//                 className="flex-row items-center mb-3 bg-white/15 rounded-xl px-4 py-3"
-//               >
-//                 <FontAwesome5
-//                   name="check"
-//                   size={16}
-//                   color="#fef08a"
-//                   style={{ marginRight: 10 }}
-//                 />
-//                 <Text className="text-white font-medium">{feature}</Text>
-//               </View>
-//             ))}
-//           </View>
-
-//           {/* Price */}
-//           <View className="mb-6 items-center">
-//             <Text className="text-white text-4xl font-extrabold mb-2">
-//               $9.99
-//             </Text>
-//             <Text className="text-gray-100">
-//               One-time payment, lifetime access
-//             </Text>
-//           </View>
-
-//           {/* Subscribe Button */}
-//           <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-//             <TouchableOpacity
-//               className="rounded-2xl overflow-hidden shadow-lg"
-//               activeOpacity={0.9}
-//               onPress={() => proPackage && handleSubscribe(proPackage)}
-//             >
-//               <LinearGradient
-//                 colors={["#facc15", "#fbbf24"]}
-//                 start={[0, 0]}
-//                 end={[1, 1]}
-//                 style={{
-//                   paddingVertical: 16,
-//                   borderRadius: 16,
-//                 }}
-//               >
-//                 <Text className="text-white font-bold text-center text-xl">
-//                   Go PRO
-//                 </Text>
-//               </LinearGradient>
-//             </TouchableOpacity>
-//           </Animated.View>
-
-//           <Text className="text-gray-200 text-center text-xs mt-4">
-//             Cancel anytime. Secure payments handled by{" "}
-//             {Platform.OS === "android" ? "Google" : "Apple"}.
-//           </Text>
-//         </ScrollView>
-
-//         {loading && (
-//           <View className="absolute inset-0 bg-black/50 items-center justify-center rounded-3xl">
-//             <ActivityIndicator size="large" color="#fff" />
-//           </View>
-//         )}
-//       </LinearGradient>
-//     </SafeAreaView>
-//   );
-// }

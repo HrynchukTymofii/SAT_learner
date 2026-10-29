@@ -185,17 +185,17 @@ export default function QuizHeader({
           style={{
             flexDirection: "row",
             alignItems: "center",
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             paddingHorizontal: 16,
             paddingVertical: 10,
             borderRadius: 12,
             borderWidth: 1,
-            borderColor: isDark ? "#374155" : "#e5e7eb",
+            borderColor: isDark ? "#2B2733" : "#E5DFEE",
           }}
         >
-          <ArrowLeft size={18} color={isDark ? "#06B6D4" : "#0891B2"} />
+          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
           <Text style={{
-            color: isDark ? "#06B6D4" : "#0891B2",
+            color: isDark ? "#C9AAFB" : "#7A4BDB",
             fontWeight: "600",
             marginLeft: 8,
             fontSize: 14
@@ -219,7 +219,7 @@ export default function QuizHeader({
                       left: -4,
                       right: -4,
                       bottom: -4,
-                      backgroundColor: "#06B6D4",
+                      backgroundColor: "#8A5CE6",
                       borderRadius: 16,
                       opacity: glowAnim,
                     }}
@@ -234,18 +234,18 @@ export default function QuizHeader({
                     onPress={toggleAllTasksDialog}
                     activeOpacity={0.7}
                     style={{
-                      backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                      backgroundColor: isDark ? "#17151C" : "#EFEAF7",
                       padding: 10,
                       borderRadius: 12,
                       borderWidth: isQuizCompleted ? 2 : 1,
                       borderColor: isQuizCompleted
-                        ? "#06B6D4"
+                        ? "#8A5CE6"
                         : isDark
-                        ? "#374155"
-                        : "#e5e7eb",
+                        ? "#2B2733"
+                        : "#E5DFEE",
                     }}
                   >
-                    <LayoutGrid size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+                    <LayoutGrid size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
                   </TouchableOpacity>
                 </Animated.View>
               </View>
@@ -260,7 +260,7 @@ export default function QuizHeader({
                       left: -4,
                       right: -4,
                       bottom: -4,
-                      backgroundColor: "#06B6D4",
+                      backgroundColor: "#8A5CE6",
                       borderRadius: 16,
                       opacity: glowAnim,
                     }}
@@ -275,18 +275,18 @@ export default function QuizHeader({
                     onPress={toggleResetDialog}
                     activeOpacity={0.7}
                     style={{
-                      backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+                      backgroundColor: isDark ? "#17151C" : "#EFEAF7",
                       padding: 10,
                       borderRadius: 12,
                       borderWidth: isQuizCompleted ? 2 : 1,
                       borderColor: isQuizCompleted
-                        ? "#06B6D4"
+                        ? "#8A5CE6"
                         : isDark
-                        ? "#374155"
-                        : "#e5e7eb",
+                        ? "#2B2733"
+                        : "#E5DFEE",
                     }}
                   >
-                    <RotateCcw size={20} color={isDark ? "#06B6D4" : "#0891B2"} />
+                    <RotateCcw size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
                   </TouchableOpacity>
                 </Animated.View>
               </View>
@@ -298,19 +298,19 @@ export default function QuizHeader({
             flexDirection: "row",
             alignItems: "center",
             gap: 8,
-            backgroundColor: isDark ? "#1f2937" : "#f3f4f6",
+            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
             paddingHorizontal: 12,
             paddingVertical: 8,
             borderRadius: 12,
             borderWidth: 1,
-            borderColor: timeRemaining < 300 ? "#ef4444" : (isDark ? "#374155" : "#e5e7eb"),
+            borderColor: timeRemaining < 300 ? "#D93F55" : (isDark ? "#2B2733" : "#E5DFEE"),
           }}>
-            <Clock size={20} color={timeRemaining < 300 ? "#ef4444" : "#06B6D4"} />
+            <Clock size={20} color={timeRemaining < 300 ? "#D93F55" : "#8A5CE6"} />
             <Text style={{
               fontFamily: "monospace",
               fontSize: 16,
               fontWeight: "600",
-              color: timeRemaining < 300 ? "#ef4444" : (isDark ? "#06B6D4" : "#0891B2"),
+              color: timeRemaining < 300 ? "#D93F55" : (isDark ? "#C9AAFB" : "#7A4BDB"),
             }}>
               {formatTime(timeRemaining)}
             </Text>

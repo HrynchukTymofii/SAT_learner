@@ -31,7 +31,7 @@ const LessonYouTubeVideo = ({
           noCookie={true}
         />
       ) : (
-        <div className="text-sm text-red-500">
+        <div className="text-sm text-destructive">
           Invalid YouTube URL. Please edit the video URL.
         </div>
       )}

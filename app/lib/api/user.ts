@@ -10,10 +10,13 @@ export const getUserData = async (token: string) => {
 
     return { success: true, user: res.data };
   } catch (error: any) {
-    console.error("❌ getUserData error:", error.response?.data || error.message);
+    const status = error.response?.status;
+    const message = error.response?.data?.error || error.message;
+
     return {
       success: false,
-      error: error.response?.data?.error || "Failed to fetch user data",
+      error: message,
+      status,
     };
   }
 };

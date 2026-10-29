@@ -1,0 +1,329 @@
+<!doctype html>
+<html lang="en" class="h-full">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05070D">
+<title>SAT Learner — Bluebook Exam Simulator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#05070D;--surface:#10131D;--surface2:#171B28;--line:rgba(255,255,255,.08);
+  --text:#F3F5FB;--muted:#8D94AB;--dim:#5E657B;
+  --blue:#4F74FF;--teal:#3CC6B4;--ink:#0A0D16;
+  --cta:linear-gradient(90deg,#3CC6B4 0%,#4F74FF 100%);
+  --card:radial-gradient(130% 85% at 50% 115%,#2F6BFF 0%,#1B3FAE 32%,#0E1633 66%,#0A0D19 100%);
+  --amber:#FFD27A;--emerald:#4FD8A4;--rose:#FF5E7E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'Bai Jamjuree',system-ui,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+button{font:inherit;color:inherit;cursor:pointer}
+
+#wrapper{height:100%;display:flex;flex-direction:column;position:relative}
+
+/* Header */
+.top{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 24px;background:rgba(16,19,29,.9);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}
+.top-left{display:flex;align-items:center;gap:12px}
+.mod-tag{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--teal);background:rgba(60,198,180,.12);border:1px solid rgba(60,198,180,.3);padding:3px 9px;border-radius:7px}
+.top-title{font-size:15px;font-weight:600}
+
+/* Timer */
+.timer-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border:1px solid var(--line);padding:6px 14px;border-radius:20px;font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:600}
+.timer-pill svg{color:var(--muted)}
+.btn-hide{background:none;border:0;color:var(--muted);font-size:12px;text-decoration:underline;cursor:pointer;margin-left:4px}
+
+.tools{display:flex;align-items:center;gap:10px}
+.btn-tool{display:flex;align-items:center;gap:6px;height:36px;padding:0 12px;border-radius:18px;background:var(--surface2);border:1px solid var(--line);font-size:13px;font-weight:600;color:var(--text);transition:.2s}
+.btn-tool:hover{border-color:var(--blue)}
+
+/* Stage Area */
+.main-stage{flex:1;overflow-y:auto;display:flex;justify-content:center;padding:24px 16px;scrollbar-width:thin}
+.q-box{max-width:740px;width:100%;margin:auto 0;background:var(--surface);border:1px solid var(--line);border-radius:28px;padding:28px 24px;box-shadow:0 20px 50px rgba(0,0,0,.6);position:relative}
+
+.q-meta{display:flex;justify-content:space-between;align-items:center;padding-bottom:16px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.q-num{width:36px;height:36px;border-radius:10px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center;font-weight:700;font-size:15px;color:var(--teal);font-family:'JetBrains Mono',monospace}
+.flag-btn{display:flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--muted);background:none;border:0}
+.flag-btn.on{color:var(--amber)}
+
+.q-prompt{font-size:18px;line-height:1.5;margin-bottom:24px;color:#F3F5FB;font-weight:500}
+.math-eq{font-family:"Cambria Math","Times New Roman",serif;font-style:italic;color:#A9DCFA;padding:0 3px}
+
+/* Option Rows */
+.opts{display:flex;flex-direction:column;gap:12px}
+.opt-row{display:flex;align-items:center;gap:8px}
+.opt-card{flex:1;display:flex;align-items:center;gap:14px;padding:16px 18px;border-radius:18px;background:var(--surface2);border:1.5px solid var(--line);font-size:16.5px;font-weight:500;text-align:left;transition:.2s}
+.opt-card:active{transform:scale(.99)}
+.opt-card.picked{background:linear-gradient(180deg,#122554,#183f9e);border-color:#5B80FF}
+.opt-card.eliminated{text-decoration:line-through;opacity:.35}
+.opt-badge{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--dim);display:grid;place-items:center;font-size:12.5px;font-weight:700;color:var(--muted);flex:none}
+.opt-card.picked .opt-badge{background:#fff;border-color:#fff;color:#0A0D16}
+.btn-del{width:42px;height:42px;border-radius:14px;border:1px solid var(--line);background:var(--surface2);color:var(--dim);display:grid;place-items:center;transition:.2s}
+.btn-del:hover{color:var(--rose);border-color:var(--rose)}
+
+/* Bottom Bar */
+.bottom{position:relative;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;background:rgba(16,19,29,.9);backdrop-filter:blur(16px);border-top:1px solid var(--line)}
+.nav-btn{height:46px;padding:0 22px;border-radius:23px;border:1px solid var(--line);background:var(--surface2);font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;transition:.2s}
+.nav-btn:hover{border-color:var(--muted)}
+.nav-btn.primary{background:var(--cta);border:0;color:#fff;box-shadow:0 8px 24px -6px rgba(79,116,255,.6)}
+
+.grid-btn{height:42px;padding:0 18px;border-radius:21px;border:1px solid var(--line);background:var(--surface2);font-size:14px;font-weight:600;display:flex;align-items:center;gap:8px}
+
+/* Modal Bottom Sheets */
+.backdrop{position:fixed;inset:0;background:rgba(2,4,10,.7);backdrop-filter:blur(8px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:40}
+.backdrop.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:540px;transform:translate(-50%,105%);transition:transform .4s cubic-bezier(.2,.8,.2,1);background:#0E1220;border-radius:28px 28px 0 0;border-top:1px solid var(--line);padding:14px 22px 28px;z-index:50;max-height:88%;overflow-y:auto}
+.sheet.open{transform:translate(-50%,0)}
+.grab{width:40px;height:5px;border-radius:3px;background:#2A3042;margin:0 auto 16px}
+
+/* Question Drawer Grid */
+.q-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-top:16px}
+.g-item{aspect-ratio:1;border-radius:14px;background:var(--surface2);border:1px solid var(--line);font-family:'JetBrains Mono',monospace;font-size:14px;font-weight:700;display:grid;place-items:center;transition:.2s}
+.g-item.cur{background:var(--blue);border-color:var(--blue);color:#fff}
+.g-item.done{background:rgba(60,198,180,.15);border-color:var(--teal);color:var(--teal)}
+.g-item.flag{border-color:var(--amber);color:var(--amber)}
+
+/* Formulas */
+.f-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.f-card{background:var(--surface2);border:1px solid var(--line);border-radius:16px;padding:14px;font-size:13.5px}
+.f-card b{display:block;margin-bottom:4px;color:var(--teal)}
+</style>
+</head>
+<body>
+<div id="wrapper">
+  
+  <!-- Header -->
+  <header class="top">
+    <div class="top-left">
+      <span class="mod-tag">Section 2: Math</span>
+      <span class="top-title">Module 1 (Timed Drill)</span>
+    </div>
+
+    <!-- Timer -->
+    <div style="display:flex;align-items:center">
+      <div class="timer-pill" id="timerBox">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+        <span id="clock">34:42</span>
+      </div>
+      <button class="btn-hide" onclick="toggleClock()">Hide</button>
+    </div>
+
+    <!-- Tools -->
+    <div class="tools">
+      <button class="btn-tool" onclick="openFormulas()">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#5FE0C8" stroke-width="2"><path d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z"/></svg>
+        <span>Reference Sheet</span>
+      </button>
+      <a href="index.html" class="btn-tool" style="text-decoration:none">
+        <span>Exit Exam</span>
+      </a>
+    </div>
+  </header>
+
+  <!-- Stage -->
+  <main class="main-stage">
+    <div class="q-box">
+      <div class="q-meta">
+        <div style="display:flex;align-items:center;gap:12px">
+          <div class="q-num" id="qLabel">12</div>
+          <span style="font-size:13px;color:var(--muted)">Heart of Algebra &bull; Linear Equations</span>
+        </div>
+        <button class="flag-btn" id="flagBtn" onclick="toggleFlag()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1zM4 22v-7"/></svg>
+          <span id="flagTxt">Mark for Review</span>
+        </button>
+      </div>
+
+      <p class="q-prompt">
+        The line with equation <span class="math-eq">y = &minus;2x + b</span> intersects the parabola <span class="math-eq">y = x<sup>2</sup> &minus; 6x + 8</span> at exactly one point in the <span class="math-eq">xy</span>-plane. What is the value of <span class="math-eq">b</span>?
+      </p>
+
+      <div class="opts">
+        <!-- Option A -->
+        <div class="opt-row">
+          <button class="opt-card" onclick="selectOpt(this, 'A')">
+            <span class="opt-badge">A</span>
+            <span>3</span>
+          </button>
+          <button class="btn-del" onclick="crossOpt(this)" title="Eliminate option">&times;</button>
+        </div>
+
+        <!-- Option B -->
+        <div class="opt-row">
+          <button class="opt-card" onclick="selectOpt(this, 'B')">
+            <span class="opt-badge">B</span>
+            <span>4</span>
+          </button>
+          <button class="btn-del" onclick="crossOpt(this)" title="Eliminate option">&times;</button>
+        </div>
+
+        <!-- Option C -->
+        <div class="opt-row">
+          <button class="opt-card" onclick="selectOpt(this, 'C')">
+            <span class="opt-badge">C</span>
+            <span>5</span>
+          </button>
+          <button class="btn-del" onclick="crossOpt(this)" title="Eliminate option">&times;</button>
+        </div>
+
+        <!-- Option D -->
+        <div class="opt-row">
+          <button class="opt-card" onclick="selectOpt(this, 'D')">
+            <span class="opt-badge">D</span>
+            <span>7</span>
+          </button>
+          <button class="btn-del" onclick="crossOpt(this)" title="Eliminate option">&times;</button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Bottom Navigation -->
+  <footer class="bottom">
+    <button class="nav-btn" onclick="goDelta(-1)">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M15 18l-6-6 6-6"/></svg>
+      <span>Back</span>
+    </button>
+
+    <button class="grid-btn" onclick="openGrid()">
+      <span id="qDisplay">Question 12 of 22</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 15l-6-6-6 6"/></svg>
+    </button>
+
+    <button class="nav-btn primary" onclick="goDelta(1)">
+      <span>Next</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M9 18l6-6-6-6"/></svg>
+    </button>
+  </footer>
+
+</div>
+
+<!-- Backdrop & Sheets -->
+<div class="backdrop" id="backdrop" onclick="closeSheet()"></div>
+<div class="sheet" id="sheet"></div>
+
+<script>
+let curQ = 12;
+let totalQ = 22;
+let answers = {1:'A', 2:'C', 3:'B', 4:'D', 5:'B', 6:'A', 7:'C', 8:'B', 9:'A', 10:'D', 11:'C'};
+let flagged = {5: true};
+
+// Timer
+let sLeft = 34 * 60 + 42;
+const clock = document.getElementById('clock');
+setInterval(() => {
+  if (sLeft > 0) {
+    sLeft--;
+    const m = String(Math.floor(sLeft / 60)).padStart(2, '0');
+    const s = String(sLeft % 60).padStart(2, '0');
+    clock.textContent = `${m}:${s}`;
+  }
+}, 1000);
+
+function toggleClock() {
+  const box = document.getElementById('timerBox');
+  const btn = event.target;
+  if (box.style.visibility === 'hidden') {
+    box.style.visibility = 'visible';
+    btn.textContent = 'Hide';
+  } else {
+    box.style.visibility = 'hidden';
+    btn.textContent = 'Show';
+  }
+}
+
+function selectOpt(card, letter) {
+  document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('picked'));
+  card.classList.add('picked');
+  answers[curQ] = letter;
+  try { navigator.vibrate && navigator.vibrate(12); } catch(e){}
+}
+
+function crossOpt(btn) {
+  const c = btn.previousElementSibling;
+  c.classList.toggle('eliminated');
+}
+
+function toggleFlag() {
+  flagged[curQ] = !flagged[curQ];
+  const btn = document.getElementById('flagBtn');
+  btn.classList.toggle('on', flagged[curQ]);
+  document.getElementById('flagTxt').textContent = flagged[curQ] ? 'Flagged for Review' : 'Mark for Review';
+}
+
+function goDelta(d) {
+  curQ = Math.max(1, Math.min(totalQ, curQ + d));
+  updateQView();
+}
+
+function updateQView() {
+  document.getElementById('qLabel').textContent = curQ;
+  document.getElementById('qDisplay').textContent = `Question ${curQ} of ${totalQ}`;
+  document.querySelectorAll('.opt-card').forEach(c => c.classList.remove('picked', 'eliminated'));
+  const btn = document.getElementById('flagBtn');
+  btn.classList.toggle('on', !!flagged[curQ]);
+  document.getElementById('flagTxt').textContent = flagged[curQ] ? 'Flagged for Review' : 'Mark for Review';
+}
+
+// Question Review Drawer
+function openGrid() {
+  let items = '';
+  for(let i=1; i<=totalQ; i++) {
+    const isCur = i === curQ;
+    const isDone = !!answers[i];
+    const isFlag = !!flagged[i];
+    const cls = isCur ? 'cur' : isFlag ? 'flag' : isDone ? 'done' : '';
+    items += `<button class="g-item ${cls}" onclick="jumpTo(${i})">${i}</button>`;
+  }
+
+  showSheet(`
+    <div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <h3 style="font-size:18px;font-weight:700">Module 1 Questions</h3>
+      <span style="font-size:12px;color:var(--muted)">11 answered &bull; 1 flagged</span>
+    </div>
+    <div class="q-grid">${items}</div>
+  `);
+}
+
+function jumpTo(q) {
+  curQ = q;
+  updateQView();
+  closeSheet();
+}
+
+// Reference Sheet Modal
+function openFormulas() {
+  showSheet(`
+    <div class="grab"></div>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <h3 style="font-size:18px;font-weight:700">Official SAT Math Reference</h3>
+      <span class="mod-tag">Formulas</span>
+    </div>
+    <div class="f-grid">
+      <div class="f-card"><b>Circle</b>A = &pi;r<sup>2</sup><br>C = 2&pi;r</div>
+      <div class="f-card"><b>Triangle</b>A = &frac12;bh<br>c<sup>2</sup> = a<sup>2</sup> + b<sup>2</sup></div>
+      <div class="f-card"><b>Special Triangles</b>30-60-90 &bull; x, x&radic;3, 2x<br>45-45-90 &bull; s, s, s&radic;2</div>
+      <div class="f-card"><b>Cylinder & Sphere</b>V = &pi;r<sup>2</sup>h<br>V = <sup>4</sup>/<sub>3</sub>&pi;r<sup>3</sup></div>
+      <div class="f-card"><b>Radians</b>Degrees = 360&deg;<br>Radians = 2&pi;</div>
+      <div class="f-card"><b>Sum of Angles</b>Triangle = 180&deg;<br>Line = 180&deg;</div>
+    </div>
+  `);
+}
+
+function showSheet(html) {
+  const sh = document.getElementById('sheet');
+  sh.innerHTML = html;
+  document.getElementById('backdrop').classList.add('open');
+  requestAnimationFrame(() => sh.classList.add('open'));
+}
+
+function closeSheet() {
+  document.getElementById('sheet').classList.remove('open');
+  document.getElementById('backdrop').classList.remove('open');
+}
+</script>
+</body>
+</html>

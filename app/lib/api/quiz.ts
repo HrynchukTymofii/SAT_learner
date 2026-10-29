@@ -151,6 +151,8 @@ export async function submitQuizAnswers(
 
     return res.data;
   } catch (error: any) {
+    // Offline or server error → throw so the caller queues it; 4xx won't get better on retry
+    if (!error.response || error.response.status >= 500) throw error;
     console.error("❌ Failed to submit quiz answers:", error.response?.data || error.message);
     return {
       success: false,
@@ -174,6 +176,8 @@ export async function saveQuestion(token: string, questionId: string) {
 
     return res.data.saved;
   } catch (error: any) {
+    // Offline or server error → throw so the caller queues it; 4xx won't get better on retry
+    if (!error.response || error.response.status >= 500) throw error;
     console.error("❌ Failed to toggle save question:", error.response?.data || error.message);
     return null;
   }
@@ -193,6 +197,8 @@ export async function resetQuiz(token: string, quizId: string) {
 
     return res.data;
   } catch (error: any) {
+    // Offline or server error → throw so the caller queues it; 4xx won't get better on retry
+    if (!error.response || error.response.status >= 500) throw error;
     console.error("❌ Failed to reset quiz:", error.response?.data || error.message);
     return {
       success: false,
@@ -216,6 +222,8 @@ export async function updateUserPoints(token: string, totalPoints: number): Prom
 
     return true;
   } catch (error: any) {
+    // Offline or server error → throw so the caller queues it; 4xx won't get better on retry
+    if (!error.response || error.response.status >= 500) throw error;
     console.error("❌ Failed to update user points:", error.response?.data || error.message);
     return false;
   }

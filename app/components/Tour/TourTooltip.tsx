@@ -82,7 +82,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         <Animated.View style={[
           styles.tooltipContent,
           {
-            backgroundColor: isDark ? '#1e293b' : '#ffffff',
+            backgroundColor: isDark ? '#17151C' : '#ffffff',
             opacity: fadeAnim,
             transform: [{
               scale: fadeAnim.interpolate({
@@ -95,27 +95,27 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={[styles.badge, { backgroundColor: '#06B6D4' }]}>
+              <View style={[styles.badge, { backgroundColor: '#8A5CE6' }]}>
                 <Text style={styles.badgeText}>
                   {stepNumber}/{totalSteps}
                 </Text>
               </View>
               <Text style={[
                 styles.title,
-                { color: isDark ? '#ffffff' : '#1f2937' }
+                { color: isDark ? '#F4F1F8' : '#0B0A0F' }
               ]}>
                 {title}
               </Text>
             </View>
             <TouchableOpacity onPress={onSkip} style={styles.closeButton}>
-              <X size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <X size={20} color={isDark ? '#9C95A8' : '#6B6577'} />
             </TouchableOpacity>
           </View>
 
           {/* Content */}
           <Text style={[
             styles.content,
-            { color: isDark ? '#d1d5db' : '#4b5563' }
+            { color: isDark ? '#CFC9DA' : '#4F4A5A' }
           ]}>
             {content}
           </Text>
@@ -127,12 +127,12 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                 onPress={onSkip}
                 style={[
                   styles.skipButton,
-                  { backgroundColor: isDark ? '#374151' : '#f3f4f6' }
+                  { backgroundColor: isDark ? '#2B2733' : '#EFEAF7' }
                 ]}
               >
                 <Text style={[
                   styles.skipButtonText,
-                  { color: isDark ? '#9ca3af' : '#6b7280' }
+                  { color: isDark ? '#9C95A8' : '#6B6577' }
                 ]}>
                   {skipButtonText}
                 </Text>
@@ -145,13 +145,13 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                   onPress={onPrev}
                   style={[
                     styles.navButton,
-                    { backgroundColor: isDark ? '#374151' : '#f3f4f6' }
+                    { backgroundColor: isDark ? '#2B2733' : '#EFEAF7' }
                   ]}
                 >
-                  <ArrowLeft size={16} color={isDark ? '#06B6D4' : '#0891B2'} />
+                  <ArrowLeft size={16} color={isDark ? '#C9AAFB' : '#7A4BDB'} />
                   <Text style={[
                     styles.navButtonText,
-                    { color: isDark ? '#06B6D4' : '#0891B2' }
+                    { color: isDark ? '#C9AAFB' : '#7A4BDB' }
                   ]}>
                     Prev
                   </Text>
@@ -179,7 +179,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       onClose={onClose}
       contentStyle={[
         styles.tooltip,
-        { backgroundColor: isDark ? '#1e293b' : '#ffffff' }
+        { backgroundColor: isDark ? '#17151C' : '#ffffff' }
       ]}
       arrowSize={{ width: 16, height: 8 }}
       backgroundColor="rgba(0,0,0,0.5)"
@@ -268,7 +268,7 @@ const styles = StyleSheet.create({
     gap: 4,
   },
   nextButton: {
-    backgroundColor: '#06B6D4',
+    backgroundColor: '#8A5CE6',
   },
   navButtonText: {
     fontSize: 13,

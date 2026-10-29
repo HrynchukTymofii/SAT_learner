@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>App Icon Concepts</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Manrope:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F4F1F9; --card: #FFFFFF; --ink: #0B0A0F; --muted: #6B6577; --line: #E5DFEE;
+    --wall: linear-gradient(160deg, #C9AAFB 0%, #E4CDFF 45%, #FEE7A6 100%);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #121016; --card: #1B1821; --ink: #F4F1F8; --muted: #9C95A8; --line: #2C2834;
+      --wall: linear-gradient(160deg, #1d1530 0%, #0B0A0F 60%, #2a2412 100%); }
+  }
+  :root[data-theme="dark"] { --bg: #121016; --card: #1B1821; --ink: #F4F1F8; --muted: #9C95A8; --line: #2C2834;
+    --wall: linear-gradient(160deg, #1d1530 0%, #0B0A0F 60%, #2a2412 100%); }
+
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font-family: Manrope, system-ui, sans-serif; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 40px 16px 80px; }
+  header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 16px; margin-bottom: 32px; }
+  h1 { font: 600 clamp(32px, 5vw, 52px)/1.05 Outfit, sans-serif; letter-spacing: -.02em; margin: 0; }
+  header p { margin: 8px 0 0; color: var(--muted); max-width: 52ch; }
+  .seg { display: inline-flex; gap: 4px; padding: 4px; border-radius: 999px; background: var(--card); border: 1.5px solid var(--line); }
+  .seg button { border: 0; background: none; color: var(--ink); font: 700 13px Manrope, sans-serif; padding: 8px 14px; border-radius: 999px; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+  .card { background: var(--card); border: 1.5px solid var(--line); border-radius: 28px; padding: 22px; display: grid; gap: 16px; }
+  .icon { width: 100%; aspect-ratio: 1; border-radius: 22.5%; overflow: hidden; box-shadow: 0 18px 40px -18px rgba(11,10,15,.45); }
+  .icon svg { display: block; width: 100%; height: 100%; }
+  .meta { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+  .meta b { font: 600 20px Outfit, sans-serif; }
+  .meta span { color: var(--muted); font-weight: 800; font-size: 13px; }
+  .card p { margin: -8px 0 0; color: var(--muted); font-size: 14px; line-height: 1.45; }
+  .sizes { display: flex; align-items: end; gap: 12px; }
+  .sizes .icon { box-shadow: none; }
+
+  h2 { font: 600 28px Outfit, sans-serif; margin: 56px 0 16px; }
+  .phone { background: var(--wall); border-radius: 36px; padding: 28px 22px; display: grid; grid-template-columns: repeat(5, 1fr); gap: 22px 14px; max-width: 520px; }
+  .app { display: grid; justify-items: center; gap: 6px; font: 700 11px Manrope, sans-serif; color: #fff; text-shadow: 0 1px 2px rgba(0,0,0,.35); }
+  .app .icon { width: 100%; max-width: 72px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>SAT Learner app icon: 10 ideas</h1>
+      <p>Same palette as the redesign: lavender, butter, black, with mint and rose as accents. Each card shows the icon large, at 60 and 40 px, and all ten sit on a home screen at the bottom.</p>
+    </div>
+    <div class="seg" role="group" aria-label="Theme">
+      <button data-t="light">Light</button><button data-t="dark">Dark</button><button data-t="auto">Auto</button>
+    </div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <h2>On a home screen</h2>
+  <div class="phone" id="phone"></div>
+</div>
+
+<!-- Icons are 1024×1024; the rounded corners come from the .icon mask, as on iOS -->
+<template id="i1"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#E4CDFF"/>
+  <path d="M680 340V284H350L530 512 350 740H680V684" fill="none" stroke="#0B0A0F" stroke-width="92" stroke-linejoin="round" stroke-linecap="round"/></svg></template>
+
+<template id="i2"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <path d="M220 230c80 600 504 600 584 0" fill="none" stroke="#E4CDFF" stroke-width="70" stroke-linecap="round"/>
+  <circle cx="512" cy="680" r="78" fill="#FEE7A6"/></svg></template>
+
+<template id="i3"><svg viewBox="0 0 1024 1024"><defs><pattern id="g3" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="rgba(11,10,15,.09)" stroke-width="3"/></pattern></defs>
+  <rect width="1024" height="1024" fill="#FEE7A6"/><rect width="1024" height="1024" fill="url(#g3)"/>
+  <path d="M220 820 820 230" stroke="#0B0A0F" stroke-width="64" stroke-linecap="round"/>
+  <path d="M400 640h240V400" fill="none" stroke="#0B0A0F" stroke-width="22" stroke-dasharray="24 30" stroke-linecap="round"/>
+  <circle cx="400" cy="640" r="66" fill="#fff" stroke="#0B0A0F" stroke-width="22"/><circle cx="640" cy="400" r="66" fill="#0B0A0F"/></svg></template>
+
+<template id="i4"><svg viewBox="0 0 1024 1024"><defs><pattern id="g4" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="rgba(11,10,15,.08)" stroke-width="3"/></pattern></defs>
+  <rect width="1024" height="1024" fill="#C9AAFB"/><rect width="1024" height="1024" fill="url(#g4)"/>
+  <text x="512" y="610" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="330" letter-spacing="-14" fill="#0B0A0F">750</text>
+  <rect x="300" y="680" width="424" height="92" rx="46" fill="#0B0A0F"/>
+  <text x="512" y="745" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="58" fill="#FEE7A6">SAT MATH</text></svg></template>
+
+<template id="i5"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+  <path d="M0 0H1024V330C860 330 820 470 512 470S164 330 0 330Z" fill="#0B0A0F"/>
+  <path transform="translate(512 700) scale(.6) translate(-512 -512)" d="M680 340V284H350L530 512 350 740H680V684" fill="none" stroke="#0B0A0F" stroke-width="120" stroke-linejoin="round" stroke-linecap="round"/>
+  <circle cx="512" cy="300" r="64" fill="#E4CDFF"/></svg></template>
+
+<template id="i6"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#FEE7A6"/>
+  <path d="M0 0H1024L0 1024Z" fill="#E4CDFF"/>
+  <rect x="232" y="232" width="560" height="560" rx="150" fill="#0B0A0F"/>
+  <path transform="translate(512 512) scale(.62) translate(-512 -512)" d="M680 340V284H350L530 512 350 740H680V684" fill="none" stroke="#E4CDFF" stroke-width="120" stroke-linejoin="round" stroke-linecap="round"/></svg></template>
+
+<template id="i7"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <text x="512" y="560" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="300" letter-spacing="-8" fill="#fff">SAT</text>
+  <path d="M250 680c120 110 404 110 524 0" fill="none" stroke="#C9AAFB" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="774" cy="680" r="44" fill="#FEE7A6"/></svg></template>
+
+<template id="i8"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#E4CDFF"/>
+  <rect x="190" y="230" width="644" height="460" rx="110" fill="#0B0A0F"/>
+  <path d="M330 690h170l-150 130Z" fill="#0B0A0F"/>
+  <path d="M370 470l100 100 190-210" fill="none" stroke="#FEE7A6" stroke-width="70" stroke-linecap="round" stroke-linejoin="round"/></svg></template>
+
+<template id="i9"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <circle cx="512" cy="512" r="330" fill="#E4CDFF"/>
+  <text x="470" y="650" text-anchor="middle" font-family="Outfit" font-weight="700" font-size="360" fill="#0B0A0F">x</text>
+  <text x="680" y="460" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="200" fill="#0B0A0F">2</text>
+  <circle cx="812" cy="250" r="70" fill="#FEE7A6"/></svg></template>
+
+<template id="i10"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <rect x="196" y="560" width="176" height="270" rx="88" fill="#CDEFD9"/>
+  <rect x="424" y="400" width="176" height="430" rx="88" fill="#FEE7A6"/>
+  <rect x="652" y="196" width="176" height="634" rx="88" fill="#E4CDFF"/></svg></template>
+
+
+<script>
+  const ideas = [
+    ["i1", "Sigma tile", "Today's logo, scaled up. Safest choice: matches the website and the store page."],
+    ["i2", "Parabola", "Black icon with a lavender curve and a butter vertex. Stands out on a busy home screen."],
+    ["i3", "Rise over run", "The slope picture from the lesson cards, on butter graph paper."],
+    ["i4", "750", "Puts the goal in the icon. Bold, but the number says more than a symbol."],
+    ["i5", "The notch", "The black header drip from the redesign, with ∑ under it. Most 'us'."],
+    ["i6", "Split tile", "Lavender and butter halves with a black ∑ chip. Shows both brand colours."],
+    ["i7", "SAT smile", "Wordmark with a lavender curve. Readable, but text gets small at 40 px."],
+    ["i8", "Got it", "A speech-bubble card with a tick: 'you solved it'. Friendly, less math-specific."],
+    ["i9", "x²", "One symbol everyone knows from algebra. Simple shapes, sharp at every size."],
+    ["i10", "Progress bars", "Mint, butter, lavender bars rising. About getting better, not about math."],
+  ];
+  const grid = document.getElementById("grid"), phone = document.getElementById("phone");
+  const svg = (id) => document.getElementById(id).innerHTML;
+  ideas.forEach(([id, name, text], n) => {
+    grid.insertAdjacentHTML("beforeend", `
+      <article class="card">
+        <div class="icon">${svg(id)}</div>
+        <div class="meta"><b>${name}</b><span>#${n + 1}</span></div>
+        <p>${text}</p>
+        <div class="sizes"><div class="icon" style="width:60px">${svg(id)}</div><div class="icon" style="width:40px">${svg(id)}</div></div>
+      </article>`);
+    phone.insertAdjacentHTML("beforeend", `<div class="app"><div class="icon">${svg(id)}</div>${name}</div>`);
+  });
+  // Pattern ids repeat across copies; the first definition wins, which is fine for identical patterns
+
+  const root = document.documentElement, buttons = document.querySelectorAll(".seg button");
+  function setTheme(t) {
+    if (t === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", t);
+    buttons.forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.t === t)));
+    try { localStorage.setItem("icons-theme", t); } catch {}
+  }
+  let saved = "auto";
+  try { saved = localStorage.getItem("icons-theme") || "auto"; } catch {}
+  setTheme(saved);
+  buttons.forEach((b) => b.addEventListener("click", () => setTheme(b.dataset.t)));
+</script>
+</body>
+</html>

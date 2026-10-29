@@ -13,7 +13,7 @@ export default function TimeAlert() {
         borderRadius: 12,
         padding: 16,
         borderLeftWidth: 4,
-        borderLeftColor: "#ef4444",
+        borderLeftColor: "#D93F55",
         shadowColor: "#000",
         shadowOffset: { width: 0, height: 2 },
         shadowOpacity: 0.1,
@@ -22,11 +22,11 @@ export default function TimeAlert() {
       }}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <AlertTriangle size={20} color="#ef4444" />
+        <AlertTriangle size={20} color="#D93F55" />
         <Text
           style={{
             fontWeight: "600",
-            color: "#ef4444",
+            color: "#D93F55",
             fontSize: 14,
           }}
         >

@@ -1,0 +1,1098 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#05070D">
+<title>SAT Learner — Personalized Digital SAT Mastery Plan</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  color-scheme:dark;
+  --bg:#05070D;--surface:#10131D;--surface2:#171B28;--line:rgba(255,255,255,.08);
+  --text:#F3F5FB;--muted:#8D94AB;--dim:#5E657B;
+  --blue:#4F74FF;--teal:#3CC6B4;--indigo:#6366F1;--ink:#0A0D16;
+  --cta:linear-gradient(90deg,#3CC6B4 0%,#4F74FF 100%);
+  --card:radial-gradient(130% 85% at 50% 115%,#2F6BFF 0%,#1B3FAE 32%,#0E1633 66%,#0A0D19 100%);
+  --card-sat:radial-gradient(130% 85% at 50% 115%,#3CC6B4 0%,#1B3FAE 38%,#0E1633 68%,#0A0D19 100%);
+  --amber:#FFD27A;--emerald:#4FD8A4;--rose:#FF5E7E;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+:root{box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{height:100%;background:var(--bg);scroll-padding-top:env(safe-area-inset-top,0px)}
+body{height:100%;background:var(--bg);color:var(--text);font-family:'Bai Jamjuree',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow:hidden}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--bg)}
+button,input{font:inherit;color:inherit}
+button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+:focus-visible{outline:2px solid #8FB0FF;outline-offset:3px}
+
+#app{position:relative;height:100%;max-width:480px;margin:0 auto;display:flex;flex-direction:column}
+#app::after{content:"";position:absolute;left:-20%;right:-20%;bottom:-30%;height:60%;background:radial-gradient(closest-side,rgba(47,107,255,.16),transparent);pointer-events:none;z-index:0}
+
+/* Top Navigation Bar */
+.top{position:relative;z-index:2;display:flex;align-items:center;gap:12px;padding:10px 16px 6px;min-height:58px}
+#app.no-top .top{display:none}
+.icon-btn{width:40px;height:40px;flex:none;border-radius:50%;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;transition:opacity .2s}
+.icon-btn.hide{opacity:0;pointer-events:none}
+.progress{flex:1;height:6px;border-radius:6px;background:var(--surface2);overflow:hidden}
+.progress i{display:block;height:100%;width:0;background:var(--cta);border-radius:6px;transition:width .55s cubic-bezier(.2,.8,.2,1)}
+#mini{width:38px;height:38px;display:grid;place-items:center}
+.badge-sat{display:inline-flex;align-items:center;gap:6px;padding:3px 10px;border-radius:8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;background:rgba(60,198,180,.15);color:#5FE0C8;border:1px solid rgba(60,198,180,.3)}
+
+/* Stage & Screens */
+#stage{position:relative;flex:1;overflow:hidden;z-index:1}
+.screen{position:absolute;inset:0;overflow-y:auto;overflow-x:hidden;padding:6px 20px 24px;display:flex;flex-direction:column;-webkit-overflow-scrolling:touch}
+.screen>*{flex-shrink:0}
+.screen.enter{animation:inF .42s cubic-bezier(.2,.8,.2,1) both}
+.screen.exit{animation:outF .3s ease both;pointer-events:none}
+.screen.back.enter{animation-name:inB}.screen.back.exit{animation-name:outB}
+@keyframes inF{from{opacity:0;transform:translateX(32px)}to{opacity:1;transform:none}}
+@keyframes outF{to{opacity:0;transform:translateX(-32px)}}
+@keyframes inB{from{opacity:0;transform:translateX(-32px)}to{opacity:1;transform:none}}
+@keyframes outB{to{opacity:0;transform:translateX(32px)}}
+
+.q-title{font-size:27px;line-height:1.15;font-weight:600;letter-spacing:-.01em;margin:10px 0 8px;text-wrap:balance}
+.q-sub{color:var(--muted);font-size:15.5px;line-height:1.45;margin-bottom:20px;max-width:38ch}
+.center{text-align:center;margin-left:auto;margin-right:auto}
+
+/* Option Cards */
+.opts{display:flex;flex-direction:column;gap:10px}
+.opts>*{animation:rise .38s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*40ms)}
+@keyframes rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.opt{display:flex;align-items:center;gap:14px;width:100%;text-align:left;padding:16px 18px;border-radius:18px;background:var(--surface);border:1px solid var(--line);font-size:16.5px;font-weight:500;transition:transform .15s,background .25s,border-color .25s}
+.opt:active{transform:scale(.98)}
+.opt.picked{background:linear-gradient(180deg,#122554,#183f9e);border-color:#5B80FF}
+.opt .emo{font-size:22px;width:30px;text-align:center;flex:none}
+.opt .letter{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--dim);display:grid;place-items:center;font-size:12px;font-weight:700;color:var(--muted);flex:none;transition:.2s}
+.opt.picked .letter{background:#fff;border-color:#fff;color:#0A0D16}
+.opt .ot{flex:1;display:flex;flex-direction:column;gap:2px}
+.opt small{color:var(--muted);font-size:13.5px;font-weight:400}
+.opt.picked small{color:#C5D3FF}
+.box{width:24px;height:24px;flex:none;border-radius:8px;border:1.5px solid var(--dim);display:grid;place-items:center;transition:.2s}
+.opt.picked .box{background:#fff;border-color:#fff}
+.box svg{opacity:0;transition:.2s}.opt.picked .box svg{opacity:1}
+
+/* Math Question Box */
+.math-card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px;margin-bottom:18px}
+.math-meta{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.math-domain{font-size:11.5px;font-weight:700;text-transform:uppercase;color:var(--teal);letter-spacing:.05em}
+.math-qnum{font-size:12px;color:var(--muted);font-family:monospace}
+.math-prompt{font-size:16.5px;line-height:1.45;color:#F3F5FB;font-weight:500}
+.math-eq{font-family:"Cambria Math","Times New Roman",serif;font-style:italic;color:#A9DCFA;padding:0 2px}
+.explanation{background:rgba(60,198,180,.12);border:1px solid rgba(60,198,180,.35);border-radius:16px;padding:14px 16px;margin-top:14px;font-size:14px;line-height:1.45;color:#D3EFE8;animation:rise .3s both}
+.explanation b{color:#5FE0C8;display:block;margin-bottom:4px}
+
+/* Fact Screens */
+.fact{margin-top:8px;border-radius:30px;background:var(--card);border:1px solid rgba(110,150,255,.25);padding:28px 22px 24px;display:flex;flex-direction:column;align-items:center;text-align:center}
+.fact h2{font-size:25px;font-weight:600;line-height:1.18;margin-top:16px;text-wrap:balance}
+.stat{font-size:64px;font-weight:700;line-height:1;margin-top:16px;letter-spacing:-.02em;font-variant-numeric:tabular-nums;background:linear-gradient(180deg,#fff,#AFC4FF);-webkit-background-clip:text;background-clip:text;color:transparent}
+.fact p{color:#C9D2EE;font-size:16px;line-height:1.5;margin-top:12px;max-width:32ch}
+.fact .src{color:#7F8BB3;font-size:12px;margin-top:16px}
+.points{display:flex;flex-direction:column;gap:10px;margin-top:18px;width:100%;text-align:left}
+.point{display:flex;gap:12px;align-items:flex-start;background:rgba(5,8,18,.5);border:1px solid rgba(255,255,255,.07);border-radius:16px;padding:12px 14px;font-size:14.5px;line-height:1.4;color:#DCE3F7}
+.point b{display:block;color:#fff;font-weight:600}
+.point .pi{flex:none;width:24px;height:24px;border-radius:8px;display:grid;place-items:center;background:rgba(79,116,255,.25)}
+
+/* Footer CTA */
+.foot{margin-top:auto;padding-top:16px;position:sticky;bottom:0;background:linear-gradient(transparent,var(--bg) 40%);z-index:3}
+.cta{position:relative;width:100%;height:58px;border-radius:29px;border:0;background:var(--cta);color:#fff;font-size:18px;font-weight:600;box-shadow:0 12px 30px -12px rgba(79,116,255,.8);display:grid;place-items:center;transition:transform .15s,opacity .2s,background .3s}
+.cta:active{transform:scale(.98)}
+.cta:disabled{opacity:.35;box-shadow:none}
+.cta .spin,.cta .tick{display:none}
+.cta.loading .lbl{visibility:hidden}.cta.loading .spin{display:block;position:absolute}
+.cta.done{background:linear-gradient(90deg,#4FD8A4,#3CC6B4)}.cta.done .lbl,.cta.done .spin{display:none}.cta.done .tick{display:block;position:absolute}
+.spin{width:24px;height:24px;border:3px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:rot .8s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* Avatar & Badges */
+.sat-orb{width:110px;height:110px;border-radius:50%;background:radial-gradient(circle at 35% 30%,#6CE0FF 0%,#3F67E8 55%,#1A2875 100%);display:grid;place-items:center;box-shadow:0 0 35px rgba(79,116,255,.45);margin:10px auto;animation:float 4s ease-in-out infinite}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
+.sat-orb svg{width:54px;height:54px;color:#fff}
+
+/* Animated Ring Loading */
+.load{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:8px}
+.ring-wrap{position:relative;width:200px;height:200px;margin:12px 0 6px}
+.ring-wrap svg{position:absolute;inset:0;transform:rotate(-90deg)}
+.ring-wrap .track{fill:none;stroke:#161A27;stroke-width:10}
+.ring-wrap .bar{fill:none;stroke-width:10;stroke-linecap:round;stroke-dasharray:597;stroke-dashoffset:597;transition:stroke-dashoffset .12s linear}
+.ring-blob{position:absolute;inset:0;display:grid;place-items:center}
+.pct{font-size:42px;font-weight:700;font-variant-numeric:tabular-nums;color:#fff}
+.steps{list-style:none;width:100%;display:flex;flex-direction:column;gap:10px;margin:16px 0 16px;text-align:left}
+.steps li{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:15px;transition:color .3s}
+.steps li .sd{width:22px;height:22px;border-radius:50%;border:1.5px solid #2A3042;display:grid;place-items:center;flex:none;transition:.3s}
+.steps li.act{color:var(--text)}.steps li.act .sd{border-color:#5B80FF;border-top-color:transparent;animation:rot .9s linear infinite}
+.steps li.ok{color:#B9C3DE}.steps li.ok .sd{background:#3CC6B4;border-color:#3CC6B4;animation:none}
+.steps li .sd svg{opacity:0}.steps li.ok .sd svg{opacity:1}
+.tst{width:100%;min-height:130px;border-radius:20px;background:var(--surface);border:1px solid var(--line);padding:16px;text-align:left;transition:opacity .35s,transform .35s}
+.tst.fade{opacity:0;transform:translateY(6px)}
+.stars{color:var(--amber);letter-spacing:2px;font-size:14px}
+.tst p{font-size:14.5px;line-height:1.45;margin:6px 0 8px;color:#DDE3F3}
+.who{display:flex;align-items:center;gap:10px;color:var(--muted);font-size:13.5px}
+.av{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-weight:700;font-size:12px;color:#0B1020}
+.ver{color:#5FD6A2;font-size:12px}
+
+/* Bottom Sheet */
+.backdrop{position:fixed;inset:0;background:rgba(2,4,10,.65);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);opacity:0;pointer-events:none;transition:opacity .3s;z-index:29}
+.backdrop.open{opacity:1;pointer-events:auto}
+.sheet{position:fixed;left:50%;bottom:0;width:100%;max-width:480px;transform:translate(-50%,105%);transition:transform .4s cubic-bezier(.2,.8,.2,1);background:#0E1220;border-radius:28px 28px 0 0;border-top:1px solid var(--line);padding:12px 20px calc(22px + env(safe-area-inset-bottom,0px));z-index:30;max-height:92%;overflow-y:auto}
+.sheet.open{transform:translate(-50%,0)}
+.grab{width:40px;height:5px;border-radius:3px;background:#2A3042;margin:0 auto 14px}
+.pop-q{display:flex;flex-direction:column;align-items:center;text-align:center;gap:6px;margin-bottom:18px}
+.pop-q small{color:var(--muted);font-size:13.5px}
+.pop-q h3{font-size:21px;font-weight:600;line-height:1.25;max-width:26ch}
+
+/* Result Screen */
+.chart-card{border-radius:26px;background:var(--surface);border:1px solid var(--line);padding:18px 14px 12px;margin-bottom:14px}
+.chart-card h3{font-size:17px;font-weight:600;padding:0 6px}
+.chart-card svg{width:100%;height:auto;display:block;margin-top:8px}
+.legend{display:flex;gap:16px;padding:6px 6px 0;color:var(--muted);font-size:13px}
+.legend span{display:flex;align-items:center;gap:6px}.legend i{width:14px;height:3px;border-radius:2px;display:block}
+.sum{border-radius:22px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.sum div{display:flex;justify-content:space-between;gap:16px;padding:13px 18px;font-size:15px;border-bottom:1px solid var(--line)}
+.sum div:last-child{border:0}.sum span{color:var(--muted)}.sum b{font-weight:600;text-align:right}
+
+/* Paywall */
+.pw-bar{position:sticky;top:-6px;z-index:6;display:flex;align-items:center;justify-content:space-between;gap:10px;margin:-6px -20px 16px;padding:12px 16px;background:rgba(8,11,20,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
+.pw-bar p{font-size:13.5px;color:#C9D2EE;line-height:1.3}
+.timer{font-variant-numeric:tabular-nums;font-weight:700;color:var(--amber);font-size:19px}
+.pw-bar button{flex:none;height:38px;padding:0 16px;border-radius:19px;border:0;background:var(--cta);color:#fff;font-weight:600;font-size:14.5px}
+.comp-card{border-radius:30px;background:var(--card-sat);border:1px solid rgba(110,150,255,.3);padding:22px 18px 24px;display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center}
+.comp-card .meta{align-self:stretch;display:flex;justify-content:space-between;color:#9FA9C9;font-size:13.5px}
+.comp-card .cn{font-size:38px;font-weight:700;line-height:1;margin-top:4px;letter-spacing:-.02em}
+h2.sec{font-size:21px;font-weight:600;margin:26px 0 12px;line-height:1.2}
+.vs{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.vs>div{border-radius:20px;padding:16px;background:var(--surface);border:1px solid var(--line)}
+.vs>div.goal{background:linear-gradient(180deg,#0d2258,#133b9e);border-color:rgba(120,155,255,.4)}
+.vs small{color:var(--muted);font-size:13px}.vs .goal small{color:#C5D3FF}
+.vs strong{display:block;font-size:32px;font-weight:700;margin:4px 0 8px;font-family:monospace}
+.meter{height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+.meter i{display:block;height:100%;border-radius:4px;width:0;transition:width 1.2s cubic-bezier(.2,.8,.2,1)}
+.plans{display:flex;flex-direction:column;gap:12px}
+.plan{position:relative;display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;padding:16px;border-radius:20px;background:var(--surface);border:1.5px solid var(--line);text-align:left;width:100%;transition:.2s}
+.plan.on{border-color:#5B80FF;background:linear-gradient(180deg,#0f1838,#142c74)}
+.plan.pop{margin-top:6px}
+.badge{position:absolute;top:-10px;left:16px;padding:3px 10px;border-radius:8px;background:var(--cta);font-size:12px;font-weight:700;color:#fff}
+.radio{width:22px;height:22px;border-radius:50%;border:2px solid var(--dim);display:grid;place-items:center}
+.plan.on .radio{border-color:#fff}.plan.on .radio::after{content:"";width:10px;height:10px;border-radius:50%;background:#fff}
+.plan .pn{font-size:16.5px;font-weight:600}
+.plan .pp{font-size:13.5px;color:var(--muted);margin-top:2px}.plan .pp s{color:var(--dim);margin-right:6px}
+.perday{text-align:right;line-height:1}
+.perday s{display:block;color:var(--dim);font-size:12.5px;margin-bottom:3px}
+.perday b{font-size:22px;font-weight:700}.perday small{display:block;color:var(--muted);font-size:12px;margin-top:3px}
+.fine{color:var(--dim);font-size:12px;line-height:1.5;text-align:center;margin-top:12px}
+.gets{display:flex;flex-direction:column;gap:12px}
+.gets li{list-style:none;display:flex;gap:12px;align-items:flex-start;font-size:15.5px;line-height:1.4}
+.gets li .ck{flex:none;width:24px;height:24px;border-radius:8px;background:rgba(60,198,180,.18);display:grid;place-items:center;margin-top:1px}
+.rating{display:flex;align-items:center;gap:14px;margin-bottom:12px}
+.rating strong{font-size:42px;font-weight:700;line-height:1}
+.rating p{color:var(--muted);font-size:13.5px}
+.reviews{display:flex;gap:12px;overflow-x:auto;margin:0 -20px;padding:0 20px 6px;scroll-snap-type:x mandatory}
+.reviews .tst{flex:0 0 84%;scroll-snap-align:start;min-height:0}
+.guar{display:flex;gap:14px;align-items:flex-start;border-radius:22px;padding:18px;background:linear-gradient(180deg,rgba(60,198,180,.12),rgba(60,198,180,.04));border:1px solid rgba(60,198,180,.35)}
+.guar b{display:block;font-size:16.5px;margin-bottom:4px;color:#fff}.guar p{color:#BFD9D3;font-size:14px;line-height:1.45}
+
+/* Field */
+.field{width:100%;height:56px;border-radius:18px;background:var(--surface);border:1px solid var(--line);padding:0 18px;font-size:17px;outline:none;transition:border-color .2s;color:#fff}
+.field:focus{border-color:#5B80FF}
+.flabel{display:block;color:var(--muted);font-size:13.5px;margin:0 0 8px 4px}
+.note{color:var(--dim);font-size:13px;line-height:1.45;margin-top:12px;display:flex;gap:8px;align-items:flex-start}
+
+/* Checkout */
+.co-h{font-size:22px;font-weight:600;margin-bottom:14px}
+.order{border-radius:18px;background:var(--surface);border:1px solid var(--line);padding:4px 16px;margin-bottom:16px}
+.order div{display:flex;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--line);font-size:15px}
+.order div:last-child{border:0;font-weight:700;font-size:17px}
+.order .save{color:#5FD6A2}
+.cardrow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.lock{display:flex;justify-content:center;gap:6px;align-items:center;color:var(--muted);font-size:12.5px;margin-top:12px}
+
+/* Success Screen */
+.succ{display:flex;flex-direction:column;align-items:center;text-align:center;padding-top:10px}
+.succ h1{font-size:28px;font-weight:600;margin-top:8px;animation:rise .5s .4s both}
+.succ>p{color:var(--muted);font-size:15.5px;margin-top:6px;animation:rise .5s .55s both}
+.sat-box{width:100%;margin-top:20px;background:#0A0E1A;border:1px solid var(--line);border-radius:28px;padding:20px;text-align:left;animation:rise .6s .8s both}
+.sat-box-h{display:flex;justify-content:space-between;align-items:center;padding-bottom:14px;border-bottom:1px solid var(--line);margin-bottom:14px}
+.sat-box-h b{font-size:20px;font-weight:700}
+#confetti{position:fixed;inset:0;pointer-events:none;z-index:40}
+.linkbtn{background:none;border:0;color:var(--muted);font-size:14px;text-decoration:underline;text-underline-offset:3px;margin-top:16px}
+
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
+.screen,.reviews,.sheet{scrollbar-width:none;-ms-overflow-style:none}
+.screen::-webkit-scrollbar,.reviews::-webkit-scrollbar,.sheet::-webkit-scrollbar{display:none;width:0;height:0}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="top">
+    <button class="icon-btn hide" id="backBtn" aria-label="Go back">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+    </button>
+    <div class="progress" role="progressbar" aria-label="Funnel progress"><i id="bar"></i></div>
+    <div id="mini">
+      <span class="badge-sat">SAT</span>
+    </div>
+  </header>
+  <main id="stage"></main>
+</div>
+<div class="backdrop" id="backdrop"></div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true"></div>
+<canvas id="confetti"></canvas>
+
+<script>
+/* ---------- helpers ---------- */
+const $=(s,el=document)=>el.querySelector(s);
+const $$=(s,el=document)=>[...el.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const val=v=>typeof v==='function'?v():v;
+const buzz=()=>{try{navigator.vibrate&&navigator.vibrate(12)}catch(e){}};
+const CHECK='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0A0D16" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const CHECK_W='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+const CHECK_T='<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#5FE0C8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+
+/* ---------- SAT State ---------- */
+const fresh=()=>({
+  cur:null,hist:[],
+  grade:'11th',
+  targetScore:1520,
+  baselineScore:1180,
+  testDate:'May 2026',
+  weakness:'algebra',
+  dailyTime:'15 min',
+  userName:'',
+  email:'',
+  plan:'p4',
+  deadline:0,
+  answeredDiagnostic:false,
+  timers:[],
+  answers:{}
+});
+let S=fresh();
+
+const user=()=>esc(S.userName||'Student');
+
+const PLANS={
+  p1:{name:'1-Week Sprint Pass',price:6.99,old:13.99,days:7,period:'week'},
+  p4:{name:'4-Week Score Booster',price:19.99,old:39.99,days:28,period:'4 weeks',pop:true},
+  p12:{name:'12-Week Complete SAT Pass',price:39.99,old:79.99,days:84,period:'12 weeks'}
+};
+
+const TESTI=[
+  {n:'Jason K., 17',score:'1540 (was 1290)',t:'I spent 15 mins every day doing the Mistake Vault drills. Ended up with an 790 in Math on the March Digital SAT!'},
+  {n:'Sarah L., 18',score:'1510 (was 1340)',t:'The Desmos tricks and formula explanations made the hardest quadratics feel like free points.'},
+  {n:'Marcus R., 17',score:'1480 (was 1180)',t:'The adaptive plan identified my comma splice and dangling modifier errors in 5 minutes. Best prep investment ever.'},
+  {n:'Elena P., 16',score:'1560 (was 1420)',t:'Bluebook mock exams with the exact countdown and question review grid eliminated all my test anxiety.'}
+];
+
+/* ---------- Flow Control ---------- */
+function flow(){
+  return [
+    'grade',
+    'target',
+    'test_date',
+    'weakness',
+    'fact1',
+    'baseline',
+    'daily_time',
+    'diagnostic',
+    'fact2',
+    'style',
+    'name',
+    'loading',
+    'email',
+    'result',
+    'paywall',
+    'success'
+  ];
+}
+
+function clearTimers(){S.timers.forEach(t=>{clearTimeout(t);clearInterval(t)});S.timers=[]}
+function later(fn,ms){const t=setTimeout(fn,ms);S.timers.push(t);return t}
+function every(fn,ms){const t=setInterval(fn,ms);S.timers.push(t);return t}
+
+function render(id,dir='fwd'){
+  clearTimers();
+  S.cur=id;
+  const def=build(id);
+  const stage=$('#stage');
+  const old=stage.querySelector('.screen:not(.exit)');
+  const el=document.createElement('section');
+  el.className='screen enter'+(dir==='back'?' back':'');
+  el.innerHTML=def.html;
+  if(old){old.classList.add('exit');if(dir==='back')old.classList.add('back');setTimeout(()=>old.remove(),320)}
+  stage.appendChild(el);
+  setTimeout(()=>el.classList.remove('enter'),460);
+  el.scrollTop=0;
+  updateTop(id,def);
+  const nx=el.querySelector('[data-next]');
+  if(nx) nx.addEventListener('click',()=>{buzz();next()});
+  def.after&&def.after(el);
+}
+
+function updateTop(id,def){
+  $('#app').classList.toggle('no-top',!!def.noTop);
+  $('#backBtn').classList.toggle('hide',!S.hist.length||!!def.noBack);
+  const f=flow(),end=f.indexOf('loading');
+  const total=end>0?end:15,i=f.indexOf(id);
+  $('#bar').style.width=(end>0&&i>=end?100:Math.max(4,i/total*100))+'%';
+}
+
+function next(){
+  const f=flow(),i=f.indexOf(S.cur);
+  S.hist.push(S.cur);
+  render(f[i+1]);
+}
+
+function back(){
+  if(!S.hist.length)return;
+  let id=S.hist.pop();
+  while(id==='loading'&&S.hist.length) id=S.hist.pop();
+  render(id,'back');
+}
+$('#backBtn').addEventListener('click',back);
+
+/* ---------- Builders ---------- */
+function head(q){return `<h1 class="q-title">${val(q.title)}</h1>${q.sub?`<p class="q-sub">${val(q.sub)}</p>`:'<div style="height:12px"></div>'}`}
+
+function singleScreen(q,onPick){
+  const cur=S.answers[q.key];
+  return {
+    html:head(q)+`<div class="opts">${q.opts.map((o,i)=>`<button class="opt${cur===o.t?' picked':''}" style="--i:${i}" data-i="${i}">${o.e?`<span class="emo">${o.e}</span>`:''}<span class="ot"><b>${o.t}</b>${o.s?`<small>${o.s}</small>`:''}</span></button>`).join('')}</div>`,
+    after(el){
+      $$('.opt',el).forEach(b=>b.addEventListener('click',()=>{
+        $$('.opt',el).forEach(x=>x.classList.remove('picked'));
+        b.classList.add('picked');buzz();
+        const o=q.opts[+b.dataset.i];S.answers[q.key]=o.t;
+        if(onPick) onPick(o);
+        later(next,260);
+      }));
+    }
+  };
+}
+
+function factScreen(f){
+  return {
+    html:`<div class="fact"><div class="sat-orb"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg></div><h2>${val(f.title)}</h2>${f.stat!=null?`<div class="stat" data-to="${f.stat}" data-dec="${f.dec||0}" data-suf="${f.suf||''}">0</div>`:''}${f.text?`<p>${val(f.text)}</p>`:''}${f.extra||''}${f.src?`<p class="src">Source: ${f.src}</p>`:''}</div><div class="foot"><button class="cta" data-next><span class="lbl">Continue</span></button></div>`,
+    after(el){const s=$('.stat',el);if(s)countUp(s)}
+  };
+}
+
+function countUp(el){
+  const to=+el.dataset.to,dec=+el.dataset.dec,suf=el.dataset.suf,t0=performance.now(),d=1100;
+  const step=t=>{const p=Math.min(1,(t-t0)/d),e=1-Math.pow(1-p,3);el.textContent=(to*e).toFixed(dec)+suf;if(p<1)requestAnimationFrame(step)};
+  requestAnimationFrame(step);
+}
+
+function build(id){
+  switch(id){
+  case 'grade': return {
+    noBack:true,
+    html:`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+        <span class="badge-sat">2026/2027 College Board Format</span>
+        <span style="font-size:12px;color:var(--muted)">2 min diagnostic</span>
+      </div>
+      <h1 class="q-title">What is your current high school grade?</h1>
+      <p class="q-sub">We tailor the pacing and question difficulty to your college admission timeline.</p>
+      <div class="opts">
+        ${[
+          ['Junior (11th Grade)', 'Most common SAT testing year', '🎓'],
+          ['Senior (12th Grade)', 'Final score boost before deadlines', '🚀'],
+          ['Sophomore (10th Grade)', 'Early prep & PSAT foundation', '🌱'],
+          ['Parent, Tutor, or Other', 'Exploring on behalf of a student', '📘']
+        ].map(([t,s,e],i)=>`
+          <button class="opt" style="--i:${i}" data-i="${i}">
+            <span class="emo">${e}</span>
+            <span class="ot"><b>${t}</b><small>${s}</small></span>
+          </button>
+        `).join('')}
+      </div>`,
+    after(el){
+      $$('.opt',el).forEach(b=>b.addEventListener('click',()=>{
+        $$('.opt',el).forEach(x=>x.classList.remove('picked'));
+        b.classList.add('picked');buzz();
+        S.grade=b.querySelector('b').textContent;
+        later(next,260);
+      }));
+    }
+  };
+
+  case 'target': return singleScreen({
+    key:'target',
+    title:'What is your dream SAT score?',
+    sub:'Target scores unlock different merit scholarships and admission brackets.',
+    opts:[
+      {e:'🏆',t:'1550+ (Ivy League & Top 10)',s:'Harvard, MIT, Stanford, Yale'},
+      {e:'🎯',t:'1450 – 1540 (Top 30 Tier)',s:'UC Berkeley, NYU, Michigan, Emory'},
+      {e:'📈',t:'1350 – 1440 (Flagship State)',s:'Significant merit scholarships'},
+      {e:'💡',t:'1200 – 1340 (Solid Foundation)',s:'Comfortable admission baseline'}
+    ]
+  }, o=>{
+    S.targetScore = o.t.includes('1550') ? 1560 : o.t.includes('1450') ? 1510 : o.t.includes('1350') ? 1420 : 1320;
+  });
+
+  case 'test_date': return singleScreen({
+    key:'testDate',
+    title:'When are you taking the Digital SAT?',
+    sub:'We will build a daily study calendar counting down to your exact test date.',
+    opts:[
+      {e:'📅',t:'May 2026 Test Date',s:'~4 weeks left &bull; High urgency'},
+      {e:'📅',t:'June 2026 Test Date',s:'~8 weeks left &bull; Optimal pace'},
+      {e:'☀️',t:'August 2026 (Summer)',s:'Summer intensive prep'},
+      {e:'🍁',t:'October 2026 or later',s:'Long-term mastery path'},
+      {e:'⏳',t:'Not registered yet',s:'Help me decide when to test'}
+    ]
+  }, o=>S.testDate=o.t);
+
+  case 'weakness': return singleScreen({
+    key:'weakness',
+    title:'Which section is holding your score back most?',
+    sub:'Every student has a leak in their score. Pinpointing it gives immediate 80+ point gains.',
+    opts:[
+      {e:'📐',t:'Math: Heart of Algebra & Systems',s:'Linear equations, inequalities, graphs'},
+      {e:'⚡',t:'Math: Advanced Math & Quadratics',s:'Parabolas, polynomials, complex numbers'},
+      {e:'📖',t:'Reading: Craft & Structure',s:'Vocabulary in context, passage synthesis'},
+      {e:'✍️',t:'Writing: Grammar & Punctuation',s:'Semicolons, modifiers, transitions'},
+      {e:'⚖️',t:'Both Math and Reading equally',s:'Comprehensive balanced preparation'}
+    ]
+  }, o=>S.weakness=o.t);
+
+  case 'fact1': return factScreen({
+    title:'The 1250 Plateau is real',
+    stat:84.2,suf:'%',dec:1,
+    text:'of students who practice by taking random practice tests score below 1250. True score leaps happen only when you drill specific question patterns.',
+    src:'College Board National SAT Suite Report 2026'
+  });
+
+  case 'baseline': return singleScreen({
+    key:'baseline',
+    title:'What was your latest SAT or PSAT score?',
+    sub:'If you haven\'t tested yet, give your best honest estimate.',
+    opts:[
+      {e:'1️⃣',t:'Under 1100',s:'Starting fresh &bull; Greatest room to grow'},
+      {e:'2️⃣',t:'1100 – 1240',s:'Solid fundamentals, need advanced drills'},
+      {e:'3️⃣',t:'1250 – 1390',s:'Strong student, need 1500+ breakthrough'},
+      {e:'4️⃣',t:'1400 or above',s:'Sharpening accuracy on hard Module 2 questions'},
+      {e:'🆕',t:'Never taken a practice test',s:'We will establish your diagnostic baseline today'}
+    ]
+  }, o=>{
+    S.baselineScore = o.t.includes('Under') ? 1080 : o.t.includes('1100') ? 1180 : o.t.includes('1250') ? 1320 : o.t.includes('1400') ? 1420 : 1150;
+  });
+
+  case 'daily_time': return singleScreen({
+    key:'dailyTime',
+    title:'How much time can you commit each day?',
+    sub:'Short, focused daily consistency always outperforms 4-hour weekend cramming.',
+    opts:[
+      {e:'☕',t:'10 minutes a day',s:'1 quick drill &bull; Steady progress'},
+      {e:'🔥',t:'15 – 20 minutes a day',s:'Recommended pace &bull; 1 drill + mistake review'},
+      {e:'🚀',t:'30 – 45 minutes a day',s:'Rapid score boost &bull; 2 modules + Desmos tricks'},
+      {e:'⚡',t:'60+ minutes a day',s:'Full test-cram bootcamp mode'}
+    ]
+  }, o=>S.dailyTime=o.t);
+
+  case 'diagnostic': return {
+    html:`
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <span class="badge-sat">Live Skill Calibration</span>
+        <span style="font-size:12px;color:var(--muted)">1 Diagnostic Question</span>
+      </div>
+      <h1 class="q-title" style="margin-top:4px">Solve this Digital SAT Math problem</h1>
+      <p class="q-sub" style="margin-bottom:14px">Tests your algebraic manipulation speed — typical of SAT Module 1.</p>
+      
+      <div class="math-card">
+        <div class="math-meta">
+          <span class="math-domain">Heart of Algebra</span>
+          <span class="math-qnum">SAT Diagnostic &bull; 1 min</span>
+        </div>
+        <p class="math-prompt">
+          If <span class="math-eq">3x + 7 = 2(x &minus; 4) + 21</span>, what is the value of <span class="math-eq">x + 5</span>?
+        </p>
+      </div>
+
+      <div class="opts" id="diagOpts">
+        <button class="opt" data-opt="A" data-correct="false">
+          <span class="letter">A</span>
+          <span class="ot"><b>6</b></span>
+        </button>
+        <button class="opt" data-opt="B" data-correct="true">
+          <span class="letter">B</span>
+          <span class="ot"><b>11</b></span>
+        </button>
+        <button class="opt" data-opt="C" data-correct="false">
+          <span class="letter">C</span>
+          <span class="ot"><b>13</b></span>
+        </button>
+        <button class="opt" data-opt="D" data-correct="false">
+          <span class="letter">D</span>
+          <span class="ot"><b>18</b></span>
+        </button>
+      </div>
+
+      <div id="explBox" class="explanation" style="display:none">
+        <b id="explTitle"></b>
+        <p id="explBody"></p>
+      </div>
+      <div class="foot" id="diagFoot" style="display:none">
+        <button class="cta" data-next><span class="lbl">Continue to Plan</span></button>
+      </div>
+    `,
+    after(el){
+      const opts = $$('#diagOpts .opt', el);
+      const explBox = $('#explBox', el);
+      const explTitle = $('#explTitle', el);
+      const explBody = $('#explBody', el);
+      const foot = $('#diagFoot', el);
+
+      opts.forEach(b=>{
+        b.addEventListener('click', ()=>{
+          opts.forEach(x=>x.disabled=true);
+          b.classList.add('picked');
+          buzz();
+          const isCorrect = b.dataset.correct === 'true';
+          S.answeredDiagnostic = isCorrect;
+          
+          if(isCorrect){
+            b.style.borderColor = '#4FD8A4';
+            explTitle.textContent = 'Correct! The answer is B (11).';
+            explBody.innerHTML = 'Expand right side: 3x + 7 = 2x - 8 + 21 = 2x + 13.<br>Subtract 2x: x + 7 = 13 &rarr; x = 6.<br>Question asks for <b>x + 5 = 6 + 5 = 11</b>. Great job catching the final step!';
+          } else {
+            b.style.borderColor = '#FF5E7E';
+            explTitle.textContent = 'Close! The correct answer is B (11).';
+            explBody.innerHTML = 'Common trap: solving for x gives <b>x = 6</b> (Option A). But the SAT asks for <b>x + 5</b>! 6 + 5 = 11. Our Mistake Vault flags traps like this automatically.';
+          }
+          explBox.style.display = 'block';
+          foot.style.display = 'block';
+        });
+      });
+    }
+  };
+
+  case 'fact2': return factScreen({
+    title:'Immediate error correction is key',
+    text:'Students who review their missed questions with step-by-step breakdowns within 24 hours score an average of 180 points higher than those who only look at test scores.',
+    src:'Cognitive Science of Deliberate Practice in Standardized Testing, 2026',
+    extra:`<div class="points">
+      <div class="point"><span class="pi">${CHECK_W}</span><span><b>Automatic Mistake Vault</b>Every incorrect question is saved for repeat drills until 100% mastery.</span></div>
+      <div class="point"><span class="pi">${CHECK_W}</span><span><b>Desmos Graphing Shortcuts</b>Learn when to graph instead of computing by hand to save 45 seconds per problem.</span></div>
+    </div>`
+  });
+
+  case 'style': return singleScreen({
+    key:'style',
+    title:'What helps you understand hard concepts best?',
+    sub:'We customize your explanations and lesson formats.',
+    opts:[
+      {e:'📝',t:'Step-by-step written logic & formulas',s:'Crisp KaTeX mathematical proofs'},
+      {e:'🎯',t:'Quick interactive drills & instant feedback',s:'Learn through hands-on practice'},
+      {e:'📊',t:'Visual charts & Desmos graphing tricks',s:'Visual learners & geometry shortcuts'},
+      {e:'⏱️',t:'Timed mock test conditions',s:'Simulating the real Bluebook exam'}
+    ]
+  });
+
+  case 'name': return {
+    html:`
+      <div style="display:flex;justify-content:center;margin:16px 0 8px">
+        <div class="sat-orb" style="width:90px;height:90px">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+        </div>
+      </div>
+      <h1 class="q-title center">What is your first name?</h1>
+      <p class="q-sub center">We will generate your personalized SAT Score Improvement Roadmap.</p>
+      <input class="field" id="uname" maxlength="24" placeholder="Your first name" value="${esc(S.userName)}" autocomplete="given-name">
+      <div class="foot">
+        <button class="cta" id="go" ${S.userName?'':'disabled'}><span class="lbl">Generate My SAT Plan</span></button>
+      </div>
+    `,
+    after(el){
+      const inp=$('#uname',el),go=$('#go',el);
+      setTimeout(()=>inp.focus({preventScroll:true}),450);
+      inp.addEventListener('input',()=>go.disabled=!inp.value.trim());
+      go.addEventListener('click',()=>{S.userName=inp.value.trim();buzz();next()});
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&inp.value.trim())go.click()});
+    }
+  };
+
+  case 'loading': return loadingScreen();
+
+  case 'email': return {
+    html:`
+      <div style="display:flex;justify-content:center;margin:12px 0 6px">
+        <div class="sat-orb" style="width:84px;height:84px">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+        </div>
+      </div>
+      <h1 class="q-title center">Where should we send ${user()}'s diagnostic report?</h1>
+      <p class="q-sub center">Access your score projections and syllabus on any device (Web, iPhone, Android).</p>
+      <input class="field" id="em" type="email" inputmode="email" placeholder="student@example.com" value="${esc(S.email)}" autocomplete="email">
+      <p class="note">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+        We respect your privacy. No spam. Unsubscribe anytime.
+      </p>
+      <div class="foot">
+        <button class="cta" id="go" disabled><span class="lbl">View My Score Projection &rarr;</span></button>
+      </div>
+    `,
+    noBack:true,
+    after(el){
+      const inp=$('#em',el),go=$('#go',el),ok=v=>/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v.trim());
+      go.disabled=!ok(inp.value);
+      inp.addEventListener('input',()=>go.disabled=!ok(inp.value));
+      go.addEventListener('click',()=>{S.email=inp.value.trim();buzz();next()});
+      inp.addEventListener('keydown',e=>{if(e.key==='Enter'&&ok(inp.value))go.click()});
+    }
+  };
+
+  case 'result': return resultScreen();
+  case 'paywall': return paywallScreen();
+  case 'success': return successScreen();
+  }
+}
+
+/* ---------- Loading Screen with Rotating Reviews & Clarifying Sheet ---------- */
+function loadingScreen(){
+  const steps=[
+    'Analyzing algebra & reading diagnostic baseline',
+    'Calibrating against College Board 2026 curve',
+    `Building ${user()}'s targeted Mistake Vault`,
+    `Finalizing ${S.targetScore}+ roadmap for ${S.testDate}`
+  ];
+  return {
+    noTop:true,noBack:true,
+    html:`<div class="load">
+      <h1 class="q-title">Analyzing Your Profile</h1>
+      <p class="q-sub center" style="margin-bottom:4px">Calibrating your customized Digital SAT Roadmap</p>
+      <div class="ring-wrap">
+        <svg viewBox="0 0 210 210">
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#3CC6B4"/>
+              <stop offset="1" stop-color="#4F74FF"/>
+            </linearGradient>
+          </defs>
+          <circle class="track" cx="105" cy="105" r="95"/>
+          <circle class="bar" id="rbar" cx="105" cy="105" r="95" stroke="url(#lg)"/>
+        </svg>
+        <div class="ring-blob">
+          <div class="pct"><span id="pct">0</span>%</div>
+        </div>
+      </div>
+      <ul class="steps">${steps.map(s=>`<li><span class="sd">${CHECK_W}</span>${s}</li>`).join('')}</ul>
+      <div class="tst" id="tst"></div>
+    </div>`,
+    after(el){
+      const C=2*Math.PI*95,rbar=$('#rbar',el),pct=$('#pct',el),lis=$$('.steps li',el),tst=$('#tst',el);
+      rbar.style.strokeDasharray=C;rbar.style.strokeDashoffset=C;
+      let ti=0;
+      const showT=()=>{
+        const t=TESTI[ti++%TESTI.length];
+        tst.classList.add('fade');
+        later(()=>{tst.innerHTML=testiHTML(t);tst.classList.remove('fade')},300);
+      };
+      tst.innerHTML=testiHTML(TESTI[0]);ti=1;
+      every(showT,3200);
+
+      let p=0,paused=false,asked=false;
+      const tick=every(()=>{
+        if(paused)return;
+        p=Math.min(100,p+1);
+        pct.textContent=p;
+        rbar.style.strokeDashoffset=C*(1-p/100);
+        const stepIdx=Math.min(3,Math.floor(p/25));
+        lis.forEach((li,i)=>{
+          li.classList.toggle('ok',i<stepIdx||p===100);
+          li.classList.toggle('act',i===stepIdx&&p<100);
+        });
+
+        // Clarifying modal at 52%
+        if(p===52 && !asked){
+          asked=true;paused=true;
+          openSheet(`
+            <div class="grab"></div>
+            <div class="pop-q">
+              <span class="badge-sat">Daily Habit Tuning</span>
+              <h3>Would you like a daily practice reminder?</h3>
+              <small>Consistent 15-minute drills are the #1 predictor of a 1500+ score.</small>
+            </div>
+            <div class="opts">
+              <button class="opt" data-c="yes"><span class="emo">🔔</span><span class="ot"><b>Yes, send reminders at 7:00 PM</b><small>Keep me accountable</small></span></button>
+              <button class="opt" data-c="no"><span class="emo">🙋</span><span class="ot"><b>I will log in on my own</b></span></button>
+            </div>
+          `, sh=>{
+            $$('.opt',sh).forEach(b=>b.addEventListener('click',()=>{
+              b.classList.add('picked');buzz();
+              setTimeout(()=>{closeSheet();paused=false},280);
+            }));
+          }, false);
+        }
+
+        if(p===100){
+          clearInterval(tick);
+          buzz();
+          later(next,900);
+        }
+      },75);
+    }
+  };
+}
+
+function testiHTML(t){
+  return `<div class="stars" aria-label="5 stars">★★★★★</div>
+  <p>“${t.t}”</p>
+  <div class="who">
+    <span class="av" style="background:#5FE0C8">${t.n[0]}</span>
+    <div>
+      <span style="font-weight:600;color:#F3F5FB">${t.n}</span>
+      <span class="ver" style="margin-left:6px;font-weight:700">${t.score}</span>
+    </div>
+  </div>`;
+}
+
+function openSheet(html,after,dismissable=true){
+  const sh=$('#sheet');sh.innerHTML=html;sheetDismiss=dismissable;
+  $('#backdrop').classList.add('open');requestAnimationFrame(()=>sh.classList.add('open'));
+  after&&after(sh);
+}
+function closeSheet(){$('#sheet').classList.remove('open');$('#backdrop').classList.remove('open')}
+$('#backdrop').addEventListener('click',()=>{if(sheetDismiss)closeSheet()});
+
+/* ---------- Result Screen with Interactive Score Curve ---------- */
+function smooth(p){
+  let d=`M${p[0][0]},${p[0][1]}`;
+  for(let i=0;i<p.length-1;i++){
+    const a=p[i-1]||p[i],b=p[i],c=p[i+1],e=p[i+2]||c;
+    d+=` C${b[0]+(c[0]-a[0])/6},${b[1]+(c[1]-a[1])/6} ${c[0]-(e[0]-b[0])/6},${c[1]-(e[1]-b[1])/6} ${c[0]},${c[1]}`;
+  }
+  return d;
+}
+
+function chartSVG(start,target){
+  const xs=[26,92,160,228,294];
+  const y=v=>170-((v-1000)/600)*130;
+  const w=[start, start+(target-start)*.22, start+(target-start)*.52, start+(target-start)*.80, target].map((v,i)=>[xs[i],y(v)]);
+  const al=[start, start+20, start+10, start+35, start+30].map((v,i)=>[xs[i],y(v)]);
+  const line=smooth(w);
+  const by=Math.max(4,y(target)-36);
+
+  return `<svg viewBox="0 0 320 196" role="img" aria-label="Projected SAT score growth">
+    <defs>
+      <linearGradient id="ar" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0" stop-color="#3CC6B4" stop-opacity=".35"/>
+        <stop offset="1" stop-color="#3CC6B4" stop-opacity="0"/>
+      </linearGradient>
+      <linearGradient id="ln" x1="0" x2="1">
+        <stop offset="0" stop-color="#4F74FF"/>
+        <stop offset="1" stop-color="#3CC6B4"/>
+      </linearGradient>
+    </defs>
+    ${[1100,1300,1500].map(v=>`<line x1="20" x2="300" y1="${y(v)}" y2="${y(v)}" stroke="rgba(255,255,255,.07)"/>`).join('')}
+    <path id="area" d="${line} L294,170 L26,170 Z" fill="url(#ar)" opacity="0" style="transition:opacity .8s .9s"/>
+    <path d="${smooth(al)}" fill="none" stroke="#5E657B" stroke-width="2.5" stroke-dasharray="5 6"/>
+    <path id="mline" d="${line}" fill="none" stroke="url(#ln)" stroke-width="4" stroke-linecap="round"/>
+    ${w.map((p,i)=>`<circle class="cdot" cx="${p[0]}" cy="${p[1]}" r="${i===4?7:4.5}" fill="${i===4?'#3CC6B4':'#0A0D19'}" stroke="${i===4?'#fff':'#3CC6B4'}" stroke-width="2.5" opacity="0" style="transition:opacity .3s ${0.25+i*.3}s"/>`).join('')}
+    <g class="cdot" opacity="0" style="transition:opacity .4s 1.6s">
+      <rect x="220" y="${by}" width="88" height="28" rx="9" fill="#fff"/>
+      <text x="264" y="${by+19}" text-anchor="middle" font-size="12.5" font-weight="700" fill="#0A0D19" font-family="Bai Jamjuree, sans-serif">Goal ${target}</text>
+    </g>
+    <text x="26" y="${y(start)-12}" font-size="12" fill="#8D94AB" font-family="Bai Jamjuree, sans-serif">${start}</text>
+    ${['Today','Week 1','Week 2','Week 3',S.testDate.split(' ')[0]].map((l,i)=>`<text x="${xs[i]}" y="192" text-anchor="${i===0?'start':i===4?'end':'middle'}" font-size="11.5" fill="#8D94AB" font-family="Bai Jamjuree, sans-serif">${l}</text>`).join('')}
+  </svg>`;
+}
+
+function resultScreen(){
+  const start = S.baselineScore;
+  const target = Math.max(start + 180, S.targetScore);
+  const pts = target - start;
+  return {
+    noBack:true,
+    html:`
+      <h1 class="q-title">${user()}, your projected score is <span style="color:#5FE0C8">${target}+</span></h1>
+      <p class="q-sub">Based on your diagnostic answers, you have a realistic path to gain <b style="color:#fff">+${pts} points</b> by ${esc(S.testDate)}.</p>
+      
+      <div class="chart-card">
+        <h3>Estimated SAT Score Growth</h3>
+        ${chartSVG(start, target)}
+        <div class="legend">
+          <span><i style="background:linear-gradient(90deg,#4F74FF,#3CC6B4)"></i>With SAT Learner Plan</span>
+          <span><i style="background:#5E657B"></i>Without Plan</span>
+        </div>
+      </div>
+
+      <div class="sum">
+        <div><span>Target Score</span><b>${target} (${target>=1500?'99th':'93rd'} percentile)</b></div>
+        <div><span>Estimated Math Split</span><b>${Math.min(800, Math.round(target*0.51))} / 800</b></div>
+        <div><span>Estimated Reading/Writing Split</span><b>${Math.round(target*0.49)} / 800</b></div>
+        <div><span>Primary Focus Domain</span><b>${esc(S.weakness.split(':')[1]||S.weakness)}</b></div>
+        <div><span>Daily Commitment</span><b>${esc(S.dailyTime)}</b></div>
+      </div>
+      <p class="fine">Projection calibrated from official College Board scoring matrices.</p>
+      <div class="foot">
+        <button class="cta" data-next><span class="lbl">Unlock My Custom Plan &rarr;</span></button>
+      </div>
+    `,
+    after(el){
+      const ml=$('#mline',el),L=ml.getTotalLength();
+      ml.style.strokeDasharray=L;ml.style.strokeDashoffset=L;ml.getBoundingClientRect();
+      ml.style.transition='stroke-dashoffset 1.6s cubic-bezier(.4,0,.2,1) .2s';
+      requestAnimationFrame(()=>{
+        ml.style.strokeDashoffset=0;
+        $('#area',el).style.opacity=1;
+        $$('.cdot',el).forEach(d=>d.setAttribute('opacity',1));
+      });
+    }
+  };
+}
+
+/* ---------- Paywall Screen ---------- */
+const money=n=>'$'+n.toFixed(2);
+function fmtTime(ms){const s=Math.max(0,Math.floor(ms/1000));return String(Math.floor(s/60)).padStart(2,'0')+':'+String(s%60).padStart(2,'0')}
+
+function paywallScreen(){
+  if(!S.deadline) S.deadline=Date.now()+10*60*1000;
+  const start = S.baselineScore;
+  const target = Math.max(start + 180, S.targetScore);
+  const planHTML=()=>Object.entries(PLANS).map(([k,p])=>`
+    <button class="plan${S.plan===k?' on':''}${p.pop?' pop':''}" data-p="${k}" role="radio" aria-checked="${S.plan===k}">
+      ${p.pop?'<span class="badge">Most Popular &bull; Save 50%</span>':''}
+      <span class="radio"></span>
+      <span>
+        <span class="pn">${p.name}</span>
+        <span class="pp"><s>${money(p.old)}</s>${money(p.price)}</span>
+      </span>
+      <span class="perday">
+        <s>${money(p.old/p.days)}</s>
+        <b>${money(p.price/p.days)}</b>
+        <small>per day</small>
+      </span>
+    </button>
+  `).join('');
+
+  const gets=[
+    'Full access to all 450+ official-standard SAT questions',
+    'Bluebook Exam Simulator with authentic College Board timing',
+    'Personalized Mistake Vault for rapid score recovery',
+    'Instant KaTeX step-by-step explanations & Desmos graphing tricks',
+    'Cross-device sync: use on Web, iPhone, or Android with offline mode'
+  ];
+
+  return {
+    noTop:true,noBack:true,
+    html:`
+      <div class="pw-bar">
+        <p>50% Early SAT Taker Discount<br>expires in <span class="timer">10:00</span></p>
+        <button class="pay-open">Get Plan</button>
+      </div>
+
+      <h1 class="q-title" style="margin-top:0">${user()}, your SAT Mastery Plan is ready</h1>
+      <p class="q-sub">Your personal roadmap to reach <b>${target}+</b> on the ${esc(S.testDate)}.</p>
+
+      <div class="comp-card">
+        <div class="meta"><span>Target: ${esc(S.testDate)}</span><span>College Board 2026</span></div>
+        <div class="cn">${target} Goal</div>
+        <span class="badge-sat">1500+ Admission Tier</span>
+        <div style="margin:12px 0 6px">
+          <div class="sat-orb" style="width:100px;height:100px;margin:0 auto">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222"/></svg>
+          </div>
+        </div>
+        <p style="color:#C9D2EE;font-size:14.5px;max-width:32ch">Includes personalized daily drills & diagnostic tests.</p>
+      </div>
+
+      <h2 class="sec">Score projection: now vs. with plan</h2>
+      <div class="vs">
+        <div>
+          <small>Current Baseline</small>
+          <strong>${start}</strong>
+          <div class="meter"><i style="background:#5E657B" data-w="${Math.round(start/16)}"></i></div>
+        </div>
+        <div class="goal">
+          <small>With SAT Learner</small>
+          <strong style="color:#5FE0C8">${target}+</strong>
+          <div class="meter"><i style="background:linear-gradient(90deg,#4F74FF,#3CC6B4)" data-w="${Math.round(target/16)}"></i></div>
+        </div>
+      </div>
+
+      <h2 class="sec">Choose your plan</h2>
+      <div class="plans" role="radiogroup" id="plans">${planHTML()}</div>
+      <div style="margin-top:16px"><button class="cta pay-open"><span class="lbl">Get My Plan</span></button></div>
+      <p class="fine" id="renew"></p>
+
+      <h2 class="sec">Everything included</h2>
+      <ul class="gets">${gets.map(g=>`<li><span class="ck">${CHECK_T}</span>${g}</li>`).join('')}</ul>
+
+      <h2 class="sec">Proven score improvements</h2>
+      <div class="rating">
+        <strong>4.9</strong>
+        <div>
+          <div class="stars">★★★★★</div>
+          <p>Average student rating across 14,000+ SAT test-takers</p>
+        </div>
+      </div>
+      <div class="reviews">${TESTI.map(r=>`<div class="tst">${testiHTML(r)}</div>`).join('')}</div>
+
+      <h2 class="sec">100% Risk-Free Guarantee</h2>
+      <div class="guar">
+        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#5FE0C8" stroke-width="1.8" stroke-linejoin="round" style="flex:none"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12.2l2.4 2.4 4.6-4.8" stroke-linecap="round"/></svg>
+        <div>
+          <b>Score Improvement Guarantee</b>
+          <p>If you complete your daily drills and do not improve your SAT score, reach out and we will refund you 100% with no questions asked.</p>
+        </div>
+      </div>
+
+      <div style="margin-top:22px"><button class="cta pay-open"><span class="lbl">Get My Plan</span></button></div>
+      <p class="fine" style="margin-top:16px;padding-bottom:12px">SAT&reg; is a registered trademark of the College Board, which is not affiliated with and does not endorse this product.</p>
+    `,
+    after(el){
+      const renew=$('#renew',el);
+      const updRenew=()=>{
+        const p=PLANS[S.plan];
+        renew.textContent=`Today you pay ${money(p.price)}. Plan renews at ${money(p.old)} every ${p.period} unless cancelled. Cancel anytime in 1 click.`;
+      };
+      updRenew();
+      $('#plans',el).addEventListener('click',e=>{
+        const b=e.target.closest('.plan');if(!b)return;
+        S.plan=b.dataset.p;buzz();
+        $$('.plan',el).forEach(x=>{x.classList.toggle('on',x===b);x.setAttribute('aria-checked',x===b)});
+        updRenew();
+      });
+      $$('.pay-open',el).forEach(b=>b.addEventListener('click',checkout));
+      later(()=>$$('.meter i',el).forEach(m=>m.style.width=m.dataset.w+'%'),300);
+      const tm=$('.timer',el),upd=()=>{tm.textContent=fmtTime(S.deadline-Date.now())};upd();every(upd,1000);
+    }
+  };
+}
+
+/* ---------- Checkout Bottom Sheet ---------- */
+function checkout(){
+  buzz();
+  const p=PLANS[S.plan];
+  openSheet(`
+    <div class="grab"></div>
+    <h2 class="co-h">Confirm Your SAT Plan</h2>
+    <div class="order">
+      <div><span>${p.name}</span><span>${money(p.old)}</span></div>
+      <div><span>50% Early Bird Discount</span><span class="save">&minus;${money(p.old-p.price)}</span></div>
+      <div><span>Total Today</span><span>${money(p.price)}</span></div>
+    </div>
+    <label class="flabel" for="cc">Card number</label>
+    <input class="field" id="cc" inputmode="numeric" placeholder="4242 &bull;&bull;&bull;&bull; &bull;&bull;&bull;&bull; 4242" maxlength="19" autocomplete="cc-number">
+    <div class="cardrow">
+      <div>
+        <label class="flabel" for="ex">Expiry</label>
+        <input class="field" id="ex" inputmode="numeric" placeholder="MM/YY" maxlength="5" autocomplete="cc-exp">
+      </div>
+      <div>
+        <label class="flabel" for="cv">CVC</label>
+        <input class="field" id="cv" inputmode="numeric" placeholder="123" maxlength="4" autocomplete="cc-csc">
+      </div>
+    </div>
+    <div style="margin-top:18px">
+      <button class="cta" id="pay">
+        <span class="lbl">Activate Plan &bull; ${money(p.price)}</span>
+        <span class="spin"></span>
+        <span class="tick">${CHECK_W.replace('width="14" height="14"','width="28" height="28"')}</span>
+      </button>
+    </div>
+    <p class="lock">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 018 0v3"/></svg>
+      256-Bit SSL Encrypted &bull; 100% Score Improvement Guarantee
+    </p>
+    <p class="fine">Demo checkout: card processing preview.</p>
+  `, sh=>{
+    const cc=$('#cc',sh),ex=$('#ex',sh);
+    cc.addEventListener('input',()=>{cc.value=cc.value.replace(/\D/g,'').slice(0,16).replace(/(.{4})/g,'$1 ').trim()});
+    ex.addEventListener('input',()=>{let v=ex.value.replace(/\D/g,'').slice(0,4);ex.value=v.length>2?v.slice(0,2)+'/'+v.slice(2):v});
+    const pay=$('#pay',sh);
+    pay.addEventListener('click',()=>{
+      if(pay.classList.contains('loading')||pay.classList.contains('done'))return;
+      buzz();pay.classList.add('loading');sheetDismiss=false;
+      setTimeout(()=>{pay.classList.remove('loading');pay.classList.add('done');buzz()},1500);
+      setTimeout(()=>{closeSheet();next()},2100);
+    });
+  });
+}
+
+/* ---------- Success Screen with Confetti & App Launch ---------- */
+function successScreen(){
+  const target = Math.max(S.baselineScore + 180, S.targetScore);
+  return {
+    noTop:true,noBack:true,
+    html:`
+      <div class="succ">
+        <div class="sat-orb" style="width:110px;height:110px;margin-top:10px">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h1>Welcome to SAT Learner, ${user()}!</h1>
+        <p>Your ${target}+ Score Plan is officially active.</p>
+
+        <div class="sat-box">
+          <div class="sat-box-h">
+            <div>
+              <span class="badge-sat">Daily Target</span>
+              <b style="display:block;margin-top:4px">Day 1: Heart of Algebra Drill</b>
+            </div>
+            <span style="font-family:monospace;font-size:14px;color:#5FE0C8">15 min</span>
+          </div>
+
+          <p style="font-size:14px;color:#BAC5DF;line-height:1.45;margin-bottom:16px">
+            Your first practice session is ready. 10 questions calibrated to target your specific weak spots in linear systems and quadratics.
+          </p>
+
+          <a href="exam-runner.html" class="cta" style="height:50px;border-radius:25px;text-decoration:none">
+            <span class="lbl">Start Day 1 Practice Drill &rarr;</span>
+          </a>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:16px;width:100%">
+          <a href="dashboard.html" class="opt" style="flex:1;justify-content:center;text-decoration:none;text-align:center">
+            <span class="ot"><b style="font-size:14px">Open Dashboard</b></span>
+          </a>
+          <a href="course.html" class="opt" style="flex:1;justify-content:center;text-decoration:none;text-align:center">
+            <span class="ot"><b style="font-size:14px">Browse Syllabus</b></span>
+          </a>
+        </div>
+
+        <button class="linkbtn" id="restart">Retake Diagnostic Assessment</button>
+      </div>
+    `,
+    after(el){
+      confetti();
+      $('#restart',el).addEventListener('click',()=>{clearTimers();S=fresh();render('grade')});
+    }
+  };
+}
+
+function confetti(){
+  if(matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+  const cv=$('#confetti'),ctx=cv.getContext('2d'),dpr=devicePixelRatio||1;
+  cv.width=innerWidth*dpr;cv.height=innerHeight*dpr;ctx.scale(dpr,dpr);
+  const cols=['#3CC6B4','#4F74FF','#6EDCAB','#FFD27A','#ffffff'];
+  const cx=innerWidth/2,cy=Math.min(innerHeight*.25,200);
+  const P=Array.from({length:120},()=>{
+    const a=Math.random()*Math.PI*2,v=4+Math.random()*7;
+    return{x:cx,y:cy,vx:Math.cos(a)*v,vy:Math.sin(a)*v-4,r:3+Math.random()*4,c:cols[Math.random()*cols.length|0],round:Math.random()>.5,rot:Math.random()*6};
+  });
+  const t0=performance.now();
+  (function f(t){
+    ctx.clearRect(0,0,innerWidth,innerHeight);
+    P.forEach(p=>{
+      p.vy+=.18;p.vx*=.985;p.x+=p.vx;p.y+=p.vy;p.rot+=.1;
+      ctx.save();
+      ctx.globalAlpha=Math.max(0,1-(t-t0)/2600);
+      ctx.fillStyle=p.c;
+      ctx.translate(p.x,p.y);
+      ctx.rotate(p.rot);
+      if(p.round){ctx.beginPath();ctx.arc(0,0,p.r,0,7);ctx.fill()}
+      else ctx.fillRect(-p.r,-p.r/2,p.r*2,p.r);
+      ctx.restore();
+    });
+    if(t-t0<2700)requestAnimationFrame(f);
+    else ctx.clearRect(0,0,innerWidth,innerHeight);
+  })(t0);
+}
+
+// Start
+render('grade');
+</script>
+</body>
+</html>

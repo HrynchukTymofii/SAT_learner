@@ -42,7 +42,7 @@ export function ErrorPage({
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 p-4 ${className}`}
+      className={`min-h-screen flex items-center justify-center bg-muted p-4 ${className}`}
     >
       <div className="max-w-md w-full text-center">
         {/* Animated Error SVG */}
@@ -104,15 +104,15 @@ export function ErrorPage({
 
         {/* Error Content */}
         <div className="space-y-4 mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">{title}</h1>
-          <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{message}</p>
+          <h1 className="text-3xl font-bold text-foreground dark:text-white">{title}</h1>
+          <p className="text-muted-foreground leading-relaxed">{message}</p>
         </div>
 
         {/* Action Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Button
             onClick={handleRetry}
-            className="bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white font-medium px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
+            className="bg-butter text-on-pastel font-medium px-6 py-3 rounded-lg transition-all duration-200 transform hover:scale-105 shadow-lg"
           >
             <RefreshCw className="w-4 h-4 mr-2" />
             {retryText}
@@ -122,7 +122,7 @@ export function ErrorPage({
             <Button
               onClick={handleHome}
               variant="outline"
-              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 px-6 py-3 rounded-lg transition-all duration-200"
+              className="border-border text-foreground hover:bg-muted px-6 py-3 rounded-lg transition-all duration-200"
             >
               <Home className="w-4 h-4 mr-2" />
               Go Home
@@ -131,11 +131,11 @@ export function ErrorPage({
         </div>
 
         {/* Additional Help */}
-        <div className="mt-8 text-sm text-gray-500 dark:text-gray-400">
+        <div className="mt-8 text-sm text-muted-foreground">
           <p>Error Code: ERR_UNEXPECTED</p>
           <p className="mt-1">
             Need help?{" "}
-            <a href="/support" className="text-orange-500 hover:text-orange-600 underline">
+            <a href="/support" className="text-warn hover:text-warn underline">
               Contact Support
             </a>
           </p>

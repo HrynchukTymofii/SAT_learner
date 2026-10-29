@@ -173,7 +173,7 @@ export default function OnboardingScreen() {
 
           {/* White Curve Overlay */}
           <View className="absolute bottom-0 left-0 right-0 z-20">
-            <UCurve height={80} fill={colorScheme === 'light' ? "#fff" : "#111827"} />
+            <UCurve height={80} fill={colorScheme === 'light' ? "#fff" : "#0B0A0F"} />
           </View>
         </View>
 
@@ -235,7 +235,7 @@ export default function OnboardingScreen() {
                       activeOpacity={0.7}
                     >
                       <LinearGradient
-                        colors={["#14B8A6", "#06B6D4"]}
+                        colors={["#14B8A6", "#8A5CE6"]}
                         start={{ x: 0, y: 0 }}
                         end={{ x: 1, y: 0 }}
                         style={{
@@ -256,7 +256,7 @@ export default function OnboardingScreen() {
                     activeOpacity={0.7}
                   >
                     <LinearGradient
-                      colors={["#14B8A6", "#06B6D4"]}
+                      colors={["#14B8A6", "#8A5CE6"]}
                       start={{ x: 0, y: 0 }}
                       end={{ x: 1, y: 0 }}
                       style={{
@@ -433,7 +433,7 @@ export default function OnboardingScreen() {
 
 //   return (
 //     <LinearGradient
-//       colors={["#1e3a8a", "#3b82f6", "#60a5fa"]}
+//       colors={["#1e3a8a", "#8A5CE6", "#8A5CE6"]}
 //       start={{ x: 0, y: 0 }}
 //       end={{ x: 1, y: 1 }}
 //       style={{ flex: 1 }}
@@ -601,7 +601,7 @@ export default function OnboardingScreen() {
 //             className="rounded-2xl overflow-hidden shadow-lg mt-6"
 //           >
 //             <LinearGradient
-//               colors={["#f59e0b", "#fbbf24"]}
+//               colors={["#E5A50A", "#F2C94C"]}
 //               start={{ x: 0, y: 0 }}
 //               end={{ x: 1, y: 1 }}
 //               style={{ paddingVertical: 14 }}

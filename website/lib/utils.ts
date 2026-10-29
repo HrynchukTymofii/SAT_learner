@@ -44,3 +44,8 @@ export const calculateSATScore = (correctCount: number, totalQuestions: number):
   if (percentage >= 0.02) return 230;
   return 200;
 };
+
+// plural(1, "lesson") → "1 lesson", plural(3, "quiz", "quizzes") → "3 quizzes"
+export function plural(n: number, one: string, many = `${one}s`) {
+  return `${n} ${n === 1 ? one : many}`
+}

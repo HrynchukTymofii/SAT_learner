@@ -3,12 +3,11 @@ import { ExpoConfig } from "expo/config";
 const config: ExpoConfig = {
   name: "SAT Math Learner",
   slug: "sat-prep-app",
-  version: "1.0.7",
+  version: "1.0.8",
   orientation: "portrait",
   icon: "./assets/images/icon.png",
   scheme: "satprepapp",
   userInterfaceStyle: "automatic",
-  newArchEnabled: true,
 
   ios: {
     supportsTablet: true,
@@ -27,18 +26,10 @@ const config: ExpoConfig = {
       foregroundImage: "./assets/images/adaptive-icon.png",
       backgroundColor: "#ffffff",
     },
-    edgeToEdgeEnabled: true,
     permissions: [
       "android.permission.POST_NOTIFICATIONS",
       "android.permission.SCHEDULE_EXACT_ALARM",
     ],
-  },
-
-  notification: {
-    icon: "./assets/images/icon.png",
-    color: "#06b6d4",
-    androidMode: "default",
-    androidCollapsedTitle: "SAT Learner Reminder",
   },
 
   web: {
@@ -75,6 +66,15 @@ const config: ExpoConfig = {
       },
     ],
     // "@react-native-svg/plugin",
+    "@react-native-community/datetimepicker",
+    "expo-asset",
+    "expo-build-properties",
+    "expo-font",
+    "expo-image",
+    "expo-sqlite",
+    "expo-status-bar",
+    "expo-video",
+    "expo-web-browser",
   ],
 
   experiments: {
@@ -91,11 +91,6 @@ const config: ExpoConfig = {
     },
   },
 
-  splash: {
-    image: "./assets/images/splash-icon.png",
-    resizeMode: "contain",
-    backgroundColor: "#111827",
-  },
 };
 
 export default config;

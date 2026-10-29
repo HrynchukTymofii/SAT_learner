@@ -6,6 +6,8 @@ import { useTheme } from "@/context/ThemeContext";
 
 export default function TopBlur() {
   const insets = useSafeAreaInsets();
+  // Called unconditionally so the hook order is the same on every render
+  const systemColorScheme = useSystemColorScheme();
 
   // Try to use custom theme, fall back to system theme if not in provider
   let colorScheme: "light" | "dark";
@@ -14,7 +16,6 @@ export default function TopBlur() {
     colorScheme = themeColorScheme;
   } catch {
     // Fall back to system color scheme if not in ThemeProvider
-    const systemColorScheme = useSystemColorScheme();
     colorScheme = systemColorScheme === "dark" ? "dark" : "light";
   }
 

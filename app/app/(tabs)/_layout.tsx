@@ -1,8 +1,8 @@
 import { Tabs } from 'expo-router';
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import { HapticTab } from '@/components/HapticTab';
-import { useColorScheme } from '@/hooks/useColorScheme';
+import { usePalette } from '@/constants/palette';
 import { Home, ClipboardCheck, BookOpen, User } from 'lucide-react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTour } from '@/context/TourContext';
@@ -10,9 +10,9 @@ import { TourTooltip } from '@/components/Tour/TourTooltip';
 import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from '@/constants/tourSteps'; 
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const c = usePalette();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
 
   // Tour
   const { tourActive, currentStep, setCurrentStep, endTour, skipTour } = useTour();
@@ -39,40 +39,38 @@ export default function TabLayout() {
       initialRouteName="index"
       screenOptions={{
         headerShown: false,
-        tabBarActiveTintColor: '#06B6D4',
-        tabBarInactiveTintColor: isDark ? '#64748b' : '#94a3b8',
+        tabBarShowLabel: false,
+        tabBarActiveTintColor: c.navActiveInk,
+        tabBarInactiveTintColor: c.navInk,
         tabBarButton: HapticTab,
-        tabBarBackground: () => (
-          <View style={[
-            styles.tabBarBackground,
-            {
-              backgroundColor: isDark ? '#111827' : '#ffffff',
-            }
-          ]} />
-        ),
+        // Floating pill, centered above the home indicator
         tabBarStyle: {
           position: 'absolute',
-          bottom: 0,
-          left: 0,
-          right: 0,
-          height: 66 + insets.bottom,
-          borderTopWidth: 1,
-          borderTopColor: isDark ? '#1e293b' : '#e2e8f0',
-          paddingTop: 4,
-          paddingBottom: insets.bottom || 8,
-          elevation: 0,
-          shadowColor: '#06B6D4',
-          shadowOffset: { width: 0, height: -1 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
+          bottom: insets.bottom + 10,
+          left: (width - TAB_BAR_WIDTH) / 2,
+          width: TAB_BAR_WIDTH,
+          height: TAB_BAR_HEIGHT,
+          borderRadius: TAB_BAR_HEIGHT / 2,
+          backgroundColor: c.nav,
+          borderTopWidth: 0,
+          paddingTop: 0,
+          paddingBottom: 0,
+          paddingHorizontal: 7,
+          elevation: 12,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: 14 },
+          shadowOpacity: 0.35,
+          shadowRadius: 18,
         },
-        tabBarLabelStyle: {
-          fontSize: 11,
-          fontWeight: '600',
-          marginTop: 4,
+        tabBarItemStyle: {
+          height: TAB_BAR_HEIGHT,
+          justifyContent: 'center',
+          alignItems: 'center',
         },
         tabBarIconStyle: {
-          marginTop: 4,
+          width: 50,
+          height: 50,
+          marginTop: 0,
         },
       }}
     >
@@ -81,16 +79,11 @@ export default function TabLayout() {
         options={{
           title: 'Home',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[
-              styles.iconContainer,
-              focused && {
-                backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
-              }
-            ]}>
+            <View style={[styles.iconContainer, focused && { backgroundColor: c.navActive }]}>
               <Home
-                size={24}
+                size={22}
                 color={color}
-                strokeWidth={focused ? 2.5 : 2}
+                strokeWidth={focused ? 2.3 : 1.9}
               />
             </View>
           ),
@@ -117,16 +110,11 @@ export default function TabLayout() {
               showSkipButton={true}
               delayMs={600}
             >
-              <View style={[
-                styles.iconContainer,
-                focused && {
-                  backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
-                }
-              ]}>
+              <View style={[styles.iconContainer, focused && { backgroundColor: c.navActive }]}>
                 <ClipboardCheck
-                  size={24}
+                  size={22}
                   color={color}
-                  strokeWidth={focused ? 2.5 : 2}
+                  strokeWidth={focused ? 2.3 : 1.9}
                 />
               </View>
             </TourTooltip>
@@ -154,16 +142,11 @@ export default function TabLayout() {
               showSkipButton={true}
               delayMs={600}
             >
-              <View style={[
-                styles.iconContainer,
-                focused && {
-                  backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
-                }
-              ]}>
+              <View style={[styles.iconContainer, focused && { backgroundColor: c.navActive }]}>
                 <BookOpen
-                  size={24}
+                  size={22}
                   color={color}
-                  strokeWidth={focused ? 2.5 : 2}
+                  strokeWidth={focused ? 2.3 : 1.9}
                 />
               </View>
             </TourTooltip>
@@ -175,16 +158,11 @@ export default function TabLayout() {
         options={{
           title: 'Profile',
           tabBarIcon: ({ color, focused }) => (
-            <View style={[
-              styles.iconContainer,
-              focused && {
-                backgroundColor: isDark ? '#06B6D420' : '#06B6D415',
-              }
-            ]}>
+            <View style={[styles.iconContainer, focused && { backgroundColor: c.navActive }]}>
               <User
-                size={24}
+                size={22}
                 color={color}
-                strokeWidth={focused ? 2.5 : 2}
+                strokeWidth={focused ? 2.3 : 1.9}
               />
             </View>
           ),
@@ -194,108 +172,16 @@ export default function TabLayout() {
   );
 }
 
+const TAB_BAR_WIDTH = 4 * 56 + 14;
+const TAB_BAR_HEIGHT = 64;
+
 const styles = StyleSheet.create({
-  blurView: {
-    ...StyleSheet.absoluteFillObject,
-  },
-  tabBarBackground: {
-    flex: 1,
-  },
   iconContainer: {
-    width: 48,
-    height: 32,
-    borderRadius: 12,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
     alignItems: 'center',
     justifyContent: 'center',
   },
 });
 
-
-// import { Tabs } from 'expo-router';
-// import React from 'react';
-// import { View, StyleSheet } from 'react-native';
-// import { HapticTab } from '@/components/HapticTab';
-// import { IconSymbol } from '@/components/ui/IconSymbol';
-// import { useColorScheme } from '@/hooks/useColorScheme';
-
-// export default function TabLayout() {
-//   const colorScheme = useColorScheme();
-
-//   const tabBarBackgroundColor =
-//     colorScheme === 'dark'
-//       ? 'rgba(15,23,42,0.92)' // dark slate
-//       : 'rgba(255,255,255,0.92)'; // light semi-transparent
-
-//   const activeIconColor = '#22d3ee'; // bright teal-blue
-//   const inactiveIconColor = '#94a3b8'; // soft gray
-
-//   return (
-//     <Tabs
-//       initialRouteName="index"
-//       screenOptions={{
-//         headerShown: false,
-//         tabBarActiveTintColor: activeIconColor,
-//         tabBarInactiveTintColor: inactiveIconColor,
-//         tabBarButton: HapticTab,
-//         tabBarBackground: () => (
-//           <View style={[styles.tabBarBackground, { backgroundColor: tabBarBackgroundColor }]} />
-//         ),
-//         tabBarStyle: {
-//           position: 'absolute',
-//           bottom: 0,
-//           left: 16,
-//           right: 16,
-//           height: 105,
-//           borderRadius: 20,
-//           elevation: 5,
-//           shadowColor: '#000',
-//           shadowOffset: { width: 0, height: 5 },
-//           shadowOpacity: 0.15,
-//           shadowRadius: 10,
-//         },
-//       }}
-//     >
-//       <Tabs.Screen
-//         name="index"
-//         options={{
-//           title: 'Home',
-//           tabBarIcon: ({ color }) => <IconSymbol size={26} name="house.fill" color={color} />,
-//         }}
-//       />
-//       <Tabs.Screen
-//         name="tests/index"
-//         options={{
-//           title: 'Tests',
-//           tabBarIcon: ({ color }) => <IconSymbol size={26} name="checkmark.circle.fill" color={color} />,
-//         }}
-//       />
-//       <Tabs.Screen
-//         name="course/index"
-//         options={{
-//           title: 'Course',
-//           tabBarIcon: ({ color }) => <IconSymbol size={28} name="house.fill" color={color} />,
-//         }}
-//       />
-//       <Tabs.Screen
-//         name="profile/index"
-//         options={{
-//           title: 'Profile',
-//           tabBarIcon: ({ color }) => <IconSymbol size={24} name="person.fill" color={color} />,
-//         }}
-//       />
-//     </Tabs>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   tabBarBackground: {
-//     flex: 1,
-//     borderTopEndRadius: 20,
-//     borderTopStartRadius: 20,
-//     shadowColor: '#000',
-//     shadowOffset: { width: 0, height: 5 },
-//     shadowOpacity: 0.15,
-//     shadowRadius: 10,
-//     elevation: 5,
-//   },
-// });

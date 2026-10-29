@@ -47,11 +47,11 @@ export default function ImproveScreen() {
   const isDark = colorScheme === "dark";
   const { fetchQuizzesByTopicLocal } = useQuizDatabase();
 
-  const bgColor = isDark ? "#0f172a" : "#f8fafc";
-  const inputBg = isDark ? "#1e293b" : "#ffffff";
-  const inputBorder = isDark ? "#334155" : "#e5e7eb";
-  const textColor = isDark ? "#f1f5f9" : "#1f2937";
-  const subTextColor = isDark ? "#cbd5e1" : "#6b7280";
+  const bgColor = isDark ? "#0B0A0F" : "#F4F1F9";
+  const inputBg = isDark ? "#17151C" : "#ffffff";
+  const inputBorder = isDark ? "#2B2733" : "#E5DFEE";
+  const textColor = isDark ? "#EFEAF7" : "#0B0A0F";
+  const subTextColor = isDark ? "#CFC9DA" : "#6B6577";
 
   useEffect(() => {
     if (!token) router.push("/login");
@@ -95,7 +95,7 @@ export default function ImproveScreen() {
           backgroundColor: bgColor,
         }}
       >
-        <ActivityIndicator size="large" color="#22d3ee" />
+        <ActivityIndicator size="large" color="#8A5CE6" />
       </SafeAreaView>
     );
   }
@@ -103,10 +103,10 @@ export default function ImproveScreen() {
   const getProgressGradient = (p: number): [string, string] => {
     // subtle muted gradients
     if (p >= 80)
-      return isDark ? ["#34d399", "#10b981"] : ["#2ed08b", "#0ea972"]; // green
+      return isDark ? ["#6FCF97", "#2E9A5E"] : ["#2ed08b", "#0ea972"]; // green
     if (p >= 60)
-      return isDark ? ["#fbbf24", "#f59e0b"] : ["#f9b81f", "#f4970b"];
-    return isDark ? ["#1e293b", "#273449"] : ["#f1f5f9", "#e2e8f0"];
+      return isDark ? ["#F2C94C", "#E5A50A"] : ["#f9b81f", "#f4970b"];
+    return isDark ? ["#17151C", "#273449"] : ["#EFEAF7", "#e2e8f0"];
   };
 
   const handlePress = (quizId: string) =>
@@ -123,7 +123,7 @@ export default function ImproveScreen() {
     >
       {/* Header */}
       <LinearGradient
-        colors={["#3b82f6", "#2563eb"]}
+        colors={["#8A5CE6", "#8A5CE6"]}
         start={[0, 0]}
         end={[1, 1]}
         style={{
@@ -161,7 +161,7 @@ export default function ImproveScreen() {
           style={{
             fontSize: 28,
             fontWeight: "800",
-            color: isDark ? "#60a5fa" : "#2563eb",
+            color: isDark ? "#C9AAFB" : "#7A4BDB",
             marginBottom: 4,
           }}
         >
