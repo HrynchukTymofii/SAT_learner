@@ -24,6 +24,7 @@ model User{
   image         String?
   password      String?
   needSync      Boolean   @default(false)
+  role          String    @default("user")
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -285,10 +286,13 @@ model QuizQuestion {
   options     Json       
   answers     Json
   hint       String?     
-  points      Int     @default(5)
+  points      Int     @default(1)
   position    Int
   hintImageUrl String?
   note         String?
+  openEndedAnswer String?
+  likes        Int @default(0)
+  dislikes     Int @default(0)
 
   quizId      String
   quiz        Quiz       @relation(fields: [quizId], references: [id], onDelete: Cascade)
@@ -358,8 +362,18 @@ model Comment {
 
   // Optionally support threaded comments
   parentId String?
-  parent   Comment? @relation("CommentThread", fields: [parentId], references: [id])
+  parent   Comment? @relation("CommentThread", fields: [parentId], references: [id], onDelete: Cascade)
   replies  Comment[] @relation("CommentThread")
+
+  // Moderation
+  isApproved Boolean   @default(true)
+  isPinned   Boolean   @default(false)
+  editedAt   DateTime?
+
+  @@index([authorId, createdAt])
+  @@index([lessonId, isApproved, createdAt])
+  @@index([parentId])
+  @@index([quizQuestionId, isApproved, createdAt])
 }
 
 model Challenge {
@@ -490,6 +504,7 @@ model Apps{
   id String @id @default(uuid())
   name String
   needSync Boolean @default(false)
+  version String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
