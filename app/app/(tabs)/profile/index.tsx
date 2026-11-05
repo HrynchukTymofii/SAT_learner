@@ -1,323 +1,99 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  View,
-  Text,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Platform,
-  Linking,
-  StyleSheet,
-} from "react-native";
-import { useAuth, UserType } from "@/context/AuthContext";
-import { MaterialIcons } from "@expo/vector-icons";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { Image, Pressable, Text, View } from "react-native";
 import {
   BookOpen,
-  Brain,
-  CheckCircle,
+  Check,
+  CircleHelp,
+  Flame,
+  Lock,
+  LogIn,
+  LogOut,
   LucideIcon,
   Mails,
-  Settings,
-  Star,
-  Trophy,
-  LogOut,
-  User,
-  Target,
-  Crown,
-  ThumbsUp,
-  LogIn,
+  Pencil,
   RefreshCw,
+  Settings,
+  Sparkles,
+  Star,
+  ThumbsUp,
+  Trophy,
 } from "lucide-react-native";
-import { useRouter, useFocusEffect } from "expo-router";
-import { getUserData } from "@/lib/api/user";
+import { useFocusEffect, useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
-import { useColorScheme } from "@/hooks/useColorScheme";
-import { useLogout } from "@/hooks/useLogout";
-import { BlurView, BlurTargetView } from "expo-blur";
-import { LinearGradient } from "expo-linear-gradient";
 import * as SecureStore from "expo-secure-store";
+import { useAuth, UserType } from "@/context/AuthContext";
+import { getUserData } from "@/lib/api/user";
+import { useLogout } from "@/hooks/useLogout";
 import { openRatePrompt } from "@/lib/ratePrompt";
-import { useCourseDatabase } from "@/lib/db/course";
-import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
+import { AchievementStats, useCourseDatabase } from "@/lib/db/course";
+import { buildAchievements } from "@/lib/achievements";
+import { AchievementBadge } from "@/components/achievements/AchievementBadge";
+import { Sheet } from "@/components/ds/overlays";
 import { ContactDialog } from "@/components/modals/ContactDialog";
+import { Fonts, PastelName, usePalette } from "@/constants/palette";
 import {
-  SafeAreaView,
-  useSafeAreaInsets,
-} from "react-native-safe-area-context";
+  Card,
+  CircleButton,
+  EmptyState,
+  GraphPaper,
+  Group,
+  GroupRow,
+  IconTile,
+  Loading,
+  PastelCard,
+  PillButton,
+  ProBadge,
+  ProgressBar,
+  Screen,
+  SectionHeader,
+  T,
+} from "@/components/ds";
+import { CrownArt, TargetArt } from "@/components/art";
 
-const AnimatedNumber = ({
-  value,
-  isDark,
-}: {
-  value: number;
-  isDark: boolean;
-}) => {
-  const [displayValue, setDisplayValue] = useState(0);
-
+// Counts up from 0 when the number changes
+const AnimatedNumber = ({ value, color, size = 30 }: { value: number; color?: string; size?: number }) => {
+  const [display, setDisplay] = useState(0);
   useEffect(() => {
-    const steps = 60;
-    const increment = value / steps;
-    let currentStep = 0;
-
+    const steps = 40;
+    let step = 0;
     const timer = setInterval(() => {
-      currentStep++;
-      const currentValue = Math.min(increment * currentStep, value);
-      setDisplayValue(Math.round(currentValue));
-      if (currentStep >= steps) clearInterval(timer);
+      step++;
+      setDisplay(Math.round(Math.min((value / steps) * step, value)));
+      if (step >= steps) clearInterval(timer);
     }, 20);
-
     return () => clearInterval(timer);
   }, [value]);
-
-  return (
-    <Text
-      style={{
-        fontSize: 28,
-        fontWeight: "bold",
-        color: isDark ? "#F4F1F8" : "#0B0A0F",
-      }}
-    >
-      {displayValue}
-    </Text>
-  );
+  return <Text style={{ fontFamily: Fonts.display, fontSize: size, lineHeight: size + 4, letterSpacing: -0.6, color }}>{display.toLocaleString()}</Text>;
 };
-
-export interface Achievement {
-  id: number | string;
-  title: string;
-  description: string;
-  icon: LucideIcon;
-  unlocked: boolean;
-  color: string;
-}
-
-const AchievementBadge = ({
-  achievement,
-  isDark,
-}: {
-  achievement: Achievement;
-  isDark: boolean;
-}) => {
-  const Icon = achievement.icon;
-
-  const colorMap: Record<string, { bg: string; text: string; icon: string }> = {
-    cyan: { bg: "#8A5CE6", text: "#ffffff", icon: "#ffffff" },
-    purple: { bg: "#8A5CE6", text: "#ffffff", icon: "#ffffff" },
-    amber: { bg: "#E5A50A", text: "#ffffff", icon: "#ffffff" },
-    green: { bg: "#2E9A5E", text: "#ffffff", icon: "#ffffff" },
-  };
-
-  const colors = colorMap[achievement.color] || colorMap.cyan;
-
-  return (
-    <View
-      style={{
-        width: "48%",
-        borderRadius: 16,
-        backgroundColor: achievement.unlocked
-          ? colors.bg
-          : isDark
-            ? "#2B2733"
-            : "#E5DFEE",
-        padding: 16,
-        marginBottom: 16,
-        alignItems: "center",
-        opacity: achievement.unlocked ? 1 : 0.6,
-        shadowColor: achievement.unlocked ? colors.bg : "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.2,
-        shadowRadius: 8,
-        elevation: 4,
-      }}
-    >
-      <View
-        style={{
-          width: 48,
-          height: 48,
-          borderRadius: 24,
-          backgroundColor: achievement.unlocked
-            ? "rgba(255,255,255,0.2)"
-            : isDark
-              ? "#17151C"
-              : "#D9D2E5",
-          alignItems: "center",
-          justifyContent: "center",
-          marginBottom: 12,
-        }}
-      >
-        <Icon
-          size={24}
-          color={
-            achievement.unlocked ? colors.icon : isDark ? "#7E7889" : "#9C95A8"
-          }
-        />
-      </View>
-      <Text
-        style={{
-          fontSize: 14,
-          fontWeight: "600",
-          color: achievement.unlocked
-            ? colors.text
-            : isDark
-              ? "#9C95A8"
-              : "#6B6577",
-          textAlign: "center",
-          marginBottom: 4,
-        }}
-      >
-        {achievement.title}
-      </Text>
-      <Text
-        style={{
-          fontSize: 11,
-          color: achievement.unlocked
-            ? "rgba(255,255,255,0.8)"
-            : isDark
-              ? "#7E7889"
-              : "#9C95A8",
-          textAlign: "center",
-        }}
-      >
-        {achievement.description}
-      </Text>
-
-      {achievement.unlocked && (
-        <View
-          style={{
-            position: "absolute",
-            top: 8,
-            right: 8,
-            backgroundColor: "#ffffff",
-            borderRadius: 12,
-            padding: 2,
-          }}
-        >
-          <CheckCircle size={16} color="#2E9A5E" />
-        </View>
-      )}
-    </View>
-  );
-};
-
-function getDynamicAchievements({
-  lessonsCount,
-  quizzesCount,
-  averageSatScore,
-  has100Quiz,
-  hasHighScore,
-}: {
-  lessonsCount: number;
-  quizzesCount: number;
-  averageSatScore: number;
-  has100Quiz: boolean;
-  hasHighScore: boolean;
-}) {
-  return [
-    {
-      id: 1,
-      title: "First Steps",
-      description: "Complete first lesson",
-      icon: BookOpen,
-      unlocked: lessonsCount >= 1,
-      color: "cyan",
-    },
-    {
-      id: 2,
-      title: "High Scorer",
-      description: "Score 700+ on SAT exam",
-      icon: Trophy,
-      unlocked: hasHighScore,
-      color: "amber",
-    },
-    {
-      id: 3,
-      title: "Math Master",
-      description: "Complete 10 quizzes",
-      icon: Brain,
-      unlocked: quizzesCount >= 10,
-      color: "purple",
-    },
-    {
-      id: 4,
-      title: "Perfect Practice",
-      description: "Score 100% on quiz",
-      icon: Star,
-      unlocked: has100Quiz,
-      color: "green",
-    },
-  ];
-}
 
 export default function ProfileScreen() {
+  const c = usePalette();
   const { token, user, setUser, hydrated } = useAuth();
   const router = useRouter();
   const logout = useLogout();
   // Set while logging out, so the focus effect doesn't open /login a second time
   const loggingOutRef = useRef(false);
   const [reloadKey, setReloadKey] = useState(0);
-  const insets = useSafeAreaInsets();
   const [contactOpen, setContactOpen] = useState(false);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
   const [answers, setAnswers] = useState<Record<string, string>>({});
-  const {
-    getCompletedLessonsCount,
-    getCompletedQuizzesCount,
-    getAverageScoreByChapter,
-    hasPerfectScoreInPublishedChapters,
-    hasHighSATScore,
-  } = useCourseDatabase();
+  const { getAchievementStats, getAverageScoreByChapter } = useCourseDatabase();
 
-  const [lessonsCount, setLessonsCount] = useState(0);
-  const [quizzesCount, setQuizzesCount] = useState(0);
+  const [stats, setStats] = useState<AchievementStats | null>(null);
   const [averageSatScore, setAverageSatScore] = useState(0);
-  const [have100Quiz, setHave100Quiz] = useState(false);
-  const [hasHighScore, setHasHighScore] = useState(false);
-  const [achievements, setAchievements] = useState(
-    getDynamicAchievements({
-      lessonsCount: 0,
-      quizzesCount: 0,
-      averageSatScore: 0,
-      has100Quiz: false,
-      hasHighScore: false,
-    })
-  );
+  const [allBadgesOpen, setAllBadgesOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load stats when page comes into focus
+  // Stats from the local database
   useFocusEffect(
     useCallback(() => {
       (async () => {
         const SAT_EXAMS_CHAPTER_ID = "8d3703a4-41ce-46b0-a27c-e25c0a0702e2";
-
-        const lessonsRes = await getCompletedLessonsCount();
-        const quizzesRes = await getCompletedQuizzesCount();
-        const avgSatScoreRes = await getAverageScoreByChapter(SAT_EXAMS_CHAPTER_ID);
-        const have100 = await hasPerfectScoreInPublishedChapters();
-        const highScoreRes = await hasHighSATScore(SAT_EXAMS_CHAPTER_ID);
-
-        const newLessonsCount = lessonsRes.success ? (lessonsRes.count ?? 0) : 0;
-        const newQuizzesCount = quizzesRes.success ? (quizzesRes.count ?? 0) : 0;
-        const newAverageScore = avgSatScoreRes.success ? (avgSatScoreRes.average ?? 0) : 0;
-        const newHasHighScore = highScoreRes.success ? (highScoreRes.hasHighScore ?? false) : false;
-
-        setLessonsCount(newLessonsCount);
-        setQuizzesCount(newQuizzesCount);
-        setAverageSatScore(newAverageScore);
-        setHave100Quiz(have100.hasPerfectScore || false);
-        setHasHighScore(newHasHighScore);
-
-        setAchievements(
-          getDynamicAchievements({
-            lessonsCount: newLessonsCount,
-            quizzesCount: newQuizzesCount,
-            averageSatScore: newAverageScore,
-            has100Quiz: have100.hasPerfectScore || false,
-            hasHighScore: newHasHighScore,
-          })
-        );
+        const [st, avgRes] = await Promise.all([getAchievementStats(SAT_EXAMS_CHAPTER_ID), getAverageScoreByChapter(SAT_EXAMS_CHAPTER_ID)]);
+        setStats(st);
+        setAverageSatScore(avgRes.success ? (avgRes.average ?? 0) : 0);
       })();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
   );
 
@@ -325,20 +101,14 @@ export default function ProfileScreen() {
     loggingOutRef.current = true;
     await logout();
     router.replace("/login");
-    Toast.show({
-      type: "success",
-      text1: message,
-      position: "top",
-      visibilityTime: 700,
-    });
+    Toast.show({ type: "success", text1: message, position: "top", visibilityTime: 700 });
   };
 
-  // Load user data when page comes into focus
+  // User data from the server
   useFocusEffect(
     useCallback(() => {
       // Stored token not read yet: a logged-in user would be sent to /login
       if (!hydrated) return;
-
       if (!token) {
         if (!loggingOutRef.current) {
           router.push({ pathname: "/login", params: { returnUrl: "/profile" } });
@@ -355,10 +125,7 @@ export default function ProfileScreen() {
           if (res.success) {
             // The refreshed token (if any) is saved by the background sync
             const { token: _refreshedToken, ...serverUser } = res.user;
-            const mappedUser: UserType = {
-              ...serverUser,
-              categories: serverUser.league,
-            };
+            const mappedUser: UserType = { ...serverUser, categories: serverUser.league };
             setUser(mappedUser);
           } else if (res.status === 401 || res.status === 404) {
             // Token expired or account gone: log out instead of showing an error
@@ -372,950 +139,253 @@ export default function ProfileScreen() {
           setLoading(false);
         }
       };
-
       load();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [token, reloadKey, hydrated])
   );
 
   useEffect(() => {
-    const loadAnswers = async () => {
+    (async () => {
       const stored = await SecureStore.getItemAsync("onboardingAnswers");
       if (stored) setAnswers(JSON.parse(stored));
       else setAnswers({ name: user?.name || "Student" });
-    };
-    loadAnswers();
+    })();
   }, [user]);
-
 
   // Same rating sheet the app shows after a finished test (lib/ratePrompt)
   const handleRateUs = () => openRatePrompt("profile_button");
 
-  // Logged out (or back from /login without logging in): show the page locked
-  // instead of the loader, which never finishes without a token
-  if (!hydrated) return <GraduationCap3DLoader />;
+  if (!hydrated) return <Loading />;
 
+  // Logged out (or back from /login without logging in)
   if (!token) {
-    return (
-      <LockedProfile
-        isDark={isDark}
-        onLogin={() =>
-          router.push({ pathname: "/login", params: { returnUrl: "/profile" } })
-        }
-      />
-    );
+    return <LockedProfile onLogin={() => router.push({ pathname: "/login", params: { returnUrl: "/profile" } })} />;
   }
 
-  if (loading) return <GraduationCap3DLoader />;
-  if (error || !user)
+  if (loading && !user) return <Loading />;
+
+  if (error || !user) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          padding: 16,
-          backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-        }}
-      >
-        <Text style={{ color: "#D93F55", fontSize: 16, marginBottom: 4 }}>
-          Error loading profile
-        </Text>
-        {error && (
-          <Text style={{ color: isDark ? "#9C95A8" : "#6B6577" }}>{error}</Text>
-        )}
-
-        {/* Without these the user was stuck here with no way out */}
-        <View style={{ flexDirection: "row", gap: 12, marginTop: 20 }}>
-          <TouchableOpacity
-            onPress={() => setReloadKey((k) => k + 1)}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-              borderRadius: 12,
-              backgroundColor: "#8A5CE6",
-            }}
-            activeOpacity={0.7}
-          >
-            <RefreshCw size={16} color="#ffffff" />
-            <Text style={{ color: "#ffffff", fontWeight: "600", marginLeft: 6 }}>
-              Try again
-            </Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => handleLogout()}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              paddingHorizontal: 16,
-              paddingVertical: 10,
-              borderRadius: 12,
-              backgroundColor: isDark ? "#2B2733" : "#E5DFEE",
-            }}
-            activeOpacity={0.7}
-          >
-            <LogOut size={16} color="#D93F55" />
-            <Text style={{ color: "#D93F55", fontWeight: "600", marginLeft: 6 }}>
-              Log Out
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+      <Screen tab contentStyle={{ flexGrow: 1, justifyContent: "center" }}>
+        <EmptyState icon={RefreshCw} tone="rose" title="Couldn't load your profile" text={error ?? undefined} action="Try again" onAction={() => setReloadKey((k) => k + 1)} />
+        <PillButton title="Log out" tone="soft" icon={LogOut} center onPress={() => handleLogout()} />
+      </Screen>
     );
+  }
 
   const initials = user.name
     ? user.name
         .split(" ")
         .map((n) => n[0])
         .join("")
+        .slice(0, 2)
         .toUpperCase()
     : "U";
+  const achievements = stats ? buildAchievements(stats, user.points ?? 0) : [];
+  const unlocked = achievements.filter((a) => a.unlocked).length;
+  // Unlocked first (newest tiers last), then the locked ones closest to done
+  const featured = [...achievements]
+    .sort((a, b) => Number(b.unlocked) - Number(a.unlocked) || b.current / b.target - a.current / a.target)
+    .slice(0, 6);
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}
-    >
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 60 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Profile Card */}
-        <View style={{ padding: 16 }}>
-          <View
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 20,
-              padding: 20,
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              {user.image ? (
-                <Image
-                  source={{ uri: user.image }}
-                  style={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: 36,
-                    marginRight: 16,
-                  }}
-                />
-              ) : answers["avatar"] ? (
-                <View
-                  style={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: 36,
-                    backgroundColor: "#8A5CE6",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: 16,
-                  }}
-                >
-                  <Text style={{ fontSize: 32 }}>{answers["avatar"]}</Text>
-                </View>
-              ) : (
-                <View
-                  style={{
-                    width: 72,
-                    height: 72,
-                    borderRadius: 36,
-                    backgroundColor: "#8A5CE6",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    marginRight: 16,
-                  }}
-                >
-                  <Text
-                    style={{ color: "#fff", fontSize: 24, fontWeight: "bold" }}
-                  >
-                    {initials}
-                  </Text>
-                </View>
-              )}
+    <Screen tab>
+      {/* Header */}
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+        <T variant="title">Profile</T>
+        <CircleButton icon={Settings} label="Settings" onPress={() => router.push("/settings")} />
+      </View>
 
-              <View style={{ flex: 1 }}>
-                <Text
-                  style={{
-                    fontSize: 20,
-                    fontWeight: "bold",
-                    color: isDark ? "#F4F1F8" : "#0B0A0F",
-                    marginBottom: 4,
-                  }}
-                >
-                  {user.name}
-                </Text>
-                <Text
-                  style={{
-                    fontSize: 14,
-                    color: isDark ? "#9C95A8" : "#6B6577",
-                    marginBottom: 8,
-                  }}
-                >
-                  {user.email}
-                </Text>
-                {user.isPro && (
-                  <View
-                    style={{
-                      flexDirection: "row",
-                      alignItems: "center",
-                      backgroundColor: isDark ? "#422006" : "#fef3c7",
-                      paddingHorizontal: 12,
-                      paddingVertical: 4,
-                      borderRadius: 12,
-                      alignSelf: "flex-start",
-                    }}
-                  >
-                    <Crown
-                      size={14}
-                      color={isDark ? "#F2C94C" : "#d97706"}
-                      style={{ marginRight: 4 }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 12,
-                        fontWeight: "600",
-                        color: isDark ? "#F2C94C" : "#d97706",
-                      }}
-                    >
-                      PRO Member
-                    </Text>
-                  </View>
-                )}
-              </View>
-            </View>
+      {/* Identity card */}
+      <PastelCard tone="lav" radius={30} style={{ padding: 20, gap: 16 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+          <View style={{ width: 72, height: 72, borderRadius: 36, borderWidth: 3, borderColor: "#fff", backgroundColor: c.butter, alignItems: "center", justifyContent: "center", overflow: "hidden" }}>
+            {user.image ? (
+              <Image source={{ uri: user.image }} style={{ width: "100%", height: "100%" }} />
+            ) : answers["avatar"] ? (
+              <Text style={{ fontSize: 32 }}>{answers["avatar"]}</Text>
+            ) : (
+              <Text style={{ fontFamily: Fonts.displayBold, fontSize: 24, color: c.onPastel }}>{initials}</Text>
+            )}
           </View>
-
-          {/* Stats Grid */}
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-              marginTop: 16,
-            }}
-          >
-            {/* Total Points */}
-            <View
-              style={{
-                width: "48%",
-                backgroundColor: isDark ? "#17151C" : "#ffffff",
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 16,
-                borderLeftWidth: 4,
-                borderLeftColor: "#8A5CE6",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                elevation: 3,
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: isDark ? "#C9AAFB" : "#E4CDFF",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <Trophy size={20} color="#8A5CE6" />
+          <View style={{ flex: 1, gap: 4 }}>
+            <T variant="h2" onPastel numberOfLines={1}>
+              {user.name}
+            </T>
+            {!!user.email && (
+              <T variant="caption" onPastel numberOfLines={1} style={{ opacity: 0.7 }}>
+                {user.email}
+              </T>
+            )}
+            {user.isPro && (
+              <View style={{ marginTop: 2 }}>
+                <ProBadge />
               </View>
-              <AnimatedNumber value={user.points} isDark={isDark} />
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: isDark ? "#9C95A8" : "#6B6577",
-                  marginTop: 4,
-                }}
-              >
-                Total Points
-              </Text>
-            </View>
-
-            {/* Lessons Done */}
-            <View
-              style={{
-                width: "48%",
-                backgroundColor: isDark ? "#17151C" : "#ffffff",
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 16,
-                borderLeftWidth: 4,
-                borderLeftColor: "#2E9A5E",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                elevation: 3,
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: isDark ? "#064e3b" : "#d1fae5",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <BookOpen size={20} color="#2E9A5E" />
-              </View>
-              <AnimatedNumber value={lessonsCount} isDark={isDark} />
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: isDark ? "#9C95A8" : "#6B6577",
-                  marginTop: 4,
-                }}
-              >
-                Lessons Done
-              </Text>
-            </View>
-
-            {/* Quizzes Taken */}
-            <View
-              style={{
-                width: "48%",
-                backgroundColor: isDark ? "#17151C" : "#ffffff",
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 16,
-                borderLeftWidth: 4,
-                borderLeftColor: "#8A5CE6",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                elevation: 3,
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: isDark ? "#4c1d95" : "#ede9fe",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <Target size={20} color="#8A5CE6" />
-              </View>
-              <AnimatedNumber value={quizzesCount} isDark={isDark} />
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: isDark ? "#9C95A8" : "#6B6577",
-                  marginTop: 4,
-                }}
-              >
-                Quizzes Taken
-              </Text>
-            </View>
-
-            {/* Avg SAT Score */}
-            <View
-              style={{
-                width: "48%",
-                backgroundColor: isDark ? "#17151C" : "#ffffff",
-                borderRadius: 16,
-                padding: 16,
-                marginBottom: 16,
-                borderLeftWidth: 4,
-                borderLeftColor: "#E5A50A",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                elevation: 3,
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  backgroundColor: isDark ? "#78350f" : "#fef3c7",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  marginBottom: 12,
-                }}
-              >
-                <Star size={20} color="#E5A50A" />
-              </View>
-              {averageSatScore > 0 ? (
-                <AnimatedNumber value={averageSatScore} isDark={isDark} />
-              ) : (
-                <Text
-                  style={{
-                    fontSize: 16,
-                    fontWeight: "600",
-                    color: isDark ? "#7E7889" : "#9C95A8",
-                  }}
-                >
-                  No data
-                </Text>
-              )}
-              <Text
-                style={{
-                  fontSize: 12,
-                  color: isDark ? "#9C95A8" : "#6B6577",
-                  marginTop: 4,
-                }}
-              >
-                Avg SAT Score
-              </Text>
-            </View>
+            )}
           </View>
-
-          {/* PRO Card */}
-          {!user.isPro && (
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => router.push("/payment")}
-              style={{
-                borderRadius: 20,
-                overflow: "hidden",
-                marginBottom: 24,
-                shadowColor: "#E5A50A",
-                shadowOffset: { width: 0, height: 4 },
-                shadowOpacity: 0.3,
-                shadowRadius: 12,
-                elevation: 8,
-              }}
-            >
-              <LinearGradient
-                colors={["#E5A50A", "#D97706"]}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-                style={{ padding: 20 }}
-              >
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    marginBottom: 12,
-                  }}
-                >
-                  <View
-                    style={{
-                      width: 48,
-                      height: 48,
-                      borderRadius: 24,
-                      backgroundColor: "rgba(255,255,255,0.2)",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginRight: 12,
-                    }}
-                  >
-                    <Crown size={24} color="#ffffff" />
-                  </View>
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontSize: 20,
-                        fontWeight: "bold",
-                        color: "#ffffff",
-                      }}
-                    >
-                      Upgrade to PRO
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 13,
-                        color: "rgba(255,255,255,0.9)",
-                        marginTop: 2,
-                      }}
-                    >
-                      Unlock all features
-                    </Text>
-                  </View>
-                </View>
-                <View
-                  style={{
-                    backgroundColor: "#ffffff",
-                    paddingVertical: 12,
-                    borderRadius: 12,
-                    alignItems: "center",
-                  }}
-                >
-                  <Text
-                    style={{
-                      color: "#D97706",
-                      fontSize: 15,
-                      fontWeight: "600",
-                    }}
-                  >
-                    Get Started
-                  </Text>
-                </View>
-              </LinearGradient>
-            </TouchableOpacity>
-          )}
-
-          {/* Achievements */}
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              marginBottom: 16,
-            }}
-          >
-            Achievements
-          </Text>
-          <View
-            style={{
-              flexDirection: "row",
-              flexWrap: "wrap",
-              justifyContent: "space-between",
-            }}
-          >
-            {achievements.map((ach) => (
-              <AchievementBadge
-                key={ach.id}
-                achievement={ach}
-                isDark={isDark}
-              />
-            ))}
-          </View>
-
-          {/* Quick Actions */}
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "bold",
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              marginTop: 24,
-              marginBottom: 16,
-            }}
-          >
-            Quick Actions
-          </Text>
-
-          <TouchableOpacity
-            onPress={() => router.push("/info")}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 10,
-              marginBottom: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              borderLeftWidth: 4,
-              borderLeftColor: "#2E9A5E",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 12,
-              }}
-            >
-              <BookOpen size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text
-                style={{
-                  fontSize: 15,
-                  fontWeight: "600",
-                  color: isDark ? "#F4F1F8" : "#0B0A0F",
-                }}
-              >
-                About SAT
-              </Text>
-              <Text
-                style={{
-                  fontSize: 13,
-                  color: isDark ? "#9C95A8" : "#6B6577",
-                  marginTop: 2,
-                }}
-              >
-                Learn about the exam
-              </Text>
-            </View>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              size={18}
-              color={isDark ? "#7E7889" : "#9C95A8"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => router.push("/edit-profile")}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 10,
-              marginBottom: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              borderLeftWidth: 4,
-              borderLeftColor: "#8A5CE6",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 12,
-              }}
-            >
-              <User size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </View>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                fontWeight: "500",
-                color: isDark ? "#F4F1F8" : "#0B0A0F",
-              }}
-            >
-              Edit Profile
-            </Text>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              size={18}
-              color={isDark ? "#7E7889" : "#9C95A8"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => router.push("/settings")}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 10,
-              marginBottom: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              borderLeftWidth: 4,
-              borderLeftColor: "#8A5CE6",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 12,
-              }}
-            >
-              <Settings size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </View>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                fontWeight: "500",
-                color: isDark ? "#F4F1F8" : "#0B0A0F",
-              }}
-            >
-              Settings
-            </Text>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              size={18}
-              color={isDark ? "#7E7889" : "#9C95A8"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => setContactOpen(true)}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 10,
-              marginBottom: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              borderLeftWidth: 4,
-              borderLeftColor: "#8A5CE6",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 12,
-              }}
-            >
-              <Mails size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </View>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                fontWeight: "500",
-                color: isDark ? "#F4F1F8" : "#0B0A0F",
-              }}
-            >
-              Contact Us
-            </Text>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              size={18}
-              color={isDark ? "#7E7889" : "#9C95A8"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={handleRateUs}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 10,
-              marginBottom: 12,
-              flexDirection: "row",
-              alignItems: "center",
-              borderLeftWidth: 4,
-              borderLeftColor: "#8A5CE6",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 12,
-              }}
-            >
-              <ThumbsUp size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </View>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                fontWeight: "500",
-                color: isDark ? "#F4F1F8" : "#0B0A0F",
-              }}
-            >
-              Rate Us
-            </Text>
-            <MaterialIcons
-              name="arrow-forward-ios"
-              size={18}
-              color={isDark ? "#7E7889" : "#9C95A8"}
-            />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            onPress={() => handleLogout()}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 10,
-              flexDirection: "row",
-              alignItems: "center",
-              borderLeftWidth: 4,
-              borderLeftColor: "#D93F55",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 12,
-                backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 12,
-              }}
-            >
-              <LogOut size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </View>
-            <Text
-              style={{
-                flex: 1,
-                fontSize: 15,
-                fontWeight: "500",
-                color: "#D93F55",
-              }}
-            >
-              Log Out
-            </Text>
-          </TouchableOpacity>
+          <CircleButton icon={Pencil} onPastel filled size={40} label="Edit profile" onPress={() => router.push("/edit-profile")} />
         </View>
-      </ScrollView>
-
-      <ContactDialog
-        isOpen={contactOpen}
-        onClose={() => setContactOpen(false)}
-        isDark={isDark}
-      />
-    </SafeAreaView>
-  );
-}
-
-
-// Blurred preview of the profile page with a login card on top
-function LockedProfile({ isDark, onLogin }: { isDark: boolean; onLogin: () => void }) {
-  const blurTargetRef = useRef<View>(null);
-  const cardBg = isDark ? "#17151C" : "#ffffff";
-  const placeholderBar = isDark ? "#2B2733" : "#E5DFEE";
-
-  return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9", overflow: "hidden" }}>
-      {/* Placeholder copy of the real page, only for the background */}
-      <BlurTargetView ref={blurTargetRef} pointerEvents="none" style={{ flex: 1 }}>
-        <View style={{ flex: 1, padding: 16, paddingTop: 64 }}>
-          <View style={{ backgroundColor: cardBg, borderRadius: 20, padding: 20, flexDirection: "row", alignItems: "center" }}>
-            <View
-              style={{
-                width: 72,
-                height: 72,
-                borderRadius: 36,
-                backgroundColor: "#8A5CE6",
-                alignItems: "center",
-                justifyContent: "center",
-                marginRight: 16,
-              }}
-            >
-              <User size={32} color="#ffffff" />
-            </View>
-            <View style={{ flex: 1 }}>
-              <Text style={{ fontSize: 20, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 8 }}>
-                Your profile
-              </Text>
-              <View style={{ height: 12, width: "60%", borderRadius: 6, backgroundColor: placeholderBar }} />
-            </View>
+        <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", backgroundColor: "#fff", borderRadius: 20, padding: 14 }}>
+          <View>
+            <T variant="caption" onPastel style={{ opacity: 0.6 }}>
+              Total points
+            </T>
+            <AnimatedNumber value={user.points ?? 0} color={c.onPastel} size={32} />
           </View>
-
-          <View style={{ flexDirection: "row", gap: 12, marginTop: 16 }}>
-            {[0, 1].map((i) => (
-              <View key={i} style={{ flex: 1, height: 90, borderRadius: 16, backgroundColor: cardBg }} />
-            ))}
+          <View style={{ alignItems: "flex-end" }}>
+            <T variant="caption" onPastel style={{ opacity: 0.6 }}>
+              Achievements
+            </T>
+            <T style={{ fontFamily: Fonts.display, fontSize: 22 }} onPastel>
+              {unlocked}/{achievements.length}
+            </T>
           </View>
-          <View style={{ flexDirection: "row", gap: 12, marginTop: 12 }}>
-            {[0, 1].map((i) => (
-              <View key={i} style={{ flex: 1, height: 90, borderRadius: 16, backgroundColor: cardBg }} />
-            ))}
-          </View>
+        </View>
+      </PastelCard>
 
-          {[Settings, Mails, Star].map((Icon, i) => (
-            <View
-              key={i}
-              style={{ flexDirection: "row", alignItems: "center", backgroundColor: cardBg, borderRadius: 16, padding: 16, marginTop: 12 }}
-            >
-              <Icon size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-              <View style={{ marginLeft: 12, height: 12, width: "50%", borderRadius: 6, backgroundColor: placeholderBar }} />
+      {/* Stats */}
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        <StatCard label="Lessons" value={stats?.lessons ?? 0} icon={BookOpen} tone="mint" />
+        <StatCard label="Quizzes" value={stats?.quizzes ?? 0} icon={CircleHelp} tone="butter" />
+        <StatCard label="Day streak" value={stats?.currentStreak ?? 0} icon={Flame} tone="rose" />
+      </View>
+      <PastelCard tone="butter" radius={26} style={{ padding: 18, flexDirection: "row", alignItems: "center" }}>
+        <View style={{ flex: 1, gap: 2 }}>
+          <T variant="smallStrong" onPastel>
+            Average SAT Math score
+          </T>
+          {averageSatScore > 0 ? (
+            <AnimatedNumber value={averageSatScore} color={c.onPastel} size={40} />
+          ) : (
+            <>
+              <T style={{ fontFamily: Fonts.display, fontSize: 26, lineHeight: 32 }} onPastel>
+                No tests yet
+              </T>
+              <Pressable onPress={() => router.push("/tests/exams" as any)} hitSlop={8}>
+                <T variant="smallStrong" onPastel style={{ textDecorationLine: "underline" }}>
+                  Take a practice test
+                </T>
+              </Pressable>
+            </>
+          )}
+          {averageSatScore > 0 && (
+            <T variant="caption" onPastel style={{ opacity: 0.7 }}>
+              out of 800
+            </T>
+          )}
+        </View>
+        <TargetArt size={84} />
+      </PastelCard>
+
+      {/* PRO */}
+      {!user.isPro && (
+        <PastelCard tone="mint" radius={28} onPress={() => router.push("/payment")} style={{ padding: 20, gap: 8 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+            <Sparkles size={15} color={c.onPastel} />
+            <T variant="smallStrong" onPastel>
+              SAT Learner PRO
+            </T>
+          </View>
+          <T style={{ fontFamily: Fonts.display, fontSize: 24, lineHeight: 27, maxWidth: "62%" }} onPastel>
+            Unlock every lesson and test
+          </T>
+          <PillButton title="See plans" tone="white" center onPress={() => router.push("/payment")} style={{ alignSelf: "flex-start", minHeight: 44, marginTop: 6 }} />
+          <View style={{ position: "absolute", right: 12, bottom: 12 }} pointerEvents="none">
+            <CrownArt size={88} />
+          </View>
+        </PastelCard>
+      )}
+
+      {/* Achievements */}
+      <View>
+        <SectionHeader title={`Achievements · ${unlocked}/${achievements.length}`} action="See all" onAction={() => setAllBadgesOpen(true)} />
+        <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 10 }}>
+          {featured.map((a) => (
+            <AchievementBadge key={a.id} achievement={a} />
+          ))}
+        </View>
+      </View>
+
+      {/* Actions */}
+      <View>
+        <SectionHeader title="More" />
+        <Group>
+          <GroupRow icon={BookOpen} tone="mint" title="About the SAT" subtitle="Dates, scoring, what's on it" onPress={() => router.push("/info")} />
+          <GroupRow icon={Mails} tone="butter" title="Contact us" onPress={() => setContactOpen(true)} />
+          <GroupRow icon={ThumbsUp} tone="lav" title="Rate the app" onPress={handleRateUs} />
+        </Group>
+      </View>
+
+      <ContactDialog isOpen={contactOpen} onClose={() => setContactOpen(false)} isDark={c.isDark} />
+
+      <Sheet visible={allBadgesOpen} onClose={() => setAllBadgesOpen(false)} title="Achievements" text={`${unlocked} of ${achievements.length} unlocked`} scroll>
+        <View style={{ gap: 18 }}>
+          {(["Learning", "Practice", "Exams", "Habits"] as const).map((g) => (
+            <View key={g} style={{ gap: 10 }}>
+              <T variant="label">{g}</T>
+              <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 10 }}>
+                {achievements
+                  .filter((a) => a.group === g)
+                  .map((a) => (
+                    <AchievementBadge key={a.id} achievement={a} />
+                  ))}
+              </View>
             </View>
           ))}
         </View>
-      </BlurTargetView>
+      </Sheet>
+    </Screen>
+  );
+}
 
-      <BlurView
-        blurTarget={blurTargetRef}
-        intensity={40}
-        tint={isDark ? "dark" : "light"}
-        blurMethod="dimezisBlurView"
-        style={StyleSheet.absoluteFill}
-      />
-
-      <View style={[StyleSheet.absoluteFill, { justifyContent: "center", alignItems: "center", paddingHorizontal: 16 }]}>
-        <View
-          style={{
-            backgroundColor: cardBg,
-            borderRadius: 20,
-            padding: 28,
-            width: "100%",
-            maxWidth: 420,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.15,
-            shadowRadius: 12,
-            elevation: 6,
-          }}
-        >
-          <Text style={{ fontSize: 22, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", textAlign: "center", marginBottom: 12 }}>
-            👋 Log in to see your profile
-          </Text>
-          <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577", textAlign: "center", marginBottom: 24 }}>
-            Track your progress, achievements and sync them across devices.
-          </Text>
-
-          <TouchableOpacity
-            onPress={onLogin}
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              paddingVertical: 14,
-              borderRadius: 12,
-              backgroundColor: "#8A5CE6",
-            }}
-            activeOpacity={0.8}
-          >
-            <LogIn size={20} color="#ffffff" />
-            <Text style={{ color: "#ffffff", fontWeight: "bold", fontSize: 16, marginLeft: 10 }}>
-              Log in / Sign up
-            </Text>
-          </TouchableOpacity>
-        </View>
+function StatCard({ label, value, icon, tone }: { label: string; value: number; icon: LucideIcon; tone: PastelName }) {
+  const c = usePalette();
+  return (
+    <Card style={{ flex: 1, gap: 12, padding: 14 }}>
+      <IconTile icon={icon} tone={tone} size={36} radius={12} />
+      <View>
+        <AnimatedNumber value={value} color={c.ink} size={26} />
+        <T variant="caption">{label}</T>
       </View>
-    </View>
+    </Card>
+  );
+}
+
+// Logged out: what the profile holds, and a way in
+function LockedProfile({ onLogin }: { onLogin: () => void }) {
+  const c = usePalette();
+  return (
+    <Screen tab>
+      <T variant="title">Profile</T>
+      <PastelCard tone="lav" radius={30} style={{ padding: 22, gap: 12, minHeight: 260 }}>
+        <View style={{ position: "absolute", right: 14, top: 16 }} pointerEvents="none">
+          <TargetArt size={96} />
+        </View>
+        <T variant="smallStrong" onPastel>
+          Not logged in
+        </T>
+        <T style={{ fontFamily: Fonts.display, fontSize: 30, lineHeight: 32, letterSpacing: -0.6, maxWidth: "62%" }} onPastel>
+          Keep your progress safe
+        </T>
+        <T variant="small" onPastel style={{ maxWidth: "80%" }}>
+          Log in to save points, scores and achievements, and to pick up on another phone.
+        </T>
+        <PillButton title="Log in or sign up" tone="white" icon={LogIn} onPress={onLogin} style={{ marginTop: "auto" }} />
+      </PastelCard>
+      <View style={{ flexDirection: "row", gap: 10 }}>
+        {[
+          { icon: Trophy, label: "Points", tone: "butter" as const },
+          { icon: BookOpen, label: "Lessons", tone: "mint" as const },
+          { icon: Star, label: "Badges", tone: "rose" as const },
+        ].map((x) => (
+          <Card key={x.label} style={{ flex: 1, alignItems: "center", gap: 10, paddingVertical: 18 }}>
+            <IconTile icon={x.icon} tone={x.tone} size={40} radius={20} />
+            <T variant="caption" color={c.muted}>
+              {x.label}
+            </T>
+          </Card>
+        ))}
+      </View>
+    </Screen>
   );
 }

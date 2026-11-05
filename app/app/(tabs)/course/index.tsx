@@ -1,829 +1,335 @@
-import { useRef, useState, useCallback, useEffect } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  Dimensions,
-  Platform,
-} from "react-native";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { ScrollView, TextInput, View } from "react-native";
 import { useFocusEffect, useRouter } from "expo-router";
-import { useAuth } from "@/context/AuthContext";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { GoogleSignin } from "@react-native-google-signin/google-signin";
-import { Lock, MoreVertical, BookMarked, Search, X } from "lucide-react-native";
+import { BookOpen, CircleHelp, Play, Search, Trophy, X } from "lucide-react-native";
+import { useAuth } from "@/context/AuthContext";
 import { ChapterWithItems, useCourseDatabase } from "@/lib/db/course";
-import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 import { useTour } from "@/context/TourContext";
 import { TourTooltip } from "@/components/Tour/TourTooltip";
-import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
+import { getTourStepInfo, TOTAL_TOUR_STEPS, TOUR_STEPS } from "@/constants/tourSteps";
+import { Fonts, usePalette } from "@/constants/palette";
+import { EmptyState, Loading, plural, PastelCard, Screen, T, Thumb, Tap } from "@/components/ds";
+import { ParabolaArt } from "@/components/art";
 
 GoogleSignin.configure({
-  webClientId:
-    "329617813146-lmmck18chg6mfgci5i4iddtialht09ij.apps.googleusercontent.com",
+  webClientId: "329617813146-lmmck18chg6mfgci5i4iddtialht09ij.apps.googleusercontent.com",
   scopes: ["profile", "email"],
   offlineAccess: true,
   forceCodeForRefreshToken: false,
-  iosClientId:
-    "329617813146-3o5aq7gfvejqoi3mudiar02tl4urhivu.apps.googleusercontent.com",
+  iosClientId: "329617813146-3o5aq7gfvejqoi3mudiar02tl4urhivu.apps.googleusercontent.com",
 });
 
-// Helper functions
+// Points earned / points available in a chapter (lessons count fully once completed, quizzes by score)
 const calculateChapterProgress = (chapter: ChapterWithItems) => {
-  let totalPoints = 0;
-  let earnedPoints = 0;
-
+  let total = 0;
+  let earned = 0;
   for (const item of chapter.items) {
     if (item.type === "lesson") {
-      const lessonPoints = item.points ?? 0;
-      totalPoints += lessonPoints;
-      // If lesson is completed, add all its points
-      if (item.progress?.length && item.progress[0].completed) {
-        earnedPoints += lessonPoints;
-      }
+      const pts = item.points ?? 0;
+      total += pts;
+      if (item.progress?.length && item.progress[0].completed) earned += pts;
     } else if (item.type === "quiz") {
-      const maxScore = item.maxScore ?? 0;
-      totalPoints += maxScore;
-      // Add the actual score the user earned
-      if (item.results?.length) {
-        earnedPoints += item.results[0].score ?? 0;
-      }
+      total += item.maxScore ?? 0;
+      if (item.results?.length) earned += item.results[0].score ?? 0;
     }
   }
-
-  return totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+  return total > 0 ? Math.round((earned / total) * 100) : 0;
 };
 
-const getChapterColor = (progress: number) => {
-  if (progress >= 90) return "#2E9A5E"; // Green
-  if (progress >= 70) return "#E5A50A"; // Yellow
-  if (progress >= 50) return "#8A5CE6"; // Purple
-  if (progress >= 30) return "#8A5CE6"; // Blue/Cyan
-  if (progress >= 10) return "#D93F55"; // Red
-  return "#7E7889"; // Neutral gray
-};
+const isItemDone = (item: ChapterWithItems["items"][number]) =>
+  item.type === "lesson" ? !!item.progress?.length && !!item.progress[0].completed : !!item.results?.length;
 
-export default function HomeScreen() {
+export default function CourseScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const SCREEN_WIDTH = Dimensions.get('window').width;
-  const CHAPTER_CARD_WIDTH = SCREEN_WIDTH - 32; 
-
-  const { token, user } = useAuth();
+  const c = usePalette();
+  const { token } = useAuth();
   const { getFullCourse, getFullCourseWithProgress } = useCourseDatabase();
-  const {
-    tourActive,
-    currentStep,
-    setCurrentStep,
-    endTour,
-    skipTour,
-    setNumbersQuizId,
-  } = useTour();
+  const { tourActive, currentStep, setCurrentStep, endTour, skipTour, setNumbersQuizId } = useTour();
 
   const [loading, setLoading] = useState(true);
   const [course, setCourse] = useState<ChapterWithItems[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const scrollRef = useRef<ScrollView>(null);
 
-  // Set the quiz ID for tour when component mounts
+  // Quiz the tour opens
   useEffect(() => {
     setNumbersQuizId("dde1a000-1db8-47b9-9370-2796f7eaf337");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Load course
   useFocusEffect(
     useCallback(() => {
-      let isActive = true;
-
+      let active = true;
       const load = async () => {
-        setLoading(true);
-        let res;
-        if (!token) {
-          res = await getFullCourse();
-        } else {
-          res = await getFullCourseWithProgress();
-        }
-
-        if (!isActive) return;
-
-        //console.log(res.chapters![2].items[2]);
-        //console.log(res.chapters![2].items[3]);
-
-        if (res.success && res.chapters) {
-          setCourse(res.chapters);
-          setTimeout(() => {
-            const firstUnfinishedIndex = findFirstUnfinishedIndex(
-              res.chapters!
-            );
-            if (scrollRef.current && firstUnfinishedIndex >= 0) {
-              scrollRef.current.scrollTo({
-                y: firstUnfinishedIndex * 80,
-                animated: true,
-              });
-            }
-          }, 300);
-        }
-
+        const res = token ? await getFullCourseWithProgress() : await getFullCourse();
+        if (!active) return;
+        if (res.success && res.chapters) setCourse(res.chapters);
         setLoading(false);
       };
-
       load();
-
       return () => {
-        isActive = false;
+        active = false;
       };
-    }, [token]) // you can keep token if needed for DB queries
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [token])
   );
 
-  // useEffect(() => {
-  //   console.log("🧠 Course mounted");
-
-  //   return () => {
-  //     console.log("🧹 Course unmounted");
-  //   };
-  // }, []);
-
-  useEffect(() => {
-    // Don't auto-navigate - let the user see the tooltip first
-  }, [tourActive, currentStep]);
-
   const handleTourNext = () => {
-    // Special handling for CHOOSE_TOPIC step - navigate to Numbers chapter when clicking Next
+    // From "choose a topic" the tour opens the Numbers chapter
     if (currentStep === TOUR_STEPS.CHOOSE_TOPIC) {
-      const numbersChapter = course.find((ch) =>
-        ch.title.toLowerCase().includes("number")
-      );
-      if (numbersChapter) {
-        setCurrentStep(currentStep + 1); // Move to LESSONS_SECTION step
-        router.push(`/course/${numbersChapter.id}`);
+      const numbers = course.find((ch) => ch.title.toLowerCase().includes("number"));
+      if (numbers) {
+        setCurrentStep(currentStep + 1);
+        router.push(`/course/${numbers.id}`);
         return;
       }
     }
-
-    if (currentStep === TOTAL_TOUR_STEPS - 1) {
-      endTour();
-    } else {
-      setCurrentStep(currentStep + 1);
-    }
+    if (currentStep === TOTAL_TOUR_STEPS - 1) endTour();
+    else setCurrentStep(currentStep + 1);
   };
-
   const handleTourPrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
-  // --- Helpers ---
-  const findFirstUnfinishedIndex = (chapters: ChapterWithItems[]) => {
-    let index = 0;
-    for (const chapter of chapters) {
-      for (const item of chapter.items) {
-        if (item.type === "lesson" && !item.progress?.length) return index;
-        if (item.type === "quiz" && !item.results?.length) return index;
-        index++;
+  if (loading) return <Loading />;
+
+  // Course totals
+  let total = 0;
+  let earned = 0;
+  let lessons = 0;
+  let quizzes = 0;
+  for (const ch of course) {
+    for (const item of ch.items) {
+      if (item.type === "lesson") {
+        lessons++;
+        total += item.points ?? 0;
+        if (item.progress?.length && item.progress[0].completed) earned += item.points ?? 0;
+      } else if (item.type === "quiz") {
+        quizzes++;
+        total += item.maxScore ?? 0;
+        if (item.results?.length) earned += item.results[0].score ?? 0;
       }
     }
-    return -1;
-  };
-
-  const calculateCourseProgress = () => {
-    let totalPoints = 0;
-    let earnedPoints = 0;
-
-    for (const chapter of course) {
-      for (const item of chapter.items) {
-        if (item.type === "lesson") {
-          const lessonPoints = item.points ?? 0;
-          totalPoints += lessonPoints;
-          // If lesson is completed, add all its points
-          if (item.progress?.length && item.progress[0].completed) {
-            earnedPoints += lessonPoints;
-          }
-        } else if (item.type === "quiz") {
-          const maxScore = item.maxScore ?? 0;
-          totalPoints += maxScore;
-          // Add the actual score the user earned
-          if (item.results?.length) {
-            earnedPoints += item.results[0].score ?? 0;
-          }
-        }
-      }
-    }
-
-    return totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
-  };
-
-  const filteredCourse = course.filter((chapter) =>
-    chapter.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  const clearSearch = () => {
-    setSearchQuery("");
-  };
-
-  if (loading) {
-    return <GraduationCap3DLoader />;
   }
+  const courseProgress = total > 0 ? Math.round((earned / total) * 100) : 0;
 
-  const courseProgress = calculateCourseProgress();
-  const radius = 50;
-  const strokeWidth = 10;
-  const circumference = 2 * Math.PI * radius;
-  const progressOffset = circumference - (circumference * courseProgress) / 100;
+  // Card under the header: continue the first unfinished chapter, or start chapter 1
+  const started = !!token && course.some((ch) => ch.items.some(isItemDone));
+  const nextChapter = (started ? course.find((ch) => ch.items.some((i) => !isItemDone(i))) : undefined) ?? course[0];
+  const nextIndex = nextChapter ? course.indexOf(nextChapter) : -1;
+  const nextProgress = nextChapter && token ? calculateChapterProgress(nextChapter) : 0;
 
+  const q = searchQuery.trim().toLowerCase();
+  const filtered = course.filter((ch) => ch.title.toLowerCase().includes(q));
   const chooseTopicInfo = getTourStepInfo(TOUR_STEPS.CHOOSE_TOPIC);
 
   return (
-    <View style={[styles.container, { backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }]}>
-      {/* Header */}
-      <View
-        style={[
-          styles.header,
-          {
-            paddingTop: insets.top + 12,
-            backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-            borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
-          },
-        ]}
-      >
-        {/* Title and Progress */}
-        <View style={styles.headerTitleRow}>
-          <Text style={[styles.headerTitle, { color: isDark ? "#F4F1F8" : "#0B0A0F" }]}>
-            SAT Math Course
-          </Text>
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <Screen tab scrollRef={scrollRef}>
+        <View style={{ gap: 6 }}>
+          <T variant="label">SAT Math course</T>
+          <T variant="title" style={{ fontSize: 30, lineHeight: 34 }} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>
+            From the basics to 800
+          </T>
+        </View>
+
+        {/* Header art with the continue / start card joined underneath */}
+        <View style={{ borderRadius: 28, overflow: "hidden", backgroundColor: c.lav }}>
+          <PastelCard tone="lav" radius={0} style={{ height: 170, padding: 0, alignItems: "center", justifyContent: "center" }}>
+            <ParabolaArt width="100%" height={160} />
+            {token && (
+              <View style={{ position: "absolute", left: 16, top: 14, backgroundColor: "#fff", borderRadius: 999, paddingHorizontal: 12, paddingVertical: 6 }}>
+                <T variant="smallStrong" onPastel>
+                  {courseProgress}% complete
+                </T>
+              </View>
+            )}
+          </PastelCard>
+          {nextChapter && (
+            <Tap
+              onPress={() => router.push(`/course/${nextChapter.id}` as any)}
+              style={({ pressed }) => ({
+                margin: 6,
+                marginTop: 0,
+                borderRadius: 23,
+                backgroundColor: "#0B0A0F",
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 12,
+                paddingVertical: 12,
+                paddingLeft: 16,
+                paddingRight: 10,
+                opacity: pressed ? 0.88 : 1,
+              })}
+            >
+              <View style={{ flex: 1, minWidth: 0, gap: 4 }}>
+                <T variant="caption" color="rgba(255,255,255,0.65)">
+                  {started ? `Continue · Chapter ${nextIndex + 1}` : "Start the course · Chapter 1"}
+                </T>
+                <T variant="bodyStrong" color="#fff" numberOfLines={1}>
+                  {nextChapter.title.trim()}
+                </T>
+                {started && (
+                  <View style={{ height: 4, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.18)", marginTop: 4, overflow: "hidden" }}>
+                    <View style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${nextProgress}%`, backgroundColor: c.lav }} />
+                  </View>
+                )}
+              </View>
+              <View style={{ width: 46, height: 46, borderRadius: 23, backgroundColor: c.lav, alignItems: "center", justifyContent: "center" }}>
+                <Play size={19} color="#0B0A0F" strokeWidth={2.1} />
+              </View>
+            </Tap>
+          )}
+        </View>
+
+        {/* Facts */}
+        <View style={{ flexDirection: "row", gap: 10 }}>
+          {[
+            { icon: BookOpen, text: plural(lessons, "lesson") },
+            { icon: CircleHelp, text: plural(quizzes, "quiz") },
+            { icon: Trophy, text: plural(course.length, "chapter") },
+          ].map(({ icon: Icon, text }) => (
+            <View key={text} style={{ flex: 1, flexDirection: "row", alignItems: "center", gap: 8 }}>
+              <View style={{ width: 38, height: 38, borderRadius: 19, borderWidth: 1.5, borderColor: c.line, backgroundColor: c.surface, alignItems: "center", justifyContent: "center" }}>
+                <Icon size={17} color={c.ink} strokeWidth={1.9} />
+              </View>
+              <T variant="caption" style={{ flex: 1 }} numberOfLines={2}>
+                {text}
+              </T>
+            </View>
+          ))}
+        </View>
+
+        {/* Search */}
+        <View
+          style={{
+            flexDirection: "row",
+            alignItems: "center",
+            gap: 10,
+            borderWidth: 1.5,
+            borderColor: c.line,
+            backgroundColor: c.surface,
+            borderRadius: 999,
+            paddingHorizontal: 16,
+            height: 50,
+          }}
+        >
+          <Search size={19} color={c.muted} />
+          <TextInput
+            style={{ flex: 1, fontFamily: Fonts.bodySemi, fontSize: 15, color: c.ink, paddingVertical: 0 }}
+            placeholder="Search chapters"
+            placeholderTextColor={c.subtle}
+            value={searchQuery}
+            onChangeText={setSearchQuery}
+            returnKeyType="search"
+          />
+          {searchQuery.length > 0 && (
+            <Tap hitSlop={10} onPress={() => setSearchQuery("")}>
+              <X size={18} color={c.muted} />
+            </Tap>
+          )}
+        </View>
+
+        <View style={{ gap: 10 }}>
+          <T variant="h2">Chapters</T>
           {token && (
-            <View style={[styles.progressBadge, { backgroundColor: isDark ? "#17151C" : "#EFEAF7" }]}>
-              <Text style={[styles.progressBadgeText, { color: isDark ? "#C9AAFB" : "#7A4BDB" }]}>
-                {courseProgress}% Complete
-              </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 14 }}>
+              {[
+                { label: "Finished", n: course.filter((ch) => calculateChapterProgress(ch) >= 100).length, color: c.mint },
+                { label: "Started", n: course.filter((ch) => calculateChapterProgress(ch) < 100 && ch.items.some(isItemDone)).length, color: c.butter },
+                { label: "Not started", n: course.filter((ch) => !ch.items.some(isItemDone)).length, color: c.surface2 },
+              ].map((g) => (
+                <View key={g.label} style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+                  <View style={{ width: 12, height: 12, borderRadius: 4, backgroundColor: g.color, borderWidth: 1, borderColor: c.line }} />
+                  <T variant="caption">
+                    {g.label} · {g.n}
+                  </T>
+                </View>
+              ))}
             </View>
           )}
         </View>
 
-        {/* Search Bar */}
-        <View style={[styles.searchBar, { backgroundColor: isDark ? "#17151C" : "#EFEAF7" }]}>
-          <Search size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-          <TextInput
-            style={[styles.searchInput, { color: isDark ? "#F4F1F8" : "#0B0A0F" }]}
-            placeholder="Search chapters..."
-            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
-            value={searchQuery}
-            onChangeText={setSearchQuery}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity activeOpacity={0.7} onPress={clearSearch} style={styles.clearButton}>
-              <X size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </TouchableOpacity>
-          )}
-        </View>
-      </View>
+        <View style={{ gap: 10, marginTop: -6 }}>
+          {filtered.length === 0 ? (
+            <EmptyState icon={Search} title="Nothing found" text={`No chapter matches "${searchQuery}".`} />
+          ) : (
+            filtered.map((chapter) => {
+              const index = course.indexOf(chapter);
+              const progress = calculateChapterProgress(chapter);
+              const lessonCount = chapter.items.filter((i) => i.type === "lesson").length;
+              const quizCount = chapter.items.filter((i) => i.type === "quiz").length;
+              // Colour = status: finished green, started yellow, not started grey
+              const started = !!token && chapter.items.some(isItemDone);
+              const tone = !token ? "neutral" : progress >= 100 ? "mint" : started ? "butter" : "neutral";
 
-      {/* Chapters List */}
-      <ScrollView
-        ref={scrollRef}
-        contentContainerStyle={styles.scrollContent}
-        showsVerticalScrollIndicator={false}
-      >
-        {filteredCourse.length === 0 ? (
-          <View style={styles.emptyState}>
-            <Text style={[styles.emptyStateText, { color: isDark ? "#9C95A8" : "#6B6577" }]}>
-              No chapters found matching "{searchQuery}"
-            </Text>
-          </View>
-        ) : (
-          filteredCourse.map((chapter, cIndex) => {
-            const chapterProgress = calculateChapterProgress(chapter);
-            const chapterColor = getChapterColor(chapterProgress);
-
-            // Chapters are never locked - locking is at the lesson/quiz level based on isFree flag
-            const isLocked = false;
-
-            const lessonsCount = chapter.items.filter((i) => i.type === "lesson").length;
-            const quizzesCount = chapter.items.filter((i) => i.type === "quiz").length;
-
-            // Create the chapter card element
-            const chapterCard = (
-              <TouchableOpacity
-                activeOpacity={0.7}
-                onPress={() => {
-                  router.push(`/course/${chapter.id}` as any);
-                }}
-                style={[
-                  styles.chapterCard,
-                  {
-                    backgroundColor: isDark ? "#17151C" : "#ffffff",
-                    borderLeftColor: chapterColor,
-                  },
-                ]}
-              >
-                {/* Title and Progress */}
-                <View style={styles.headerRow}>
-                  <Text
-                    style={[
-                      styles.chapterTitle,
-                      { color: isDark ? "#F4F1F8" : "#0B0A0F" },
-                    ]}
-                  >
-                    {chapter.title}
-                  </Text>
-                  {token && (
-                    <View style={styles.progressContainer}>
-                      <View style={styles.progressCenter}>
-                        <Text style={[styles.progressText, { color: chapterColor }]}>
-                          {chapterProgress}%
-                        </Text>
-                      </View>
-                    </View>
-                  )}
-                </View>
-
-                {/* Stats */}
-                <Text
-                  style={[
-                    styles.statsText,
-                    { color: isDark ? "#9C95A8" : "#6B6577" },
-                  ]}
+              const row = (
+                <Tap
+                  onPress={() => router.push(`/course/${chapter.id}` as any)}
+                  style={({ pressed }) => ({
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: 12,
+                    backgroundColor: c.surface,
+                    borderColor: c.line,
+                    borderWidth: 1,
+                    borderRadius: 20,
+                    padding: 10,
+                    paddingRight: 14,
+                    opacity: pressed ? 0.85 : 1,
+                  })}
                 >
-                  {lessonsCount} lessons · {quizzesCount} quizzes
-                </Text>
-
-                {/* Footer */}
-                {/* <View style={styles.footerRow}>
-                  
-                  <View
-                    style={[
-                      styles.badge,
-                      { backgroundColor: isDark ? "#2B2733" : "#EFEAF7" },
-                    ]}
-                  >
-                    <BookMarked size={14} color={isDark ? "#9C95A8" : "#6B6577"} />
-                    <Text
-                      style={[
-                        styles.badgeText,
-                        { color: isDark ? "#9C95A8" : "#6B6577" },
-                      ]}
-                    >
-                      {chapter.items.length} items
-                    </Text>
-                  </View>
-
-                 
-                  <View style={styles.actionsRow}>
-                    {isLocked && (
-                      <Lock size={16} color="#8A5CE6" style={styles.lockIcon} />
+                  <Thumb text={String(index + 1).padStart(2, "0")} tone={tone} />
+                  <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
+                    <T variant="bodyStrong" numberOfLines={2}>
+                      {chapter.title.trim()}
+                    </T>
+                    <T variant="caption">
+                      {plural(lessonCount, "lesson")} · {plural(quizCount, "quiz")}
+                    </T>
+                    {token && progress > 0 && progress < 100 && (
+                      <View style={{ height: 4, borderRadius: 4, backgroundColor: c.line, marginTop: 4, overflow: "hidden" }}>
+                        <View style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: `${progress}%`, backgroundColor: c.ink }} />
+                      </View>
                     )}
-                   
                   </View>
-                </View> */}
-              </TouchableOpacity>
-            );
+                  {token && (
+                    <T variant="smallStrong" color={progress >= 100 ? c.success : progress > 0 ? c.ink : c.subtle}>
+                      {progress}%
+                    </T>
+                  )}
+                </Tap>
+              );
 
-            // Wrap with tooltip if this is the first chapter and tour is active
-            if (cIndex === 0 && tourActive && currentStep === TOUR_STEPS.CHOOSE_TOPIC) {
-              return (
-            
+              if (index === 0 && tourActive && currentStep === TOUR_STEPS.CHOOSE_TOPIC) {
+                return (
                   <TourTooltip
-                  key={999}
-                    visible={true}
+                    key={chapter.id}
+                    visible
                     onNext={handleTourNext}
                     onPrev={handleTourPrev}
                     onSkip={skipTour}
                     onClose={() => {}}
-                    title={chooseTopicInfo?.title || ''}
-                    content={chooseTopicInfo?.content || ''}
+                    title={chooseTopicInfo?.title || ""}
+                    content={chooseTopicInfo?.content || ""}
                     stepNumber={TOUR_STEPS.CHOOSE_TOPIC + 1}
                     totalSteps={TOTAL_TOUR_STEPS}
                     placement="bottom"
                     nextButtonText="Next"
                     skipButtonText="Skip Tour"
-                    showSkipButton={true}
+                    showSkipButton
                   >
-                    <View style={{
-                    width: CHAPTER_CARD_WIDTH,
-                    paddingHorizontal: 0,
-                  }}>
-                    {chapterCard}
-                    </View>
+                    <View>{row}</View>
                   </TourTooltip>
-              );
-            }
+                );
+              }
+              return <View key={chapter.id}>{row}</View>;
+            })
+          )}
+        </View>
+      </Screen>
 
-            // Return normal card without tooltip
-            return <View key={cIndex}>{chapterCard}</View>;
-          })
-        )}
-      </ScrollView>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-  },
-  headerTitleRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 16,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: "bold",
-  },
-  progressBadge: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  progressBadgeText: {
-    fontSize: 14,
-    fontWeight: "600",
-  },
-  searchBar: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 12,
-    paddingHorizontal: 16,
-    paddingVertical: Platform.OS === 'ios' ? 12 : 6,
-  },
-  searchInput: {
-    flex: 1,
-    marginLeft: 12,
-    fontSize: 16,
-  },
-  clearButton: {
-    marginLeft: 8,
-  },
-  scrollContent: {
-    padding: 16,
-    paddingBottom: 120,
-  },
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 48,
-  },
-  emptyStateText: {
-    fontSize: 16,
-    textAlign: "center",
-  },
-  chapterCard: {
-    marginBottom: 16,
-    borderRadius: 16,
-    padding: 16,
-    borderLeftWidth: 4,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 8,
-    elevation: 3,
-  },
-  headerRow: {
-    flexDirection: "row",
-    alignItems: "flex-start",
-    justifyContent: "space-between",
-    marginBottom: 12,
-  },
-  chapterTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    flex: 1,
-  },
-  progressContainer: {
-    marginLeft: 8,
-  },
-  progressCenter: {
-    position: "relative",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  progressText: {
-    fontSize: 18,
-    fontWeight: "bold",
-  },
-  statsText: {
-    fontSize: 14,
-    marginBottom: 8,
-  },
-  footerRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-  },
-  badge: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 20,
-  },
-  badgeText: {
-    marginLeft: 6,
-    fontSize: 12,
-  },
-  actionsRow: {
-    flexDirection: "row",
-    alignItems: "center",
-  },
-  lockIcon: {
-    marginRight: 12,
-  },
-});
-
-// type CourseItem = {
-//   id: string;
-//   title: string;
-//   type: "lesson" | "quiz";
-//   chapterId: string;
-//   progress?: any[];
-//   results?: any[];
-// };
-
-// export default function HomeScreen() {
-//   const router = useRouter();
-//   const [loading, setLoading] = useState(true);
-//   const [course, setCourse] = useState<any>(null);
-//   const scrollRef = useRef<ScrollView>(null);
-//   const { token } = useAuth();
-//   const insets = useSafeAreaInsets();
-//   const colorScheme = useColorScheme();
-//   const { getFullCourseWithProgress,getFullCourse } = useCourseDatabase();
-
-//   const isDark = colorScheme === "dark";
-
-//   const bgColor = isDark ? "#0B0A0F" : "#F4F1F9";
-//   const textColor = isDark ? "#EFEAF7" : "#0B0A0F";
-//   const subTextColor = isDark ? "#CFC9DA" : "#6B6577";
-
-//   useEffect(() => {
-//     const load = async () => {
-//       setLoading(true);
-//       let res;
-//       if (!token) {
-//         res = await getFullCourse();
-//         //({ success, data } = await fetchCourse());
-//       } else {
-//         res = await getFullCourseWithProgress();
-//         //({ success, data } = await fetchCourseWithProgress(token));
-//       }
-
-//       if (res.success  && res.chapters) {
-//         setCourse(res.chapters);
-//         setTimeout(() => {
-//           const firstUnfinishedIndex = findFirstUnfinishedIndex(res.chapters);
-//           if (scrollRef.current && firstUnfinishedIndex >= 0) {
-//             scrollRef.current.scrollTo({ y: firstUnfinishedIndex * 160, animated: true });
-//           }
-//         }, 300);
-//       }
-//       setLoading(false);
-//     };
-//     load();
-//   }, [token]);
-
-//   const findFirstUnfinishedIndex = (chapters: ChapterWithItems[]) => {
-//     if (!Array.isArray(chapters)) return -1;
-
-//     let index = 0;
-
-//     for (const chapter of chapters) {
-//       for (const item of chapter.items) {
-//         if (item.type === "lesson") {
-//           if (!item.progress?.length) return index;
-//         } else if (item.type === "quiz") {
-//           if (!item.results?.length) return index;
-//         }
-//         index++;
-//       }
-//     }
-
-//     return -1;
-//   };
-
-//   // const findFirstUnfinishedIndex = (course: any) => {
-//   //   let index = 0;
-//   //   for (const chapter of course.chapters) {
-//   //     for (const lesson of chapter.lessons) {
-//   //       if (!lesson.progress?.length) return index;
-//   //       index++;
-//   //     }
-//   //     for (const quiz of chapter.quizzes) {
-//   //       if (!quiz.results?.length) return index;
-//   //       index++;
-//   //     }
-//   //   }
-//   //   return -1;
-//   // };
-
-//   const calculateCourseProgress = () => {
-//     if (!course) return 0;
-//     let total = 0;
-//     let completed = 0;
-//     for (const chapter of course.chapters) {
-//       for (const lesson of chapter.lessons) {
-//         total++;
-//         if (lesson.progress?.length) completed++;
-//       }
-//       for (const quiz of chapter.quizzes) {
-//         total++;
-//         if (quiz.results?.length) completed++;
-//       }
-//     }
-//     return total ? Math.round((completed / total) * 100) : 0;
-//   };
-
-//   const allItems = useMemo(() => {
-//     if (!course) return [];
-//     return course.chapters.flatMap((chapter: any) => [
-//       ...(chapter.lessons || []).map((l: any) => ({ ...l, type: "lesson", chapterId: chapter.id })),
-//       ...(chapter.quizzes || []).map((q: any) => ({ ...q, type: "quiz", chapterId: chapter.id })),
-//     ]);
-//   }, [course]);
-
-//   if (loading) {
-//     return (
-//       <SafeAreaView style={{ flex: 1, backgroundColor: bgColor, justifyContent: "center", alignItems: "center" }}>
-//         <ActivityIndicator size="large" color="#8A5CE6" />
-//       </SafeAreaView>
-//     );
-//   }
-
-//   const courseProgress = calculateCourseProgress();
-//   const radius = 50;
-//   const strokeWidth = 10;
-//   const circumference = 2 * Math.PI * radius;
-//   const progressOffset = circumference - (circumference * courseProgress) / 100;
-
-//   return (
-//     <SafeAreaView style={{ flex: 1, backgroundColor: bgColor }} edges={['bottom']}>
-//       {/* <TopBlur /> */}
-
-//       {token ? (
-//         <View
-//           style={{
-//             paddingTop: insets.top + 8,
-//             paddingBottom: 12,
-//             paddingHorizontal: 16,
-//             borderBottomLeftRadius: 32,
-//             borderBottomRightRadius: 32,
-//             backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-//             shadowColor: "#000",
-//             shadowOffset: { width: 0, height: 5 },
-//             shadowOpacity: 0.1,
-//             shadowRadius: 12,
-//             elevation: 5,
-//             overflow: "hidden",
-//             alignItems: "center",
-//           }}
-//         >
-//           <LinearGradient
-//             colors={["#8A5CE6", "#8A5CE6", "#8A5CE6"]}
-//             start={{ x: 0, y: 0 }}
-//             end={{ x: 1, y: 1 }}
-//             style={StyleSheet.absoluteFill}
-//           />
-
-//           <Text style={{ fontSize: 22, fontWeight: "bold", color: "#fff", marginBottom: 16, textAlign: "center" }}>
-//             {course?.title}
-//           </Text>
-
-//           <View style={{ marginBottom: 16, justifyContent: "center", alignItems: "center" }}>
-//             <Svg width={radius * 2 + strokeWidth} height={radius * 2 + strokeWidth}>
-//               <Circle
-//                 cx={radius + strokeWidth / 2}
-//                 cy={radius + strokeWidth / 2}
-//                 r={radius}
-//                 stroke={isDark ? "#2B2733" : "#E5DFEE"}
-//                 strokeWidth={strokeWidth}
-//                 fill="none"
-//               />
-//               <Defs>
-//                 <LinearGradientSvg id="grad" x1="0" y1="0" x2="1" y2="0" gradientUnits="objectBoundingBox">
-//                   <Stop offset="0%" stopColor="#8A5CE6" />
-//                   <Stop offset="50%" stopColor="#8A5CE6" />
-//                   <Stop offset="100%" stopColor="#8A5CE6" />
-//                 </LinearGradientSvg>
-//               </Defs>
-//               <Circle
-//                 cx={radius + strokeWidth / 2}
-//                 cy={radius + strokeWidth / 2}
-//                 r={radius}
-//                 stroke="url(#grad)"
-//                 strokeWidth={strokeWidth}
-//                 strokeDasharray={circumference}
-//                 strokeDashoffset={progressOffset}
-//                 strokeLinecap="round"
-//                 fill="none"
-//               />
-//             </Svg>
-//             <Text style={{ position: "absolute", color: "#fff", fontSize: 18, fontWeight: "bold" }}>
-//               {courseProgress}%
-//             </Text>
-//           </View>
-//         </View>
-//       ) : (
-//         <View style={{ overflow: "hidden", shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 12, elevation: 5 }}>
-//           <Image
-//             source={require('@/assets/images/satCourseImg.jpg')}
-//             style={{ width: "100%", height: 250, resizeMode: "cover" }}
-//           />
-//         </View>
-//       )}
-
-//       <ScrollView
-//         ref={scrollRef}
-//         contentContainerStyle={{ padding: 16, paddingBottom: 34 }}
-//         showsVerticalScrollIndicator={false}
-//       >
-//         {course?.chapters?.map((chapter: any, cIndex: number) => {
-//           const chapterItems = allItems.filter((i: CourseItem) => i.chapterId === chapter.id);
-
-//           return (
-//             <View key={cIndex} style={{ marginBottom: 12 }}>
-//               <Text style={{ fontSize: 18, fontWeight: "600", color: textColor, marginBottom: 12 }}>
-//                 {chapter.title}
-//               </Text>
-
-//               {chapterItems.map((item: CourseItem) => {
-//                 const globalIndex = allItems.findIndex(
-//                   (i: CourseItem) => i.id === item.id && i.type === item.type
-//                 );
-
-//                 const gradientColors: [string, string, ...string[]] =
-//                   item.type === "lesson"
-//                     ? item.progress?.length
-//                       ? ["#8A5CE6", "#8A5CE6"] // completed lesson
-//                       : ["#E5E7EB", "#F3F4F6"] // incomplete lesson
-//                     : item.results?.length
-//                     ? ["#2E9A5E", "#2E9A5E"] // completed quiz
-//                     : ["#D1FAE5", "#A7F3D0"];
-
-//                 const textCol =
-//                   item.type === "lesson"
-//                     ? item.progress?.length
-//                       ? "#fff"
-//                       : "#0B0A0F"
-//                     : item.results?.length
-//                     ? "#fff"
-//                     : "#0B0A0F";
-
-//                 return (
-//                   <TouchableOpacity
-//                     key={`${item.type}-${item.id}`}
-//                     onPress={() =>
-//                       router.push({
-//                         pathname: `/course/${item.chapterId}/${item.type}/${item.id}` as any,
-//                         params: { allItems: JSON.stringify(allItems), currentIndex: globalIndex },
-//                       })
-//                     }
-//                     style={{
-//                       borderRadius: 14,
-//                       marginBottom: 16,
-//                       overflow: "hidden",
-//                       shadowColor: "#000",
-//                       shadowOffset: { width: 0, height: 4 },
-//                       shadowOpacity: 0.1,
-//                       shadowRadius: 8,
-//                       elevation: 5,
-//                     }}
-//                   >
-//                     <LinearGradient
-//                       colors={gradientColors}
-//                       start={{ x: 0, y: 0 }}
-//                       end={{ x: 1, y: 1 }}
-//                       style={{ flexDirection: 'row', alignItems: 'center', padding: 16, paddingVertical: 10, borderRadius: 14 }}
-//                     >
-//                       <View className="mr-4">
-//                         {item.type === 'lesson'
-//                           ? item.progress?.length
-//                             ? <BookOpenCheck size={28} color={textCol} />
-//                             : <BookOpen size={28} color={textCol} />
-//                           : item.results?.length
-//                           ? <BookCheck size={28} color={textCol} />
-//                           : <Pencil size={28} color={textCol} />}
-//                       </View>
-//                       <Text style={{ color: textCol, fontSize: 16, fontWeight: "600" }}>
-//                         {item.title}
-//                       </Text>
-//                     </LinearGradient>
-//                   </TouchableOpacity>
-//                 );
-//               })}
-//             </View>
-//           );
-//         })}
-//       </ScrollView>
-//     </SafeAreaView>
-//   );
-// }
