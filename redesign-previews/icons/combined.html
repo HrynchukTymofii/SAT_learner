@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SAT Learner Icons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&family=Manrope:wght@500;600;700&display=swap">
+<style>
+:root{--bg:#F4F1F9;--surface:#fff;--ink:#0B0A0F;--muted:#6B6577;--line:#E5DFEE;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0A0F;--surface:#17151C;--ink:#F4F1F8;--muted:#9C95A8;--line:#2B2733;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0A0F;--surface:#17151C;--ink:#F4F1F8;--muted:#9C95A8;--line:#2B2733;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;padding:28px 16px 64px}
+.wrap{max-width:1180px;margin:0 auto}
+header{display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap;margin-bottom:24px}
+h1{font-family:Outfit,sans-serif;font-size:30px;margin:0;letter-spacing:-.02em}
+h2{font-family:Outfit,sans-serif;font-size:22px;margin:40px 0 14px}
+p{margin:6px 0 0;color:var(--muted);max-width:66ch;line-height:1.5}
+.seg{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
+.seg button{font:inherit;border:0;background:none;color:var(--muted);padding:7px 14px;border-radius:999px;font-weight:700;font-size:13px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:26px;padding:18px;display:grid;gap:12px}
+.icon{aspect-ratio:1;border-radius:22.4%;overflow:hidden;box-shadow:0 10px 24px -14px rgba(0,0,0,.45)}
+.icon svg{display:block;width:100%;height:100%}
+.meta{display:flex;justify-content:space-between;align-items:baseline}
+.meta b{font-family:Outfit,sans-serif;font-size:18px}
+.meta span{color:var(--muted);font-weight:700;font-size:13px}
+.card p{margin:0;font-size:13.5px}
+.sizes{display:flex;gap:14px;align-items:end}
+.sizes figure{margin:0;display:grid;gap:5px;justify-items:center;font-size:11px;font-weight:600;color:var(--muted)}
+.phone{border-radius:40px;padding:34px 22px 40px;display:grid;grid-template-columns:repeat(4,1fr);gap:22px 14px;max-width:420px;background:linear-gradient(160deg,#5B4B8A,#1E1A2E 60%,#0B0A0F)}
+.phone.light{background:linear-gradient(160deg,#F8E8C8,#E4CDFF 55%,#C9AAFB)}
+.app{display:grid;gap:6px;justify-items:center}
+.app .icon{width:64px}
+.app small{color:#fff;font-size:11.5px;font-weight:600;text-shadow:0 1px 2px rgba(0,0,0,.4)}
+.phone.light .app small{color:#1E1A2E;text-shadow:none}
+.ph{width:64px;aspect-ratio:1;border-radius:22.4%;background:rgba(255,255,255,.16)}
+.phones{display:flex;gap:22px;flex-wrap:wrap}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>SAT Learner icon: parabola + SAT smile + Σ</h1>
+      <p>Six mixes of the three you liked. On iPhone and Android the name "SAT Learner" always shows under the icon, so the icon only needs to say "SAT" and "math" at a glance. Each card shows it large, at 60 px and at 40 px (Settings and notification size).</p>
+    </div>
+    <div class="seg" role="group" aria-label="Page theme">
+      <button data-t="light">Light</button><button data-t="dark">Dark</button><button data-t="auto" aria-pressed="true">Auto</button>
+    </div>
+  </header>
+
+  <div class="grid" id="grid"></div>
+
+  <h2>On a home screen</h2>
+  <div class="phones">
+    <div class="phone" id="phoneDark"></div>
+    <div class="phone light" id="phoneLight"></div>
+  </div>
+</div>
+
+<!-- 1024 × 1024 artwork; rounded corners come from the .icon mask, like the OS does -->
+
+<!-- A: SAT smile, the smile is a parabola with the vertex dot and its tangent -->
+<template id="a"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <text x="512" y="520" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="320" letter-spacing="-10" fill="#fff">SAT</text>
+  <path d="M232 610 Q512 900 792 610" fill="none" stroke="#C9AAFB" stroke-width="64" stroke-linecap="round"/>
+  <path d="M372 757 H652" stroke="#FEE7A6" stroke-width="18" stroke-linecap="round" stroke-dasharray="2 40"/>
+  <circle cx="512" cy="755" r="58" fill="#FEE7A6"/></svg></template>
+
+<!-- B: Σ tile on lavender, butter parabola smile under it -->
+<template id="b"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#E4CDFF"/>
+  <path d="M664 248V200H372L524 392 372 584H664V536" fill="none" stroke="#0B0A0F" stroke-width="78" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M232 680 Q512 960 792 680" fill="none" stroke="#0B0A0F" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="512" cy="820" r="54" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="22"/></svg></template>
+
+<!-- C: black, SAT on top, parabola below with the dot sliding + tangent (the paywall motif) -->
+<template id="c"><svg viewBox="0 0 1024 1024"><defs><pattern id="gc" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="rgba(255,255,255,.06)" stroke-width="3"/></pattern></defs>
+  <rect width="1024" height="1024" fill="#0B0A0F"/><rect width="1024" height="1024" fill="url(#gc)"/>
+  <text x="512" y="430" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="270" letter-spacing="-8" fill="#fff">SAT</text>
+  <path d="M200 560 Q512 1020 824 560" fill="none" stroke="#C9AAFB" stroke-width="56" stroke-linecap="round"/>
+  <path d="M549 811 L750 680" stroke="#FEE7A6" stroke-width="20" stroke-linecap="round"/>
+  <circle cx="649" cy="745" r="50" fill="#FEE7A6"/></svg></template>
+
+<!-- D: lavender graph paper, black SAT, smile parabola drawn in black with a butter dot -->
+<template id="d"><svg viewBox="0 0 1024 1024"><defs><pattern id="gd" width="64" height="64" patternUnits="userSpaceOnUse"><path d="M64 0H0V64" fill="none" stroke="rgba(11,10,15,.09)" stroke-width="3"/></pattern></defs>
+  <rect width="1024" height="1024" fill="#E4CDFF"/><rect width="1024" height="1024" fill="url(#gd)"/>
+  <text x="512" y="500" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="300" letter-spacing="-10" fill="#0B0A0F">SAT</text>
+  <path d="M222 590 Q512 920 802 590" fill="none" stroke="#0B0A0F" stroke-width="60" stroke-linecap="round"/>
+  <circle cx="512" cy="755" r="62" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="24"/></svg></template>
+
+<!-- E: black with a lavender Σ chip; a smile parabola wraps under it -->
+<template id="e"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <rect x="302" y="170" width="420" height="420" rx="120" fill="#E4CDFF"/>
+  <path transform="translate(512 380) scale(.48) translate(-512 -512)" d="M680 340V284H350L530 512 350 740H680V684" fill="none" stroke="#0B0A0F" stroke-width="110" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M200 650 Q512 1010 824 650" fill="none" stroke="#FEE7A6" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="512" cy="830" r="44" fill="#C9AAFB"/></svg></template>
+
+<!-- F: butter, the "A" of SAT is a parabola opening down (a vertex) with the dot on top -->
+<template id="f"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#FEE7A6"/>
+  <text x="250" y="640" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="300" fill="#0B0A0F">S</text>
+  <path d="M392 660 Q512 220 632 660" fill="none" stroke="#0B0A0F" stroke-width="64" stroke-linecap="round"/>
+  <path d="M432 540 H592" stroke="#0B0A0F" stroke-width="40" stroke-linecap="round"/>
+  <circle cx="512" cy="330" r="50" fill="#C9AAFB" stroke="#0B0A0F" stroke-width="22"/>
+  <text x="776" y="640" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="300" fill="#0B0A0F">T</text>
+  <path d="M262 780 Q512 900 762 780" fill="none" stroke="#0B0A0F" stroke-width="30" stroke-linecap="round" opacity=".85"/></svg></template>
+
+<!-- A2: A with the tangent at a point on the side, bold, dashed, running across the whole icon -->
+<template id="a2"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <text x="512" y="520" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="320" letter-spacing="-10" fill="#fff">SAT</text>
+  <path d="M232 610 Q512 900 792 610" fill="none" stroke="#C9AAFB" stroke-width="64" stroke-linecap="round"/>
+  <path d="M-40 1063 L1064 514" stroke="#FEE7A6" stroke-width="30" stroke-linecap="round" stroke-dasharray="54 40"/>
+  <circle cx="646" cy="722" r="62" fill="#FEE7A6"/></svg></template>
+
+<!-- B2: B with the sigma turned 90 degrees clockwise -->
+<template id="b2"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#E4CDFF"/>
+  <path transform="rotate(90 518 392)" d="M664 248V200H372L524 392 372 584H664V536" fill="none" stroke="#0B0A0F" stroke-width="78" stroke-linejoin="round" stroke-linecap="round"/>
+  <path d="M232 680 Q512 960 792 680" fill="none" stroke="#0B0A0F" stroke-width="56" stroke-linecap="round"/>
+  <circle cx="512" cy="820" r="54" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="22"/></svg></template>
+
+<!-- A3: bigger SAT; parabola from 40% (left edge) down to 10% (left of centre) and up out of the right edge at 70%;
+     dot on the rising side with its tangent, bold and dashed, running past the edges -->
+<template id="a3"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+  <text x="512" y="480" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="380" letter-spacing="-12" fill="#fff">SAT</text>
+  <path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+  <path d="M150 1080 L1064 656" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+  <circle cx="560" cy="890" r="66" fill="#FEE7A6"/></svg></template>
+
+<!-- A4: SAT bigger and centred; steeper right arm leaving the right edge at 60% -->
+<template id="a4"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-40 575 C240 1050 700 1075 1064 330" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-65 1243 L1335 471" stroke="#FEE7A6" stroke-width="50" stroke-linecap="round" stroke-dasharray="70 50"/>
+<circle cx="635" cy="857" r="68" fill="#FEE7A6"/>
+<text x="512" y="632" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="420" letter-spacing="-14" fill="#fff">SAT</text></svg></template>
+
+<!-- A5: the previous one with bigger SAT nudged left and the dot further right; dark and light -->
+<template id="a5d"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></svg></template>
+<template id="a5l"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></svg></template>
+
+<script>
+  const ideas = [
+    ["a5d", "Final candidate, dark", "The previous version with a bigger SAT in the same place, nudged a little left, and the dot moved a little to the right along the curve (tangent recalculated)."],
+    ["a5l", "Final candidate, light", "Same drawing on the app's light background: black SAT, a deeper lavender curve, a darker butter tangent so it shows on light, and the dot with a black ring."],
+    ["a4", "A, earlier", "SAT bigger and in the middle. The curve dips to about 10%, climbs more steeply and leaves the right edge at 60%. Dot and bold dashed tangent on the rising side."],
+    ["a3", "A, previous", "Bigger SAT. The parabola starts on the left at 40% height, dips to 10% just left of centre and leaves the right edge at 70%. The dot sits on the rising side with a bolder dashed tangent."],
+    ["a2", "A, new: long tangent", "Variation A with the dot moved to the side of the curve and its tangent line bold, dashed and running across the whole icon."],
+    ["b2", "B, new: Σ turned", "Variation B with the Σ turned 90° clockwise."],
+    ["a", "SAT smile + vertex", "The smile is a real parabola with a butter dot at its vertex and the tangent line. Closest to the SAT smile you liked, now clearly math."],
+    ["b", "Σ with a smile", "Today's Σ logo kept as is, with a parabola smile under it. Keeps the recognisable logo and adds the curve."],
+    ["c", "SAT + moving point", "Black graph paper, SAT on top, the paywall's parabola with the dot and tangent under it. Ties the icon to the app's own animation."],
+    ["d", "Lavender SAT smile", "Same idea as the first one on lavender graph paper, so it matches the app's cards. Softer on the home screen."],
+    ["e", "Σ chip + smile", "The Σ tile as a lavender chip on black, with a butter parabola smiling under it. Logo and smile together, very bold."],
+    ["f", "SAT with a parabola A", "The A in SAT is a parabola with its vertex dot. The most playful one: reads as SAT and as math at once."],
+  ];
+  const svg = (id) => document.getElementById(id).innerHTML;
+  const grid = document.getElementById("grid");
+  ideas.forEach(([id, name, text], n) => {
+    grid.insertAdjacentHTML("beforeend", `
+      <article class="card">
+        <div class="icon">${svg(id)}</div>
+        <div class="meta"><b>${name}</b><span>${n < 2 ? "latest" : n < 6 ? "earlier" : String.fromCharCode(59 + n)}</span></div>
+        <p>${text}</p>
+        <div class="sizes">
+          <figure><div class="icon" style="width:60px">${svg(id)}</div>60 px</figure>
+          <figure><div class="icon" style="width:40px">${svg(id)}</div>40 px</figure>
+        </div>
+      </article>`);
+  });
+  for (const phoneId of ["phoneDark", "phoneLight"]) {
+    const phone = document.getElementById(phoneId);
+    ideas.forEach(([id], n) => phone.insertAdjacentHTML("beforeend", `<div class="app"><div class="icon">${svg(id)}</div><small>SAT Learner</small></div>`));
+    for (let i = 0; i < 2; i++) phone.insertAdjacentHTML("beforeend", `<div class="app"><div class="ph"></div><small>&nbsp;</small></div>`);
+  }
+  const root = document.documentElement, btns = document.querySelectorAll("[data-t]");
+  btns.forEach((b) => b.onclick = () => {
+    if (b.dataset.t === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", b.dataset.t);
+    btns.forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+  });
+</script>
+</body>
+</html>

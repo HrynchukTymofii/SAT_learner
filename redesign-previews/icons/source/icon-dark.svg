@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024"><style>@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@800');</style><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></svg>

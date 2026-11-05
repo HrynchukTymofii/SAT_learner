@@ -1,0 +1,46 @@
+{
+  "project_info": {
+    "project_number": "329617813146",
+    "project_id": "sat-prep-469713",
+    "storage_bucket": "sat-prep-469713.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:329617813146:android:b08a7411bc749bf6b43923",
+        "android_client_info": {
+          "package_name": "com.hrynchuk.satprepapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "329617813146-lmmck18chg6mfgci5i4iddtialht09ij.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2GNyP7PGBa9L0_n9-fwfa6O25OEa93y0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "329617813146-lmmck18chg6mfgci5i4iddtialht09ij.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "329617813146-3o5aq7gfvejqoi3mudiar02tl4urhivu.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.hrynchuk.satprepapp"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

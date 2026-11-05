@@ -1,7 +1,7 @@
 import { ExpoConfig } from "expo/config";
 
 const config: ExpoConfig = {
-  name: "SAT Math Learner",
+  name: "SAT Learner",
   slug: "sat-prep-app",
   version: "1.0.8",
   orientation: "portrait",
@@ -22,9 +22,14 @@ const config: ExpoConfig = {
 
   android: {
     package: "com.hrynchuk.satprepapp",
+    // Firebase config for push notifications (FCM), project sat-prep-469713
+    googleServicesFile: "./google-services.json",
+    // Two layers so the launcher's mask (circle, rounded square...) crops the curve, not the SAT
     adaptiveIcon: {
       foregroundImage: "./assets/images/adaptive-icon.png",
-      backgroundColor: "#ffffff",
+      backgroundImage: "./assets/images/adaptive-background.png",
+      monochromeImage: "./assets/images/adaptive-monochrome.png",
+      backgroundColor: "#0B0A0F",
     },
     permissions: [
       "android.permission.POST_NOTIFICATIONS",
@@ -46,15 +51,16 @@ const config: ExpoConfig = {
         image: "./assets/images/splash-icon.png",
         imageWidth: 200,
         resizeMode: "contain",
-        backgroundColor: "#111827",
+        backgroundColor: "#0B0A0F",
       },
     ],
     "expo-secure-store",
     [
       "expo-notifications",
       {
-        icon: "./assets/images/icon.png",
-        color: "#111827",
+        // Android status-bar icon: white silhouette on transparent, tinted with `color`
+        icon: "./assets/images/notification-icon.png",
+        color: "#C9AAFB",
         sounds: [],
       },
     ],

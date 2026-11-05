@@ -1,0 +1,150 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Android Icon Shapes</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;800&family=Manrope:wght@600;700&display=swap">
+<style>
+:root{--bg:#F4F1F9;--surface:#fff;--ink:#0B0A0F;--muted:#6B6577;--line:#E5DFEE;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0B0A0F;--surface:#17151C;--ink:#F4F1F8;--muted:#9C95A8;--line:#2B2733;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0B0A0F;--surface:#17151C;--ink:#F4F1F8;--muted:#9C95A8;--line:#2B2733;color-scheme:dark}
+*{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,sans-serif;padding:28px 16px 60px}
+.wrap{max-width:1180px;margin:0 auto} h1,h2{font-family:Outfit,sans-serif;margin:0 0 8px} h1{font-size:28px} h2{font-size:21px;margin-top:34px}
+p{color:var(--muted);max-width:70ch;line-height:1.5;margin:0 0 18px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px;padding:16px;display:grid;gap:12px}
+.card b{font-family:Outfit,sans-serif;font-size:16px}
+.row{display:flex;gap:14px;align-items:end;flex-wrap:wrap}
+.ic{overflow:hidden;flex:none;box-shadow:0 8px 18px -10px rgba(0,0,0,.5)} .ic svg{display:block;width:100%;height:100%}
+.home{margin-top:14px;border-radius:26px;padding:22px} .hrow{display:flex;gap:26px;flex-wrap:wrap}
+.app{display:grid;gap:6px;justify-items:center} .app small{font-size:11.5px;font-weight:600;color:#888}
+</style></head><body><div class="wrap">
+<h1>Android icon shapes</h1>
+<p>Android launchers crop the icon to their own shape: a circle on many phones, a rounded square of about 35 to 40% on older Samsung, Xiaomi and similar, or a squircle on Pixel. Here the curve still runs off the edges and SAT is 95% of the iPhone size and sits a little lower-left, so the circle doesn't cut the T. Sizes: 192, 96 and 48 px.</p>
+<h2>Dark icon</h2><div class="grid"><div class="card"><b>Circle</b><div class="row"><div class="ic" style="width:192px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div></div></div><div class="card"><b>Rounded 40%</b><div class="row"><div class="ic" style="width:192px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div></div></div><div class="card"><b>Rounded 35%</b><div class="row"><div class="ic" style="width:192px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div></div></div><div class="card"><b>Squircle (Pixel / iOS-like)</b><div class="row"><div class="ic" style="width:192px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div></div></div></div><div class="home" style="background:#1E1A2E"><div class="hrow"><div class="app"><div class="ic" style="width:58px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><small>SAT Learner</small></div><div class="app"><div class="ic" style="width:58px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><small>SAT Learner</small></div><div class="app"><div class="ic" style="width:58px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><small>SAT Learner</small></div><div class="app"><div class="ic" style="width:58px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#0B0A0F"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#C9AAFB" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#FEE7A6" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#FFFFFF">SAT</text></g></svg></div><small>SAT Learner</small></div></div></div><h2>Light icon</h2><div class="grid"><div class="card"><b>Circle</b><div class="row"><div class="ic" style="width:192px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div></div></div><div class="card"><b>Rounded 40%</b><div class="row"><div class="ic" style="width:192px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div></div></div><div class="card"><b>Rounded 35%</b><div class="row"><div class="ic" style="width:192px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div></div></div><div class="card"><b>Squircle (Pixel / iOS-like)</b><div class="row"><div class="ic" style="width:192px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:96px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><div class="ic" style="width:48px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div></div></div></div><div class="home" style="background:#EDE6F7"><div class="hrow"><div class="app"><div class="ic" style="width:58px;border-radius:50%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><small>SAT Learner</small></div><div class="app"><div class="ic" style="width:58px;border-radius:40%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><small>SAT Learner</small></div><div class="app"><div class="ic" style="width:58px;border-radius:35%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><small>SAT Learner</small></div><div class="app"><div class="ic" style="width:58px;border-radius:22.4%"><svg viewBox="0 0 1024 1024"><rect width="1024" height="1024" fill="#F4F1F9"/>
+<path d="M-30 569 Q512 1410 1054 244" fill="none" stroke="#A57CF0" stroke-width="66" stroke-linecap="round"/>
+<path d="M-175 1402 L1425 303" stroke="#F2C14E" stroke-width="44" stroke-linecap="round" stroke-dasharray="66 48"/>
+<circle cx="625" cy="853" r="66" fill="#FEE7A6" stroke="#0B0A0F" stroke-width="20"/>
+<g transform="translate(490 560) scale(.95) translate(-512 -512)"><text x="492" y="488" text-anchor="middle" font-family="Outfit" font-weight="800" font-size="440" letter-spacing="-14" fill="#0B0A0F">SAT</text></g></svg></div><small>SAT Learner</small></div></div></div>
+</div></body></html>

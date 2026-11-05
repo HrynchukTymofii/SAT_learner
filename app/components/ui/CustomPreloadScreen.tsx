@@ -1,5 +1,5 @@
 import { ActivityIndicator, Image, View, useColorScheme as useSystemColorScheme } from "react-native";
-import { Palette, Pastel } from "@/constants/palette";
+import { Palette } from "@/constants/palette";
 
 /**
  * Shown while fonts and the database load (before the theme provider exists,
@@ -10,9 +10,7 @@ export default function CustomPreloadScreen() {
   const p = dark ? Palette.dark : Palette.light;
   return (
     <View style={{ flex: 1, backgroundColor: p.bg, alignItems: "center", justifyContent: "center", gap: 28 }}>
-      <View style={{ width: 112, height: 112, borderRadius: 36, backgroundColor: Pastel.lav, alignItems: "center", justifyContent: "center" }}>
-        <Image source={require("@/assets/images/splash-icon-light.png")} style={{ width: 72, height: 72 }} resizeMode="contain" />
-      </View>
+      <Image source={require("@/assets/images/icon.png")} style={{ width: 112, height: 112, borderRadius: 26 }} />
       <ActivityIndicator color={p.brand} />
     </View>
   );
