@@ -16,6 +16,10 @@ import { useQuizDatabase } from "@/lib/db/quiz";
 import { useColorScheme } from "@/hooks/useColorScheme";
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
 import { calculateSATScore } from "@/lib/utils";
+import { Play } from "lucide-react-native";
+import { Fonts, usePalette } from "@/constants/palette";
+import { EmptyState, Loading, PastelCard, PillButton, Screen, T, Tap, TopBar } from "@/components/ds";
+import { StopwatchArt } from "@/components/art";
 
 type Quiz = {
   id: string;
@@ -37,6 +41,7 @@ export default function TestsByTopicScreen() {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === "dark";
   const { fetchExamsLocal } = useQuizDatabase();
+  const c = usePalette();
 
   useEffect(() => {
     if (!token) router.push("/login");
@@ -70,7 +75,7 @@ export default function TestsByTopicScreen() {
   );
 
   if (loading) {
-    return <GraduationCap3DLoader />;
+    return <Loading />;
   }
 
   const handlePress = (quizId: string, isLocked: boolean) => {
@@ -98,399 +103,105 @@ export default function TestsByTopicScreen() {
     });
   };
 
+  const scoreOf = (q: Quiz) => calculateSATScore(Math.round((q.progress / 100) * q.questionCount), q.questionCount);
+  const locked = (index: number) => !user?.isPro && index > 1;
+  const attempted = quizzes.filter((q) => q.attemptCount > 0);
+  const best = attempted.reduce((m, q) => Math.max(m, scoreOf(q)), 0);
+  // Up next: the first exam you haven't taken (and can open), else the first one you can open
+  const nextIndex = (() => {
+    const fresh = quizzes.findIndex((q, i) => q.attemptCount === 0 && !locked(i));
+    return fresh >= 0 ? fresh : quizzes.findIndex((_, i) => !locked(i));
+  })();
+  const next = nextIndex >= 0 ? quizzes[nextIndex] : null;
+
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
-      {/* Header */}
-      <View
-        style={{
-          paddingTop: insets.top + 12,
-          paddingBottom: 16,
-          paddingHorizontal: 16,
-          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-          borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
-        }}
-      >
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 16,
-            alignSelf: "flex-start",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-            borderRadius: 12,
-          }}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-          <Text
-            style={{
-              color: isDark ? "#C9AAFB" : "#7A4BDB",
-              fontWeight: "600",
-              marginLeft: 6,
-              fontSize: 14,
-            }}
-          >
-            Back
-          </Text>
-        </TouchableOpacity>
-
-        {/* Title */}
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            color: isDark ? "#F4F1F8" : "#0B0A0F",
-            marginBottom: 8,
-          }}
-        >
-          SAT Math Exams
-        </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
-          Full-length practice tests with 44 questions
-        </Text>
-      </View>
-
-      {/* Content */}
-      <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {quizzes.length ? (
-          quizzes.map((quiz, index) => {
-            const isLocked = !user?.isPro && index > 1;
-            const correctAnswered =  Math.round((quiz.progress / 100) * quiz.questionCount)
-            const satScore = calculateSATScore(correctAnswered, quiz.questionCount);
-            const scoreColor = satScore
-              ? getScoreColor(satScore)
-              : isDark
-                ? "#9C95A8"
-                : "#6B6577";
-            const hasAttempt = quiz.attemptCount > 0;
-
-            return (
-              <TouchableOpacity
-                key={quiz.id}
-                onPress={() => handlePress(quiz.id, isLocked)}
-                activeOpacity={0.7}
-                style={{
-                  marginBottom: 20,
-                  backgroundColor: isDark ? "#17151C" : "#ffffff",
-                  borderRadius: 16,
-                  padding: 20,
-                  borderLeftWidth: 4,
-                  borderLeftColor: hasAttempt ? scoreColor : "#8A5CE6",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 3,
-                }}
-              >
-                {/* Title and Lock */}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 16,
-                  }}
-                >
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontSize: 18,
-                        fontWeight: "bold",
-                        color: isDark ? "#F4F1F8" : "#0B0A0F",
-                        marginBottom: 4,
-                      }}
-                    >
-                      {quiz.title}
-                    </Text>
-                    {hasAttempt && (
-                      <Text
-                        style={{
-                          fontSize: 12,
-                          color: isDark ? "#9C95A8" : "#6B6577",
-                        }}
-                      >
-                        {quiz.attemptCount} attempt
-                        {quiz.attemptCount > 1 ? "s" : ""}
-                      </Text>
-                    )}
-                  </View>
-                  {isLocked && (
-                    <Lock
-                      size={20}
-                      color="#8A5CE6"
-                      style={{ marginLeft: 12 }}
-                    />
-                  )}
-                </View>
-
-                {/* Stats Grid */}
-                {hasAttempt ? (
-                  <>
-                    <View style={{ flexDirection: "row", gap: 12 }}>
-                      {/* SAT Score */}
-                      <View
-                        style={{
-                          backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                          borderRadius: 12,
-                          padding: 16,
-                          marginBottom: 12,
-                          borderWidth: 1,
-                          borderColor: scoreColor,
-                          flex: 1,
-                        }}
-                      >
-                        <View
-                          style={{
-                            flexDirection: "row",
-                            alignItems: "center",
-                            marginBottom: 8,
-                          }}
-                        >
-                          <Trophy
-                            size={20}
-                            color={scoreColor}
-                            style={{ marginRight: 8 }}
-                          />
-                          <Text
-                            style={{
-                              fontSize: 14,
-                              color: isDark ? "#9C95A8" : "#6B6577",
-                              fontWeight: "600",
-                            }}
-                          >
-                            SAT Score
-                          </Text>
-                        </View>
-                        <Text
-                          style={{
-                            fontSize: 32,
-                            fontWeight: "bold",
-                            color: scoreColor,
-                          }}
-                        >
-                          {satScore}
-                        </Text>
-                        <Text
-                          style={{
-                            fontSize: 12,
-                            color: isDark ? "#7E7889" : "#9C95A8",
-                            marginTop: 4,
-                          }}
-                        >
-                          out of 800
-                        </Text>
-                      </View>
-
-                      {/* Stats Row */}
-                      <View
-                        style={{
-                          flexDirection: "column",
-                          gap: 12,
-                          marginBottom: 12,
-                        }}
-                      >
-                        {/* Correct Answers */}
-                        <View
-                          style={{
-                            flex: 1,
-                            backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                            borderRadius: 12,
-                            padding: 12,
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                              marginBottom: 6,
-                            }}
-                          >
-                            <CheckCircle2
-                              size={16}
-                              color="#2E9A5E"
-                              style={{ marginRight: 6 }}
-                            />
-                            <Text
-                              style={{
-                                fontSize: 12,
-                                color: isDark ? "#9C95A8" : "#6B6577",
-                              }}
-                            >
-                              Correct
-                            </Text>
-                          </View>
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "flex-end",
-                              gap: 4,
-                            }}
-                          >
-                            <Text
-                              style={{
-                                fontSize: 20,
-                                fontWeight: "bold",
-                                color: isDark ? "#F4F1F8" : "#0B0A0F",
-                              }}
-                            >
-                              {Math.round(
-                                (quiz.progress / 100) * quiz.questionCount
-                              )}
-                            </Text>
-                            <Text
-                              style={{
-                                fontSize: 11,
-                                color: isDark ? "#7E7889" : "#9C95A8",
-                                paddingBottom: 2,
-                              }}
-                            >
-                              of {quiz.questionCount}
-                            </Text>
-                          </View>
-                        </View>
-
-                        {/* Accuracy */}
-                        <View
-                          style={{
-                            flex: 1,
-                            backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                            borderRadius: 12,
-                            padding: 12,
-                            justifyContent: "center",
-                          }}
-                        >
-                          <View
-                            style={{
-                              flexDirection: "row",
-                              alignItems: "center",
-                            }}
-                          >
-                            <Target
-                              size={14}
-                              color={
-                                quiz.progress >= 80
-                                  ? "#2E9A5E"
-                                  : quiz.progress >= 60
-                                    ? "#E5A50A"
-                                    : "#8A5CE6"
-                              }
-                              style={{ marginRight: 6 }}
-                            />
-
-                            <Text
-                              style={{
-                                fontSize: 12, // reduced font size
-                                fontWeight: "600",
-                                color: isDark ? "#F4F1F8" : "#0B0A0F",
-                              }}
-                            >
-                              {quiz.progress >= 85
-                                ? "Excellent"
-                                : quiz.progress >= 60
-                                  ? "Good"
-                                  : "Practice"}
-                            </Text>
-                          </View>
-                        </View>
-                      </View>
-                    </View>
-
-                    {/* Last Attempt */}
-                    {quiz.lastAttempt && (
-                      <View
-                        style={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          paddingTop: 12,
-                          borderTopWidth: 1,
-                          borderTopColor: isDark ? "#2B2733" : "#E5DFEE",
-                        }}
-                      >
-                        <Calendar
-                          size={14}
-                          color={isDark ? "#9C95A8" : "#6B6577"}
-                          style={{ marginRight: 6 }}
-                        />
-                        <Text
-                          style={{
-                            fontSize: 12,
-                            color: isDark ? "#9C95A8" : "#6B6577",
-                          }}
-                        >
-                          Last attempt: {formatDate(quiz.lastAttempt)}
-                        </Text>
-                      </View>
-                    )}
-                  </>
-                ) : (
-                  <View
-                    style={{
-                      backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                      borderRadius: 12,
-                      padding: 16,
-                      alignItems: "center",
-                    }}
-                  >
-                    <Clock
-                      size={32}
-                      color={isDark ? "#C9AAFB" : "#7A4BDB"}
-                      style={{ marginBottom: 12 }}
-                    />
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "600",
-                        color: isDark ? "#F4F1F8" : "#0B0A0F",
-                        marginBottom: 4,
-                      }}
-                    >
-                      Not Started
-                    </Text>
-                    <Text
-                      style={{
-                        fontSize: 14,
-                        color: isDark ? "#9C95A8" : "#6B6577",
-                        textAlign: "center",
-                      }}
-                    >
-                      {quiz.questionCount} questions · ~70 minutes
-                    </Text>
-                  </View>
-                )}
-              </TouchableOpacity>
-            );
-          })
-        ) : (
-          <View
-            style={{
-              alignItems: "center",
-              justifyContent: "center",
-              marginTop: 48,
-            }}
-          >
-            <Target size={40} color={isDark ? "#9C95A8" : "#6B6577"} />
-            <Text
-              style={{
-                fontSize: 16,
-                color: isDark ? "#9C95A8" : "#6B6577",
-                marginTop: 8,
-                textAlign: "center",
-              }}
-            >
-              No exams available
-            </Text>
+    <Screen header={<TopBar />}>
+      <View style={{ flexDirection: "row", alignItems: "flex-end", justifyContent: "space-between", gap: 12 }}>
+        <View style={{ flex: 1, gap: 6 }}>
+          <T variant="title">Practice exams</T>
+          <T variant="small" style={{ fontSize: 14 }}>
+            Full SAT Math: 44 questions, 70 min
+          </T>
+        </View>
+        {attempted.length > 0 && (
+          <View style={{ alignItems: "flex-end" }}>
+            <T variant="caption">Best score</T>
+            <T style={{ fontFamily: Fonts.display, fontSize: 28, lineHeight: 32 }} color={best >= 700 ? c.success : c.ink}>
+              {best}
+            </T>
           </View>
         )}
-      </ScrollView>
-    </View>
+      </View>
+
+      {quizzes.length === 0 ? (
+        <EmptyState icon={Target} title="No exams yet" text="Exams show up here once the course is downloaded." />
+      ) : (
+        <>
+          {next && (
+            <PastelCard tone="lav" radius={28} onPress={() => handlePress(next.id, false)} style={{ padding: 20, gap: 8, minHeight: 190 }}>
+              <View style={{ position: "absolute", right: 14, top: 14 }} pointerEvents="none">
+                <StopwatchArt size={96} />
+              </View>
+              <T variant="smallStrong" onPastel style={{ opacity: 0.7 }}>
+                {next.attemptCount > 0 ? "Try again" : "Up next"} · Exam {nextIndex + 1}
+              </T>
+              <T style={{ fontFamily: Fonts.display, fontSize: 26, lineHeight: 29, letterSpacing: -0.5, paddingRight: 110 }} onPastel numberOfLines={2}>
+                {next.title.trim()}
+              </T>
+              <PillButton tone="white" title={next.attemptCount > 0 ? "Retake exam" : "Start exam"} icon={Play} onPress={() => handlePress(next.id, false)} style={{ marginTop: "auto" }} />
+            </PastelCard>
+          )}
+
+          <View style={{ gap: 12 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "baseline" }}>
+              <T variant="h2">All exams</T>
+              <T variant="caption">
+                {attempted.length} of {quizzes.length} taken
+              </T>
+            </View>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 10 }}>
+              {quizzes.map((quiz, index) => {
+                const isLocked = locked(index);
+                const taken = quiz.attemptCount > 0;
+                const score = taken ? scoreOf(quiz) : 0;
+                const bg = isLocked ? c.surface2 : taken ? (score >= 700 ? c.mint : c.butter) : c.surface;
+                const fg = taken && !isLocked ? c.onPastel : c.ink;
+                return (
+                  <Tap
+                    key={quiz.id}
+                    onPress={() => handlePress(quiz.id, isLocked)}
+                    accessibilityLabel={`${quiz.title}${taken ? `, score ${score}` : ""}${isLocked ? ", PRO" : ""}`}
+                    style={({ pressed }) => ({
+                      width: "31.5%",
+                      aspectRatio: 0.95,
+                      borderRadius: 22,
+                      padding: 12,
+                      justifyContent: "space-between",
+                      backgroundColor: bg,
+                      borderWidth: taken && !isLocked ? 0 : 1,
+                      borderColor: c.line,
+                      opacity: pressed ? 0.85 : isLocked ? 0.75 : 1,
+                    })}
+                  >
+                    <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+                      <T variant="caption" color={taken && !isLocked ? c.onPastel : c.muted}>
+                        Exam
+                      </T>
+                      {isLocked ? <Lock size={14} color={c.muted} /> : index === nextIndex ? <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: c.brand }} /> : null}
+                    </View>
+                    <T style={{ fontFamily: Fonts.display, fontSize: 30, lineHeight: 34 }} color={fg}>
+                      {index + 1}
+                    </T>
+                    <T variant="smallStrong" color={taken && !isLocked ? c.onPastel : c.muted} style={{ fontSize: 12 }}>
+                      {isLocked ? "PRO" : taken ? `Score ${score}` : "New"}
+                    </T>
+                  </Tap>
+                );
+              })}
+            </View>
+          </View>
+        </>
+      )}
+    </Screen>
   );
 }

@@ -23,6 +23,10 @@ import {
 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { useQuizDatabase } from "@/lib/db/quiz";
+import { TrendingUp } from "lucide-react-native";
+import { TestList } from "@/components/tests/TestList";
+import { Loading, PillButton } from "@/components/ds";
+
 
 type Quiz = {
   id: string;
@@ -85,20 +89,7 @@ export default function ImproveScreen() {
     );
   }, [search, quizzes]);
 
-  if (loading) {
-    return (
-      <SafeAreaView
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: bgColor,
-        }}
-      >
-        <ActivityIndicator size="large" color="#8A5CE6" />
-      </SafeAreaView>
-    );
-  }
+  if (loading) return <Loading />;
 
   const getProgressGradient = (p: number): [string, string] => {
     // subtle muted gradients
@@ -113,185 +104,20 @@ export default function ImproveScreen() {
     router.push(`/tests/improve/${quizId}` as any);
 
   return (
-    <SafeAreaView
-      style={{
-        flex: 1,
-        backgroundColor: bgColor,
-        paddingBottom: 20,
-        paddingTop: 8,
-      }}
-    >
-      {/* Header */}
-      <LinearGradient
-        colors={["#8A5CE6", "#8A5CE6"]}
-        start={[0, 0]}
-        end={[1, 1]}
-        style={{
-          borderRadius: 16,
-          overflow: "hidden",
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.15,
-          shadowRadius: 8,
-          elevation: 5,
-          marginBottom: 16,
-          alignSelf: "flex-start",
-          marginLeft: 12,
-        }}
-      >
-        <TouchableOpacity
-          onPress={() => router.push("/tests")}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-          }}
-        >
-          <ArrowLeft size={18} color="#fff" />
-          <Text style={{ color: "#fff", fontWeight: "600", marginLeft: 6 }}>
-            Back
-          </Text>
-        </TouchableOpacity>
-      </LinearGradient>
-
-      {/* Page Heading */}
-      <View style={{ marginBottom: 8, marginHorizontal: 12 }}>
-        <Text
-          style={{
-            fontSize: 28,
-            fontWeight: "800",
-            color: isDark ? "#C9AAFB" : "#7A4BDB",
-            marginBottom: 4,
-          }}
-        >
-          Personalized Practice
-        </Text>
-        <Text
-          style={{
-            color: subTextColor,
-            fontSize: 15,
-            marginBottom: 8,
-            lineHeight: 20,
-          }}
-        >
-          Adaptive tasks tailored to your mistakes to help you improve
-          efficiently. Focus on the topics where you struggle the most, track
-          your progress, and gradually master the skills needed to excel on the
-          SAT Math exam.
-        </Text>
-      </View>
-
-      {/* Search */}
-      <TextInput
-        placeholder="Search topics..."
-        placeholderTextColor={subTextColor}
-        value={search}
-        onChangeText={setSearch}
-        style={{
-          marginHorizontal: 16,
-          marginBottom: 16,
-          paddingHorizontal: 16,
-          paddingVertical: 12,
-          borderRadius: 16,
-          backgroundColor: inputBg,
-          borderWidth: 1,
-          borderColor: inputBorder,
-          color: textColor,
-        }}
-      />
-
-      <ScrollView
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 30 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {filtered.length ? (
-          filtered.map((quiz) => {
-            const gradientColors = getProgressGradient(quiz.progress);
-            const itemTextColor = quiz.progress >= 60 ? "#ffffff" : textColor;
-
-            return (
-              <TouchableOpacity
-                key={quiz.id}
-                onPress={() => handlePress(quiz.id)}
-                style={{
-                  marginBottom: 16,
-                  borderRadius: 16,
-                  overflow: "hidden",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 4 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 5,
-                }}
-              >
-                <LinearGradient
-                  colors={gradientColors}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    padding: 16,
-                    borderRadius: 16,
-                  }}
-                >
-                  <BookCheck
-                    size={28}
-                    color={itemTextColor}
-                    style={{ marginRight: 12 }}
-                  />
-                  <View style={{ flex: 1 }}>
-                    <Text
-                      style={{
-                        fontSize: 16,
-                        fontWeight: "600",
-                        color: itemTextColor,
-                        marginBottom: 4,
-                      }}
-                    >
-                      {quiz.title}
-                    </Text>
-                    <View
-                      style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <Text style={{ fontSize: 14, color: itemTextColor }}>
-                        Questions: {quiz.questionCount}
-                      </Text>
-                      <Text
-                        style={{
-                          fontSize: 14,
-                          fontWeight: "600",
-                          color: itemTextColor,
-                        }}
-                      >
-                        {quiz.progress}%
-                      </Text>
-                    </View>
-                  </View>
-                </LinearGradient>
-              </TouchableOpacity>
-            );
-          })
-        ) : (
-          <View
-            style={{
-              justifyContent: "center",
-              alignItems: "center",
-              marginTop: 50,
-            }}
-          >
-            <BookOpen size={40} color={subTextColor} />
-            <Text style={{ fontSize: 16, color: subTextColor, marginTop: 8 }}>
-              {search ? "No topics found" : "No available topics"}
-            </Text>
-          </View>
-        )}
-      </ScrollView>
-    </SafeAreaView>
+    <TestList
+      title="Improve"
+      subtitle="Practice built from your mistakes, one topic at a time."
+      search={search}
+      onSearch={setSearch}
+      searchPlaceholder="Search topics"
+      items={filtered.map((quiz) => ({
+        id: quiz.id,
+        title: quiz.title.trim(),
+        subtitle: `${quiz.questionCount} questions`,
+        progress: quiz.progress,
+        onPress: () => handlePress(quiz.id),
+      }))}
+      empty={{ icon: TrendingUp, title: "Nothing to improve yet", text: "Finish a few quizzes and your practice shows up here." }}
+    />
   );
 }

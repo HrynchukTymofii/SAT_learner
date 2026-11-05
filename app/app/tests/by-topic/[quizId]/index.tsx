@@ -4,6 +4,8 @@ import { useLocalSearchParams, useRouter } from "expo-router"
 import { fetchQuizById } from "@/lib/api/quiz"
 import { useAuth } from "@/context/AuthContext"
 import QuizScreen from "@/components/quiz/QuizScreen"
+import { EmptyState, Loading, Screen, TopBar } from "@/components/ds"
+import { CircleAlert } from "lucide-react-native"
 import { useQuizDatabase } from "@/lib/db/quiz"
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader"
 
@@ -45,15 +47,15 @@ const QuizByTopicScreen = () => {
 
   if (loading || !token || !quizId) {
     return (
-      <GraduationCap3DLoader />
+      <Loading />
     );
   }
 
   if (error || !quizData) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-red-500">{error || "Something went wrong("}</Text>
-      </View>
+      <Screen header={<TopBar />} contentStyle={{ flexGrow: 1, justifyContent: "center" }}>
+        <EmptyState icon={CircleAlert} tone="rose" title="Couldn't open this test" text={error || "Something went wrong. Please try again."} action="Go back" onAction={() => router.back()} />
+      </Screen>
     )
   }
 
