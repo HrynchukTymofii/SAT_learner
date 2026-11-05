@@ -49,6 +49,20 @@ export type ChapterWithItems = {
   items: CourseItem[];
 };
 
+export type AchievementStats = {
+  lessons: number;
+  quizzes: number;
+  perfectQuizzes: number;
+  chaptersDone: number;
+  exams: number;
+  bestExam: number;
+  improvedRetakes: number;
+  longestStreak: number;
+  currentStreak: number;
+  activeDays: number;
+  savedQuestions: number;
+};
+
 export function useCourseDatabase() {
   const db = useSQLiteContext();
 
@@ -639,8 +653,8 @@ export function useCourseDatabase() {
             `
             SELECT COALESCE(SUM(l.points), 0) as earnedPoints
             FROM lessons l
-            JOIN lesson_progress lp ON lp.lessonId = l.id
-            WHERE l.chapterId = ? AND lp.completed = 1
+            WHERE l.chapterId = ?
+              AND EXISTS (SELECT 1 FROM lesson_progress lp WHERE lp.lessonId = l.id AND lp.completed = 1)
             `,
             [chapter.chapterId]
           );
@@ -655,20 +669,25 @@ export function useCourseDatabase() {
             [chapter.chapterId]
           );
 
-          // Get earned points from quiz results
+          // Earned quiz points: only the latest finished attempt of each quiz counts
+          // (every retake adds a row, summing them all pushed progress past 100%)
           const earnedQuizPointsResult = await db.getFirstAsync<{ earnedPoints: number }>(
             `
-            SELECT COALESCE(SUM(qr.score), 0) as earnedPoints
+            SELECT COALESCE(SUM(MIN(
+              COALESCE((SELECT qr.score FROM quiz_results qr
+                        WHERE qr.quizId = q.id AND qr.completed = 1
+                        ORDER BY qr.updatedAt DESC LIMIT 1), 0),
+              COALESCE(q.maxScore, 0)
+            )), 0) as earnedPoints
             FROM quizzes q
-            JOIN quiz_results qr ON qr.quizId = q.id
-            WHERE q.chapterId = ? AND qr.completed = 1
+            WHERE q.chapterId = ?
             `,
             [chapter.chapterId]
           );
 
           const totalPoints = (lessonPointsResult?.totalPoints ?? 0) + (quizMaxScoreResult?.totalMaxScore ?? 0);
           const earnedPoints = (earnedLessonPointsResult?.earnedPoints ?? 0) + (earnedQuizPointsResult?.earnedPoints ?? 0);
-          const progress = totalPoints > 0 ? Math.round((earnedPoints / totalPoints) * 100) : 0;
+          const progress = totalPoints > 0 ? Math.min(100, Math.round((earnedPoints / totalPoints) * 100)) : 0;
 
           return {
             id: chapter.chapterId,
@@ -687,5 +706,100 @@ export function useCourseDatabase() {
     }
   }
 
-  return { getCompletedLessonsCount, hasPerfectScoreInPublishedChapters, getCompletedQuizzesCount, getAverageScoreByChapter, hasHighSATScore, getFullCourse, getFullCourseWithProgress, getChapterItems, getRecentChapters }
+  /**
+   * Everything the achievements need, read from the local database in one go.
+   * `examsChapterId` is the chapter holding the full practice exams (scored on the 200-800 scale).
+   */
+  async function getAchievementStats(examsChapterId: string): Promise<AchievementStats> {
+    const empty: AchievementStats = {
+      lessons: 0, quizzes: 0, perfectQuizzes: 0, chaptersDone: 0, exams: 0, bestExam: 0,
+      improvedRetakes: 0, longestStreak: 0, currentStreak: 0, activeDays: 0, savedQuestions: 0,
+    };
+    try {
+      const one = async (sql: string, params: any[] = []) =>
+        ((await db.getFirstAsync<{ n: number }>(sql, params))?.n ?? 0) as number;
+
+      const lessons = await one(`SELECT COUNT(DISTINCT lessonId) AS n FROM lesson_progress WHERE completed = 1`);
+      const quizzes = await one(
+        `SELECT COUNT(DISTINCT qr.quizId) AS n FROM quiz_results qr JOIN quizzes q ON q.id = qr.quizId
+         WHERE qr.completed = 1 AND q.chapterId != ?`, [examsChapterId]);
+      const perfectQuizzes = await one(
+        `SELECT COUNT(DISTINCT qr.quizId) AS n FROM quiz_results qr JOIN quizzes q ON q.id = qr.quizId
+         WHERE qr.completed = 1 AND q.maxScore > 0 AND qr.score >= q.maxScore`);
+      const savedQuestions = await one(`SELECT COUNT(*) AS n FROM user_quiz_questions WHERE saved = 1`);
+      // Quizzes where the latest finished attempt beat the first one
+      const improvedRetakes = await one(
+        `SELECT COUNT(*) AS n FROM (SELECT DISTINCT quizId FROM quiz_results WHERE completed = 1) x
+         WHERE (SELECT score FROM quiz_results WHERE quizId = x.quizId AND completed = 1 ORDER BY updatedAt DESC LIMIT 1)
+             > (SELECT score FROM quiz_results WHERE quizId = x.quizId AND completed = 1 ORDER BY updatedAt ASC LIMIT 1)`);
+
+      // Chapters (not the exams one) where every published lesson and quiz is done
+      const chaptersDone = await one(
+        `SELECT COUNT(*) AS n FROM chapters c
+         WHERE c.isPublished = 1 AND c.id != ?
+           AND EXISTS (SELECT 1 FROM lessons l WHERE l.chapterId = c.id AND l.isPublished = 1)
+           AND NOT EXISTS (
+             SELECT 1 FROM lessons l WHERE l.chapterId = c.id AND l.isPublished = 1
+               AND NOT EXISTS (SELECT 1 FROM lesson_progress lp WHERE lp.lessonId = l.id AND lp.completed = 1))
+           AND NOT EXISTS (
+             SELECT 1 FROM quizzes q WHERE q.chapterId = c.id AND q.isPublished = 1
+               AND NOT EXISTS (SELECT 1 FROM quiz_results qr WHERE qr.quizId = q.id AND qr.completed = 1))`,
+        [examsChapterId]);
+
+      // Practice exams: count and best SAT score
+      const examRows = (await db.getAllAsync(
+        `SELECT qr.answers, q.id AS quizId, q.totalQuestions FROM quiz_results qr
+         JOIN quizzes q ON q.id = qr.quizId WHERE q.chapterId = ? AND qr.completed = 1`,
+        [examsChapterId])) as { answers: string; quizId: string; totalQuestions: number }[];
+      let bestExam = 0;
+      const answerKeys = new Map<string, { id: string; answers: string }[]>();
+      for (const row of examRows) {
+        try {
+          if (!answerKeys.has(row.quizId)) {
+            answerKeys.set(row.quizId, (await db.getAllAsync(`SELECT id, answers FROM quiz_questions WHERE quizId = ?`, [row.quizId])) as any);
+          }
+          const user = JSON.parse(row.answers || "{}");
+          let correct = 0;
+          for (const q of answerKeys.get(row.quizId)!) {
+            const mine: string[] = user[q.id] || [];
+            const key: string[] = JSON.parse(q.answers);
+            if (key.length === mine.length && key.every((a) => mine.includes(a))) correct++;
+          }
+          if (row.totalQuestions > 0) bestExam = Math.max(bestExam, calculateSATScore(correct, row.totalQuestions));
+        } catch {
+          // skip a result we can't read
+        }
+      }
+
+      // Study days: any finished lesson or quiz counts for that (local) day
+      const dayRows = (await db.getAllAsync(
+        `SELECT DISTINCT date(updatedAt, 'localtime') AS d FROM lesson_progress WHERE completed = 1 AND updatedAt IS NOT NULL
+         UNION
+         SELECT DISTINCT date(updatedAt, 'localtime') AS d FROM quiz_results WHERE completed = 1 AND updatedAt IS NOT NULL
+         ORDER BY d`)) as { d: string }[];
+      const days = dayRows.map((r) => r.d).filter(Boolean);
+      const dayNum = (d: string) => Math.round(new Date(d + "T00:00:00Z").getTime() / 86400000);
+      let longest = 0;
+      let run = 0;
+      for (let i = 0; i < days.length; i++) {
+        run = i > 0 && dayNum(days[i]) - dayNum(days[i - 1]) === 1 ? run + 1 : 1;
+        longest = Math.max(longest, run);
+      }
+      // Current streak: the run that ends today or yesterday
+      const now = new Date();
+      const today = Math.round(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()) / 86400000);
+      const last = days.length ? dayNum(days[days.length - 1]) : -10;
+      const currentStreak = today - last <= 1 ? run : 0;
+
+      return {
+        lessons, quizzes, perfectQuizzes, chaptersDone, exams: examRows.length, bestExam,
+        improvedRetakes, longestStreak: longest, currentStreak, activeDays: days.length, savedQuestions,
+      };
+    } catch (err) {
+      console.error("❌ Failed to read achievement stats:", err);
+      return empty;
+    }
+  }
+
+  return { getAchievementStats, getCompletedLessonsCount, hasPerfectScoreInPublishedChapters, getCompletedQuizzesCount, getAverageScoreByChapter, hasHighSATScore, getFullCourse, getFullCourseWithProgress, getChapterItems, getRecentChapters }
 }
