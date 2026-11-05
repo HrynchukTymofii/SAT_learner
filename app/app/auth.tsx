@@ -22,6 +22,9 @@ import {
 } from "@react-native-google-signin/google-signin";
 import { Mail } from "lucide-react-native";
 import { handleAppleLogin } from "@/hooks/useAppleLogin";
+import { Fonts, usePalette } from "@/constants/palette";
+import { LinkButton, PastelCard, PillButton, Screen, T, Tap } from "@/components/ds";
+import { SlopeArt } from "@/components/art";
 import { useLoadUserInBackground } from "@/lib/user";
 
 // Configure Google Sign-In
@@ -144,153 +147,72 @@ export default function AuthLandingScreen() {
   };
 
   return (
-    <View className="flex-1 bg-white dark:bg-gray-900">
-      <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          justifyContent: "center",
-          paddingHorizontal: 24,
-        }}
-        bounces={false}
-      >
-        {/* Logo */}
-        <View className="items-center mb-12">
-          <View className="w-24 h-24 bg-cyan-500 rounded-3xl items-center justify-center mb-8">
-            {/* Replace with your actual logo */}
-            <Image
-              source={require("@/assets/images/splash-icon-light.png")}
-              style={{ width: 90, height: 90 }}
-              resizeMode="contain"
-            />
-          </View>
-
-          <Text className="text-3xl font-bold text-gray-900 dark:text-white mb-2">
-            Let's Get Started!
-          </Text>
-          <Text className="text-gray-600 dark:text-gray-300 text-center">
-            Let's dive in into your account
-          </Text>
+    <Screen contentStyle={{ flexGrow: 1 }}>
+      <PastelCard tone="lav" radius={34} style={{ minHeight: 300, padding: 22, justifyContent: "flex-end", marginTop: 8 }}>
+        <View style={{ position: "absolute", right: 0, left: 0, top: 18, alignItems: "center" }} pointerEvents="none">
+          <SlopeArt width={190} height={178} />
         </View>
+        <T variant="smallStrong" onPastel style={{ marginBottom: 6 }}>
+          SAT Math Learner
+        </T>
+        <T style={{ fontFamily: Fonts.display, fontSize: 34, lineHeight: 36, letterSpacing: -0.8 }} onPastel>
+          Let's get you started
+        </T>
+      </PastelCard>
 
-        {/* Auth Options */}
-        <View className="mb-8">
-          {/* Google */}
-          <TouchableOpacity
-            onPress={handleGoogleAuth}
-            disabled={googleLoading}
-            activeOpacity={0.7}
-            className="flex-row items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 mb-4 shadow-sm"
-          >
-            {googleLoading ? (
-              <ActivityIndicator
-                size="small"
-                color="#8A5CE6"
-                className="mr-4"
-              />
-            ) : (
-              <Image
-                source={require("@/assets/images/google-logo.webp")}
-                style={{ width: 24, height: 24, marginRight: 16 }}
-              />
-            )}
-            <Text className="text-gray-900 dark:text-white font-medium text-base flex-1">
-              Continue with Google
-            </Text>
-          </TouchableOpacity>
+      <T variant="small" style={{ fontSize: 14.5, lineHeight: 21 }}>
+        Make a free account to save your answers, scores and points, and keep them on any phone.
+      </T>
 
-          {/* Apple - iOS only */}
-          {Platform.OS === "ios" && (
-            <TouchableOpacity
-              onPress={handleAppleAuth}
-              disabled={appleLoading}
-              activeOpacity={0.7}
-              className="flex-row items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 mb-4 shadow-sm"
-            >
-              {appleLoading ? (
-                <ActivityIndicator
-                  size="small"
-                  color="#8A5CE6"
-                  className="mr-4"
-                />
-              ) : (
-                <Image
-                  source={require("@/assets/images/apple-logo.png")}
-                  style={{ width: 24, height: 24, marginRight: 16 }}
-                />
-              )}
-              <Text className="text-gray-900 dark:text-white font-medium text-base flex-1">
-                Continue with Apple
-              </Text>
-            </TouchableOpacity>
-          )}
+      <View style={{ gap: 10 }}>
+        <AuthButton title="Continue with Google" loading={googleLoading} onPress={handleGoogleAuth} image={require("@/assets/images/google-logo.webp")} />
+        {Platform.OS === "ios" && (
+          <AuthButton title="Continue with Apple" loading={appleLoading} onPress={handleAppleAuth} image={require("@/assets/images/apple-logo.png")} tintDark />
+        )}
+        <PillButton title="Sign up with email" icon={Mail} onPress={handleEmailAuth} />
+      </View>
 
-          {/* Email */}
-          <TouchableOpacity
-            onPress={handleEmailAuth}
-            activeOpacity={0.7}
-            className="flex-row items-center bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-2xl px-6 py-4 shadow-sm"
-          >
-            <Mail size={24} color="#8A5CE6" style={{ marginRight: 16 }} />
-            <Text className="text-gray-900 dark:text-white font-medium text-base flex-1">
-              Continue with Email
-            </Text>
-          </TouchableOpacity>
-        </View>
+      <View style={{ flexDirection: "row", justifyContent: "center", gap: 6 }}>
+        <T variant="small">Already have an account?</T>
+        <LinkButton title="Log in" onPress={() => router.push({ pathname: "/login", params: { tab: "login" } } as any)} />
+      </View>
 
-        {/* Sign Up Button */}
-        <TouchableOpacity
-          onPress={() =>
-            router.push({
-              pathname: "/login",
-              params: { tab: "register" },
-            } as any)
-          }
-          activeOpacity={0.8}
-          className="bg-cyan-500 rounded-full py-4 items-center justify-center mb-4"
-        >
-          <Text className="text-white font-semibold text-base">Sign up</Text>
-        </TouchableOpacity>
+      <View style={{ flex: 1 }} />
+      <View style={{ flexDirection: "row", justifyContent: "center", gap: 18 }}>
+        <LinkButton title="Privacy Policy" onPress={() => Linking.openURL("https://www.satlearner.com/privacy-policy")} />
+        <LinkButton title="Terms of Service" onPress={() => Linking.openURL("https://www.satlearner.com/terms-of-service")} />
+      </View>
+    </Screen>
+  );
+}
 
-        {/* Sign In Button */}
-        <TouchableOpacity
-          onPress={() =>
-            router.push({ pathname: "/login", params: { tab: "login" } } as any)
-          }
-          activeOpacity={0.8}
-          className="bg-cyan-500/10 dark:bg-cyan-500/20 rounded-full py-4 items-center justify-center mb-8"
-        >
-          <Text className="text-cyan-500 dark:text-cyan-400 font-semibold text-base">
-            Sign in
-          </Text>
-        </TouchableOpacity>
-
-        {/* Footer Links */}
-        <View className="flex-row justify-center items-center">
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() =>
-              Linking.openURL("https://www.satlearner.com/privacy-policy")
-            }
-          >
-            <Text className="text-gray-500 dark:text-gray-400 text-sm">
-              Privacy Policy
-            </Text>
-          </TouchableOpacity>
-
-          <Text className="text-gray-400 dark:text-gray-500 mx-2">·</Text>
-
-          <TouchableOpacity
-            activeOpacity={0.7}
-            onPress={() =>
-              Linking.openURL("https://www.satlearner.com/terms-of-service")
-            }
-          >
-            <Text className="text-gray-500 dark:text-gray-400 text-sm">
-              Terms of Service
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </View>
+function AuthButton({ title, onPress, loading, image, tintDark }: { title: string; onPress: () => void; loading?: boolean; image: any; tintDark?: boolean }) {
+  const c = usePalette();
+  return (
+    <Tap
+      onPress={onPress}
+      disabled={loading}
+      style={({ pressed }) => ({
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10,
+        minHeight: 56,
+        borderRadius: 999,
+        borderWidth: 1.5,
+        borderColor: c.line,
+        backgroundColor: c.surface,
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
+      {loading ? (
+        <ActivityIndicator color={c.ink} />
+      ) : (
+        <>
+          <Image source={image} style={{ width: 20, height: 20, tintColor: tintDark && c.isDark ? "#fff" : undefined }} />
+          <T variant="bodyStrong">{title}</T>
+        </>
+      )}
+    </Tap>
   );
 }

@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
-  Image,
-  ActivityIndicator,
-  Linking,
-} from "react-native";
+import { View, ScrollView, KeyboardAvoidingView, Platform, Image, ActivityIndicator, Linking } from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { Fonts, usePalette } from "@/constants/palette";
+import { Checkbox, Field, GUTTER, PastelCard, PillButton, T, TopBar, Tap } from "@/components/ds";
+import { SlopeArt } from "@/components/art";
 import { useAuth } from "../context/AuthContext";
 import { router } from "expo-router";
 import { useSearchParams } from "expo-router/build/hooks";
@@ -22,11 +15,9 @@ import {
   isSuccessResponse,
   statusCodes,
 } from "@react-native-google-signin/google-signin";
-import { ArrowLeft, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
-import { AppleLoginButton } from "@/components/AppleLoginButton";
+import { ArrowRight, Mail, Lock, Eye, EyeOff } from "lucide-react-native";
 import { handleAppleLogin } from "@/hooks/useAppleLogin";
 import { useLoadUserInBackground } from "@/lib/user";
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 // Configure Google Sign-In
 GoogleSignin.configure({
@@ -50,8 +41,8 @@ export default function AuthScreen() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const { setToken, setUser } = useAuth();
   const { loadUserInBackground } = useLoadUserInBackground();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const c = usePalette();
+  const insets = useSafeAreaInsets();
 
   const returnUrl = params.get("returnUrl");
   const safeReturnUrl =
@@ -333,272 +324,149 @@ export default function AuthScreen() {
   };
 
   return (
-    <KeyboardAvoidingView
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#ffffff" }}
-    >
+    <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={{ flex: 1, backgroundColor: c.bg }}>
       <ScrollView
-        contentContainerStyle={{ flexGrow: 1 }}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: GUTTER, paddingTop: insets.top + 8, paddingBottom: insets.bottom + 20 }}
         keyboardShouldPersistTaps="handled"
         bounces={false}
+        showsVerticalScrollIndicator={false}
       >
-        {/* Header with Back Button */}
-        <View style={{ paddingTop: 48, paddingLeft: 24, paddingBottom: 24 }}>
-          <TouchableOpacity
-            onPress={handleBack}
-            activeOpacity={0.7}
-            style={{ marginBottom: 24 }}
-          >
-            <ArrowLeft size={24} color="#8A5CE6" />
-          </TouchableOpacity>
+        <TopBar onBack={handleBack} />
 
-          <Text style={{
-            fontSize: 36,
-            fontWeight: "bold",
-            color: isDark ? "#F4F1F8" : "#0B0A0F"
-          }}>
-            {mode === "login" ? "Welcome Back! 👋" : "Start Your Journey ✨"}
-          </Text>
-          <Text style={{
-            color: isDark ? "#CFC9DA" : "#4F4A5A",
-            marginTop: 12,
-            paddingRight: 24,
-            lineHeight: 24
-          }}>
-            {mode === "login"
-              ? "Continue your SAT Math preparation and ace your exam"
-              : "Join thousands of students mastering SAT Math. Sign up to get started"}
-          </Text>
+        {/* Hero card */}
+        <PastelCard tone={mode === "login" ? "lav" : "butter"} radius={30} style={{ marginTop: 16, padding: 22, minHeight: 170, justifyContent: "flex-end" }}>
+          <View style={{ position: "absolute", right: 6, top: 6 }} pointerEvents="none">
+            <SlopeArt width={120} height={112} />
+          </View>
+          <T variant="smallStrong" onPastel style={{ marginBottom: 6 }}>
+            {mode === "login" ? "Welcome back" : "New here?"}
+          </T>
+          <T style={{ fontFamily: Fonts.display, fontSize: 32, lineHeight: 34, letterSpacing: -0.7, maxWidth: "75%" }} onPastel>
+            {mode === "login" ? "Log in to keep going" : "Create your account"}
+          </T>
+        </PastelCard>
+
+        {/* Login / Sign up switch */}
+        <View style={{ flexDirection: "row", backgroundColor: c.surface2, borderRadius: 999, padding: 4, marginTop: 20 }}>
+          {(["login", "register"] as const).map((m) => (
+            <Tap
+              key={m}
+              onPress={() => setMode(m)}
+              style={{ flex: 1, alignItems: "center", paddingVertical: 11, borderRadius: 999, backgroundColor: mode === m ? c.inkButton : "transparent" }}
+            >
+              <T variant="smallStrong" color={mode === m ? c.inkButtonText : c.muted} style={{ fontSize: 14 }}>
+                {m === "login" ? "Log in" : "Sign up"}
+              </T>
+            </Tap>
+          ))}
         </View>
 
-        {/* Form Container */}
-        <View style={{ paddingHorizontal: 24, flex: 1 }}>
-          {/* Email Input */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={{
-              color: isDark ? "#CFC9DA" : "#2E2A35",
-              marginBottom: 8,
-              fontWeight: "500"
-            }}>Email</Text>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: isDark ? "#17151C" : "#F4F1F9",
-              borderWidth: 1,
-              borderColor: isDark ? "#2B2733" : "#E5DFEE",
-              borderRadius: 12,
-              paddingHorizontal: 16,
-              paddingVertical: Platform.OS === 'ios' ? 16 : 8
-            }}>
-              <Mail size={20} color="#8A5CE6" />
-              <TextInput
-                style={{ flex: 1, marginLeft: 12, color: isDark ? "#F4F1F8" : "#0B0A0F" }}
-                placeholder="Your email"
-                placeholderTextColor="#9C95A8"
-                value={email}
-                onChangeText={setEmail}
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-              />
-            </View>
-          </View>
+        <View style={{ gap: 14, marginTop: 20 }}>
+          <Field
+            label="Email"
+            icon={Mail}
+            placeholder="you@example.com"
+            value={email}
+            onChangeText={setEmail}
+            keyboardType="email-address"
+            autoCapitalize="none"
+            autoCorrect={false}
+            autoComplete="email"
+            returnKeyType="next"
+          />
+          <Field
+            label="Password"
+            icon={Lock}
+            placeholder={mode === "login" ? "Your password" : "At least 4 characters"}
+            secureTextEntry={!showPassword}
+            value={password}
+            onChangeText={setPassword}
+            autoComplete={mode === "login" ? "password" : "new-password"}
+            returnKeyType="go"
+            onSubmitEditing={handleEmailAuth}
+            right={
+              <Tap hitSlop={10} onPress={() => setShowPassword(!showPassword)} accessibilityLabel={showPassword ? "Hide password" : "Show password"}>
+                {showPassword ? <EyeOff size={19} color={c.muted} /> : <Eye size={19} color={c.muted} />}
+              </Tap>
+            }
+          />
 
-          {/* Password Input */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={{
-              color: isDark ? "#CFC9DA" : "#2E2A35",
-              marginBottom: 8,
-              fontWeight: "500"
-            }}>Password</Text>
-            <View style={{
-              flexDirection: "row",
-              alignItems: "center",
-              backgroundColor: isDark ? "#17151C" : "#F4F1F9",
-              borderWidth: 1,
-              borderColor: isDark ? "#2B2733" : "#E5DFEE",
-              borderRadius: 12,
-              paddingHorizontal: 16,
-              paddingVertical: Platform.OS === 'ios' ? 16 : 8
-            }}>
-              <Lock size={20} color="#8A5CE6" />
-              <TextInput
-                style={{ flex: 1, marginLeft: 12, color: isDark ? "#F4F1F8" : "#0B0A0F" }}
-                placeholder="Your password"
-                placeholderTextColor="#9C95A8"
-                secureTextEntry={!showPassword}
-                value={password}
-                onChangeText={setPassword}
-              />
-              <TouchableOpacity
-                onPress={() => setShowPassword(!showPassword)}
-                activeOpacity={0.7}
-              >
-                {showPassword ? (
-                  <EyeOff size={20} color="#8A5CE6" />
-                ) : (
-                  <Eye size={20} color="#8A5CE6" />
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-
-          {/* Remember Me & Forgot Password (Login Mode) */}
-          {/* {mode === "login" && (
-            <View className="flex-row justify-between items-center mb-6">
-              <TouchableOpacity
-                onPress={() => {
-                }}
-                activeOpacity={0.7}
-              >
-                <Text className="text-cyan-500 font-medium">
-                  Forgot Password?
-                </Text>
-              </TouchableOpacity>
-            </View>
-          )} */}
-
-          {/* Terms & Conditions (Register Mode) */}
           {mode === "register" && (
-            <View style={{ flexDirection: "row", alignItems: "flex-start", marginBottom: 24 }}>
-              <TouchableOpacity
-                onPress={() => setAgreeToTerms(!agreeToTerms)}
-                activeOpacity={0.7}
-                style={{ marginRight: 12, marginTop: 2 }}
-              >
-                <View
-                  style={{
-                    width: 20,
-                    height: 20,
-                    borderRadius: 4,
-                    borderWidth: 2,
-                    borderColor: agreeToTerms ? "#8A5CE6" : (isDark ? "#3A3542" : "#D9D2E5"),
-                    backgroundColor: agreeToTerms ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}
-                >
-                  {agreeToTerms && <Text style={{ color: "#ffffff", fontSize: 12 }}>✓</Text>}
-                </View>
-              </TouchableOpacity>
-              <Text style={{ flex: 1, color: isDark ? "#CFC9DA" : "#2E2A35", fontSize: 14 }}>
-                I agree to SAT Math Learner{" "}
-                <Text
-                  style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "500" }}
-                  onPress={() => Linking.openURL("https://www.satlearner.com/terms-of-service")}
-                >
+            <Tap onPress={() => setAgreeToTerms(!agreeToTerms)} style={{ flexDirection: "row", alignItems: "center", gap: 12, marginTop: 2 }}>
+              <Checkbox checked={agreeToTerms} onPress={() => setAgreeToTerms(!agreeToTerms)} />
+              <T variant="small" style={{ flex: 1 }}>
+                I agree to the{" "}
+                <T variant="smallStrong" color={c.brand} onPress={() => Linking.openURL("https://www.satlearner.com/terms-of-service")}>
                   Terms & Conditions
-                </Text>
-                .
-              </Text>
-            </View>
+                </T>
+              </T>
+            </Tap>
           )}
 
-          {/* Submit Button */}
-          <TouchableOpacity
+          <PillButton
+            title={mode === "login" ? "Log in" : "Create account"}
+            icon={ArrowRight}
+            loading={loading}
             onPress={handleEmailAuth}
-            disabled={loading}
-            activeOpacity={0.8}
-            style={{
-              backgroundColor: "#8A5CE6",
-              borderRadius: 24,
-              paddingVertical: 16,
-              alignItems: "center",
-              justifyContent: "center",
-              marginBottom: 24
-            }}
-          >
-            {loading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 16 }}>
-                {mode === "login" ? "Sign in" : "Sign up"}
-              </Text>
-            )}
-          </TouchableOpacity>
+            style={{ marginTop: 6 }}
+          />
+        </View>
 
-          {/* Divider */}
-          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 24 }}>
-            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#2B2733" : "#E5DFEE" }} />
-            <Text style={{ marginHorizontal: 16, color: isDark ? "#9C95A8" : "#6B6577" }}>or continue with</Text>
-            <View style={{ flex: 1, height: 1, backgroundColor: isDark ? "#2B2733" : "#E5DFEE" }} />
-          </View>
+        {/* Divider */}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 12, marginVertical: 22 }}>
+          <View style={{ flex: 1, height: 1, backgroundColor: c.line }} />
+          <T variant="caption">or</T>
+          <View style={{ flex: 1, height: 1, backgroundColor: c.line }} />
+        </View>
 
-          {/* Social Login Buttons */}
-          <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", gap: 32, marginBottom: 24 }}>
-            <TouchableOpacity
-              onPress={handleGoogleAuth}
-              disabled={googleLoading}
-              activeOpacity={0.7}
-              style={{
-                width: 112,
-                height: 64,
-                borderRadius: 48,
-                borderWidth: 1,
-                borderColor: isDark ? "#2B2733" : "#E5DFEE",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: isDark ? "#17151C" : "#ffffff"
-              }}
-            >
-              {googleLoading ? (
-                <ActivityIndicator size="small" color="#8A5CE6" />
-              ) : (
-                <Image
-                  source={require("@/assets/images/google-logo.webp")}
-                  style={{ width: 24, height: 24 }}
-                />
-              )}
-            </TouchableOpacity>
-
-            {Platform.OS === 'ios' && (
-              <TouchableOpacity
-                onPress={() =>
-                  handleAppleLogin({
-                    setToken,
-                    setUser,
-                    router,
-                    safeReturnUrl,
-                    loadUserInBackground,
-                  })
-                }
-                activeOpacity={0.7}
-                style={{
-                  width: 112,
-                  height: 64,
-                  borderRadius: 48,
-                  borderWidth: 1,
-                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: isDark ? "#17151C" : "#ffffff"
-                }}
-              >
-                <Image
-                  source={require("@/assets/images/apple-logo.png")}
-                  style={{ width: 24, height: 24 }}
-                />
-              </TouchableOpacity>
-            )}
-          </View>
-          {/* Toggle to other mode */}
-          <View style={{ flexDirection: "row", justifyContent: "center", alignItems: "center", marginTop: "auto", marginBottom: 96 }}>
-            <Text style={{ color: isDark ? "#9C95A8" : "#4F4A5A" }}>
-              {mode === "login"
-                ? "Don't have an account? "
-                : "Already have an account? "}
-            </Text>
-            <TouchableOpacity
-              onPress={() => setMode(mode === "login" ? "register" : "login")}
-              activeOpacity={0.7}
-            >
-              <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "500" }}>
-                {mode === "login" ? "Sign up" : "Sign in"}
-              </Text>
-            </TouchableOpacity>
-          </View>
+        <View style={{ gap: 10 }}>
+          <SocialButton
+            title="Continue with Google"
+            loading={googleLoading}
+            onPress={handleGoogleAuth}
+            image={require("@/assets/images/google-logo.webp")}
+          />
+          {Platform.OS === "ios" && (
+            <SocialButton
+              title="Continue with Apple"
+              onPress={() => handleAppleLogin({ setToken, setUser, router, safeReturnUrl, loadUserInBackground })}
+              image={require("@/assets/images/apple-logo.png")}
+              tintDark
+            />
+          )}
         </View>
       </ScrollView>
     </KeyboardAvoidingView>
+  );
+}
+
+function SocialButton({ title, onPress, loading, image, tintDark }: { title: string; onPress: () => void; loading?: boolean; image: any; tintDark?: boolean }) {
+  const c = usePalette();
+  return (
+    <Tap
+      onPress={onPress}
+      disabled={loading}
+      style={({ pressed }) => ({
+        flexDirection: "row",
+        alignItems: "center",
+        justifyContent: "center",
+        gap: 10,
+        minHeight: 54,
+        borderRadius: 999,
+        borderWidth: 1.5,
+        borderColor: c.line,
+        backgroundColor: c.surface,
+        opacity: pressed ? 0.8 : 1,
+      })}
+    >
+      {loading ? (
+        <ActivityIndicator color={c.ink} />
+      ) : (
+        <>
+          <Image source={image} style={{ width: 20, height: 20, tintColor: tintDark && c.isDark ? "#fff" : undefined }} />
+          <T variant="bodyStrong">{title}</T>
+        </>
+      )}
+    </Tap>
   );
 }
