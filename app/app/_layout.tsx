@@ -4,12 +4,20 @@ import {
   ThemeProvider,
 } from "expo-router/react-navigation";
 import { useFonts } from "expo-font";
-import { Outfit_600SemiBold, Outfit_700Bold } from "@expo-google-fonts/outfit";
+import { Outfit_500Medium, Outfit_600SemiBold, Outfit_700Bold } from "@expo-google-fonts/outfit";
+import {
+  Manrope_500Medium,
+  Manrope_600SemiBold,
+  Manrope_700Bold,
+  Manrope_800ExtraBold,
+} from "@expo-google-fonts/manrope";
+import { usePalette } from "@/constants/palette";
 import { Redirect, Stack, useRouter } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import "react-native-reanimated";
 import "../global.css";
 import Toast from "react-native-toast-message";
+import { toastConfig } from "@/components/ds/overlays";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { TourProvider } from "@/context/TourContext";
 import RatePromptSheet from "@/components/modals/RatePromptSheet";
@@ -29,7 +37,9 @@ import { AppState, Platform, useColorScheme } from "react-native";
 import { useLoadUserInBackground } from "@/lib/user";
 import { getUserSession } from "@/lib/session";
 import { upgradeToPro, removePro } from "@/lib/api/user";
-import { scheduleDailyStudyReminder } from "@/lib/notifications";
+import { scheduleDailyStudyReminder, isDailyReminderTurnedOff, requestNotificationPermissions } from "@/lib/notifications";
+import { registerPushToken } from "@/lib/inbox";
+import * as Notifications from "expo-notifications";
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -145,30 +155,70 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
     return () => subscription.remove();
   }, [token]);
 
-  // Setup daily study reminder notification
+  // Daily study reminder (once per launch) and push registration (again whenever the account changes).
+  // One effect so the permission prompt is asked once, before the push token is requested.
+  const reminderSetUp = useRef(false);
   useEffect(() => {
-    const setupNotifications = async () => {
+    // Local and push notifications only exist on iOS/Android
+    if (Platform.OS === "web") return;
+    (async () => {
       try {
-        await scheduleDailyStudyReminder();
-        //console.log("Daily study reminder scheduled successfully");
+        if (!reminderSetUp.current) {
+          reminderSetUp.current = true;
+          // Turned off in Settings: leave it off, but still ask so pushes can arrive
+          if (await isDailyReminderTurnedOff()) await requestNotificationPermissions();
+          else await scheduleDailyStudyReminder();
+        }
       } catch (error) {
         console.error("Failed to schedule daily reminder:", error);
       }
-    };
+      await registerPushToken(token ?? null);
+    })();
+  }, [token]);
 
-    setupNotifications();
-  }, []);
+  // Tapping a push from the inbox opens its link (or the inbox)
+  const router = useRouter();
+  useEffect(() => {
+    if (Platform.OS === "web") return;
+    const sub = Notifications.addNotificationResponseReceivedListener((response) => {
+      const data = response.notification.request.content.data as { type?: string; url?: string | null } | undefined;
+      if (data?.type !== "inbox") return;
+      router.push((data.url && data.url.startsWith("/") ? data.url : "/notifications") as any);
+    });
+    return () => sub.remove();
+  }, [router]);
 
   return <>{children}</>;
 }
 
 
+// Screens sit on the app background, so there is no white flash between pushes
+function ThemedStack({ children }: { children: React.ReactNode }) {
+  const c = usePalette();
+  return (
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
+      {children}
+    </Stack>
+  );
+}
+
+// Follows the theme chosen in Settings, not just the phone's setting
+function ThemedStatusBar() {
+  const c = usePalette();
+  return <StatusBar style={c.isDark ? "light" : "dark"} />;
+}
+
 export default function RootLayout() {
   const router = useRouter();
   const [loaded] = useFonts({
     SpaceMono: require("../assets/fonts/SpaceMono-Regular.ttf"),
+    Outfit_500Medium,
     Outfit_600SemiBold,
     Outfit_700Bold,
+    Manrope_500Medium,
+    Manrope_600SemiBold,
+    Manrope_700Bold,
+    Manrope_800ExtraBold,
   });
 
   const [onboardingDone, setOnboardingDone] = useState<boolean>(true);
@@ -206,7 +256,7 @@ export default function RootLayout() {
               <AppSyncWrapper>
                  <TourProvider>
                 <CustomThemeProvider>
-                  <Stack screenOptions={{ headerShown: false }}>
+                  <ThemedStack>
                     {/* Main tabs */}
                     <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
 
@@ -239,10 +289,10 @@ export default function RootLayout() {
 
                     {/* Not found */}
                     <Stack.Screen name="+not-found" />
-                  </Stack>
+                  </ThemedStack>
                   <RatePromptSheet />
-                  <Toast />
-                  <StatusBar style="auto" />
+                  <Toast config={toastConfig} topOffset={56} />
+                  <ThemedStatusBar />
                 </CustomThemeProvider>
                 </TourProvider>
              </AppSyncWrapper>

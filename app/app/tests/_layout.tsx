@@ -1,8 +1,11 @@
 import { Stack } from "expo-router";
+import { usePalette } from "@/constants/palette";
 
 export default function TestsLayout() {
+  // App background behind every screen, so pushes and swipes back never flash white
+  const c = usePalette();
   return (
-    <Stack screenOptions={{ headerShown: false }}>
+    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: c.bg } }}>
       {/* By Topic Tests */}
       <Stack.Screen name="by-topic/index" options={{ title: "Tests by Topic" }} />
       <Stack.Screen name="by-topic/[quizId]/index" options={{ title: "Topic Quiz" }} />

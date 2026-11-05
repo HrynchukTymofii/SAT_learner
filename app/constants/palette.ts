@@ -11,14 +11,19 @@ export const Palette = {
     muted: "#6B6577",
     subtle: "#9C95A8",
     line: "#E5DFEE",
+    // links and small accents on the page background
     brand: "#7A4BDB",
-    success: "#2E9A5E",
-    danger: "#D93F55",
+    success: "#0E7A43",
+    danger: "#B4233F",
     // floating tab bar
-    nav: "#0B0A0F",
-    navInk: "#FFFFFF",
-    navActive: "#FFFFFF",
-    navActiveInk: "#0B0A0F",
+    nav: "#FFFFFF",
+    navInk: "#6B6577",
+    navActive: "transparent",
+    navActiveInk: "#7A4BDB",
+    // ink buttons flip with the theme
+    inkButton: "#0B0A0F",
+    inkButtonText: "#FFFFFF",
+    overlay: "rgba(11,10,15,0.45)",
   },
   dark: {
     bg: "#0B0A0F",
@@ -29,12 +34,15 @@ export const Palette = {
     subtle: "#7E7889",
     line: "#2B2733",
     brand: "#C9AAFB",
-    success: "#6FCF97",
+    success: "#7FD9A3",
     danger: "#F0707F",
-    nav: "#E4CDFF",
-    navInk: "#0B0A0F",
-    navActive: "#0B0A0F",
-    navActiveInk: "#E4CDFF",
+    nav: "#17151C",
+    navInk: "#9C95A8",
+    navActive: "transparent",
+    navActiveInk: "#C9AAFB",
+    inkButton: "#F4F1F8",
+    inkButtonText: "#0B0A0F",
+    overlay: "rgba(0,0,0,0.65)",
   },
 };
 
@@ -46,17 +54,29 @@ export const Pastel = {
   mint: "#CDEFD9",
   rose: "#FFD6DE",
   onPastel: "#0B0A0F",
+  mintInk: "#0E7A43",
+  roseInk: "#B4233F",
   // faint graph-paper lines drawn on pastel cards
   grid: "rgba(11,10,15,0.07)",
 };
 
-// Headings use Outfit (loaded in app/_layout.tsx); body text stays on the system font
+export type PastelName = "lav" | "lav2" | "butter" | "mint" | "rose";
+export const PASTEL_CYCLE: PastelName[] = ["butter", "lav", "mint", "lav2", "rose"];
+
+// Headings use Outfit, body text uses Manrope (both loaded in app/_layout.tsx)
 export const Fonts = {
   display: "Outfit_600SemiBold",
+  displayMedium: "Outfit_500Medium",
   displayBold: "Outfit_700Bold",
+  body: "Manrope_500Medium",
+  bodySemi: "Manrope_600SemiBold",
+  bodyBold: "Manrope_700Bold",
+  bodyHeavy: "Manrope_800ExtraBold",
 };
 
 export function usePalette() {
   const scheme = useColorScheme();
   return { ...Palette[scheme === "dark" ? "dark" : "light"], ...Pastel, isDark: scheme === "dark" };
 }
+
+export type AppPalette = ReturnType<typeof usePalette>;

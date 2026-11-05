@@ -5,10 +5,16 @@
 
 interface WrapHtmlOptions {
   isDark?: boolean;
+  // "question": bigger heading-style text for the question itself
+  variant?: "question" | "body";
 }
 
 export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}): string {
-  const { isDark = false } = options;
+  const { isDark = false, variant = "body" } = options;
+  const ink = isDark ? "#F4F1F8" : "#0B0A0F";
+  const soft = isDark ? "#221F29" : "#EFEAF7";
+  const line = isDark ? "#2B2733" : "#E5DFEE";
+  const accent = isDark ? "#C9AAFB" : "#7A4BDB";
 
   return `<!DOCTYPE html>
 <html>
@@ -25,9 +31,11 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
 
     /* Base styles */
     html, body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-      font-size: 16px;
-      line-height: 1.6;
+      font-family: ${variant === "question" ? '"Outfit", ' : '"Manrope", '}-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: ${variant === "question" ? "19px" : "16px"};
+      font-weight: ${variant === "question" ? 500 : 500};
+      line-height: ${variant === "question" ? 1.45 : 1.6};
+      letter-spacing: ${variant === "question" ? "-0.01em" : "0"};
       -webkit-font-smoothing: antialiased;
       -webkit-text-size-adjust: 100%;
       width: 100%;
@@ -39,7 +47,7 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
       padding: 0;
       margin: 0;
       background-color: transparent;
-      color: ${isDark ? '#f5f5f4' : '#1f2937'};
+      color: ${ink};
       width: 100%;
       max-width: 100%;
       box-sizing: border-box;
@@ -146,12 +154,12 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
       font-size: 14px;
       padding: 2px 6px;
       border-radius: 4px;
-      background-color: ${isDark ? '#334155' : '#f3f4f6'};
-      color: ${isDark ? '#e2e8f0' : 'inherit'};
+      background-color: ${soft};
+      color: inherit;
     }
 
     pre {
-      background-color: ${isDark ? '#334155' : '#f3f4f6'};
+      background-color: ${soft};
       border-radius: 8px;
       padding: 16px;
       overflow-x: auto;
@@ -168,17 +176,17 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
 
     /* Blockquotes */
     blockquote {
-      border-left: 4px solid #06B6D4;
+      border-left: 3px solid ${accent};
       padding-left: 16px;
       margin: 12px 0;
-      background-color: ${isDark ? '#334155' : '#f0f9ff'};
+      background-color: ${soft};
       padding: 12px 16px;
       border-radius: 8px;
     }
 
     /* Links */
     a {
-      color: ${isDark ? '#22d3ee' : '#06B6D4'};
+      color: ${accent};
       text-decoration: none;
     }
 
@@ -214,13 +222,13 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
 
     th,
     td {
-      border: 1px solid ${isDark ? '#334155' : '#e5e7eb'};
+      border: 1px solid ${line};
       padding: 8px 12px;
       text-align: left;
     }
 
     th {
-      background-color: ${isDark ? '#1e293b' : '#f3f4f6'};
+      background-color: ${soft};
       font-weight: 600;
     }
 
@@ -237,6 +245,7 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
   </style>
 
   <!-- KaTeX for LaTeX rendering -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Outfit:wght@500;600&display=swap">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
   <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
@@ -273,9 +282,9 @@ export function wrapHtmlContent(content: string, options: WrapHtmlOptions = {}):
         if (data.type === 'setTheme') {
           // Update colors dynamically
           if (data.theme === 'dark') {
-            document.body.style.color = '#f5f5f4';
+            document.body.style.color = '#F4F1F8';
           } else {
-            document.body.style.color = '#1f2937';
+            document.body.style.color = '#0B0A0F';
           }
         }
       } catch (e) {
