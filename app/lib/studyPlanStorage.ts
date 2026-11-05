@@ -17,10 +17,20 @@ const PLAN_PREFIX = "learningPlan_";
 const ALL_PLANS_KEY = "allPlanDates";
 
 /**
- * Format date as YYYY-MM-DD string
+ * Format date as YYYY-MM-DD in the phone's time zone.
+ * (toISOString() is UTC, which turned local dates into the previous day east of UTC.)
  */
 export const formatDateKey = (date: Date): string => {
-  return date.toISOString().split("T")[0];
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, "0");
+  const d = String(date.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+
+/** "2026-11-05" -> local midnight of that day (new Date("2026-11-05") would be UTC midnight). */
+export const parseDateKey = (key: string): Date => {
+  const [y, m, d] = key.split("-").map(Number);
+  return new Date(y, (m || 1) - 1, d || 1);
 };
 
 /**

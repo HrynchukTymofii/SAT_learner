@@ -1,508 +1,158 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  useColorScheme,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { ArrowLeft, ChevronLeft, ChevronRight, Calendar as CalendarIcon, AlertCircle } from "lucide-react-native";
-import { useRouter, useFocusEffect } from "expo-router";
+import React, { useCallback, useEffect, useState } from "react";
+import { Text, View } from "react-native";
+import { useFocusEffect, useRouter } from "expo-router";
 import * as SecureStore from "expo-secure-store";
-import { getAllPlanDates, getTaskCount } from "@/lib/studyPlanStorage";
+import { CalendarPlus, ChevronLeft, ChevronRight } from "lucide-react-native";
+import { formatDateKey, getAllPlanDates, getTaskCount } from "@/lib/studyPlanStorage";
+import { Fonts, usePalette } from "@/constants/palette";
+import { Card, CircleButton, PastelCard, PillButton, Screen, T, Tap, TopBar } from "@/components/ds";
+import { StopwatchArt } from "@/components/art";
 
+const sameDay = (a: Date, b: Date) => a.getDate() === b.getDate() && a.getMonth() === b.getMonth() && a.getFullYear() === b.getFullYear();
+const WEEKDAYS = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+
+/** Planner: SAT countdown and a month grid. Tap a day to plan it. */
 export default function CalendarScreen() {
   const router = useRouter();
-  const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const c = usePalette();
+  const [month, setMonth] = useState(() => new Date(new Date().getFullYear(), new Date().getMonth(), 1));
   const [satDate, setSatDate] = useState<string | null>(null);
-  const [planDates, setPlanDates] = useState<string[]>([]);
-  const [taskCounts, setTaskCounts] = useState<Map<string, { total: number; completed: number }>>(new Map());
+  const [counts, setCounts] = useState<Map<string, { total: number; completed: number }>>(new Map());
 
-  // Load SAT date from SecureStore
   useEffect(() => {
-    loadSatDate();
+    (async () => {
+      try {
+        const stored = await SecureStore.getItemAsync("onboardingAnswers");
+        if (stored) setSatDate(JSON.parse(stored).satDate || null);
+      } catch (error) {
+        console.error("Failed to load SAT date:", error);
+      }
+    })();
   }, []);
 
-  // Load plan dates when screen is focused or month changes
   useFocusEffect(
-    React.useCallback(() => {
-      loadPlanDates();
-    }, [currentMonth])
+    useCallback(() => {
+      (async () => {
+        try {
+          const dates = await getAllPlanDates();
+          const map = new Map<string, { total: number; completed: number }>();
+          for (const key of dates) map.set(key, await getTaskCount(key));
+          setCounts(map);
+        } catch (error) {
+          console.error("Failed to load plan dates:", error);
+        }
+      })();
+    }, [])
   );
 
-  const loadPlanDates = async () => {
-    try {
-      const dates = await getAllPlanDates();
-      setPlanDates(dates);
+  const sat = satDate ? new Date(satDate) : null;
+  const satValid = sat && !isNaN(sat.getTime()) ? sat : null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const daysLeft = satValid ? Math.round((new Date(satValid.getFullYear(), satValid.getMonth(), satValid.getDate()).getTime() - today.getTime()) / 86400000) : null;
 
-      // Load task counts for visible dates in current month
-      const counts = new Map<string, { total: number; completed: number }>();
-      for (const dateKey of dates) {
-        const count = await getTaskCount(dateKey);
-        counts.set(dateKey, count);
-      }
-      setTaskCounts(counts);
-    } catch (error) {
-      console.error("Failed to load plan dates:", error);
-    }
-  };
-
-  const loadSatDate = async () => {
-    try {
-      const stored = await SecureStore.getItemAsync("onboardingAnswers");
-      if (stored) {
-        const answers = JSON.parse(stored);
-        setSatDate(answers.satDate || null);
-      }
-    } catch (error) {
-      console.error("Failed to load SAT date:", error);
-    }
-  };
-
-  // Calendar helper functions
-  const getDaysInMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (date: Date) => {
-    const year = date.getFullYear();
-    const month = date.getMonth();
-    return new Date(year, month, 1).getDay();
-  };
-
-  const formatMonthYear = (date: Date) => {
-    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
-  };
-
-  const isSameDay = (date1: Date, date2: Date) => {
-    return (
-      date1.getDate() === date2.getDate() &&
-      date1.getMonth() === date2.getMonth() &&
-      date1.getFullYear() === date2.getFullYear()
-    );
-  };
-
-  const isToday = (date: Date) => {
-    return isSameDay(date, new Date());
-  };
-
-  const isSatDate = (date: Date) => {
-    if (!satDate) return false;
-    const sat = new Date(satDate);
-    return isSameDay(date, sat);
-  };
-
-  const previousMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1));
-  };
-
-  const nextMonth = () => {
-    setCurrentMonth(new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1));
-  };
-
-  const handleDateClick = (day: number) => {
-    const selected = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-    setSelectedDate(selected);
-    const dateStr = selected.toISOString().split("T")[0];
-    router.push(`/calendar/day/${dateStr}` as any);
-  };
-
-  // Generate calendar grid
-  const generateCalendar = () => {
-    const daysInMonth = getDaysInMonth(currentMonth);
-    const firstDay = getFirstDayOfMonth(currentMonth);
-    const days = [];
-
-    // Add empty cells for days before month starts
-    for (let i = 0; i < firstDay; i++) {
-      days.push(<View key={`empty-${i}`} style={{ width: "14.28%", aspectRatio: 1 }} />);
-    }
-
-    // Add day cells
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
-      const isCurrentDay = isToday(date);
-      const isSATDay = isSatDate(date);
-      const isSelected = selectedDate && isSameDay(date, selectedDate);
-
-      // Check if this date has tasks
-      const dateKey = date.toISOString().split("T")[0];
-      const taskCount = taskCounts.get(dateKey);
-      const hasTasks = taskCount && taskCount.total > 0;
-
-      days.push(
-        <TouchableOpacity
-          key={day}
-          onPress={() => handleDateClick(day)}
-          style={{
-            width: "14.28%",
-            aspectRatio: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            padding: 4,
-            borderRadius: 12,
-            backgroundColor: isSelected
-              ? "#8A5CE6"
-              : isSATDay
-              ? "#E5A50A"
-              : isDark
-              ? "#17151C"
-              : "#ffffff",
-            borderWidth: isCurrentDay ? 2 : 0,
-            borderColor: "#8A5CE6",
-            paddingBottom: 10
-          }}
-          activeOpacity={0.7}
-        >
-          <Text
-            style={{
-              fontSize: 14,
-              fontWeight: isSATDay || isSelected || isCurrentDay ? "700" : "400",
-              color: isSelected || isSATDay ? "#ffffff" : isDark ? "#F4F1F8" : "#0B0A0F",
-            }}
-          >
-            {day}
-          </Text>
-          {hasTasks && !isSATDay && (
-            <View
-              style={{
-                position: "absolute",
-                top: 1,
-                right: 1,
-                minWidth: 16,
-                height: 16,
-                borderRadius: 8,
-                backgroundColor: isSelected ? "#ffffff" : "#8A5CE6",
-                justifyContent: "center",
-                alignItems: "center",
-                paddingHorizontal: 4,
-              }}
-            >
-              <Text style={{ fontSize: 10, fontWeight: "700", color: isSelected ? "#8A5CE6" : "#ffffff" }}>
-                {taskCount!.total}
-              </Text>
-            </View>
-          )}
-        </TouchableOpacity>
-      );
-    }
-
-    return days;
-  };
+  const firstDay = month.getDay();
+  const daysInMonth = new Date(month.getFullYear(), month.getMonth() + 1, 0).getDate();
+  const cells: (Date | null)[] = [
+    ...Array.from({ length: firstDay }, () => null),
+    ...Array.from({ length: daysInMonth }, (_, i) => new Date(month.getFullYear(), month.getMonth(), i + 1)),
+  ];
+  while (cells.length % 7) cells.push(null);
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
-      {/* Header */}
-      <View
-        style={{
-          paddingTop: insets.top + 12,
-          paddingBottom: 16,
-          paddingHorizontal: 16,
-          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-          borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
-        }}
-      >
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 16,
-            alignSelf: "flex-start",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-            borderRadius: 12,
-          }}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-          <Text
-            style={{
-              color: isDark ? "#C9AAFB" : "#7A4BDB",
-              fontWeight: "600",
-              marginLeft: 6,
-              fontSize: 14,
-            }}
-          >
-            Back
+    <Screen header={<TopBar title="Planner" />}>
+      {/* SAT countdown */}
+      {satValid && daysLeft != null && daysLeft >= 0 ? (
+        <PastelCard tone="butter" radius={28} style={{ padding: 20, gap: 4, minHeight: 150 }}>
+          <View style={{ position: "absolute", right: 14, top: 14 }} pointerEvents="none">
+            <StopwatchArt size={96} />
+          </View>
+          <T variant="smallStrong" onPastel>
+            Your SAT
+          </T>
+          <Text style={{ fontFamily: Fonts.display, fontSize: 44, lineHeight: 48, letterSpacing: -1, color: c.onPastel }}>
+            {daysLeft === 0 ? "Today" : `${daysLeft} day${daysLeft === 1 ? "" : "s"}`}
           </Text>
-        </TouchableOpacity>
+          <T variant="small" onPastel style={{ opacity: 0.75 }}>
+            {satValid.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric", year: "numeric" })}
+          </T>
+          <Tap onPress={() => router.push("/edit-profile" as any)} hitSlop={8} style={{ marginTop: 8, alignSelf: "flex-start" }}>
+            <T variant="smallStrong" onPastel style={{ textDecorationLine: "underline" }}>
+              Change date
+            </T>
+          </Tap>
+        </PastelCard>
+      ) : (
+        <PastelCard tone="lav" radius={28} style={{ padding: 20, gap: 8 }}>
+          <T variant="h2" onPastel>
+            When is your SAT?
+          </T>
+          <T variant="small" onPastel style={{ opacity: 0.75 }}>
+            Add the date to see a countdown here and on Home.
+          </T>
+          <PillButton title="Set the date" tone="white" icon={CalendarPlus} onPress={() => router.push("/edit-profile" as any)} style={{ marginTop: 6 }} />
+        </PastelCard>
+      )}
 
-        {/* Title */}
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            color: isDark ? "#F4F1F8" : "#0B0A0F",
-            marginBottom: 4,
-          }}
-        >
-          Study Calendar
-        </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
-          Plan your SAT preparation journey
-        </Text>
-      </View>
-
-      {/* Content */}
-      <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* SAT Date Notification */}
-        {satDate ? (
-          <View
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 16,
-              marginBottom: 20,
-              borderLeftWidth: 4,
-              borderLeftColor: "#E5A50A",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-              <View
-                style={{
-                  padding: 8,
-                  borderRadius: 8,
-                  backgroundColor: "#E5A50A20",
-                  marginRight: 12,
-                }}
-              >
-                <CalendarIcon size={20} color="#E5A50A" />
-              </View>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "700",
-                  color: isDark ? "#F4F1F8" : "#0B0A0F",
-                }}
-              >
-                Your SAT Date
-              </Text>
-            </View>
-            <Text
-              style={{
-                fontSize: 20,
-                fontWeight: "bold",
-                color: "#E5A50A",
-                marginBottom: 8,
-              }}
-            >
-              {new Date(satDate).toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
-            </Text>
-            <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-              <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
-                {Math.ceil((new Date(satDate).getTime() - new Date().getTime()) / (1000 * 60 * 60 * 24))} days remaining
-              </Text>
-              <TouchableOpacity
-                onPress={() => router.push("/edit-profile" as any)}
-                style={{
-                  paddingHorizontal: 12,
-                  paddingVertical: 6,
-                  borderRadius: 8,
-                  backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                }}
-                activeOpacity={0.7}
-              >
-                <Text style={{ color: "#8A5CE6", fontWeight: "600", fontSize: 12 }}>
-                  Change Date
-                </Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        ) : (
-          <TouchableOpacity
-            onPress={() => router.push("/edit-profile" as any)}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 16,
-              marginBottom: 20,
-              borderLeftWidth: 4,
-              borderLeftColor: "#D93F55",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-            activeOpacity={0.7}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-              <View
-                style={{
-                  padding: 8,
-                  borderRadius: 8,
-                  backgroundColor: "#D93F5520",
-                  marginRight: 12,
-                }}
-              >
-                <AlertCircle size={20} color="#D93F55" />
-              </View>
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "700",
-                  color: isDark ? "#F4F1F8" : "#0B0A0F",
-                }}
-              >
-                Set Your SAT Date
-              </Text>
-            </View>
-            <Text
-              style={{
-                fontSize: 14,
-                color: isDark ? "#9C95A8" : "#6B6577",
-                marginBottom: 8,
-              }}
-            >
-              Tap here to set your SAT exam date and track your preparation progress
-            </Text>
-            <View
-              style={{
-                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                paddingVertical: 8,
-                borderRadius: 8,
-                alignItems: "center",
-              }}
-            >
-              <Text style={{ color: "#8A5CE6", fontWeight: "600", fontSize: 14 }}>
-                Set Date Now
-              </Text>
-            </View>
-          </TouchableOpacity>
-        )}
-
-        {/* Calendar */}
-        <View
-          style={{
-            backgroundColor: isDark ? "#17151C" : "#ffffff",
-            borderRadius: 16,
-            padding: 16,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
-          {/* Month Navigation */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              marginBottom: 20,
-            }}
-          >
-            <TouchableOpacity
-              onPress={previousMonth}
-              style={{
-                padding: 8,
-                borderRadius: 8,
-                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-              }}
-              activeOpacity={0.7}
-            >
-              <ChevronLeft size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-            </TouchableOpacity>
-
-            <Text
-              style={{
-                fontSize: 18,
-                fontWeight: "700",
-                color: isDark ? "#F4F1F8" : "#0B0A0F",
-              }}
-            >
-              {formatMonthYear(currentMonth)}
-            </Text>
-
-            <TouchableOpacity
-              onPress={nextMonth}
-              style={{
-                padding: 8,
-                borderRadius: 8,
-                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-              }}
-              activeOpacity={0.7}
-            >
-              <ChevronRight size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-            </TouchableOpacity>
-          </View>
-
-          {/* Day Labels */}
-          <View style={{ flexDirection: "row", marginBottom: 8 }}>
-            {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-              <View key={day} style={{ flex: 1, alignItems: "center" }}>
-                <Text
-                  style={{
-                    fontSize: 12,
-                    fontWeight: "600",
-                    color: isDark ? "#9C95A8" : "#6B6577",
-                  }}
+      {/* Month */}
+      <Card style={{ padding: 14, gap: 12 }}>
+        <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between" }}>
+          <CircleButton icon={ChevronLeft} size={40} label="Previous month" onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth() - 1, 1))} />
+          <T variant="h3">{month.toLocaleDateString("en-US", { month: "long", year: "numeric" })}</T>
+          <CircleButton icon={ChevronRight} size={40} label="Next month" onPress={() => setMonth(new Date(month.getFullYear(), month.getMonth() + 1, 1))} />
+        </View>
+        <View style={{ flexDirection: "row" }}>
+          {WEEKDAYS.map((d) => (
+            <T key={d} variant="caption" style={{ flex: 1, textAlign: "center" }}>
+              {d}
+            </T>
+          ))}
+        </View>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", rowGap: 6 }}>
+          {cells.map((date, i) => {
+            if (!date) return <View key={`e${i}`} style={{ width: `${100 / 7}%`, height: 46 }} />;
+            const key = formatDateKey(date);
+            const isToday = sameDay(date, new Date());
+            const isSat = !!satValid && sameDay(date, satValid);
+            const count = counts.get(key);
+            const allDone = !!count && count.total > 0 && count.completed === count.total;
+            const bg = isToday ? c.inkButton : isSat ? c.butter : "transparent";
+            const fg = isToday ? c.inkButtonText : isSat ? c.onPastel : c.ink;
+            return (
+              <View key={key} style={{ width: `${100 / 7}%`, alignItems: "center" }}>
+                <Tap
+                  onPress={() => router.push(`/calendar/day/${key}` as any)}
+                  accessibilityLabel={date.toDateString()}
+                  style={({ pressed }) => ({ width: 42, height: 46, borderRadius: 16, alignItems: "center", justifyContent: "center", backgroundColor: bg, opacity: pressed ? 0.7 : 1 })}
                 >
-                  {day}
-                </Text>
+                  <Text style={{ fontFamily: isToday || isSat ? Fonts.bodyHeavy : Fonts.bodySemi, fontSize: 15, color: fg }}>{date.getDate()}</Text>
+                  {!!count && count.total > 0 && (
+                    <View style={{ position: "absolute", bottom: 5, width: 6, height: 6, borderRadius: 3, backgroundColor: allDone ? c.success : isToday ? c.lav : c.lav2 }} />
+                  )}
+                </Tap>
               </View>
-            ))}
-          </View>
-
-          {/* Calendar Grid */}
-          <View style={{ flexDirection: "row", flexWrap: "wrap" }}>
-            {generateCalendar()}
-          </View>
-
-          {/* Legend */}
-          <View style={{ marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: isDark ? "#2B2733" : "#E5DFEE" }}>
-            <View style={{ flexDirection: "row", justifyContent: "space-around", flexWrap: "wrap" }}>
-              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 6, borderWidth: 2, borderColor: "#8A5CE6", marginRight: 6 }} />
-                <Text style={{ fontSize: 12, color: isDark ? "#9C95A8" : "#6B6577" }}>Today</Text>
-              </View>
-              {satDate && (
-                <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                  <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#E5A50A", marginRight: 6 }} />
-                  <Text style={{ fontSize: 12, color: isDark ? "#9C95A8" : "#6B6577" }}>SAT Date</Text>
-                </View>
-              )}
-              <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 8 }}>
-                <View style={{ width: 12, height: 12, borderRadius: 6, backgroundColor: "#8A5CE6", marginRight: 6 }} />
-                <Text style={{ fontSize: 12, color: isDark ? "#9C95A8" : "#6B6577" }}>Selected</Text>
-              </View>
-            </View>
-          </View>
+            );
+          })}
         </View>
+      </Card>
 
-        {/* Helper Text */}
-        <View style={{ marginTop: 16, padding: 16, backgroundColor: isDark ? "#17151C20" : "#7A4BDB10", borderRadius: 12 }}>
-          <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577", textAlign: "center" }}>
-            Tap any date to create a study plan for that day
-          </Text>
-        </View>
-      </ScrollView>
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 14, justifyContent: "center" }}>
+        <Legend color={c.lav2} label="Planned" />
+        <Legend color={c.success} label="All done" />
+        {satValid && <Legend color={c.butter} label="SAT day" square />}
+      </View>
+      <T variant="caption" style={{ textAlign: "center" }}>
+        Tap any day to plan what you'll study.
+      </T>
+    </Screen>
+  );
+}
+
+function Legend({ color, label, square }: { color: string; label: string; square?: boolean }) {
+  return (
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
+      <View style={{ width: square ? 14 : 8, height: square ? 14 : 8, borderRadius: square ? 5 : 4, backgroundColor: color }} />
+      <T variant="caption">{label}</T>
     </View>
   );
 }

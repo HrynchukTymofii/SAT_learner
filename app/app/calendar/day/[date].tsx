@@ -1,32 +1,19 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  ScrollView,
-  TextInput,
-  useColorScheme,
-} from "react-native";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  ArrowLeft,
-  Save,
-  Plus,
-  Trash2,
-  CheckCircle2,
-  Circle,
-  BookOpen,
-} from "lucide-react-native";
+import { TextInput, View } from "react-native";
+import { BookOpen, Check, CircleHelp, Plus, RotateCcw, Save, Trash2 } from "lucide-react-native";
 import { useRouter, useLocalSearchParams } from "expo-router";
-import { getStudyPlan, saveStudyPlan, Task } from "@/lib/studyPlanStorage";
+import { getStudyPlan, parseDateKey, saveStudyPlan, Task } from "@/lib/studyPlanStorage";
 import Toast from "react-native-toast-message";
+import { Fonts, usePalette } from "@/constants/palette";
+import { Card, Chip, Field, PastelCard, PillButton, ProgressBar, Screen, T, Tap, TopBar } from "@/components/ds";
+
+const TYPE_LABEL = { lesson: "Lesson", quiz: "Quiz", review: "Review" } as const;
+const TYPE_ICON = { lesson: BookOpen, quiz: CircleHelp, review: RotateCcw } as const;
 
 export default function DayPlanningScreen() {
   const router = useRouter();
   const params = useLocalSearchParams();
-  const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const c = usePalette();
 
   const dateParam = params.date as string;
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
@@ -38,7 +25,7 @@ export default function DayPlanningScreen() {
 
   useEffect(() => {
     if (dateParam) {
-      const date = new Date(dateParam);
+      const date = parseDateKey(dateParam);
       setSelectedDate(date);
       loadPlan(dateParam);
     }
@@ -67,16 +54,15 @@ export default function DayPlanningScreen() {
       if (success) {
         Toast.show({
           type: 'success',
-          text1: 'Success',
-          text2: 'Your study plan has been saved!',
+          text1: 'Plan saved',
           position: 'top',
           visibilityTime: 3000,
         });
       } else {
         Toast.show({
           type: 'error',
-          text1: 'Error',
-          text2: 'Failed to save your study plan. Please try again.',
+          text1: "Couldn't save the plan",
+          text2: 'Please try again',
           position: 'top',
           visibilityTime: 3000,
         });
@@ -155,529 +141,123 @@ export default function DayPlanningScreen() {
   const progressPercentage = totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
-      {/* Header */}
-      <View
-        style={{
-          paddingTop: insets.top + 12,
-          paddingBottom: 16,
-          paddingHorizontal: 16,
-          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-          borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
-        }}
-      >
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 16,
-            alignSelf: "flex-start",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-            borderRadius: 12,
-          }}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-          <Text
-            style={{
-              color: isDark ? "#C9AAFB" : "#7A4BDB",
-              fontWeight: "600",
-              marginLeft: 6,
-              fontSize: 14,
-            }}
-          >
-            Back to Calendar
-          </Text>
-        </TouchableOpacity>
-
-        {/* Title */}
-        <Text
-          style={{
-            fontSize: 24,
-            fontWeight: "bold",
-            color: isDark ? "#F4F1F8" : "#0B0A0F",
-            marginBottom: 4,
-          }}
-        >
-          Study Plan
-        </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
-          {formatDate(selectedDate)}
-        </Text>
-      </View>
-
-      {/* Content */}
-      <ScrollView
-        contentContainerStyle={{ padding: 16, paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-      >
-        {/* Progress Card */}
+    <Screen header={<TopBar title="Day plan" />} footer={<PillButton title="Save plan" icon={Save} loading={isSaving} onPress={savePlan} />}>
+      <PastelCard tone="lav" radius={28} style={{ padding: 20, gap: 10 }}>
+        <T variant="smallStrong" onPastel style={{ opacity: 0.7 }}>
+          {selectedDate.toLocaleDateString("en-US", { weekday: "long" })}
+        </T>
+        <T variant="title" onPastel>
+          {selectedDate.toLocaleDateString("en-US", { month: "long", day: "numeric", year: "numeric" })}
+        </T>
         {totalTasks > 0 && (
-          <View
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              borderRadius: 16,
-              padding: 16,
-              marginBottom: 20,
-              borderLeftWidth: 4,
-              borderLeftColor: "#8A5CE6",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                justifyContent: "space-between",
-                alignItems: "center",
-                marginBottom: 12,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 16,
-                  fontWeight: "600",
-                  color: isDark ? "#F4F1F8" : "#0B0A0F",
-                }}
-              >
-                Daily Progress
-              </Text>
-              <Text
-                style={{
-                  fontSize: 18,
-                  fontWeight: "bold",
-                  color: "#8A5CE6",
-                }}
-              >
-                {completedTasks}/{totalTasks}
-              </Text>
+          <View style={{ gap: 6, marginTop: 4 }}>
+            <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
+              <T variant="smallStrong" onPastel>
+                {completedTasks} of {totalTasks} done
+              </T>
+              <T variant="smallStrong" onPastel>
+                {Math.round(progressPercentage)}%
+              </T>
             </View>
-            <View
-              style={{
-                height: 8,
-                borderRadius: 4,
-                backgroundColor: isDark ? "#0B0A0F" : "#EFEAF7",
-                overflow: "hidden",
-              }}
-            >
-              <View
-                style={{
-                  height: "100%",
-                  width: `${progressPercentage}%`,
-                  backgroundColor: "#8A5CE6",
-                  borderRadius: 4,
-                }}
-              />
-            </View>
+            <ProgressBar value={progressPercentage} onPastel />
           </View>
         )}
+      </PastelCard>
 
-        {/* Goals Section */}
-        <View style={{ marginBottom: 24 }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "700",
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              marginBottom: 12,
-            }}
-          >
-            Goals & Notes
-          </Text>
-          <TextInput
-            value={goals}
-            onChangeText={setGoals}
-            placeholder="Set your SAT prep goals for today... e.g., 'Focus on Math concepts' or 'Review Reading strategies'"
-            multiline
-            numberOfLines={4}
-            style={{
-              backgroundColor: isDark ? "#17151C" : "#ffffff",
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              borderWidth: 1,
-              borderColor: isDark ? "#2B2733" : "#E5DFEE",
-              borderRadius: 12,
-              padding: 16,
-              fontSize: 16,
-              textAlignVertical: "top",
-              minHeight: 100,
-            }}
-            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
-          />
-        </View>
+      <Field label="Goal for the day" multiline value={goals} onChangeText={setGoals} placeholder="e.g. Finish the linear equations chapter" />
 
-        {/* Tasks Section */}
-        <View style={{ marginBottom: 24 }}>
-          <Text
-            style={{
-              fontSize: 18,
-              fontWeight: "700",
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              marginBottom: 12,
-            }}
-          >
-            Task Checklist
-          </Text>
-
-          {/* Task Type Selector */}
-          <View style={{ flexDirection: "row", marginBottom: 12, gap: 8 }}>
-            <TouchableOpacity
-              onPress={() => handleTypeSelect("lesson")}
-              style={{
-                flex: 1,
-                paddingVertical: 10,
-                paddingHorizontal: 12,
-                borderRadius: 10,
-                backgroundColor: newTaskType === "lesson" ? "#8A5CE6" : isDark ? "#17151C" : "#ffffff",
-                borderWidth: 1,
-                borderColor: newTaskType === "lesson" ? "#8A5CE6" : isDark ? "#2B2733" : "#E5DFEE",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={{ fontSize: 16, marginRight: 6 }}>📚</Text>
-              <Text style={{
-                fontSize: 14,
-                fontWeight: newTaskType === "lesson" ? "600" : "400",
-                color: newTaskType === "lesson" ? "#ffffff" : isDark ? "#9C95A8" : "#6B6577"
-              }}>
-                Lesson
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => handleTypeSelect("quiz")}
-              style={{
-                flex: 1,
-                paddingVertical: 10,
-                paddingHorizontal: 12,
-                borderRadius: 10,
-                backgroundColor: newTaskType === "quiz" ? "#8A5CE6" : isDark ? "#17151C" : "#ffffff",
-                borderWidth: 1,
-                borderColor: newTaskType === "quiz" ? "#8A5CE6" : isDark ? "#2B2733" : "#E5DFEE",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={{ fontSize: 16, marginRight: 6 }}>✏️</Text>
-              <Text style={{
-                fontSize: 14,
-                fontWeight: newTaskType === "quiz" ? "600" : "400",
-                color: newTaskType === "quiz" ? "#ffffff" : isDark ? "#9C95A8" : "#6B6577"
-              }}>
-                Quiz
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => handleTypeSelect("review")}
-              style={{
-                flex: 1,
-                paddingVertical: 10,
-                paddingHorizontal: 12,
-                borderRadius: 10,
-                backgroundColor: newTaskType === "review" ? "#8A5CE6" : isDark ? "#17151C" : "#ffffff",
-                borderWidth: 1,
-                borderColor: newTaskType === "review" ? "#8A5CE6" : isDark ? "#2B2733" : "#E5DFEE",
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={{ fontSize: 16, marginRight: 6 }}>🔍</Text>
-              <Text style={{
-                fontSize: 14,
-                fontWeight: newTaskType === "review" ? "600" : "400",
-                color: newTaskType === "review" ? "#ffffff" : isDark ? "#9C95A8" : "#6B6577"
-              }}>
-                Review
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Add Task Input */}
-          <View
-            style={{
-              flexDirection: "row",
-              marginBottom: 16,
-              gap: 8,
-            }}
-          >
-            <TextInput
-              value={newTaskText}
-              onChangeText={setNewTaskText}
-              placeholder="e.g., Complete Algebra lesson"
-              onSubmitEditing={addTask}
-              returnKeyType="done"
-              style={{
-                flex: 1,
-                backgroundColor: isDark ? "#17151C" : "#ffffff",
-                color: isDark ? "#F4F1F8" : "#0B0A0F",
-                borderWidth: 1,
-                borderColor: isDark ? "#2B2733" : "#E5DFEE",
-                borderRadius: 12,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                fontSize: 16,
-              }}
-              placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
-            />
-            <TouchableOpacity
-              onPress={addTask}
-              style={{
-                backgroundColor: "#8A5CE6",
-                borderRadius: 12,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              activeOpacity={0.7}
-            >
-              <Plus size={20} color="#ffffff" />
-            </TouchableOpacity>
-          </View>
-
-          {/* Task List */}
-          {tasks.length === 0 ? (
+      <View style={{ gap: 10 }}>
+        <T variant="h2">Tasks</T>
+        {tasks.length === 0 && (
+          <T variant="small">No tasks yet. Add one below.</T>
+        )}
+        {tasks.map((task) => {
+          const Icon = task.type ? TYPE_ICON[task.type] : null;
+          return (
             <View
+              key={task.id}
               style={{
-                backgroundColor: isDark ? "#17151C" : "#ffffff",
-                borderRadius: 12,
-                padding: 32,
+                flexDirection: "row",
                 alignItems: "center",
+                gap: 12,
+                padding: 12,
+                paddingLeft: 14,
+                borderRadius: 20,
+                backgroundColor: task.completed ? c.mint : c.surface,
                 borderWidth: 1,
-                borderColor: isDark ? "#2B2733" : "#E5DFEE",
-                borderStyle: "dashed",
+                borderColor: task.completed ? "transparent" : c.line,
               }}
             >
-              <BookOpen size={32} color={isDark ? "#7E7889" : "#9C95A8"} style={{ marginBottom: 12 }} />
-              <Text
+              <Tap
+                onPress={() => toggleTask(task.id)}
+                accessibilityRole="checkbox"
+                accessibilityState={{ checked: task.completed }}
+                hitSlop={8}
                 style={{
-                  fontSize: 14,
-                  color: isDark ? "#7E7889" : "#9C95A8",
-                  textAlign: "center",
-                }}
-              >
-                No tasks yet. Add your first SAT prep task above!
-              </Text>
-            </View>
-          ) : (
-            tasks.map((task, index) => (
-              <View
-                key={task.id}
-                style={{
-                  backgroundColor: isDark ? "#17151C" : "#ffffff",
-                  borderRadius: 12,
-                  padding: 12,
-                  marginBottom: 8,
-                  flexDirection: "row",
+                  width: 28,
+                  height: 28,
+                  borderRadius: 14,
+                  borderWidth: task.completed ? 0 : 1.5,
+                  borderColor: c.line,
+                  backgroundColor: task.completed ? c.onPastel : "transparent",
                   alignItems: "center",
-                  borderWidth: 1,
-                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
+                  justifyContent: "center",
                 }}
               >
-                {/* Checkbox */}
-                <TouchableOpacity
-                  onPress={() => toggleTask(task.id)}
-                  style={{ marginRight: 12 }}
-                  activeOpacity={0.7}
-                >
-                  {task.completed ? (
-                    <CheckCircle2 size={24} color="#8A5CE6" />
-                  ) : (
-                    <Circle size={24} color="#8A5CE6" />
-                  )}
-                </TouchableOpacity>
-
-                {/* Task Icon */}
-                <View style={{ marginRight: 12 }}>
-                  <Text style={{ fontSize: 20 }}>
-                    {task.type === "lesson" ? "📚" : task.type === "quiz" ? "✏️" : task.type === "review" ? "🔍" : "📝"}
-                  </Text>
-                </View>
-
-                {/* Task Text */}
-                <Text
-                  style={{
-                    flex: 1,
-                    fontSize: 16,
-                    color: task.completed
-                      ? isDark
-                        ? "#7E7889"
-                        : "#9C95A8"
-                      : isDark
-                      ? "#F4F1F8"
-                      : "#0B0A0F",
-                    textDecorationLine: task.completed ? "line-through" : "none",
-                  }}
-                >
+                {task.completed && <Check size={16} color="#fff" strokeWidth={3} />}
+              </Tap>
+              <View style={{ flex: 1, gap: 2 }}>
+                <T variant="bodyStrong" color={task.completed ? c.onPastel : c.ink} style={{ fontSize: 14.5, textDecorationLine: task.completed ? "line-through" : "none" }}>
                   {task.text}
-                </Text>
-
-                {/* Delete Button */}
-                <TouchableOpacity
-                  onPress={() => deleteTask(task.id)}
-                  style={{
-                    padding: 8,
-                    borderRadius: 8,
-                    backgroundColor: isDark ? "#0B0A0F" : "#fef2f2",
-                  }}
-                  activeOpacity={0.7}
-                >
-                  <Trash2 size={16} color="#D93F55" />
-                </TouchableOpacity>
+                </T>
+                {task.type && Icon && (
+                  <View style={{ flexDirection: "row", alignItems: "center", gap: 4 }}>
+                    <Icon size={12} color={task.completed ? c.onPastel : c.muted} />
+                    <T variant="caption" color={task.completed ? c.onPastel : c.muted}>
+                      {TYPE_LABEL[task.type]}
+                    </T>
+                  </View>
+                )}
               </View>
-            ))
-          )}
+              <Tap onPress={() => deleteTask(task.id)} hitSlop={8} accessibilityLabel="Delete task" style={{ padding: 6 }}>
+                <Trash2 size={18} color={task.completed ? c.onPastel : c.subtle} />
+              </Tap>
+            </View>
+          );
+        })}
+      </View>
+
+      <Card style={{ gap: 12 }}>
+        <T variant="h3">Add a task</T>
+        <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8 }}>
+          {(["lesson", "quiz", "review"] as const).map((t) => (
+            <Chip key={t} label={TYPE_LABEL[t]} icon={TYPE_ICON[t]} active={newTaskType === t} onPress={() => handleTypeSelect(t)} />
+          ))}
         </View>
-
-        {/* Save Button */}
-        <TouchableOpacity
-          onPress={savePlan}
-          disabled={isSaving}
-          style={{
-            backgroundColor: "#8A5CE6",
-            borderRadius: 12,
-            paddingVertical: 16,
-            alignItems: "center",
-            flexDirection: "row",
-            justifyContent: "center",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 4,
-            elevation: 3,
-            opacity: isSaving ? 0.7 : 1,
-          }}
-          activeOpacity={0.8}
-        >
-          <Save size={20} color="#ffffff" style={{ marginRight: 8 }} />
-          <Text style={{ color: "#ffffff", fontWeight: "600", fontSize: 16 }}>
-            {isSaving ? "Saving..." : "Save Study Plan"}
-          </Text>
-        </TouchableOpacity>
-
-        {/* Helper Text */}
-        <View
-          style={{
-            marginTop: 16,
-            padding: 16,
-            backgroundColor: isDark ? "#17151C20" : "#7A4BDB10",
-            borderRadius: 12,
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 13,
-              color: isDark ? "#9C95A8" : "#6B6577",
-              textAlign: "center",
-              lineHeight: 18,
-            }}
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+          <TextInput
+            value={newTaskText}
+            onChangeText={setNewTaskText}
+            placeholder="What will you study?"
+            placeholderTextColor={c.subtle}
+            onSubmitEditing={addTask}
+            returnKeyType="done"
+            style={{ flex: 1, height: 50, borderRadius: 999, borderWidth: 1.5, borderColor: c.line, backgroundColor: c.bg, paddingHorizontal: 16, fontFamily: Fonts.bodySemi, fontSize: 15, color: c.ink }}
+          />
+          <Tap
+            onPress={addTask}
+            disabled={!newTaskText.trim()}
+            accessibilityLabel="Add task"
+            style={({ pressed }) => ({ width: 50, height: 50, borderRadius: 25, backgroundColor: c.inkButton, alignItems: "center", justifyContent: "center", opacity: !newTaskText.trim() ? 0.4 : pressed ? 0.8 : 1 })}
           >
-            Your study plan is saved locally on your device. Set clear goals and
-            track your tasks to stay organized!
-          </Text>
+            <Plus size={22} color={c.inkButtonText} />
+          </Tap>
         </View>
-      </ScrollView>
-      <Toast
-        config={{
-          success: (props) => (
-            <View
-              style={{
-                width: '90%',
-                backgroundColor: isDark ? '#17151C' : '#ffffff',
-                borderRadius: 12,
-                padding: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                elevation: 3,
-                borderLeftWidth: 4,
-                borderLeftColor: '#8A5CE6',
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: '#8A5CE620',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 12,
-                }}
-              >
-                <Text style={{ fontSize: 20 }}>✓</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#F4F1F8' : '#0B0A0F', marginBottom: 2 }}>
-                  {props.text1}
-                </Text>
-                <Text style={{ fontSize: 14, color: isDark ? '#9C95A8' : '#6B6577' }}>
-                  {props.text2}
-                </Text>
-              </View>
-            </View>
-          ),
-          error: (props) => (
-            <View
-              style={{
-                width: '90%',
-                backgroundColor: isDark ? '#17151C' : '#ffffff',
-                borderRadius: 12,
-                padding: 16,
-                flexDirection: 'row',
-                alignItems: 'center',
-                shadowColor: '#000',
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 8,
-                elevation: 3,
-                borderLeftWidth: 4,
-                borderLeftColor: '#D93F55',
-              }}
-            >
-              <View
-                style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 20,
-                  backgroundColor: '#D93F5520',
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                  marginRight: 12,
-                }}
-              >
-                <Text style={{ fontSize: 20 }}>✕</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text style={{ fontSize: 16, fontWeight: '600', color: isDark ? '#F4F1F8' : '#0B0A0F', marginBottom: 2 }}>
-                  {props.text1}
-                </Text>
-                <Text style={{ fontSize: 14, color: isDark ? '#9C95A8' : '#6B6577' }}>
-                  {props.text2}
-                </Text>
-              </View>
-            </View>
-          ),
-        }}
-      />
-    </View>
+      </Card>
+
+      <T variant="caption" style={{ textAlign: "center" }}>
+        Plans are saved on this phone.
+      </T>
+    </Screen>
   );
 }
