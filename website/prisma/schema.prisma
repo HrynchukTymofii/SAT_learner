@@ -40,6 +40,10 @@ model User{
 
   studyPlans StudyPlan[]
   settings   UserSettings?
+
+  pushTokens        PushToken[]
+  notifications     Notification[]     @relation("NotificationTarget")
+  notificationReads NotificationRead[]
 }
 
 // Study Planner System
@@ -507,4 +511,47 @@ model Apps{
   version String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+}
+
+// Push notifications (app)
+// One row per phone. userId is set while someone is logged in on that phone.
+model PushToken {
+  id        String   @id @default(uuid())
+  token     String   @unique
+  platform  String?
+  userId    String?
+  user      User?    @relation(fields: [userId], references: [userId], onDelete: SetNull)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+// A message for the in-app inbox, usually also sent as a push.
+// audience: "all" | "pro" | "free" | "user" (then userId is the one person)
+model Notification {
+  id        String   @id @default(uuid())
+  title     String
+  body      String
+  url       String?
+  audience  String   @default("all")
+  userId    String?
+  user      User?    @relation("NotificationTarget", fields: [userId], references: [userId], onDelete: Cascade)
+  pushCount Int      @default(0)
+  createdAt DateTime @default(now())
+
+  reads NotificationRead[]
+
+  @@index([audience, createdAt])
+  @@index([userId])
+}
+
+model NotificationRead {
+  userId         String
+  notificationId String
+  readAt         DateTime     @default(now())
+  user           User         @relation(fields: [userId], references: [userId], onDelete: Cascade)
+  notification   Notification @relation(fields: [notificationId], references: [id], onDelete: Cascade)
+
+  @@id([userId, notificationId])
 }

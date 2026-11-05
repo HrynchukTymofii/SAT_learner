@@ -5,6 +5,7 @@ import * as Network from "expo-network";
 import * as SecureStore from "expo-secure-store";
 import { useSQLiteContext } from "expo-sqlite";
 import Purchases from "react-native-purchases";
+import { unlinkPushToken } from "@/lib/inbox";
 
 // Local tables with the logged-in user's progress. Content tables are shared and stay
 const USER_TABLES = ["quiz_results", "user_quiz_questions", "lesson_progress"];
@@ -42,6 +43,9 @@ export function useLogout() {
     } catch (e) {
       console.warn("⚠️ RevenueCat logout skipped", e);
     }
+
+    // This phone stops getting the account's personal pushes (it still gets ones sent to everyone)
+    await unlinkPushToken();
 
     await clearOfflineQueue();
     await SecureStore.deleteItemAsync("paused_exam");

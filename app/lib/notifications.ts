@@ -1,5 +1,6 @@
 import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
+import * as SecureStore from "expo-secure-store";
 
 // Configure notification handler
 Notifications.setNotificationHandler({
@@ -37,7 +38,8 @@ export const requestNotificationPermissions = async (): Promise<boolean> => {
         importance: Notifications.AndroidImportance.HIGH,
         vibrationPattern: [0, 250, 250, 250],
         lightColor: "#06B6D4",
-        sound: "default",
+        // no `sound` here: the channel then plays the system default
+        // ("default" is looked up as a bundled sound file and fails)
       });
     }
 
@@ -66,7 +68,7 @@ export const scheduleDailyStudyReminder = async (): Promise<string | null> => {
       content: {
         title: "Time to Study! 📚",
         body: "Don't forget to complete your study plan for today. Every step brings you closer to your SAT goals!",
-        sound: "default",
+        sound: true, // system default sound
         priority: Notifications.AndroidNotificationPriority.HIGH,
         data: { type: "daily_reminder" },
       },
@@ -132,11 +134,26 @@ export const sendTestNotification = async (): Promise<void> => {
       content: {
         title: "Test Notification 📚",
         body: "Daily study reminders are now enabled!",
-        sound: "default",
+        sound: true, // system default sound
       },
       trigger: null, // Send immediately
     });
   } catch (error) {
     console.error("Failed to send test notification:", error);
+  }
+};
+
+// The user's choice in Settings. The app schedules the reminder on start unless it was turned off.
+const REMINDER_PREF_KEY = "dailyReminderOff";
+
+export const isDailyReminderTurnedOff = async (): Promise<boolean> =>
+  (await SecureStore.getItemAsync(REMINDER_PREF_KEY).catch(() => null)) === "1";
+
+export const setDailyReminderTurnedOff = async (off: boolean): Promise<void> => {
+  try {
+    if (off) await SecureStore.setItemAsync(REMINDER_PREF_KEY, "1");
+    else await SecureStore.deleteItemAsync(REMINDER_PREF_KEY);
+  } catch {
+    // not saved; the reminder just follows the default next launch
   }
 };
