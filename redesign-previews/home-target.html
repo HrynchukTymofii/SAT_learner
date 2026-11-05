@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Home Screen Target</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700&family=Manrope:wght@500;600;700;800&display=swap">
+<style>
+/* Target for app/app/(tabs)/index.tsx. Same tokens as app/constants/palette.ts */
+:root{
+  --bg:#F4F1F9;--surface:#FFFFFF;--surface-2:#EFEAF7;--ink:#0B0A0F;--muted:#6B6577;--subtle:#9C95A8;--line:#E5DFEE;--brand:#7A4BDB;
+  --lav:#E4CDFF;--lav-2:#C9AAFB;--butter:#FEE7A6;--mint:#CDEFD9;--rose:#FFD6DE;--on-pastel:#0B0A0F;
+  --nav:#0B0A0F;--nav-ink:#FFFFFF;--nav-active:#FFFFFF;--nav-active-ink:#0B0A0F;--ink-btn:#0B0A0F;--ink-btn-text:#fff;
+  --grid:rgba(11,10,15,.07);--bezel:#0B0A0F;--shadow:0 30px 60px -35px rgba(40,20,80,.45);
+  --display:"Outfit",system-ui,sans-serif;--sans:"Manrope",system-ui,sans-serif;color-scheme:light;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0B0A0F;--surface:#17151C;--surface-2:#221F29;--ink:#F4F1F8;--muted:#9C95A8;--subtle:#7E7889;--line:#2B2733;--brand:#C9AAFB;
+  --nav:#E4CDFF;--nav-ink:#0B0A0F;--nav-active:#0B0A0F;--nav-active-ink:#E4CDFF;--ink-btn:#F4F1F8;--ink-btn-text:#0B0A0F;
+  --bezel:#26222D;--shadow:0 30px 60px -35px #000;color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0A0F;--surface:#17151C;--surface-2:#221F29;--ink:#F4F1F8;--muted:#9C95A8;--subtle:#7E7889;--line:#2B2733;--brand:#C9AAFB;
+  --nav:#E4CDFF;--nav-ink:#0B0A0F;--nav-active:#0B0A0F;--nav-active-ink:#E4CDFF;--ink-btn:#F4F1F8;--ink-btn-text:#0B0A0F;
+  --bezel:#26222D;--shadow:0 30px 60px -35px #000;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:var(--sans);font-size:14px;line-height:1.45;padding:28px 16px 64px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;padding:0;text-align:left}
+svg.i{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+h1,h2,h3{font-family:var(--display);margin:0;font-weight:600}
+
+.top{max-width:900px;margin:0 auto 26px;display:flex;justify-content:space-between;align-items:end;gap:16px;flex-wrap:wrap}
+.top h1{font-size:28px;letter-spacing:-.02em}
+.top p{margin:6px 0 0;color:var(--muted);max-width:60ch}
+.seg{display:flex;gap:4px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px}
+.seg button{padding:7px 14px;border-radius:999px;font-weight:700;font-size:13px;color:var(--muted)}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.ctrls{display:flex;gap:10px;flex-wrap:wrap}
+
+.stage{display:flex;justify-content:center;gap:40px;flex-wrap:wrap;max-width:1100px;margin:0 auto}
+.notes{max-width:340px;display:grid;gap:10px;align-content:start;color:var(--muted);font-weight:600;font-size:13px}
+.notes h2{font-size:17px;color:var(--ink)}
+.notes ol{margin:0;padding-left:18px;display:grid;gap:7px}
+.notes b{color:var(--ink)}
+
+/* phone: 390 wide like an iPhone 14, the scroll area really scrolls */
+.phone{width:390px;max-width:100%;height:844px;border:9px solid var(--bezel);border-radius:52px;overflow:hidden;background:var(--bg);box-shadow:var(--shadow);position:relative;display:flex;flex-direction:column}
+.sb{display:flex;justify-content:space-between;align-items:center;padding:14px 30px 4px;font-size:13px;font-weight:700;flex:none}
+.sb i{display:inline-block;width:22px;height:11px;border:1.6px solid currentColor;border-radius:3px;position:relative}
+.sb i::after{content:"";position:absolute;inset:1.5px;right:5px;background:currentColor;border-radius:1px}
+.scroll{flex:1;overflow-y:auto;scrollbar-width:none;padding:12px 20px 130px;display:flex;flex-direction:column;gap:18px}
+.scroll::-webkit-scrollbar{display:none}
+
+.paper{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:18px 18px}
+.pastel{color:var(--on-pastel)}
+.lav{background-color:var(--lav)}.butter{background-color:var(--butter)}.mint{background-color:var(--mint)}.rose{background-color:var(--rose)}.lav2{background-color:var(--lav-2)}
+
+/* greeting */
+.hi{display:flex;justify-content:space-between;align-items:center}
+.hi b{font-family:var(--display);font-size:19px;font-weight:600;display:block}
+.hi small{display:flex;gap:6px;align-items:center;color:var(--muted);font-weight:600;font-size:13px;margin-top:3px}
+.pro{background:var(--ink);color:var(--bg);font-size:10px;font-weight:800;letter-spacing:.08em;padding:2px 7px;border-radius:999px}
+.ava{width:50px;height:50px;border-radius:50%;background:var(--butter);color:var(--on-pastel);display:grid;place-items:center;font-family:var(--display);font-weight:700;font-size:18px;border:3px solid var(--surface)}
+.hero-t{font-size:34px;line-height:37px;letter-spacing:-.8px}
+
+/* chips: horizontal scroll that bleeds to the screen edge */
+.chips{display:flex;gap:8px;margin:0 -20px;padding:0 20px;overflow-x:auto;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:none;display:flex;gap:7px;align-items:center;border-radius:999px;padding:9px 15px 9px 12px;font-weight:700;font-size:13px;color:var(--on-pastel)}
+.chip svg.i{width:15px;height:15px;stroke-width:2}
+.chip.plain{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)}
+
+/* continue card: full width */
+.big{border-radius:30px;padding:20px;position:relative;display:flex;flex-direction:column;gap:10px;min-height:236px;overflow:hidden}
+.big .k{font-weight:700;font-size:13px}
+.big h3{font-size:30px;line-height:31px;letter-spacing:-.7px;max-width:58%}
+.meta{display:flex;align-items:center;gap:8px;font-weight:700;font-size:13px}
+.prog{height:6px;border-radius:9px;background:rgba(11,10,15,.12);overflow:hidden;width:110px}
+.prog b{display:block;height:100%;background:var(--on-pastel);border-radius:9px}
+.illus{position:absolute;right:4px;top:40px;width:136px;height:128px;pointer-events:none}
+.cta{margin-top:auto;display:flex;align-items:center;justify-content:space-between;background:#fff;color:#0B0A0F;border-radius:999px;min-height:56px;padding:6px 6px 6px 22px;font-weight:700;font-size:16px;position:relative;z-index:1;width:100%}
+.cta i{width:44px;height:44px;border-radius:50%;background:#0B0A0F;color:#fff;display:grid;place-items:center}
+
+.sec{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:12px}
+.sec h2{font-size:20px;letter-spacing:-.3px}
+.sec a,.link{color:var(--brand);font-weight:700;text-decoration:none;font-size:13.5px}
+
+/* recent chapters */
+.cards{display:flex;gap:12px;margin:0 -20px;padding:0 20px;overflow-x:auto;scrollbar-width:none}
+.cards::-webkit-scrollbar{display:none}
+.pc{flex:none;width:200px;border-radius:24px;padding:14px;display:grid;gap:14px;color:var(--on-pastel)}
+.pc .ic{width:40px;height:40px;border-radius:20px;background:#fff;display:grid;place-items:center;color:#0B0A0F}
+.pc b{font-size:15px;line-height:21px;min-height:42px;display:block}
+.pc .line{display:flex;justify-content:space-between;font-size:12px;font-weight:600}
+.pc .line span:last-child{font-weight:700}
+.pc .prog{width:100%;background:rgba(255,255,255,.6);margin-top:6px}
+
+/* week strip */
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px}
+.week{display:flex;padding:8px}
+.day{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 0 13px;border-radius:999px;position:relative;font-weight:700;font-size:15px}
+.day small{color:var(--muted);font-weight:600;font-size:11.5px}
+.day.on{background:var(--ink-btn);color:var(--ink-btn-text)}.day.on small{color:inherit;opacity:.75}
+.day.sat{background:var(--butter);color:var(--on-pastel)}.day.sat small{color:var(--on-pastel)}
+.day.dot::after{content:"";position:absolute;bottom:5px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--lav-2)}
+.day.on.dot::after{background:var(--lav)}
+
+/* today's plan */
+.plan-h{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:4px}
+.plan-h h2{font-size:20px}
+.plan-sub{color:var(--muted);font-weight:600;font-size:13px;margin:0 0 12px}
+.tasks{display:grid;gap:10px}
+.task{display:flex;align-items:center;gap:12px;padding:14px;border-radius:20px;background:var(--surface);border:1px solid var(--line);width:100%}
+.task .box{width:28px;height:28px;border-radius:50%;border:1.5px solid var(--line);display:grid;place-items:center;flex:none}
+.task span{flex:1;font-weight:700;font-size:14.5px;line-height:20px}
+.task small{color:var(--muted);font-weight:600;font-size:12px}
+.task.done{background:var(--mint);border-color:transparent;color:var(--on-pastel)}
+.task.done .box{background:#0B0A0F;border:0;color:#fff}
+.task.done span{text-decoration:line-through}
+.task.done small{color:var(--on-pastel)}
+.add{display:flex;align-items:center;justify-content:center;gap:8px;padding:14px;border-radius:20px;border:1.5px dashed var(--line);color:var(--muted);font-weight:700;font-size:13px;width:100%}
+
+/* promo cards */
+.promo{border-radius:28px;padding:20px;position:relative;display:flex;flex-direction:column;gap:8px;overflow:hidden;width:100%;min-height:172px}
+.promo .go{margin-top:auto!important}
+.promo .k{display:flex;gap:6px;align-items:center;font-weight:700;font-size:13px}
+.promo h3{font-size:26px;line-height:29px;letter-spacing:-.5px;padding-right:112px}
+.promo .go{display:flex;align-items:center;gap:6px;margin-top:6px;font-weight:700;font-size:15px}
+.promo .art{position:absolute;right:14px;bottom:10px;pointer-events:none}
+
+/* floating tab bar: full width (16pt margins), each tab gets a quarter of it */
+.nav{position:absolute;left:16px;right:16px;bottom:26px;height:64px;background:var(--nav);color:var(--nav-ink);border-radius:32px;padding:0 6px;display:flex;align-items:center;box-shadow:0 14px 18px -6px rgba(0,0,0,.3)}
+.nav button{flex:1;height:64px;display:grid;place-items:center;border-radius:32px}
+.nav button span{width:64px;height:48px;border-radius:24px;display:grid;place-items:center}
+.nav button[aria-current] span{background:var(--nav-active);color:var(--nav-active-ink)}
+.nav svg.i{width:22px;height:22px}
+.homebar{position:absolute;left:50%;bottom:8px;transform:translateX(-50%);width:134px;height:5px;border-radius:3px;background:var(--ink);opacity:.85}
+
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="top">
+  <div>
+    <h1>Home screen: how it should look</h1>
+    <p>The redesigned Home tab at iPhone size (390 pt wide). Scroll inside the phone. This is what the app's code is meant to render, and it matches the browser preview from the last session.</p>
+  </div>
+  <div class="ctrls">
+    <div class="seg" role="group" aria-label="User">
+      <button data-u="in" aria-pressed="true">Logged in</button><button data-u="out">Logged out</button>
+    </div>
+    <div class="seg" role="group" aria-label="Theme">
+      <button data-t="light">Light</button><button data-t="dark">Dark</button><button data-t="auto" aria-pressed="true">Auto</button>
+    </div>
+  </div>
+</header>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="home" viewBox="0 0 24 24"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"/><path d="M3 10a2 2 0 0 1 .7-1.5l7-6a2 2 0 0 1 2.6 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></symbol>
+  <symbol id="book" viewBox="0 0 24 24"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></symbol>
+  <symbol id="check-sq" viewBox="0 0 24 24"><path d="M21 10.5V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h12.5"/><path d="m9 11 3 3L22 4"/></symbol>
+  <symbol id="user" viewBox="0 0 24 24"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></symbol>
+  <symbol id="cal" viewBox="0 0 24 24"><path d="M8 2v4M16 2v4"/><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M3 10h18"/></symbol>
+  <symbol id="timer" viewBox="0 0 24 24"><path d="M10 2h4M12 14l3-3"/><circle cx="12" cy="14" r="8"/></symbol>
+  <symbol id="play" viewBox="0 0 24 24"><path d="M6 3l14 9-14 9z"/></symbol>
+  <symbol id="arrow" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></symbol>
+  <symbol id="plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"/></symbol>
+  <symbol id="tick" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="spark" viewBox="0 0 24 24"><path d="M12 3l1.9 5.8L20 11l-6.1 2.2L12 19l-1.9-5.8L4 11l6.1-2.2z"/></symbol>
+</svg>
+
+<main class="stage">
+<div class="phone">
+  <div class="sb"><span>9:41</span><i></i></div>
+  <div class="scroll">
+
+    <!-- 1 greeting -->
+    <div class="hi">
+      <div>
+        <b data-in>Hi, Alex</b><b data-out hidden>Hi there</b>
+        <small data-in><span class="pro">PRO</span> 1,240 points</small>
+        <small data-out hidden>Log in to save your progress</small>
+      </div>
+      <div class="ava"><span data-in>A</span><span data-out hidden>S</span></div>
+    </div>
+
+    <h1 class="hero-t">Let's crack<br>some math.</h1>
+
+    <!-- 2 quick chips -->
+    <div class="chips">
+      <button class="chip butter"><svg class="i"><use href="#cal"/></svg>SAT in 23 days</button>
+      <button class="chip mint"><svg class="i"><use href="#book"/></svg>Course</button>
+      <button class="chip lav"><svg class="i"><use href="#timer"/></svg>Practice exam</button>
+      <button class="chip plain"><svg class="i"><use href="#cal"/></svg>Planner</button>
+    </div>
+
+    <!-- 3 continue card -->
+    <article class="big butter paper pastel">
+      <div class="k" data-in>Continue where you left off</div><div class="k" data-out hidden>Start here</div>
+      <h3 data-in>Linear Equations</h3><h3 data-out hidden>SAT Math course</h3>
+      <div class="meta" data-in><div class="prog"><b style="width:44%"></b></div>44%</div>
+      <div data-out hidden style="font-weight:600;font-size:13px;max-width:55%">Short lessons, then a quiz for each topic.</div>
+      <svg class="illus" viewBox="0 0 170 160" fill="none" stroke="#0B0A0F" stroke-width="2.4" stroke-linecap="round" aria-hidden="true">
+        <path d="M30 140V20M20 120h140"/><path d="M30 20l-5 8M30 20l5 8M160 120l-8-5M160 120l-8 5"/>
+        <path d="M36 132 150 36" stroke-width="4"/>
+        <circle cx="72" cy="102" r="7" fill="#fff"/><circle cx="118" cy="63" r="7" fill="#0B0A0F"/>
+        <path d="M72 102h46v-39" stroke-dasharray="4 6"/>
+        <text x="122" y="104" font-family="Outfit" font-size="16" font-weight="600" fill="#0B0A0F" stroke="none">Δx</text>
+        <g transform="translate(128 6)"><rect width="38" height="24" rx="12" fill="#0B0A0F" stroke="none"/><text x="19" y="16.5" text-anchor="middle" font-family="Outfit" font-size="12" font-weight="700" fill="#FEE7A6" stroke="none">y=mx</text></g>
+      </svg>
+      <button class="cta"><span data-in>Continue chapter</span><span data-out hidden>Open the course</span><i><svg class="i"><use href="#play"/></svg></i></button>
+    </article>
+
+    <!-- 4 recent chapters (only when there are 2+) -->
+    <section data-in>
+      <div class="sec"><h2>Recent chapters</h2><a href="#">All chapters</a></div>
+      <div class="cards">
+        <div class="pc lav paper"><div class="ic"><svg class="i"><use href="#book"/></svg></div><b>Systems of Equations</b><div><div class="line"><span>Progress</span><span>62%</span></div><div class="prog"><b style="width:62%"></b></div></div></div>
+        <div class="pc mint paper"><div class="ic"><svg class="i"><use href="#book"/></svg></div><b>Quadratic Functions</b><div><div class="line"><span>Progress</span><span>18%</span></div><div class="prog"><b style="width:18%"></b></div></div></div>
+        <div class="pc lav2 paper"><div class="ic"><svg class="i"><use href="#book"/></svg></div><b>Ratios and Percentages</b><div><div class="line"><span>Progress</span><span>5%</span></div><div class="prog"><b style="width:5%"></b></div></div></div>
+      </div>
+    </section>
+
+    <!-- 5 this week -->
+    <section>
+      <div class="sec"><h2>This week</h2><a href="#">Planner</a></div>
+      <div class="card week">
+        <div class="day"><small>Su</small>1</div>
+        <div class="day dot"><small>Mo</small>2</div>
+        <div class="day dot"><small>Tu</small>3</div>
+        <div class="day"><small>We</small>4</div>
+        <div class="day on dot"><small>Th</small>5</div>
+        <div class="day"><small>Fr</small>6</div>
+        <div class="day"><small>Sa</small>7</div>
+      </div>
+    </section>
+
+    <!-- 6 today's plan -->
+    <section>
+      <div class="plan-h"><h2>Today's plan</h2><a class="link" href="#" data-in>Edit</a><a class="link" href="#" data-out hidden>Make my own</a></div>
+      <p class="plan-sub" data-in>1 of 3 done</p>
+      <p class="plan-sub" data-out hidden>A suggested plan. Tick a task or make your own.</p>
+      <div class="tasks">
+        <button class="task done"><span class="box"><svg class="i" style="width:16px;height:16px;stroke-width:3"><use href="#tick"/></svg></span><span>Complete 1-2 lessons in a chosen chapter</span><small>Lesson</small></button>
+        <button class="task"><span class="box"></span><span>Practice quiz questions from completed lessons</span><small>Quiz</small></button>
+        <button class="task"><span class="box"></span><span>Review incorrect answers and study explanations</span><small>Review</small></button>
+        <button class="add"><svg class="i" style="width:17px;height:17px"><use href="#plus"/></svg>Add a task</button>
+      </div>
+    </section>
+
+    <!-- 7 practice exam -->
+    <button class="promo lav paper pastel">
+      <div class="k">Practice exam · 44 questions · 70 min</div>
+      <h3>Full SAT Math section</h3>
+      <div class="go">Start a test <svg class="i" style="width:18px;height:18px"><use href="#arrow"/></svg></div>
+      <svg class="art" width="92" height="92" viewBox="0 0 100 100" fill="none" stroke="#0B0A0F" stroke-width="3.2" stroke-linecap="round" aria-hidden="true">
+        <circle cx="48" cy="56" r="32" fill="#fff"/><path d="M40 14h16M48 14v10M76 26l6-6"/><path d="M48 56V36M48 56l12 8" stroke-width="4"/><circle cx="48" cy="56" r="3.5" fill="#0B0A0F"/>
+      </svg>
+    </button>
+
+    <!-- 8 PRO (logged in, not PRO yet) -->
+    <button class="promo mint paper pastel" data-in>
+      <div class="k"><svg class="i" style="width:15px;height:15px"><use href="#spark"/></svg>SAT Learner PRO</div>
+      <h3 style="font-size:24px;line-height:27px">Every lesson, every test, no limits</h3>
+      <div class="go">See plans <svg class="i" style="width:18px;height:18px"><use href="#arrow"/></svg></div>
+      <svg class="art" style="right:12px;bottom:12px" width="88" height="88" viewBox="0 0 100 100" fill="none" stroke="#0B0A0F" stroke-width="3.2" stroke-linejoin="round" aria-hidden="true">
+        <path d="M16 70 10 30l24 18 16-28 16 28 24-18-6 40z" fill="#FEE7A6"/><path d="M18 82h64"/>
+      </svg>
+    </button>
+  </div>
+
+  <nav class="nav" aria-label="Tabs">
+    <button aria-current="page" aria-label="Home"><span><svg class="i" style="stroke-width:2.3"><use href="#home"/></svg></span></button>
+    <button aria-label="Course"><span><svg class="i"><use href="#book"/></svg></span></button>
+    <button aria-label="Tests"><span><svg class="i"><use href="#check-sq"/></svg></span></button>
+    <button aria-label="Profile"><span><svg class="i"><use href="#user"/></svg></span></button>
+  </nav>
+  <div class="homebar"></div>
+</div>
+
+<aside class="notes">
+  <h2>What to check on your phone</h2>
+  <ol>
+    <li><b>Tab bar</b> runs the full width of the screen (16 pt gap each side), floating above the home indicator. Each tab is a quarter of the bar, and the active one has a wide white pill.</li>
+    <li><b>Every card is full width</b> (screen minus 20 pt on each side): the butter "continue" card, the week strip, the task rows and the two promo cards.</li>
+    <li><b>Pastel cards</b> have rounded corners, a faint graph-paper grid, and a drawing on the right that stays inside the card.</li>
+    <li><b>Chip row and recent chapters</b> scroll sideways and run to the screen edge.</li>
+    <li>Headings use <b>Outfit</b>, everything else uses <b>Manrope</b>.</li>
+  </ol>
+</aside>
+</main>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var tb=document.querySelectorAll('[data-t]'), ub=document.querySelectorAll('[data-u]');
+  function theme(t){ if(t==='auto') root.removeAttribute('data-theme'); else root.setAttribute('data-theme',t);
+    tb.forEach(function(b){b.setAttribute('aria-pressed', String(b.dataset.t===t));}); }
+  function user(u){ document.querySelectorAll('[data-in]').forEach(function(e){e.hidden=u!=='in';});
+    document.querySelectorAll('[data-out]').forEach(function(e){e.hidden=u!=='out';});
+    ub.forEach(function(b){b.setAttribute('aria-pressed', String(b.dataset.u===u));}); }
+  tb.forEach(function(b){b.onclick=function(){theme(b.dataset.t);};});
+  ub.forEach(function(b){b.onclick=function(){user(b.dataset.u);};});
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SAT Math Learner — New Sub-Lesson Architecture & Video Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Outfit:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js" onload="renderMath()"></script>
+  <style>
+    :root {
+      --lav: #E4CDFF;
+      --lav-deep: #C9AAFB;
+      --violet: #7C4DDB;
+      --butter: #FEE7A6;
+      --mint: #CDEFD9;
+      --green: #1F9D55;
+      --rose: #FFD6DE;
+      --red: #E0446A;
+      --ink: #0B0A0F;
+      --ink2: #4A4458;
+      --bg: #F4F1F9;
+      --white: #FFFFFF;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Manrope', sans-serif;
+      background-color: var(--bg);
+      background-image: linear-gradient(rgba(11,10,15,.04) 1px, transparent 1px), linear-gradient(90deg, rgba(11,10,15,.04) 1px, transparent 1px);
+      background-size: 40px 40px;
+      color: var(--ink);
+      padding: 28px 24px 80px;
+    }
+    .container {
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 28px;
+      background: var(--ink);
+      color: var(--white);
+      padding: 22px 30px;
+      border-radius: 28px;
+      border: 3px solid var(--ink);
+      box-shadow: 0 8px 0 var(--lav-deep);
+    }
+    header h1 {
+      font-family: 'Outfit', sans-serif;
+      font-size: 28px;
+      font-weight: 900;
+    }
+    header h1 span { color: var(--butter); }
+    header p {
+      color: var(--lav);
+      font-size: 15px;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+    .topic-tabs {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .topic-tab {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 12px 20px;
+      border-radius: 999px;
+      border: 3px solid var(--ink);
+      background: var(--white);
+      color: var(--ink);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .topic-tab.active {
+      background: var(--butter);
+      box-shadow: 0 4px 0 var(--lav);
+      transform: translateY(-2px);
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: 360px 1fr;
+      gap: 28px;
+      align-items: start;
+    }
+    @media (max-width: 960px) {
+      .grid { grid-template-columns: 1fr; }
+    }
+    .panel {
+      background: var(--white);
+      border: 3px solid var(--ink);
+      border-radius: 28px;
+      box-shadow: 0 8px 0 var(--ink);
+      padding: 24px;
+    }
+    .panel-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 20px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .panel-sub {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--ink2);
+      margin-bottom: 18px;
+    }
+    /* Sub-lesson Path Nodes */
+    .path-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .path-node {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px 16px;
+      border-radius: 18px;
+      border: 3px solid var(--ink);
+      background: var(--white);
+      cursor: pointer;
+      transition: transform 0.12s ease;
+    }
+    .path-node:hover { transform: translateX(3px); }
+    .path-node.active {
+      background: var(--lav);
+      box-shadow: 0 5px 0 var(--ink);
+    }
+    .path-node.quiz-node {
+      background: #FBF9FF;
+      border-style: dashed;
+    }
+    .node-num {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+      background: var(--ink);
+      color: var(--butter);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+    .node-info { flex: 1; }
+    .node-tag {
+      font-family: 'Outfit', sans-serif;
+      font-size: 11px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--violet);
+    }
+    .node-name {
+      font-family: 'Outfit', sans-serif;
+      font-size: 16px;
+      font-weight: 800;
+      line-height: 1.2;
+      margin-top: 2px;
+    }
+    .node-meta {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--ink2);
+      margin-top: 2px;
+    }
+
+    /* Lesson Viewer */
+    .lesson-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-bottom: 18px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--ink);
+      color: var(--butter);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 13px;
+      padding: 6px 14px;
+      border-radius: 999px;
+    }
+    .lesson-title {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 30px;
+      line-height: 1.15;
+      margin-bottom: 16px;
+    }
+    .video-box {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--ink);
+      border: 4px solid var(--ink);
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 8px 0 var(--ink);
+      margin-bottom: 24px;
+    }
+    .video-box video {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    .section-block {
+      margin-top: 22px;
+      padding: 20px 24px;
+      border-radius: 22px;
+      border: 3px solid var(--ink);
+      background: #FAF8FE;
+    }
+    .section-block h3 {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 20px;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .vex-tip {
+      background: var(--butter);
+      border: 3px solid var(--ink);
+      border-radius: 22px;
+      padding: 18px 22px;
+      margin-top: 20px;
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+    }
+    .vex-avatar {
+      background: var(--ink);
+      color: var(--butter);
+      font-family: 'Outfit', sans-serif;
+      font-weight: 900;
+      font-size: 14px;
+      padding: 8px 12px;
+      border-radius: 14px;
+      white-space: nowrap;
+    }
+
+    /* Interactive Worked Example Stepper */
+    .stepper-card {
+      margin-top: 22px;
+      background: var(--white);
+      border: 3px solid var(--ink);
+      border-radius: 22px;
+      padding: 22px 24px;
+    }
+    .step-item {
+      margin-top: 12px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 2px solid var(--ink);
+      background: var(--bg);
+      display: none;
+    }
+    .step-item.visible { display: block; animation: popIn 0.25s ease; }
+    @keyframes popIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .btn {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 15px;
+      padding: 11px 22px;
+      border-radius: 14px;
+      border: 3px solid var(--ink);
+      background: var(--lav);
+      color: var(--ink);
+      cursor: pointer;
+      box-shadow: 0 4px 0 var(--ink);
+      margin-top: 14px;
+    }
+    .btn:active { transform: translateY(2px); box-shadow: 0 2px 0 var(--ink); }
+
+    /* Instant Check Micro-Quiz */
+    .check-card {
+      margin-top: 24px;
+      background: var(--ink);
+      color: var(--white);
+      border-radius: 24px;
+      padding: 24px;
+    }
+    .options-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-top: 16px;
+    }
+    .opt-btn {
+      font-family: 'Outfit', sans-serif;
+      font-weight: 800;
+      font-size: 17px;
+      padding: 14px 18px;
+      border-radius: 16px;
+      border: 3px solid rgba(228,205,255,.25);
+      background: rgba(228,205,255,.08);
+      color: var(--white);
+      cursor: pointer;
+      text-align: left;
+      transition: all 0.15s ease;
+    }
+    .opt-btn:hover { background: rgba(228,205,255,.18); }
+    .opt-btn.correct { background: var(--mint); color: var(--ink); border-color: var(--white); }
+    .opt-btn.wrong { background: var(--rose); color: var(--ink); border-color: var(--red); }
+    .feedback {
+      margin-top: 14px;
+      padding: 12px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 15px;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <h1>SAT Math Learner · <span>Interactive Sub-Lessons & Dr. Vex Videos</span></h1>
+        <p>Each long chapter is divided into 3–4 focused sub-lessons (1 concept + 1 video + 1 interactive worked example + 1 instant check)</p>
+      </div>
+      <div class="topic-tabs">
+        <button class="topic-tab active" onclick="selectTopic('systems', this)">1. Algebra: Systems</button>
+        <button class="topic-tab" onclick="selectTopic('triangles', this)">2a. Geometry: Triangles (Dr. Vex)</button>
+        <button class="topic-tab" onclick="selectTopic('triangles_ava', this)">2b. Geometry: Triangles (Scatterplot Style · Ava)</button>
+        <button class="topic-tab" onclick="selectTopic('quadratics', this)">3. Functions: Quadratics</button>
+      </div>
+    </header>
+
+    <div class="grid">
+      <!-- Left: New Chapter Sub-Lesson Path -->
+      <div class="panel">
+        <div class="panel-title">
+          <span id="chap-title">Chapter 5: Systems</span>
+          <span style="font-size:13px; background:var(--mint); padding:4px 10px; border-radius:99px; border:2px solid var(--ink);">New Split</span>
+        </div>
+        <div class="panel-sub">Instead of 1 giant 600-word wall of text, students progress through bite-sized sub-lessons:</div>
+        <div class="path-list" id="path-list"></div>
+      </div>
+
+      <!-- Right: Active Sub-Lesson Screen -->
+      <div class="panel" id="lesson-view"></div>
+    </div>
+  </div>
+
+  <script>
+    const DATA = {
+      systems: {
+        chapter: "Chapter 5 · Systems of Linear Equations",
+        nodes: [
+          { type: "Sub-Lesson 5.1", name: "How Many Solutions? (1, 0, or ∞) & Elimination", meta: "1 min video · Interactive Example", active: true },
+          { type: "Sub-Lesson 5.2", name: "Substitution & Word-Problem Translation", meta: "1 min video · 2 Worked Examples", active: false },
+          { type: "Mini-Quiz", name: "Theory Check: Systems of Equations", meta: "6 questions · +30 pts", quiz: true },
+          { type: "Sub-Lesson 5.3", name: "The 'No Solution' Constant Trap (SAT Favorite)", meta: "1 min video · High-Yield Trap", active: false },
+          { type: "Practice Set", name: "SAT Practice Problems 1 & 2", meta: "26 questions · Exam Level", quiz: true }
+        ],
+        badge: "SUB-LESSON 5.1 · ALGEBRA",
+        title: "Systems of Equations: Elimination & Number of Solutions",
+        video: "../videos/out/lesson-systems.mp4",
+        summaryHtml: `
+          <p style="font-size:16px; line-height:1.6;">A system of two linear equations represents <strong>two lines on the coordinate plane</strong>. Every point where the lines touch is a solution $(x, y)$ that satisfies both equations at once:</p>
+          <ul style="margin:12px 0 0 22px; line-height:1.8; font-weight:600;">
+            <li><strong>1 Solution:</strong> Different slopes — the lines cross at one point.</li>
+            <li><strong>0 Solutions:</strong> Same slope, different $y$-intercepts — <em>parallel lines</em> that never touch ($\\frac{a_1}{a_2} = \\frac{b_1}{b_2} \\neq \\frac{c_1}{c_2}$).</li>
+            <li><strong>Infinitely Many Solutions:</strong> Same slope, same intercept — the exact same line scaled by a constant.</li>
+          </ul>
+        `,
+        vexTip: "Never solve for x and y separately if the SAT asks for an expression like 3x or x + y! Stack the two equations and add or subtract them — the SAT designs the coefficients to cancel in one move.",
+        exampleQuestion: "For what value of constant $a$ does the system $\\begin{cases} 12x - ay = 10 \\\\ 4x - 3y = -5 \\end{cases}$ have <strong>no solution</strong>?",
+        steps: [
+          "<strong>Step 1 (Spot the keyword):</strong> 'No solution' means the two lines are <em>parallel</em> — their $x$ and $y$ coefficients must be in the exact same ratio.",
+          "<strong>Step 2 (Scale to match $12x$):</strong> Multiply the bottom equation's left side by $3$: $3(4x - 3y) = 12x - 9y$.",
+          "<strong>Step 3 (Match $-ay$ with $-9y$):</strong> Comparing $12x - ay$ with $12x - 9y$ gives $\\mathbf{a = 9}$ (while the constants $10 \\neq -15$ stay different!)."
+        ],
+        checkQuestion: "Instant Check: For what value of $k$ does the system $6x + ky = 14$ and $2x + 5y = 3$ have NO solution?",
+        options: [
+          { text: "A) k = 5", correct: false },
+          { text: "B) k = 10", correct: false },
+          { text: "C) k = 15", correct: true },
+          { text: "D) k = 30", correct: false }
+        ],
+        checkExplain: "Correct! Multiply the second equation's coefficients by 3 to match 6x: 3 × 2x = 6x, so k = 3 × 5 = 15."
+      },
+      triangles: {
+        chapter: "Chapter 18 · Intro to Geometry",
+        nodes: [
+          { type: "Sub-Lesson 18.1", name: "Lines & Parallel Transversal Angles", meta: "1 min video · Angle Chasing", active: false },
+          { type: "Sub-Lesson 18.2", name: "Triangles & The Exterior Angle Shortcut", meta: "1 min video · Interactive Example", active: true },
+          { type: "Mini-Quiz", name: "Theory Check: Angles & Triangles", meta: "6 questions · +30 pts", quiz: true },
+          { type: "Sub-Lesson 18.3", name: "Right Triangles, Area & Similarity", meta: "1 min video · Pythagorean Triples", active: false },
+          { type: "Practice Set", name: "SAT Geometry Practice Problems", meta: "21 questions · Exam Level", quiz: true }
+        ],
+        badge: "SUB-LESSON 18.2 · GEOMETRY",
+        title: "Triangles: Interior Sum & The Exterior Angle Shortcut",
+        video: "../videos/out/lesson-triangles.mp4",
+        summaryHtml: `
+          <p style="font-size:16px; line-height:1.6;">Every triangle obeys two ironclad angle laws that turn multi-step geometry diagrams into one-line addition:</p>
+          <ul style="margin:12px 0 0 22px; line-height:1.8; font-weight:600;">
+            <li><strong>Interior Angle Sum:</strong> The three inside angles always add to $180^\\circ$ ($A + B + C = 180^\\circ$).</li>
+            <li><strong>Exterior Angle Theorem:</strong> Extending any side creates an outside angle $d$ equal to the sum of the <strong>two remote interior angles</strong>: $\\mathbf{d = A + B}$.</li>
+          </ul>
+        `,
+        vexTip: "Stop finding the third inside angle C just to subtract it from 180° again! Whenever you see an angle outside a triangle, set it directly equal to the sum of the two far inside corners.",
+        exampleQuestion: "In $\\triangle ABC$, $\\angle A = (2x + 12)^\\circ$, $\\angle B = (x + 19)^\\circ$, and the exterior angle at vertex $C$ measures $121^\\circ$. What is the value of $x$?",
+        steps: [
+          "<strong>Step 1 (Apply Exterior Angle Theorem):</strong> Outside angle at $C = \\angle A + \\angle B$, so $(2x + 12) + (x + 19) = 121$.",
+          "<strong>Step 2 (Combine like terms):</strong> $3x + 31 = 121 \\Rightarrow 3x = 90$.",
+          "<strong>Step 3 (Solve):</strong> Divide by $3$ to get $\\mathbf{x = 30}$!"
+        ],
+        checkQuestion: "Instant Check: In △ABC, interior angles A and B measure 48° and 67°. What is the measure of the exterior angle at C?",
+        options: [
+          { text: "A) 65°", correct: false },
+          { text: "B) 115°", correct: true },
+          { text: "C) 125°", correct: false },
+          { text: "D) 132°", correct: false }
+        ],
+        checkExplain: "Spot on! By the Exterior Angle Theorem, d = A + B = 48° + 67° = 115° (no need to find angle C = 65° first!)."
+      },
+      triangles_ava: {
+        chapter: "Chapter 18 · Intro to Geometry",
+        nodes: [
+          { type: "Sub-Lesson 18.1", name: "Lines & Parallel Transversal Angles", meta: "1 min video · Angle Chasing", active: false },
+          { type: "Sub-Lesson 18.2", name: "Triangle Angle Rules (Scatterplot Style · Ava Voice)", meta: "1 min video · 2 Worked Examples", active: true },
+          { type: "Mini-Quiz", name: "Theory Check: Angles & Triangles", meta: "6 questions · +30 pts", quiz: true },
+          { type: "Sub-Lesson 18.3", name: "Right Triangles, Area & Similarity", meta: "1 min video · Pythagorean Triples", active: false },
+          { type: "Practice Set", name: "SAT Geometry Practice Problems", meta: "21 questions · Exam Level", quiz: true }
+        ],
+        badge: "SUB-LESSON 18.2 · SCATTERPLOT STYLE (AVA)",
+        title: "Triangle Angle Rules: Interior Sum & Exterior Angle Shortcut",
+        video: "../videos/out/lesson-triangles-ava.mp4",
+        summaryHtml: `
+          <p style="font-size:16px; line-height:1.6;">Every triangle obeys two core angle rules that turn multi-step geometry problems into a single addition:</p>
+          <ul style="margin:12px 0 0 22px; line-height:1.8; font-weight:600;">
+            <li><strong>Interior Angle Sum:</strong> The three inside angles always add to $180^\\circ$ ($A + B + C = 180^\\circ$).</li>
+            <li><strong>Exterior Angle Rule:</strong> Extending one side past a vertex creates an outside angle $d$ equal to the sum of the two remote interior angles: $\\mathbf{d = A + B}$.</li>
+          </ul>
+        `,
+        vexTip: "Key Takeaway: Because both (A + B + C) and (d + C) form a 180° straight angle, you can always skip angle C and set the exterior angle directly equal to A + B.",
+        exampleQuestion: "In $\\triangle ABC$, $\\angle A = (2x + 12)^\\circ$, $\\angle B = (x + 19)^\\circ$, and the exterior angle at vertex $C$ measures $121^\\circ$. What is the value of $x$?",
+        steps: [
+          "<strong>Step 1 (Apply Exterior Angle Rule):</strong> Outside angle at $C = \\angle A + \\angle B$, so $(2x + 12) + (x + 19) = 121$.",
+          "<strong>Step 2 (Combine like terms):</strong> $3x + 31 = 121 \\Rightarrow 3x = 90$.",
+          "<strong>Step 3 (Solve):</strong> Divide by $3$ to get $\\mathbf{x = 30}$."
+        ],
+        checkQuestion: "Instant Check: In △ABC, interior angles A and B measure 48° and 67°. What is the measure of the exterior angle at C?",
+        options: [
+          { text: "A) 65°", correct: false },
+          { text: "B) 115°", correct: true },
+          { text: "C) 125°", correct: false },
+          { text: "D) 132°", correct: false }
+        ],
+        checkExplain: "Correct! Using d = A + B, 48° + 67° = 115°."
+      },
+      quadratics: {
+        chapter: "Chapter 8 · Functions & Parabolas",
+        nodes: [
+          { type: "Sub-Lesson 8.1", name: "Function Notation & Linear Slopes", meta: "1 min video · Domain & Range", active: false },
+          { type: "Sub-Lesson 8.2", name: "Quadratics: Vertex Shifts & The Discriminant", meta: "1 min video · Interactive Example", active: true },
+          { type: "Mini-Quiz", name: "Theory Check: Functions", meta: "9 questions · +45 pts", quiz: true },
+          { type: "Sub-Lesson 8.3", name: "Function Transformations f(x - h) + k", meta: "1 min video · Reflections & Scaling", active: false },
+          { type: "Practice Set", name: "SAT Functions Practice Problems", meta: "14 questions · Exam Level", quiz: true }
+        ],
+        badge: "SUB-LESSON 8.2 · FUNCTIONS",
+        title: "Quadratics: Vertex Form, Shifts & The Discriminant",
+        video: "../videos/out/lesson-quadratics.mp4",
+        summaryHtml: `
+          <p style="font-size:16px; line-height:1.6;">The SAT tests quadratics in two main disguises — <strong>Vertex Form</strong> for graph shifts, and <strong>Standard Form</strong> for counting real solutions:</p>
+          <ul style="margin:12px 0 0 22px; line-height:1.8; font-weight:600;">
+            <li><strong>Vertex Form:</strong> $y = a(x - h)^2 + k$ puts the vertex at $(h, k)$. Inside the parentheses, $-h$ shifts <strong>right</strong>; outside, $+k$ shifts <strong>up</strong>.</li>
+            <li><strong>The Discriminant ($D = b^2 - 4ac$):</strong> Tells you how many times $y = ax^2 + bx + c$ crosses the $x$-axis: $D > 0$ (<strong>2 roots</strong>), $D = 0$ (<strong>1 root / tangent</strong>), $D < 0$ (<strong>0 real roots</strong>).</li>
+          </ul>
+        `,
+        vexTip: "When an SAT question says a parabola 'touches the x-axis at exactly one point' or 'has one real solution', don't factor! Immediately write b² − 4ac = 0.",
+        exampleQuestion: "For what value of constant $c$ does the parabola $y = x^2 - 6x + c$ touch the $x$-axis at <strong>exactly one point</strong>?",
+        steps: [
+          "<strong>Step 1 (Translate 'one point' to Discriminant):</strong> Touching the $x$-axis once means $D = b^2 - 4ac = 0$.",
+          "<strong>Step 2 (Substitute $a=1, b=-6$):</strong> $(-6)^2 - 4(1)(c) = 0 \\Rightarrow 36 - 4c = 0$.",
+          "<strong>Step 3 (Solve for $c$):</strong> $4c = 36 \\Rightarrow \\mathbf{c = 9}$ (which makes $y = (x - 3)^2$, with vertex right on $(3, 0)$!)."
+        ],
+        checkQuestion: "Instant Check: What is the vertex of the parabola y = 2(x + 4)² − 7?",
+        options: [
+          { text: "A) (4, −7)", correct: false },
+          { text: "B) (−4, −7)", correct: true },
+          { text: "C) (−4, 7)", correct: false },
+          { text: "D) (2, −7)", correct: false }
+        ],
+        checkExplain: "Nice! Remember the horizontal sign flip: (x + 4)² = (x − (−4))², so h = −4 and k = −7 → Vertex (−4, −7)."
+      }
+    };
+
+    let currentStep = 0;
+
+    function renderMath() {
+      if (window.renderMathInElement) {
+        renderMathInElement(document.body, {
+          delimiters: [
+            { left: "$$", right: "$$", display: true },
+            { left: "$", right: "$", display: false }
+          ],
+          throwOnError: false
+        });
+      }
+    }
+
+    function selectTopic(key, btn) {
+      if (btn) {
+        document.querySelectorAll('.topic-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      }
+      const d = DATA[key];
+      currentStep = 0;
+      document.getElementById('chap-title').textContent = d.chapter;
+
+      // Render left path
+      const pathEl = document.getElementById('path-list');
+      pathEl.innerHTML = d.nodes.map((n, i) => `
+        <div class="path-node ${n.active ? 'active' : ''} ${n.quiz ? 'quiz-node' : ''}">
+          <div class="node-num">${n.quiz ? '?' : i + 1}</div>
+          <div class="node-info">
+            <div class="node-tag">${n.type}</div>
+            <div class="node-name">${n.name}</div>
+            <div class="node-meta">${n.meta}</div>
+          </div>
+        </div>
+      `).join('');
+
+      // Render right lesson view
+      const viewEl = document.getElementById('lesson-view');
+      viewEl.innerHTML = `
+        <div class="lesson-header">
+          <span class="badge">${d.badge}</span>
+          <span style="font-weight:800; font-size:14px; color:var(--green);">+10 PTS · ~3 MIN READ & WATCH</span>
+        </div>
+        <div class="lesson-title">${d.title}</div>
+
+        <div class="video-box">
+          <video controls preload="metadata" src="${d.video}"></video>
+        </div>
+
+        <div class="section-block">
+          <h3>📌 Core Concept</h3>
+          ${d.summaryHtml}
+        </div>
+
+        <div class="vex-tip">
+          <div class="vex-avatar">⚡ DR. VEX</div>
+          <div style="font-weight:700; font-size:15px; line-height:1.5;">${d.vexTip}</div>
+        </div>
+
+        <div class="stepper-card">
+          <div style="font-family:'Outfit',sans-serif; font-weight:800; font-size:14px; color:var(--violet); text-transform:uppercase; letter-spacing:0.06em;">
+            Interactive Worked SAT Example
+          </div>
+          <div style="font-size:18px; font-weight:700; margin-top:8px; line-height:1.4;">${d.exampleQuestion}</div>
+          <div id="steps-container">
+            ${d.steps.map((s, idx) => `<div class="step-item" id="step-${idx}">${s}</div>`).join('')}
+          </div>
+          <button class="btn" id="step-btn" onclick="revealNextStep(${d.steps.length})">Tap to Reveal Step 1 →</button>
+        </div>
+
+        <div class="check-card">
+          <div style="font-family:'Outfit',sans-serif; font-weight:800; font-size:14px; color:var(--butter); text-transform:uppercase; letter-spacing:0.06em;">
+            ⚡ 1-Question Instant Check
+          </div>
+          <div style="font-size:19px; font-weight:800; margin-top:6px;">${d.checkQuestion}</div>
+          <div class="options-grid">
+            ${d.options.map((o, idx) => `
+              <button class="opt-btn" onclick="checkOption(this, ${o.correct}, '${d.checkExplain.replace(/'/g, "\\'")}')">${o.text}</button>
+            `).join('')}
+          </div>
+          <div class="feedback" id="check-feedback"></div>
+        </div>
+      `;
+      renderMath();
+    }
+
+    function revealNextStep(total) {
+      const el = document.getElementById(`step-${currentStep}`);
+      if (el) el.classList.add('visible');
+      currentStep++;
+      const btn = document.getElementById('step-btn');
+      if (currentStep < total) {
+        btn.textContent = `Tap to Reveal Step ${currentStep + 1} →`;
+      } else {
+        btn.textContent = `✅ All Steps Revealed`;
+        btn.style.background = 'var(--mint)';
+      }
+      renderMath();
+    }
+
+    function checkOption(btn, isCorrect, explain) {
+      document.querySelectorAll('.opt-btn').forEach(b => b.classList.remove('correct', 'wrong'));
+      btn.classList.add(isCorrect ? 'correct' : 'wrong');
+      const fb = document.getElementById('check-feedback');
+      fb.style.display = 'block';
+      fb.style.background = isCorrect ? 'var(--mint)' : 'var(--rose)';
+      fb.style.color = 'var(--ink)';
+      fb.textContent = isCorrect ? `✅ ${explain}` : `❌ Not quite — try again or check the video!`;
+    }
+
+    window.addEventListener('DOMContentLoaded', () => selectTopic('systems'));
+  </script>
+</body>
+</html>
