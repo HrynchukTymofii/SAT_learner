@@ -3,8 +3,9 @@ import { useQuestionDatabase } from "@/lib/db/question";
 import { enqueueOfflineAction } from "@/lib/offlineQueue";
 import { Question } from "@/types";
 import { Bookmark, Lightbulb } from "lucide-react-native";
-import { TouchableOpacity, View } from "react-native";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { View } from "react-native";
+import { usePalette } from "@/constants/palette";
+import { T, Tap } from "@/components/ds";
 
 interface QuestionTogglesProps {
   currentQuestion: Question;
@@ -53,60 +54,46 @@ const QuestionToggles = ({
     });
   };
 
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-
-  const hintButton = currentQuestion.hint ? (
-    <TouchableOpacity
-      onPress={onHintPress}
-      activeOpacity={0.7}
-      style={{
-        backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-        padding: 10,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: isDark ? "#2B2733" : "#E5DFEE",
-      }}
-    >
-      <Lightbulb
-        size={20}
-        color="#E5A50A"
-        fill="#E5A50A"
-      />
-    </TouchableOpacity>
-  ) : null;
-
-  const saveButton = (
-    <TouchableOpacity
-      onPress={toggleSaveQuestion}
-      activeOpacity={0.7}
-      style={{
-        backgroundColor: currentQuestion.isSaved
-          ? (isDark ? "#1e40af" : "#E4CDFF")
-          : (isDark ? "#17151C" : "#EFEAF7"),
-        padding: 10,
-        borderRadius: 12,
-        borderWidth: 1,
-        borderColor: currentQuestion.isSaved
-          ? "#8A5CE6"
-          : (isDark ? "#2B2733" : "#E5DFEE"),
-      }}
-    >
-      <Bookmark
-        size={20}
-        color={currentQuestion.isSaved ? "#8A5CE6" : (isDark ? "#9C95A8" : "#6B6577")}
-        fill={currentQuestion.isSaved ? "#8A5CE6" : "transparent"}
-      />
-    </TouchableOpacity>
-  );
+  const c = usePalette();
 
   return (
     <View style={{ flexDirection: "row", gap: 8 }}>
-      {/* Hint Button */}
-      {currentQuestion.hint && hintButton}
-
-      {/* Bookmark Button */}
-      {saveButton}
+      {!!currentQuestion.hint && (
+        <Tap
+          onPress={onHintPress}
+          accessibilityLabel="Hint"
+          style={({ pressed }) => ({ flexDirection: "row", alignItems: "center", gap: 5, backgroundColor: c.butter, borderRadius: 999, paddingHorizontal: 12, paddingVertical: 7, opacity: pressed ? 0.8 : 1 })}
+        >
+          <Lightbulb size={14} color={c.onPastel} strokeWidth={2.2} />
+          <T variant="smallStrong" onPastel style={{ fontSize: 12 }}>
+            Hint
+          </T>
+        </Tap>
+      )}
+      <Tap
+        onPress={toggleSaveQuestion}
+        accessibilityLabel={currentQuestion.isSaved ? "Remove from saved" : "Save question"}
+        style={({ pressed }) => ({
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 5,
+          backgroundColor: currentQuestion.isSaved ? c.lav : c.surface2,
+          borderRadius: 999,
+          paddingHorizontal: 12,
+          paddingVertical: 7,
+          opacity: pressed ? 0.8 : 1,
+        })}
+      >
+        <Bookmark
+          size={14}
+          color={currentQuestion.isSaved ? c.onPastel : c.muted}
+          fill={currentQuestion.isSaved ? c.onPastel : "transparent"}
+          strokeWidth={2.2}
+        />
+        <T variant="smallStrong" color={currentQuestion.isSaved ? c.onPastel : c.muted} style={{ fontSize: 12 }}>
+          {currentQuestion.isSaved ? "Saved" : "Save"}
+        </T>
+      </Tap>
     </View>
   );
 };

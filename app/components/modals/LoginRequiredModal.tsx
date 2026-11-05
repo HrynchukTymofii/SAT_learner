@@ -1,140 +1,38 @@
 import React from "react";
-import { Modal, View, Text, TouchableOpacity } from "react-native";
-import { X } from "lucide-react-native";
 import { useRouter } from "expo-router";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { LogIn, Lock } from "lucide-react-native";
+import { PillButton } from "@/components/ds";
+import { Sheet } from "@/components/ds/overlays";
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
 }
 
+/** Shown when a feature needs an account. */
 export const LoginRequiredModal = ({ isOpen, onClose }: Props) => {
   const router = useRouter();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-
   return (
-    <Modal visible={isOpen} transparent animationType="fade" onRequestClose={onClose}>
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "rgba(0, 0, 0, 0.6)",
-          paddingHorizontal: 16,
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: isDark ? "#17151C" : "#ffffff",
-            padding: 16,
-            borderRadius: 16,
-            width: "100%",
-            maxWidth: 600,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 6 },
-            shadowOpacity: 0.15,
-            shadowRadius: 12,
-            elevation: 8,
-          }}
-        >
-          {/* Close Button */}
-          <TouchableOpacity
-            onPress={onClose}
-            style={{
-              position: "absolute",
-              top: 16,
-              right: 16,
-              zIndex: 10,
-              padding: 8,
-              backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-              borderRadius: 8,
-            }}
-            activeOpacity={0.7}
-          >
-            <X size={20} color={isDark ? "#F4F1F8" : "#0B0A0F"} />
-          </TouchableOpacity>
-
-          {/* Title */}
-          <Text
-            style={{
-              fontSize: 20,
-              fontWeight: "700",
-              marginBottom: 20,
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              paddingLeft: 8,
-            }}
-          >
-            Login Required
-          </Text>
-
-          {/* Description */}
-          <Text
-            style={{
-              textAlign: "center",
-              fontSize: 16,
-              lineHeight: 24,
-              color: isDark ? "#9C95A8" : "#6B6577",
-              marginBottom: 24,
-              paddingHorizontal: 8,
-            }}
-          >
-            Sign in to unlock full access and sync your progress across all devices.
-          </Text>
-
-          {/* Login Button */}
-          <TouchableOpacity
+    <Sheet
+      visible={isOpen}
+      onClose={onClose}
+      icon={Lock}
+      tone="lav"
+      title="Log in to continue"
+      text="With an account your answers, scores and points are saved, and you can pick up on another phone."
+      footer={
+        <>
+          <PillButton
+            title="Log in or sign up"
+            icon={LogIn}
             onPress={() => {
               onClose();
               router.push("/login");
             }}
-            style={{
-              backgroundColor: "#8A5CE6",
-              borderRadius: 12,
-              paddingVertical: 14,
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-            }}
-            activeOpacity={0.8}
-          >
-            <Text
-              style={{
-                color: "#ffffff",
-                fontWeight: "600",
-                fontSize: 16,
-              }}
-            >
-              Sign In / Register
-            </Text>
-          </TouchableOpacity>
-
-          {/* Secondary Button */}
-          <TouchableOpacity
-            onPress={onClose}
-            style={{
-              marginTop: 12,
-              paddingVertical: 12,
-              alignItems: "center",
-            }}
-            activeOpacity={0.7}
-          >
-            <Text
-              style={{
-                color: isDark ? "#9C95A8" : "#6B6577",
-                fontWeight: "600",
-                fontSize: 14,
-              }}
-            >
-              Maybe Later
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-    </Modal>
+          />
+          <PillButton title="Maybe later" tone="soft" center onPress={onClose} />
+        </>
+      }
+    />
   );
 };

@@ -81,7 +81,7 @@ function createInitialState(
 function showAnswerToast(correct: boolean) {
   Toast.show({
     type: correct ? "success" : "error",
-    text1: correct ? "Correct! ✅" : "Incorrect ❌",
+    text1: correct ? "Correct" : "Not quite",
     position: "top",
     visibilityTime: 700,
   });

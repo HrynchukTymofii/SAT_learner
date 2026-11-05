@@ -1,38 +1,16 @@
-import { View, Text } from "react-native";
+import { View } from "react-native";
 import { AlertTriangle } from "lucide-react-native";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { usePalette } from "@/constants/palette";
+import { T } from "@/components/ds";
 
 export default function TimeAlert() {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-
+  const c = usePalette();
   return (
-    <View
-      style={{
-        backgroundColor: isDark ? "#450a0a" : "#fee2e2",
-        borderRadius: 12,
-        padding: 16,
-        borderLeftWidth: 4,
-        borderLeftColor: "#D93F55",
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 4,
-        elevation: 2,
-      }}
-    >
-      <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        <AlertTriangle size={20} color="#D93F55" />
-        <Text
-          style={{
-            fontWeight: "600",
-            color: "#D93F55",
-            fontSize: 14,
-          }}
-        >
-          Less than 5 minutes remaining!
-        </Text>
-      </View>
+    <View style={{ flexDirection: "row", alignItems: "center", gap: 10, backgroundColor: c.rose, borderRadius: 999, paddingHorizontal: 16, paddingVertical: 10 }}>
+      <AlertTriangle size={17} color={c.onPastel} strokeWidth={2.2} />
+      <T variant="smallStrong" onPastel>
+        Less than 5 minutes left
+      </T>
     </View>
   );
 }

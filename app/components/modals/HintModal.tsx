@@ -1,9 +1,11 @@
 import React from "react";
-import { Modal, View, Text, Pressable, ScrollView } from "react-native";
-import { Lightbulb, X } from "lucide-react-native";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { View } from "react-native";
+import { Lightbulb } from "lucide-react-native";
 import AutoHeightWebView from "react-native-autoheight-webview";
 import { wrapHtmlContent } from "@/lib/htmlWrapper";
+import { usePalette } from "@/constants/palette";
+import { PillButton } from "@/components/ds";
+import { Sheet } from "@/components/ds/overlays";
 
 interface HintModalProps {
   isOpen: boolean;
@@ -12,127 +14,27 @@ interface HintModalProps {
   hintImageUrl?: string;
 }
 
-export const HintModal = ({
-  isOpen,
-  onClose,
-  hint,
-  hintImageUrl,
-}: HintModalProps) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-
+/** Hint for the current question, as a bottom sheet. */
+export const HintModal = ({ isOpen, onClose, hint }: HintModalProps) => {
+  const c = usePalette();
   if (!hint) return null;
-
   return (
-    <Modal
+    <Sheet
       visible={isOpen}
-      animationType="fade"
-      transparent
-      onRequestClose={onClose}
+      onClose={onClose}
+      icon={Lightbulb}
+      tone="butter"
+      title="Hint"
+      scroll
+      footer={<PillButton title="Got it" center onPress={onClose} />}
     >
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          alignItems: "center",
-          backgroundColor: "rgba(0, 0, 0, 0.6)",
-          paddingHorizontal: 16,
-        }}
-      >
-        <View
-          style={{
-            backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-            padding: 20,
-            borderRadius: 16,
-            width: "100%",
-            maxWidth: 600,
-            maxHeight: "80%",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 0.3,
-            shadowRadius: 12,
-            elevation: 10,
-          }}
-        >
-          {/* Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              marginBottom: 16,
-            }}
-          >
-            <View style={{ flexDirection: "row", alignItems: "center" }}>
-              <Lightbulb size={24} color="#E5A50A" fill="#E5A50A" />
-              <Text
-                style={{
-                  fontSize: 20,
-                  fontWeight: "800",
-                  color: isDark ? "#F4F1F8" : "#0B0A0F",
-                  marginLeft: 8,
-                }}
-              >
-                Hint
-              </Text>
-            </View>
-            <Pressable
-              onPress={onClose}
-              style={{
-                padding: 8,
-                backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-                borderRadius: 8,
-              }}
-            >
-              <X size={20} color={isDark ? "#9C95A8" : "#6B6577"} />
-            </Pressable>
-          </View>
-
-          {/* Content */}
-          <ScrollView
-            showsVerticalScrollIndicator={false}
-            style={{ maxHeight: 500 }}
-          >
-            <AutoHeightWebView
-              source={{
-                html: wrapHtmlContent(hint, { isDark }),
-              }}
-              style={{
-                width: "100%",
-                minHeight: 50,
-              }}
-              scrollEnabled={false}
-            />
-          </ScrollView>
-
-          {/* Close Button */}
-          <Pressable
-            onPress={onClose}
-            style={{
-              marginTop: 16,
-              backgroundColor: "#8A5CE6",
-              paddingVertical: 12,
-              borderRadius: 12,
-              alignItems: "center",
-              shadowColor: "#8A5CE6",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 4,
-            }}
-          >
-            <Text
-              style={{
-                color: "#ffffff",
-                fontWeight: "700",
-                fontSize: 16,
-              }}
-            >
-              Got it!
-            </Text>
-          </Pressable>
-        </View>
+      <View style={{ backgroundColor: c.surface, borderRadius: 20, borderWidth: 1, borderColor: c.line, padding: 12 }}>
+        <AutoHeightWebView
+          source={{ html: wrapHtmlContent(hint, { isDark: c.isDark }) }}
+          style={{ width: "100%", minHeight: 50 }}
+          scrollEnabled={false}
+        />
       </View>
-    </Modal>
+    </Sheet>
   );
 };

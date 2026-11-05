@@ -3,6 +3,8 @@ import { View, Text } from "react-native"
 import { useLocalSearchParams, useRouter } from "expo-router"
 import { useAuth } from "@/context/AuthContext"
 import QuizScreen from "@/components/quiz/QuizScreen"
+import { EmptyState, Loading, Screen, TopBar } from "@/components/ds"
+import { CircleAlert } from "lucide-react-native"
 import { useQuizDatabase } from "@/lib/db/quiz"
 import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader"
 
@@ -44,15 +46,15 @@ const QuizByTopicScreen = () => {
 
   if (loading || !token || !quizId) {
     return (
-      <GraduationCap3DLoader />
+      <Loading />
     );
   }
 
   if (error || !quizData) {
     return (
-      <View className="flex-1 items-center justify-center">
-        <Text className="text-red-500">{error || "Something went wrong("}</Text>
-      </View>
+      <Screen header={<TopBar />} contentStyle={{ flexGrow: 1, justifyContent: "center" }}>
+        <EmptyState icon={CircleAlert} tone="rose" title="Couldn't open this quiz" text={error || "Something went wrong. Please try again."} action="Go back" onAction={() => router.back()} />
+      </Screen>
     )
   }
 
@@ -165,7 +167,7 @@ export default QuizByTopicScreen
 //           backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
 //         }}
 //       >
-//         <GraduationCap3DLoader />
+//         <Loading />
 //       </SafeAreaView>
 //     );
 //   }
@@ -251,7 +253,7 @@ export default QuizByTopicScreen
 //               zIndex: 10,
 //             }}
 //           >
-//             <GraduationCap3DLoader />
+//             <Loading />
 //           </View>
 //         )}
 

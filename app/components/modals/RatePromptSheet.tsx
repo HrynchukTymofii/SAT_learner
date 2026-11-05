@@ -16,12 +16,13 @@ import Animated, {
 } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { useColorScheme } from "@/hooks/useColorScheme";
+import { Heart, Send } from "lucide-react-native";
+import { Fonts, usePalette } from "@/constants/palette";
+import { Chip, Field, IconTile, PillButton, T } from "@/components/ds";
 import { useAuth } from "@/context/AuthContext";
 import { sendMessage } from "@/lib/api/user";
 import { markDismissed, markRated, onRatePrompt, type RateSource } from "@/lib/ratePrompt";
 
-const CYAN = "#8A5CE6";
-const GREEN = "#2E9A5E";
 const AMBER = "#E5A50A";
 const STAR_WORDS = ["Bad", "Could be better", "Okay", "Good", "Great!"];
 const REASONS = ["Mistakes in questions", "App bugs", "Too expensive", "Hard to use", "Something else"];
@@ -33,13 +34,8 @@ export default function RatePromptSheet() {
   const { token } = useAuth();
   const insets = useSafeAreaInsets();
   const dark = useColorScheme() === "dark";
-  const c = {
-    sheet: dark ? "#0B0A0F" : "#ffffff",
-    text: dark ? "#F4F1F8" : "#0B0A0F",
-    muted: dark ? "#9C95A8" : "#6B6577",
-    border: dark ? "#2B2733" : "#E5DFEE",
-    handle: dark ? "#2B2733" : "#D9D2E5",
-  };
+  const pal = usePalette();
+  const c = { sheet: pal.bg, text: pal.ink, muted: pal.muted, border: pal.line, handle: pal.line };
 
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState<"stars" | "feedback">("stars");
@@ -127,7 +123,7 @@ export default function RatePromptSheet() {
 
   const notNow = (
     <TouchableOpacity onPress={dismiss} activeOpacity={0.7} style={{ alignSelf: "center", marginTop: 12, paddingHorizontal: 16, paddingVertical: 8 }}>
-      <Text style={{ fontSize: 14.5, fontWeight: "600", color: c.muted }}>Not now</Text>
+      <Text style={{ fontSize: 14.5, fontFamily: Fonts.bodyBold, color: c.muted }}>Not now</Text>
     </TouchableOpacity>
   );
 
@@ -149,8 +145,8 @@ export default function RatePromptSheet() {
       <View
         style={{
           backgroundColor: c.sheet,
-          borderTopLeftRadius: 28,
-          borderTopRightRadius: 28,
+          borderTopLeftRadius: 32,
+          borderTopRightRadius: 32,
           paddingHorizontal: 20,
           paddingBottom: Math.max(insets.bottom, 12) + 12,
         }}
@@ -160,101 +156,39 @@ export default function RatePromptSheet() {
         </View>
 
         {step === "stars" ? (
-          <Animated.View key="stars" entering={FadeIn.duration(250)}>
-            <Text style={{ fontSize: 22, fontWeight: "800", textAlign: "center", color: c.text }}>
-              How do you like the app?
-            </Text>
-            <Text style={{ fontSize: 14, textAlign: "center", color: c.muted, marginTop: 4 }}>
+          <Animated.View key="stars" entering={FadeIn.duration(250)} style={{ alignItems: "center" }}>
+            <IconTile icon={Heart} tone="rose" size={52} radius={18} />
+            <T variant="title" style={{ fontSize: 24, textAlign: "center", marginTop: 12 }}>
+              Enjoying SAT Learner?
+            </T>
+            <T variant="small" style={{ textAlign: "center", marginTop: 4, fontSize: 14 }}>
               Your rating helps other students find us
-            </Text>
+            </T>
 
-            <View style={{ flexDirection: "row", justifyContent: "center", gap: 8, marginTop: 24 }}>
+            <View style={{ flexDirection: "row", justifyContent: "center", gap: 8, marginTop: 22 }}>
               {[1, 2, 3, 4, 5].map((n) => (
                 <Star key={n} index={n} filled={n <= stars} onPress={() => pickStars(n)} dark={dark} />
               ))}
             </View>
 
-            <Text
-              style={{
-                fontSize: 14,
-                fontWeight: "600",
-                textAlign: "center",
-                marginTop: 12,
-                height: 20,
-                color: stars >= 4 ? GREEN : stars ? AMBER : "transparent",
-              }}
-            >
+            <T variant="smallStrong" style={{ textAlign: "center", marginTop: 12, height: 20 }} color={stars ? pal.ink : "transparent"}>
               {stars ? STAR_WORDS[stars - 1] : " "}
-            </Text>
+            </T>
             {notNow}
           </Animated.View>
         ) : (
           <Animated.View key="feedback" entering={FadeInDown.duration(300)}>
-            <Text style={{ fontSize: 22, fontWeight: "800", textAlign: "center", color: c.text }}>
-              What should we improve?
-            </Text>
-            <Text style={{ fontSize: 14, textAlign: "center", color: c.muted, marginTop: 4, marginBottom: 16 }}>
+            <T variant="title" style={{ fontSize: 24 }}>What should we improve?</T>
+            <T variant="small" style={{ marginTop: 4, marginBottom: 16, fontSize: 14 }}>
               We read every message
-            </Text>
-
-            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 12 }}>
-              {REASONS.map((label) => {
-                const on = reasons.includes(label);
-                return (
-                  <Pressable
-                    key={label}
-                    onPress={() => toggleReason(label)}
-                    style={{
-                      paddingHorizontal: 14,
-                      paddingVertical: 8,
-                      borderRadius: 999,
-                      borderWidth: 1.5,
-                      borderColor: on ? CYAN : c.border,
-                      backgroundColor: on ? (dark ? "#083344" : "#EFE4FF") : c.sheet,
-                    }}
-                  >
-                    <Text style={{ fontSize: 13.5, fontWeight: "600", color: on ? (dark ? "#C9AAFB" : "#7A4BDB") : c.text }}>
-                      {label}
-                    </Text>
-                  </Pressable>
-                );
-              })}
+            </T>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+              {REASONS.map((label) => (
+                <Chip key={label} label={label} active={reasons.includes(label)} onPress={() => toggleReason(label)} />
+              ))}
             </View>
-
-            <TextInput
-              multiline
-              value={text}
-              onChangeText={setText}
-              placeholder="Tell us what went wrong (optional)"
-              placeholderTextColor={c.muted}
-              editable={!sending}
-              style={{
-                borderWidth: 1.5,
-                borderColor: c.border,
-                borderRadius: 14,
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                marginBottom: 12,
-                fontSize: 15,
-                color: c.text,
-                backgroundColor: c.sheet,
-                minHeight: 96,
-                textAlignVertical: "top",
-              }}
-            />
-
-            <TouchableOpacity
-              onPress={send}
-              disabled={sending}
-              activeOpacity={0.8}
-              style={{ backgroundColor: CYAN, borderRadius: 14, paddingVertical: 15, alignItems: "center" }}
-            >
-              {sending ? (
-                <ActivityIndicator color="#fff" />
-              ) : (
-                <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>Send</Text>
-              )}
-            </TouchableOpacity>
+            <Field multiline value={text} onChangeText={setText} placeholder="Tell us what went wrong (optional)" editable={!sending} />
+            <PillButton title="Send" icon={Send} loading={sending} onPress={send} style={{ marginTop: 14 }} />
             {notNow}
           </Animated.View>
         )}

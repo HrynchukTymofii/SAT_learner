@@ -1,40 +1,24 @@
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  ActivityIndicator,
-  Image,
-  Pressable,
-  Text,
-  TextInput,
-  View,
-  StyleSheet,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
-import { useRouter, useLocalSearchParams } from "expo-router";
+import { ActivityIndicator, Image, Platform, Pressable, StyleSheet, View } from "react-native";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, MessageCircle, Send } from "lucide-react-native";
+import { ArrowRight, Check, MessageCircle, Send, X } from "lucide-react-native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import AutoHeightWebView from "react-native-autoheight-webview";
 import { useVideoPlayer, VideoView } from "expo-video";
 import Toast from "react-native-toast-message";
 import { useAuth } from "@/context/AuthContext";
-import {
-  fetchLessonComments,
-  postLessonComment,
-  markLessonAsDone,
-} from "@/lib/api/lesson";
-import GraduationCapLoader from "@/components/ui/GraduationCapLoader";
+import { fetchLessonComments, markLessonAsDone, postLessonComment } from "@/lib/api/lesson";
 import { useLessonDatabase } from "@/lib/db/lesson";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { Fonts, usePalette } from "@/constants/palette";
+import { Card, Field, GUTTER, IconTile, LinkButton, PillButton, T, Tag, TopBar } from "@/components/ds";
 
 export default function LessonScreen() {
   const router = useRouter();
+  const c = usePalette();
   const insets = useSafeAreaInsets();
-  const { allItems: allItemsStr, currentIndex: currentIndexStr } =
-    useLocalSearchParams<{ allItems: string; currentIndex: string }>();
+  const { allItems: allItemsStr, currentIndex: currentIndexStr } = useLocalSearchParams<{ allItems: string; currentIndex: string }>();
   const { token } = useAuth();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
 
   const [containerWidth, setContainerWidth] = useState(0);
   const [comments, setComments] = useState<any[]>([]);
@@ -44,8 +28,7 @@ export default function LessonScreen() {
   const [submitting, setSubmitting] = useState(false);
   const [loading, setLoading] = useState(true);
   const [marking, setMarking] = useState(false);
-  const [localHtml, setLocalHtml] = useState<string | null>(null);
-  const { markLessonCompletedLocal, getLessonRenderedHtml } = useLessonDatabase();
+  const { markLessonCompletedLocal } = useLessonDatabase();
 
   const allItems = JSON.parse(allItemsStr || "[]");
   const currentIndex = Number(currentIndexStr) || 0;
@@ -53,22 +36,11 @@ export default function LessonScreen() {
   const nextItem = allItems[currentIndex + 1];
 
   // Always call the hook (null source = no video) so the hook count doesn't change between lessons
-  const player = useVideoPlayer(currentItem?.videoUrl ?? null, (player) => {
-    player.loop = false;
+  const player = useVideoPlayer(currentItem?.videoUrl ?? null, (p) => {
+    p.loop = false;
   });
 
-  // Load local HTML from database
-  useEffect(() => {
-    const loadLocalHtml = async () => {
-      if (!currentItem?.id) return;
-      const html = await getLessonRenderedHtml(currentItem.id);
-      setLocalHtml(html);
-      //console.log(`📄 Loaded local HTML for lesson ${currentItem.id}:`, html ? "✅ Found" : "❌ Not found");
-    };
-    loadLocalHtml();
-  }, [currentItem?.id]);
-
-  // Load comments
+  // Comments
   useEffect(() => {
     let isMounted = true;
     const loadComments = async () => {
@@ -86,609 +58,224 @@ export default function LessonScreen() {
     };
   }, [currentItem?.id, token]);
 
-  // Update theme in WebView when colorScheme changes
-  useEffect(() => {
-    // Send theme update message to WebView
-    // This will be handled by the WebView's postMessage
-  }, [isDark]);
-
   const handleBack = () => {
     if (router.canGoBack()) router.back();
-    else {
-      if (Platform.OS == "android") {
-        router.replace("/");
-      } else {
-        router.push("/");
-      }
-    }
+    else if (Platform.OS == "android") router.replace("/");
+    else router.push("/");
   };
 
   const handleNext = () => {
     if (!nextItem) return;
-    if (Platform.OS == "android") {
-      router.replace({
-        pathname:
-          `/course/${nextItem.chapterId}/${nextItem.type}/${nextItem.id}` as any,
-        params: {
-          allItems: JSON.stringify(allItems),
-          currentIndex: currentIndex + 1,
-        },
-      });
+    const target = {
+      pathname: `/course/${nextItem.chapterId}/${nextItem.type}/${nextItem.id}` as any,
+      params: { allItems: JSON.stringify(allItems), currentIndex: currentIndex + 1 },
+    };
+    if (Platform.OS == "android") router.replace(target);
+    else router.push(target);
+  };
+
+  // Marks the lesson done (locally and on the server), then runs `then`
+  const finishLesson = async (then: () => void) => {
+    if (marking) return;
+    if (!token) {
+      router.push("/login");
+      return;
+    }
+    setMarking(true);
+    if (!currentItem?.completed) {
+      const resLocal = await markLessonCompletedLocal(currentItem?.id);
+      const res = await markLessonAsDone(token, currentItem?.id);
+      if (!resLocal) {
+        Toast.show({ type: "error", text1: "Error", text2: res.error || "Failed to mark lesson" });
+        setMarking(false);
+        return;
+      }
+    }
+    setMarking(false);
+    then();
+  };
+
+  const postComment = async () => {
+    if (!token || !newComment.trim()) return;
+    setSubmitting(true);
+    const res = await postLessonComment(token, currentItem.id, newComment.trim(), replyTo || undefined);
+    setSubmitting(false);
+    if (res.success) {
+      setNewComment("");
+      setReplyTo(null);
+      const refreshed = await fetchLessonComments(currentItem.id);
+      if (refreshed.success) setComments(refreshed.data);
     } else {
-      router.push({
-        pathname:
-          `/course/${nextItem.chapterId}/${nextItem.type}/${nextItem.id}` as any,
-        params: {
-          allItems: JSON.stringify(allItems),
-          currentIndex: currentIndex + 1,
-        },
-      });
+      Toast.show({ type: "error", text1: "Error", text2: res.error || "Failed to post comment" });
     }
   };
 
+  // Lesson pages come from the website; match them to the app's background and fonts
+  const webCss = `
+    @import url('https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700&family=Outfit:wght@600&display=swap');
+    html, body { margin:0; background:${c.bg}; color:${c.ink}; font-family: Manrope, system-ui, sans-serif; }
+    .expo-content { background:${c.bg} !important; color:${c.ink} !important; padding: 4px 4px 8px; font-size: 16px; line-height: 1.6; }
+    .expo-content h1, .expo-content h2, .expo-content h3 { font-family: Outfit, system-ui, sans-serif; letter-spacing: -0.02em; }
+    ${c.isDark ? ".expo-content blockquote { --blockquote-bg-color: #221F29 !important; }" : ""}
+  `;
+
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
-      {/* Header */}
-      <View
-        style={{
-          paddingTop: insets.top + 8,
-          paddingBottom: 10,
-          paddingHorizontal: 16,
-          backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-          borderBottomWidth: 1,
-          borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
-        }}
-      >
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={handleBack}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            alignSelf: "flex-start",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-            borderRadius: 12,
-          }}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-          <Text
-            style={{
-              color: isDark ? "#C9AAFB" : "#7A4BDB",
-              fontWeight: "600",
-              marginLeft: 6,
-              fontSize: 14,
-            }}
-          >
-            Back to Course
-          </Text>
-        </TouchableOpacity>
+    <View style={{ flex: 1, backgroundColor: c.bg }}>
+      <View style={{ paddingTop: insets.top + 8, paddingHorizontal: GUTTER, paddingBottom: 8 }}>
+        <TopBar onBack={handleBack} title={allItems.length > 1 ? `Step ${currentIndex + 1} of ${allItems.length}` : undefined} />
+        {allItems.length > 1 && (
+          <View style={{ flexDirection: "row", gap: 3, marginTop: 12 }}>
+            {allItems.map((_: any, i: number) => (
+              <View key={i} style={{ flex: 1, height: 5, borderRadius: 5, backgroundColor: i < currentIndex ? c.ink : i === currentIndex ? c.lav2 : c.line }} />
+            ))}
+          </View>
+        )}
       </View>
 
       <KeyboardAwareScrollView
-        contentContainerStyle={{ flexGrow: 1, paddingVertical: 12, paddingHorizontal: 4 }}
+        contentContainerStyle={{ flexGrow: 1, paddingTop: 10, paddingHorizontal: GUTTER, paddingBottom: insets.bottom + 120 }}
         enableOnAndroid
         extraScrollHeight={0}
         keyboardOpeningTime={0}
-        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width - 8)}
+        onLayout={(e) => setContainerWidth(e.nativeEvent.layout.width - GUTTER * 2)}
         showsVerticalScrollIndicator={false}
       >
-        {/* Lesson Title */}
-       
-          <Text
-            style={{
-              fontSize: 24,
-              fontWeight: "800",
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              marginBottom: 8,
-              paddingHorizontal: 8
-            }}
-          >
-            {currentItem?.title}
-          </Text>
+        <View style={{ flexDirection: "row", gap: 6, marginBottom: 10 }}>
+          <Tag label={currentItem?.videoUrl ? "Video lesson" : "Lesson"} tone="lav" />
+          {currentItem?.completed && <Tag label="Done" tone="mint" icon={Check} />}
+        </View>
+        <T variant="title" style={{ marginBottom: 16 }}>
+          {currentItem?.title?.trim()}
+        </T>
 
-        {/* Video */}
         {currentItem?.videoUrl && (
-          <View
-            style={{
-              marginBottom: 16,
-              borderRadius: 16,
-              overflow: "hidden",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 8,
-              elevation: 3,
-            }}
-          >
-            <VideoView
-              style={styles.video}
-              player={player}
-              fullscreenOptions={{ enable: true }}
-              allowsPictureInPicture
-            />
+          <View style={{ marginBottom: 18, borderRadius: 24, overflow: "hidden", backgroundColor: "#000" }}>
+            <VideoView style={styles.video} player={player} fullscreenOptions={{ enable: true }} allowsPictureInPicture />
           </View>
         )}
 
-        {/* Content WebView */}
-        <View
-          style={{
-            borderRadius: 16,
-            marginBottom: 16,
-            
-            minHeight: 200,
-            overflow:"hidden"
-          }}
-        >
+        {/* Lesson content */}
+        <View style={{ marginBottom: 24, minHeight: 200 }}>
           {loading && (
-            <View
-              style={{
-                position: "absolute",
-                width: "100%",
-                inset: 0,
-                justifyContent: "center",
-                alignItems: "center",
-                backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-                zIndex: 10,
-              }}
-            >
-              <GraduationCapLoader />
+            <View style={{ position: "absolute", top: 0, left: 0, right: 0, bottom: 0, justifyContent: "center", alignItems: "center", backgroundColor: c.bg, zIndex: 10 }}>
+              <ActivityIndicator color={c.brand} size="large" />
             </View>
           )}
           <AutoHeightWebView
-            source={
-              // localHtml
-              //   ? // Use local pre-rendered HTML
-              //     { html: localHtml }
-              //   : // Fallback to online URL
-                  {
-                    uri: `https://www.satlearner.com/expo-course/${currentItem?.chapterId}/lessons/${currentItem?.id}`,
-                  }
-            }
+            source={{ uri: `https://www.satlearner.com/expo-course/${currentItem?.chapterId}/lessons/${currentItem?.id}` }}
             viewportContent="width=device-width, user-scalable=no"
-            scalesPageToFit={true}
-            style={{ width: containerWidth || "100%", padding: 8 }}
+            scalesPageToFit
+            style={{ width: containerWidth || "100%", backgroundColor: c.bg }}
             scrollEnabled={false}
-            customStyle={
-            isDark
-              ? `html, body { margin:0; background-color: #111827; color: #f5f5f4;} .expo-content {background-color: #111827; color: #f5f5f4; padding: 8px } .expo-content blockquote {
-        --blockquote-bg-color: #b7c1cf !important;
-      }`
-              : ""
-          }
-            // customScript={
-            //   // Send theme to WebView when it loads
-            //   isDark
-            //     ? `window.postMessage(JSON.stringify({type: 'setTheme', theme: 'dark'}));`
-            //     : `window.postMessage(JSON.stringify({type: 'setTheme', theme: 'light'}));`
-            // }
+            customStyle={webCss}
             onLoadStart={() => setLoading(true)}
             onLoadEnd={() => setLoading(false)}
           />
         </View>
 
-        {/* Discussion Section */}
-        <View
-          style={{
-            backgroundColor: isDark ? "#17151C" : "#ffffff",
-            borderRadius: 16,
-            padding: 12,
-            marginBottom: insets.bottom + 100,
-            borderLeftWidth: 4,
-            borderLeftColor: "#8A5CE6",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 2 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 3,
-          }}
-        >
-          <View style={{ flexDirection: "row", alignItems: "center", marginBottom: 16, padding:6 }}>
-            <MessageCircle size={24} color="#8A5CE6" style={{ marginRight: 8 }} />
-            <Text
-              style={{
-                fontSize: 24,
-                fontWeight: "700",
-                color: isDark ? "#F4F1F8" : "#0B0A0F",
-              }}
-            >
-              Discussion
-            </Text>
+        {/* Discussion */}
+        <View style={{ gap: 12 }}>
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+            <IconTile icon={MessageCircle} tone="butter" size={36} radius={12} />
+            <T variant="h2">Discussion</T>
+            {comments.length > 0 && <Tag label={String(comments.length)} />}
           </View>
 
-          {/* Loading / Empty / Comments */}
-          {loadingComments ? (
-            <View style={{ paddingVertical: 20, alignItems: "center" }}>
-              <ActivityIndicator size="small" color="#8A5CE6" />
-            </View>
+          {loadingComments && token ? (
+            <ActivityIndicator color={c.brand} style={{ paddingVertical: 20 }} />
           ) : comments.length === 0 ? (
-            <View
-              style={{
-                paddingVertical: 20,
-                paddingHorizontal: 16,
-                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: isDark ? "#2B2733" : "#E5DFEE",
-                borderStyle: "dashed",
-              }}
-            >
-              <Text
-                style={{
-                  color: isDark ? "#9C95A8" : "#6B6577",
-                  textAlign: "center",
-                  fontSize: 14,
-                }}
-              >
-                No comments yet. Be the first to share your thoughts!
-              </Text>
-            </View>
+            <Card style={{ borderStyle: "dashed", alignItems: "center", paddingVertical: 20 }}>
+              <T variant="small" style={{ textAlign: "center" }}>
+                No comments yet. Ask a question or share a tip.
+              </T>
+            </Card>
           ) : (
             comments.map((comment) => (
-              <View
-                key={comment.id}
-                style={{
-                  marginBottom: 16,
-                  borderRadius: 12,
-                  backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                  padding: 12,
-                  borderWidth: 1,
-                  borderColor: isDark ? "#2B2733" : "#E5DFEE",
-                }}
-              >
-                {/* Top Row: Avatar, Name, Reply Button */}
-                <View
-                  style={{
-                    flexDirection: "row",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                    marginBottom: 8,
-                  }}
-                >
-                  {/* Left: Avatar and Name */}
-                  <View style={{ flexDirection: "row", alignItems: "center", flex: 1 }}>
-                    {/* Avatar */}
-                    {comment.author?.image ? (
-                      <Image
-                        source={{ uri: comment.author?.image }}
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          marginRight: 10,
-                          borderWidth: 2,
-                          borderColor: "#8A5CE6",
-                        }}
-                      />
-                    ) : (
-                      <View
-                        style={{
-                          width: 32,
-                          height: 32,
-                          borderRadius: 16,
-                          marginRight: 10,
-                          backgroundColor: "#8A5CE6",
-                          justifyContent: "center",
-                          alignItems: "center",
-                        }}
-                      >
-                        <Text style={{ color: "#fff", fontWeight: "700", fontSize: 16 }}>
-                          {comment.author?.name?.charAt(0).toUpperCase() || "S"}
-                        </Text>
-                      </View>
-                    )}
-
-                    {/* Name */}
-                    <Text
-                      style={{
-                        fontWeight: "600",
-                        color: isDark ? "#F4F1F8" : "#0B0A0F",
-                        fontSize: 14,
-                      }}
-                    >
-                      {comment.author?.name || "Student"}
-                    </Text>
-                  </View>
-
-                  {/* Right: Reply Button */}
-                  <Pressable
-                    onPress={() => setReplyTo(comment.id)}
-                    style={{
-                      paddingHorizontal: 10,
-                      paddingVertical: 4,
-                      backgroundColor: isDark ? "#17151C" : "#ffffff",
-                      borderRadius: 8,
-                      borderWidth: 1,
-                      borderColor: "#8A5CE6",
-                    }}
-                  >
-                    <Text style={{ color: "#8A5CE6", fontWeight: "600", fontSize: 13 }}>
-                      Reply
-                    </Text>
-                  </Pressable>
+              <Card key={comment.id} style={{ gap: 10 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+                  <Avatar name={comment.author?.name} image={comment.author?.image} />
+                  <T variant="bodyStrong" style={{ flex: 1, fontSize: 14 }}>
+                    {comment.author?.name || "Student"}
+                  </T>
+                  {token && <LinkButton title="Reply" onPress={() => setReplyTo(comment.id)} />}
                 </View>
-
-                {/* Bottom: Comment Content */}
-                <Text
-                  style={{
-                    color: isDark ? "#9C95A8" : "#2E2A35",
-                    lineHeight: 20,
-                    fontSize: 14,
-                  }}
-                >
+                <T variant="body" style={{ fontSize: 14.5, lineHeight: 21 }}>
                   {comment.content}
-                </Text>
-
-                {/* Replies */}
+                </T>
                 {comment.replies?.map((reply: any) => (
-                  <View
-                    key={reply.id}
-                    style={{
-                      marginLeft: 46,
-                      marginTop: 12,
-                      backgroundColor: isDark ? "#17151C" : "#ffffff",
-                      padding: 12,
-                      borderRadius: 12,
-                      borderLeftWidth: 2,
-                      borderLeftColor: "#8A5CE6",
-                    }}
-                  >
-                    <Text
-                      style={{
-                        fontWeight: "600",
-                        color: isDark ? "#F4F1F8" : "#0B0A0F",
-                        marginBottom: 4,
-                        fontSize: 13,
-                      }}
-                    >
-                      {reply.author?.name || "Anonymous"}
-                    </Text>
-                    <Text
-                      style={{
-                        color: isDark ? "#9C95A8" : "#4F4A5A",
-                        fontSize: 13,
-                        lineHeight: 18,
-                      }}
-                    >
+                  <View key={reply.id} style={{ marginLeft: 12, paddingLeft: 12, borderLeftWidth: 2, borderLeftColor: c.lav2, gap: 4 }}>
+                    <T variant="smallStrong">{reply.author?.name || "Anonymous"}</T>
+                    <T variant="small" color={c.ink} style={{ fontFamily: Fonts.body }}>
                       {reply.content}
-                    </Text>
+                    </T>
                   </View>
                 ))}
-              </View>
+              </Card>
             ))
           )}
 
-          {/* Comment Form */}
           {token ? (
-            <View style={{ marginTop: 16 }}>
+            <View style={{ gap: 10 }}>
               {replyTo && (
-                <View
-                  style={{
-                    flexDirection: "row",
-                    justifyContent: "space-between",
-                    marginBottom: 8,
-                    paddingHorizontal: 12,
-                    paddingVertical: 8,
-                    backgroundColor: isDark ? "#0B0A0F" : "#f0f9ff",
-                    borderRadius: 8,
-                  }}
-                >
-                  <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontSize: 13 }}>
-                    Replying to comment
-                  </Text>
-                  <Pressable onPress={() => setReplyTo(null)}>
-                    <Text style={{ color: "#D93F55", fontWeight: "600", fontSize: 13 }}>
-                      Cancel
-                    </Text>
+                <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", backgroundColor: c.lav, borderRadius: 999, paddingHorizontal: 14, paddingVertical: 8 }}>
+                  <T variant="smallStrong" onPastel>
+                    Replying to a comment
+                  </T>
+                  <Pressable hitSlop={8} onPress={() => setReplyTo(null)}>
+                    <X size={16} color={c.onPastel} />
                   </Pressable>
                 </View>
               )}
-
-              <TextInput
-                style={{
-                  width: "100%",
-                  minHeight: 44,
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: isDark ? "#2B2733" : "#D9D2E5",
-                  paddingHorizontal: 14,
-                  paddingVertical: 10,
-                  color: isDark ? "#F4F1F8" : "#0B0A0F",
-                  backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-                  marginBottom: 10,
-                  fontSize: 14,
-                }}
-                placeholder="Write a comment..."
-                placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
-                value={newComment}
-                onChangeText={setNewComment}
-                multiline
+              <Field placeholder="Write a comment..." value={newComment} onChangeText={setNewComment} multiline />
+              <PillButton
+                title="Post comment"
+                icon={Send}
+                center
+                tone="soft"
+                loading={submitting}
+                disabled={!newComment.trim()}
+                onPress={postComment}
+                style={{ minHeight: 48 }}
               />
-
-              <TouchableOpacity
-                onPress={async () => {
-                  if (!newComment.trim()) return;
-                  setSubmitting(true);
-                  const res = await postLessonComment(
-                    token,
-                    currentItem.id,
-                    newComment.trim(),
-                    replyTo || undefined
-                  );
-                  setSubmitting(false);
-                  if (res.success) {
-                    setNewComment("");
-                    setReplyTo(null);
-                    const refreshed = await fetchLessonComments(currentItem.id);
-                    if (refreshed.success) setComments(refreshed.data);
-                  } else {
-                    Toast.show({
-                      type: "error",
-                      text1: "Error",
-                      text2: res.error || "Failed to post comment",
-                    });
-                  }
-                }}
-                activeOpacity={0.8}
-                disabled={submitting || !newComment.trim()}
-                style={{
-                  backgroundColor: submitting || !newComment.trim() ? (isDark ? "#2B2733" : "#D9D2E5") : "#8A5CE6",
-                  borderRadius: 12,
-                  paddingVertical: 12,
-                  paddingHorizontal: 16,
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 4,
-                  elevation: 2,
-                }}
-              >
-                {submitting ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <>
-                    <Send size={16} color="#ffffff" style={{ marginRight: 8 }} />
-                    <Text
-                      style={{
-                        color: "#fff",
-                        fontWeight: "600",
-                        fontSize: 15,
-                      }}
-                    >
-                      Post Comment
-                    </Text>
-                  </>
-                )}
-              </TouchableOpacity>
             </View>
           ) : (
-            <View
-              style={{
-                paddingVertical: 16,
-                paddingHorizontal: 16,
-                backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-                borderRadius: 12,
-                borderWidth: 1,
-                borderColor: isDark ? "#2B2733" : "#E5DFEE",
-                marginTop: 16,
-              }}
-            >
-              <Text
-                style={{
-                  color: isDark ? "#9C95A8" : "#6B6577",
-                  textAlign: "center",
-                  fontSize: 14,
-                }}
-              >
-                Log in to leave a comment
-              </Text>
-            </View>
+            <Card style={{ alignItems: "center", gap: 10 }}>
+              <T variant="small">Log in to join the discussion</T>
+              <LinkButton title="Log in" onPress={() => router.push("/login")} />
+            </Card>
           )}
         </View>
       </KeyboardAwareScrollView>
 
-      {/* Next Button */}
-      {nextItem && (
-        <View
-          style={{
-            position: "absolute",
-            bottom: 0,
-            left: 0,
-            right: 0,
-            padding: 16,
-            paddingBottom: insets.bottom + 16,
-            backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-            borderTopWidth: 1,
-            borderTopColor: isDark ? "#17151C" : "#E5DFEE",
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: -4 },
-            shadowOpacity: 0.1,
-            shadowRadius: 8,
-            elevation: 10,
-          }}
-        >
-          <TouchableOpacity
-            onPress={async () => {
-              if (marking) return;
-              setMarking(true);
+      {/* Bottom action: always there, so the last lesson in a chapter can be finished too */}
+      <View style={{ position: "absolute", bottom: 0, left: 0, right: 0, paddingHorizontal: GUTTER, paddingTop: 12, paddingBottom: insets.bottom + 14, backgroundColor: c.bg }}>
+        {nextItem ? (
+          <PillButton
+            title={nextItem.type === "quiz" ? "Done, take the quiz" : "Done, next lesson"}
+            icon={ArrowRight}
+            loading={marking}
+            onPress={() => finishLesson(handleNext)}
+          />
+        ) : (
+          <PillButton title="Finish lesson" icon={Check} loading={marking} onPress={() => finishLesson(handleBack)} />
+        )}
+      </View>
+    </View>
+  );
+}
 
-              if (!token) {
-                router.push("/login");
-                return;
-              }
-
-              // If not completed, mark as done first
-              if (!currentItem?.completed) {
-                const resLocal = await markLessonCompletedLocal(
-                  currentItem?.id
-                );
-                const res = await markLessonAsDone(token, currentItem?.id);
-                if (!resLocal) {
-                  Toast.show({
-                    type: "error",
-                    text1: "Error",
-                    text2: res.error || "Failed to mark lesson",
-                  });
-                  setMarking(false);
-                  return;
-                }
-              }
-
-              // Then navigate to next
-              setMarking(false);
-              handleNext();
-            }}
-            activeOpacity={0.8}
-            disabled={marking}
-            style={{
-              backgroundColor: marking ? (isDark ? "#2B2733" : "#D9D2E5") : "#8A5CE6",
-              borderRadius: 16,
-              paddingVertical: 16,
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "center",
-              shadowColor: "#8A5CE6",
-              shadowOffset: { width: 0, height: 4 },
-              shadowOpacity: 0.3,
-              shadowRadius: 8,
-              elevation: 4,
-            }}
-          >
-            {marking ? (
-              <ActivityIndicator size="small" color="#fff" />
-            ) : (
-              <>
-                <Text
-                  style={{
-                    color: "#fff",
-                    fontWeight: "700",
-                    fontSize: 16,
-                    marginRight: 8,
-                  }}
-                >
-                  Continue to {nextItem.type === "quiz" ? "Quiz" : "Next Lesson"}
-                </Text>
-                <ArrowRight size={20} color="#fff" />
-              </>
-            )}
-          </TouchableOpacity>
-        </View>
-      )}
+function Avatar({ name, image }: { name?: string; image?: string }) {
+  const c = usePalette();
+  if (image) return <Image source={{ uri: image }} style={{ width: 34, height: 34, borderRadius: 17 }} />;
+  return (
+    <View style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: c.butter, alignItems: "center", justifyContent: "center" }}>
+      <T variant="smallStrong" onPastel>
+        {name?.charAt(0).toUpperCase() || "S"}
+      </T>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  video: {
-    width: "100%",
-    aspectRatio: 16 / 9,
-    borderRadius: 16,
-    backgroundColor: "black",
-    alignSelf: "center",
-  },
+  video: { width: "100%", aspectRatio: 16 / 9, backgroundColor: "black" },
 });

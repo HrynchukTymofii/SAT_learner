@@ -2,6 +2,7 @@ import React, { ReactNode, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native';
 import Tooltip from 'react-native-walkthrough-tooltip';
 import { useColorScheme } from '@/hooks/useColorScheme';
+import { Fonts, usePalette } from '@/constants/palette';
 import { X, ArrowRight, ArrowLeft } from 'lucide-react-native';
 
 interface TourTooltipProps {
@@ -47,6 +48,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
 }) => {
   const colorScheme = useColorScheme();
   const isDark = colorScheme === 'dark';
+  const c = usePalette();
 
   // Fade-in animation
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -82,7 +84,7 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
         <Animated.View style={[
           styles.tooltipContent,
           {
-            backgroundColor: isDark ? '#17151C' : '#ffffff',
+            backgroundColor: c.surface,
             opacity: fadeAnim,
             transform: [{
               scale: fadeAnim.interpolate({
@@ -95,27 +97,27 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
           {/* Header */}
           <View style={styles.header}>
             <View style={styles.headerLeft}>
-              <View style={[styles.badge, { backgroundColor: '#8A5CE6' }]}>
+              <View style={[styles.badge, { backgroundColor: c.lav }]}>
                 <Text style={styles.badgeText}>
                   {stepNumber}/{totalSteps}
                 </Text>
               </View>
               <Text style={[
                 styles.title,
-                { color: isDark ? '#F4F1F8' : '#0B0A0F' }
+                { color: c.ink }
               ]}>
                 {title}
               </Text>
             </View>
             <TouchableOpacity onPress={onSkip} style={styles.closeButton}>
-              <X size={20} color={isDark ? '#9C95A8' : '#6B6577'} />
+              <X size={20} color={c.muted} />
             </TouchableOpacity>
           </View>
 
           {/* Content */}
           <Text style={[
             styles.content,
-            { color: isDark ? '#CFC9DA' : '#4F4A5A' }
+            { color: c.muted }
           ]}>
             {content}
           </Text>
@@ -127,12 +129,12 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                 onPress={onSkip}
                 style={[
                   styles.skipButton,
-                  { backgroundColor: isDark ? '#2B2733' : '#EFEAF7' }
+                  { backgroundColor: c.surface2 }
                 ]}
               >
                 <Text style={[
                   styles.skipButtonText,
-                  { color: isDark ? '#9C95A8' : '#6B6577' }
+                  { color: c.muted }
                 ]}>
                   {skipButtonText}
                 </Text>
@@ -145,13 +147,13 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
                   onPress={onPrev}
                   style={[
                     styles.navButton,
-                    { backgroundColor: isDark ? '#2B2733' : '#EFEAF7' }
+                    { backgroundColor: c.surface2 }
                   ]}
                 >
-                  <ArrowLeft size={16} color={isDark ? '#C9AAFB' : '#7A4BDB'} />
+                  <ArrowLeft size={16} color={c.ink} />
                   <Text style={[
                     styles.navButtonText,
-                    { color: isDark ? '#C9AAFB' : '#7A4BDB' }
+                    { color: c.ink }
                   ]}>
                     Prev
                   </Text>
@@ -161,13 +163,13 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
               {showNext && onNext && (
                 <TouchableOpacity
                   onPress={onNext}
-                  style={[styles.navButton, styles.nextButton]}
+                  style={[styles.navButton, { backgroundColor: c.inkButton }]}
                 >
-                  <Text style={styles.nextButtonText}>
+                  <Text style={[styles.nextButtonText, { color: c.inkButtonText }]}>
                     {nextButtonText || (isLastStep ? 'Finish' : 'Next')}
                   </Text>
                   {!isLastStep && !nextButtonText && (
-                    <ArrowRight size={16} color="#ffffff" />
+                    <ArrowRight size={16} color={c.inkButtonText} />
                   )}
                 </TouchableOpacity>
               )}
@@ -179,10 +181,10 @@ export const TourTooltip: React.FC<TourTooltipProps> = ({
       onClose={onClose}
       contentStyle={[
         styles.tooltip,
-        { backgroundColor: isDark ? '#17151C' : '#ffffff' }
+        { backgroundColor: c.surface }
       ]}
       arrowSize={{ width: 16, height: 8 }}
-      backgroundColor="rgba(0,0,0,0.5)"
+      backgroundColor={c.overlay}
       showChildInTooltip={true}
       disableShadow={false}
     >
@@ -198,11 +200,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 12,
     elevation: 8,
-    borderRadius: 16,
+    borderRadius: 24,
   },
   tooltipContent: {
-    padding: 20,
-    borderRadius: 16,
+    padding: 18,
+    borderRadius: 24,
     minWidth: 280,
     maxWidth: 320,
   },
@@ -224,13 +226,13 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   badgeText: {
-    color: '#ffffff',
+    color: '#0B0A0F',
     fontSize: 12,
-    fontWeight: '700',
+    fontFamily: Fonts.bodyHeavy,
   },
   title: {
-    fontSize: 16,
-    fontWeight: '700',
+    fontSize: 17,
+    fontFamily: Fonts.display,
     flex: 1,
   },
   closeButton: {
@@ -239,6 +241,7 @@ const styles = StyleSheet.create({
   content: {
     fontSize: 14,
     lineHeight: 20,
+    fontFamily: Fonts.bodySemi,
     marginBottom: 16,
   },
   actions: {
@@ -247,13 +250,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   skipButton: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
   },
   skipButtonText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.bodyBold,
   },
   navigationButtons: {
     flexDirection: 'row',
@@ -262,21 +265,17 @@ const styles = StyleSheet.create({
   navButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 8,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    borderRadius: 999,
     gap: 4,
-  },
-  nextButton: {
-    backgroundColor: '#8A5CE6',
   },
   navButtonText: {
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.bodyBold,
   },
   nextButtonText: {
-    color: '#ffffff',
     fontSize: 13,
-    fontWeight: '600',
+    fontFamily: Fonts.bodyBold,
   },
 });

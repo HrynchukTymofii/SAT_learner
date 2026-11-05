@@ -1,9 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { ScrollView, Text, View } from "react-native";
+import { ScrollView, View } from "react-native";
+import { Lightbulb } from "lucide-react-native";
+import { usePalette } from "@/constants/palette";
+import { GUTTER, T, Tag } from "@/components/ds";
 import { SafeAreaView } from "react-native-safe-area-context";
 import Toast from "react-native-toast-message";
 import AutoHeightWebView from "react-native-autoheight-webview";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { useTour } from "@/context/TourContext";
 import { TOTAL_TOUR_STEPS } from "@/constants/tourSteps";
 import { wrapHtmlContent } from "@/lib/htmlWrapper";
@@ -26,9 +28,9 @@ interface QuizScreenProps extends QuizSessionProps {
 // Quiz page for every test type: topic, course, improve, wrong, saved, exam
 export default function QuizScreen(props: QuizScreenProps) {
   const { quiz, token, backUrl = "", nextTopicUrl, pageType = "topic" } = props;
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
-  const currentIconColor = isDark ? "#F4F1F8" : "#0B0A0F";
+  const c = usePalette();
+  const isDark = c.isDark;
+  const currentIconColor = c.ink;
 
   const { state, isSubmitting, leavingRef, actions } = useQuizSession(props);
   const { questions, index, selected, answered, results } = state;
@@ -91,10 +93,7 @@ export default function QuizScreen(props: QuizScreenProps) {
   const isAnswered = currentQuestion.id in answered;
 
   return (
-    <SafeAreaView
-      style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}
-      edges={["top", "bottom"]}
-    >
+    <SafeAreaView style={{ flex: 1, backgroundColor: c.bg }} edges={["top"]}>
       {resetDialog}
       <AllTasksDialog
         isOpen={isAllTasksDialogOpen}
@@ -104,67 +103,40 @@ export default function QuizScreen(props: QuizScreenProps) {
         currentQuestionIndex={index}
         onQuestionSelect={actions.goToQuestion}
       />
+      <View style={{ paddingHorizontal: GUTTER, paddingTop: 8, paddingBottom: 6 }}>
+        <QuizHeader
+          quizTitle={quiz.title}
+          currentQuestionIndex={index}
+          questions={questions}
+          answeredQuestions={answered}
+          pageType={pageType}
+          currentIconColor={currentIconColor}
+          maxFreeIndex={questions.length - 1}
+          toggleResetDialog={() => setIsResetDialogOpen(true)}
+          toggleAllTasksDialog={() => setIsAllTasksDialogOpen(true)}
+          setCurrentQuestionIndex={actions.goToQuestion}
+          setIsProModalOpen={(open) => open && actions.openPaywall()}
+          handleBack={actions.leave}
+          submitQuizResults={actions.finish}
+          ref={quizHeaderRef}
+          tourActive={tourActive}
+          currentStep={currentStep}
+          handleTourNext={handleTourNext}
+          handleTourPrev={handleTourPrev}
+          skipTour={skipTour}
+          isNumbersQuiz={quiz.id === numbersQuizId}
+        />
+      </View>
       <ScrollView
-        contentContainerStyle={{
-          flexGrow: 1,
-          alignItems: "center",
-          paddingHorizontal: 4,
-          paddingBottom: 120,
-        }}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: GUTTER, paddingTop: 8, paddingBottom: 130 }}
         showsVerticalScrollIndicator={false}
+        keyboardShouldPersistTaps="handled"
       >
-        <View style={{ paddingVertical: 8, width: "100%", maxWidth: 800 }}>
-          <QuizHeader
-            quizTitle={quiz.title}
-            currentQuestionIndex={index}
-            questions={questions}
-            answeredQuestions={answered}
-            pageType={pageType}
-            currentIconColor={currentIconColor}
-            maxFreeIndex={questions.length - 1}
-            toggleResetDialog={() => setIsResetDialogOpen(true)}
-            toggleAllTasksDialog={() => setIsAllTasksDialogOpen(true)}
-            setCurrentQuestionIndex={actions.goToQuestion}
-            setIsProModalOpen={(open) => open && actions.openPaywall()}
-            handleBack={actions.leave}
-            submitQuizResults={actions.finish}
-            ref={quizHeaderRef}
-            tourActive={tourActive}
-            currentStep={currentStep}
-            handleTourNext={handleTourNext}
-            handleTourPrev={handleTourPrev}
-            skipTour={skipTour}
-            isNumbersQuiz={quiz.id === numbersQuizId}
-          />
-
-          {/* Question Counter */}
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-              paddingHorizontal: 12,
-              marginTop: 12,
-            }}
-          >
-            <View
-              style={{
-                backgroundColor: isDark ? "#17151C" : "#ffffff",
-                paddingHorizontal: 16,
-                paddingVertical: 10,
-                borderRadius: 12,
-                borderLeftWidth: 2,
-                borderLeftColor: "#8A5CE6",
-                shadowColor: "#000",
-                shadowOffset: { width: 0, height: 2 },
-                shadowOpacity: 0.1,
-                shadowRadius: 4,
-                elevation: 2,
-              }}
-            >
-              <Text style={{ fontSize: 16, fontWeight: "700", color: isDark ? "#F4F1F8" : "#0B0A0F" }}>
-                Question {index + 1} of {questions.length}
-              </Text>
+        <View style={{ width: "100%", maxWidth: 760, alignSelf: "center" }}>
+          {/* Topic + hint / save */}
+          <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
+            <View style={{ flex: 1, flexDirection: "row" }}>
+              <Tag label={quiz.title?.trim() || "Quiz"} tone="lav" style={{ maxWidth: "100%" }} />
             </View>
             <QuestionToggles
               currentQuestion={currentQuestion}
@@ -178,65 +150,54 @@ export default function QuizScreen(props: QuizScreenProps) {
             />
           </View>
 
-          <AutoHeightWebView
-            source={{ html: wrapHtmlContent(currentQuestion.question || "", { isDark }) }}
-            style={{ width: "100%", minHeight: 10 }}
-            scrollEnabled={false}
-          />
-          {currentQuestion.questionImageUrl && (
-            <QuestionImage
-              uri={currentQuestion.questionImageUrl}
-              height={currentQuestion.imageHeight * 1.2}
+          {/* Question */}
+          <View style={{ marginHorizontal: -12, marginTop: 6 }}>
+            <AutoHeightWebView
+              source={{ html: wrapHtmlContent(currentQuestion.question || "", { isDark, variant: "question" }) }}
+              style={{ width: "100%", minHeight: 10 }}
+              scrollEnabled={false}
             />
+          </View>
+          {currentQuestion.questionImageUrl && (
+            <QuestionImage uri={currentQuestion.questionImageUrl} height={currentQuestion.imageHeight * 1.2} />
           )}
 
-          <QuestionOptions
-            currentQuestion={currentQuestion}
-            selectedAnswers={selected}
-            isAnswered={isAnswered}
-            pageType={pageType}
-            handleAnswerSelect={actions.selectOption}
-          />
+          <View style={{ marginTop: 14 }}>
+            <QuestionOptions
+              currentQuestion={currentQuestion}
+              selectedAnswers={selected}
+              isAnswered={isAnswered}
+              pageType={pageType}
+              handleAnswerSelect={actions.selectOption}
+            />
+          </View>
 
           {/* Explanation (hidden during the exam) */}
           {isAnswered && pageType !== "exam" && currentQuestion.explanation && (
-            <>
-              <View
-                style={{
-                  backgroundColor: isDark ? "#17151C" : "#ffffff",
-                  paddingHorizontal: 16,
-                  paddingVertical: 10,
-                  borderRadius: 12,
-                  marginTop: 32,
-                  marginHorizontal: 8,
-                  alignSelf: "flex-start",
-                  borderLeftWidth: 2,
-                  borderLeftColor: "#8A5CE6",
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 4,
-                  elevation: 2,
-                }}
-              >
-                <Text style={{ fontSize: 18, fontWeight: "700", color: isDark ? "#F4F1F8" : "#0B0A0F" }}>
-                  💡 Explanation
-                </Text>
-              </View>
-              <AutoHeightWebView
-                source={{ html: wrapHtmlContent(currentQuestion.explanation, { isDark }) }}
-                style={{ width: "100%", minHeight: 10 }}
-                scrollEnabled={false}
-              />
-              {currentQuestion.hintImageUrl && (
-                <View style={{ marginBottom: 16 }}>
-                  <QuestionImage
-                    uri={currentQuestion.hintImageUrl}
-                    height={currentQuestion.imageHeight * 1.2}
+            <View style={{ marginTop: 18 }}>
+              {/* little tail pointing up at the answers */}
+              <View style={{ position: "absolute", left: 40, top: -7, width: 18, height: 18, backgroundColor: c.butter, transform: [{ rotate: "45deg" }], borderRadius: 4 }} />
+              <View style={{ backgroundColor: c.butter, borderRadius: 24, paddingTop: 14, paddingBottom: 4, overflow: "hidden" }}>
+                <View style={{ flexDirection: "row", alignItems: "center", gap: 8, paddingHorizontal: 16 }}>
+                  <Lightbulb size={18} color={c.onPastel} strokeWidth={2.1} />
+                  <T variant="h3" onPastel>
+                    Explanation
+                  </T>
+                </View>
+                <View style={{ paddingHorizontal: 4 }}>
+                  <AutoHeightWebView
+                    source={{ html: wrapHtmlContent(currentQuestion.explanation, { isDark: false }) }}
+                    style={{ width: "100%", minHeight: 10 }}
+                    scrollEnabled={false}
                   />
                 </View>
-              )}
-            </>
+                {currentQuestion.hintImageUrl && (
+                  <View style={{ marginBottom: 12, paddingHorizontal: 12 }}>
+                    <QuestionImage uri={currentQuestion.hintImageUrl} height={currentQuestion.imageHeight * 1.2} />
+                  </View>
+                )}
+              </View>
+            </View>
           )}
         </View>
       </ScrollView>

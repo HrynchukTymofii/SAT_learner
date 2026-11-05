@@ -1,36 +1,14 @@
-import { useEffect, useState, useCallback } from "react";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-import {
-  ScrollView,
-  Text,
-  View,
-  TouchableOpacity,
-  Dimensions,
-} from "react-native";
-import { useRouter, useLocalSearchParams, useFocusEffect } from "expo-router";
-import {
-  ArrowLeft,
-  BookOpen,
-  BookCheck,
-  Trophy,
-  Lock,
-  CheckCircle2,
-  Play,
-} from "lucide-react-native";
+import { useCallback, useEffect, useState } from "react";
+import { View } from "react-native";
+import { useFocusEffect, useLocalSearchParams, useRouter } from "expo-router";
+import { BookOpen, Check, CircleHelp, Lock, Play, PlayCircle } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
-import { useColorScheme } from "@/hooks/useColorScheme";
 import { useCourseDatabase } from "@/lib/db/course";
-import GraduationCap3DLoader from "@/components/ui/GraduationCapLoader";
-import Svg, { Path, Circle } from "react-native-svg";
 import { useTour } from "@/context/TourContext";
 import { TourTooltip } from "@/components/Tour/TourTooltip";
-import { TOUR_STEPS, TOTAL_TOUR_STEPS, getTourStepInfo } from "@/constants/tourSteps";
-
-const SCREEN_WIDTH = Dimensions.get('window').width;
-const CARD_WIDTH = SCREEN_WIDTH * 0.7; // 70% of screen width
-const VERTICAL_SPACING = 140;
-const LEFT_OFFSET = 16; // Padding from left edge
-const RIGHT_OFFSET = 16; // Padding from right edge
+import { getTourStepInfo, TOTAL_TOUR_STEPS, TOUR_STEPS } from "@/constants/tourSteps";
+import { Fonts, usePalette } from "@/constants/palette";
+import { Loading, PastelCard, PillButton, plural, ProgressBar, Screen, T, Tag, TopBar, Tap } from "@/components/ds";
 
 type Item = {
   id: string;
@@ -44,25 +22,20 @@ type Item = {
   videoUrl?: string;
   questionCount?: number;
 };
- 
+
 export default function ChapterScreen() {
   const router = useRouter();
+  const c = usePalette();
   const { chapterId } = useLocalSearchParams();
-  const { token, user } = useAuth();
+  const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [chapterTitle, setChapterTitle] = useState("");
   const [items, setItems] = useState<Item[]>([]);
   const [showTooltips, setShowTooltips] = useState(false);
-  const insets = useSafeAreaInsets();
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
   const { getChapterItems } = useCourseDatabase();
-
-  // Tour
   const { tourActive, currentStep, setCurrentStep, endTour, skipTour, numbersQuizId } = useTour();
 
   const loadChapter = useCallback(async () => {
-    setLoading(true);
     setShowTooltips(false);
     try {
       const res = await getChapterItems(chapterId as string);
@@ -77,319 +50,181 @@ export default function ChapterScreen() {
     }
   }, [chapterId, getChapterItems]);
 
-  // Load chapter data on mount
-  useEffect(() => {
-    loadChapter();
-  }, []);
-
-  // Reload chapter data when screen comes into focus (e.g., after returning from quiz)
+  // Reload when coming back from a lesson or quiz
   useFocusEffect(
     useCallback(() => {
       loadChapter();
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
   );
 
-  // Delay tooltip appearance after loading completes
+  // Tooltips appear a moment after the list
   useEffect(() => {
     if (!loading && tourActive) {
-      const timer = setTimeout(() => {
-        setShowTooltips(true);
-      }, 400); // 400ms delay after page loads
+      const timer = setTimeout(() => setShowTooltips(true), 400);
       return () => clearTimeout(timer);
-    } else {
-      setShowTooltips(false);
     }
+    setShowTooltips(false);
   }, [loading, tourActive]);
 
   const handleTourNext = () => {
-    // If on the last step (ENTER_QUIZ), just end the tour without navigating
-    if (currentStep === TOUR_STEPS.ENTER_QUIZ) {
+    if (currentStep === TOUR_STEPS.ENTER_QUIZ || currentStep === TOTAL_TOUR_STEPS - 1) {
       endTour();
       return;
     }
-
-    if (currentStep === TOTAL_TOUR_STEPS - 1) {
-      endTour();
-    } else {
-      setCurrentStep(currentStep + 1);
-    }
+    setCurrentStep(currentStep + 1);
   };
-
   const handleTourPrev = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+    if (currentStep > 0) setCurrentStep(currentStep - 1);
   };
 
-  if (loading) {
-    return <GraduationCap3DLoader />;
-  }
+  if (loading) return <Loading />;
 
-  const isCompleted = (item: Item) => {
-    if (item.type === "lesson") return item.progress && item.progress.length > 0;
-    return item.results && item.results.length > 0;
-  };
-
-  const getItemPosition = (index: number) => {
-    const isLesson = items[index].type === "lesson";
-
-    return {
-      x: isLesson ? LEFT_OFFSET : SCREEN_WIDTH - CARD_WIDTH - RIGHT_OFFSET,
-      y: 20 + (index * VERTICAL_SPACING),
-      isLeft: isLesson,
-    };
-  };
-
-  const renderPath = (fromIndex: number, toIndex: number) => {
-    if (toIndex >= items.length) return null;
-
-    const from = getItemPosition(fromIndex);
-    const to = getItemPosition(toIndex);
-
-    const fromCompleted = isCompleted(items[fromIndex]);
-    const toCompleted = isCompleted(items[toIndex]);
-    const pathColor = (fromCompleted && toCompleted) ? "#8A5CE6" : (isDark ? "#2B2733" : "#D9D2E5");
-
-    const startX = from.x + CARD_WIDTH / 2;
-    const startY = from.y + 60;
-    const endX = to.x + CARD_WIDTH / 2;
-    const endY = to.y;
-
-    // If both items are on the same side (both lessons or both quizzes)
-    if (from.isLeft === to.isLeft) {
-      // Straight line
-      return (
-        <Path
-          key={`path-${fromIndex}-${toIndex}`}
-          d={`M ${startX} ${startY} L ${endX} ${endY}`}
-          stroke={pathColor}
-          strokeWidth="3"
-          fill="none"
-          strokeDasharray={fromCompleted && toCompleted ? "0" : "8,8"}
-        />
-      );
-    } else {
-      // Curved path (hyperbola-like) between lesson and quiz
-      const controlX1 = startX;
-      const controlY1 = startY + (endY - startY) * 0.3;
-      const controlX2 = endX;
-      const controlY2 = endY - (endY - startY) * 0.3;
-
-      return (
-        <Path
-          key={`path-${fromIndex}-${toIndex}`}
-          d={`M ${startX} ${startY} C ${controlX1} ${controlY1}, ${controlX2} ${controlY2}, ${endX} ${endY}`}
-          stroke={pathColor}
-          strokeWidth="3"
-          fill="none"
-          strokeDasharray={fromCompleted && toCompleted ? "0" : "8,8"}
-        />
-      );
-    }
-  };
+  const isCompleted = (item: Item) =>
+    item.type === "lesson" ? !!item.progress && item.progress.length > 0 : !!item.results && item.results.length > 0;
 
   const handleItemPress = (item: Item, index: number) => {
-    // Check if item is locked (not free and user is not PRO)
-    const itemWithFreeFlag = items[index] as Item & { isFree?: boolean };
-    const isItemLocked = !user?.isPro && !itemWithFreeFlag.isFree;
-
-    if (isItemLocked) {
+    if (!user?.isPro && !item.isFree) {
       router.push("/payment");
       return;
     }
-
-    const flatItems = items.map(i => ({ ...i, chapterId }));
+    const flatItems = items.map((i) => ({ ...i, chapterId }));
     router.push({
       pathname: `/course/${chapterId}/${item.type}/${item.id}` as any,
-      params: {
-        allItems: JSON.stringify(flatItems),
-        currentIndex: index
-      },
+      params: { allItems: JSON.stringify(flatItems), currentIndex: index },
     });
   };
 
-  const contentHeight = items.length * VERTICAL_SPACING + 200;
+  const doneCount = items.filter(isCompleted).length;
+  const progress = items.length ? Math.round((doneCount / items.length) * 100) : 0;
+  const nextIndex = items.findIndex((i) => !isCompleted(i));
+  const next = nextIndex >= 0 ? items[nextIndex] : undefined;
+  const lessonCount = items.filter((i) => i.type === "lesson").length;
+  const quizCount = items.length - lessonCount;
+  const firstLesson = items.find((i) => i.type === "lesson");
 
   return (
-    <View style={{ flex: 1, backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9" }}>
-      {/* Header */}
-      <View style={{
-        paddingTop: insets.top + 12,
-        paddingBottom: 16,
-        paddingHorizontal: 16,
-        backgroundColor: isDark ? "#0B0A0F" : "#ffffff",
-        borderBottomWidth: 1,
-        borderBottomColor: isDark ? "#17151C" : "#E5DFEE",
-        zIndex: 10,
-      }}>
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={() => router.back()}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            marginBottom: 16,
-            alignSelf: "flex-start",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-            borderRadius: 12,
-          }}
-          activeOpacity={0.7}
-        >
-          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-          <Text style={{ color: isDark ? "#C9AAFB" : "#7A4BDB", fontWeight: "600", marginLeft: 6, fontSize: 14 }}>
-            Back
-          </Text>
-        </TouchableOpacity>
+    <Screen
+      header={<TopBar />}
+      footer={
+        next ? (
+          <PillButton
+            title={`${doneCount === 0 ? "Start" : "Continue"}: ${next.title.trim()}`}
+            icon={Play}
+            onPress={() => handleItemPress(next, nextIndex)}
+          />
+        ) : undefined
+      }
+    >
+      {/* Chapter header */}
+      <PastelCard tone="butter" radius={28} style={{ padding: 20, gap: 10 }}>
+        <T variant="smallStrong" onPastel>
+          {plural(lessonCount, "lesson")} · {plural(quizCount, "quiz")}
+        </T>
+        <T style={{ fontFamily: Fonts.display, fontSize: 30, lineHeight: 32, letterSpacing: -0.7 }} onPastel>
+          {chapterTitle.trim()}
+        </T>
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 10, marginTop: 4 }}>
+          <ProgressBar value={progress} onPastel style={{ flex: 1 }} />
+          <T variant="smallStrong" onPastel>
+            {doneCount}/{items.length} done
+          </T>
+        </View>
+      </PastelCard>
 
-        {/* Title */}
-        <Text style={{ fontSize: 24, fontWeight: "bold", color: isDark ? "#F4F1F8" : "#0B0A0F", marginBottom: 4 }}>
-          {chapterTitle}
-        </Text>
-        <Text style={{ fontSize: 14, color: isDark ? "#9C95A8" : "#6B6577" }}>
-          {items.length} items · {items.filter(isCompleted).length} completed
-        </Text>
-      </View>
-
-      {/* Content with SVG Path */}
-      <ScrollView
-        contentContainerStyle={{ paddingBottom: 100 }}
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={{ height: contentHeight, position: "relative" }}>
-          {/* SVG for paths */}
-          <Svg
-            height={contentHeight}
-            width={SCREEN_WIDTH}
-            style={{ position: "absolute", top: 0, left: 0 }}
-          >
-            {items.map((_, index) => {
-              if (index < items.length - 1) {
-                return renderPath(index, index + 1);
-              }
-              return null;
-            })}
-          </Svg>
-
-          {/* Items */}
-          {items.map((item, index) => {
-            const completed = isCompleted(item);
-            const pos = getItemPosition(index);
-            const isLocked = !user?.isPro && !item.isFree;
-            const isLesson = item.type === "lesson";
-
-            // Get quiz progress percentage
-            const quizProgress = !isLesson && item.results && item.results.length > 0
-              ? Math.round((item.results[0].score / item.results[0].maxScore) * 100) // Assuming score is percentage
+      {/* Steps */}
+      <View>
+        {items.map((item, index) => {
+          const completed = isCompleted(item);
+          const isLocked = !user?.isPro && !item.isFree;
+          const isLesson = item.type === "lesson";
+          const isNext = index === nextIndex;
+          const last = index === items.length - 1;
+          const quizScore =
+            !isLesson && item.results && item.results.length > 0 && item.results[0].maxScore
+              ? Math.round((item.results[0].score / item.results[0].maxScore) * 100)
               : null;
 
-            // Determine if this item should show a tooltip
-            const firstLesson = items.find(i => i.type === "lesson");
-            const firstQuiz = items.find(i => i.type === "quiz");
-            const isFirstLesson = item.id === firstLesson?.id;
-            const isFirstQuiz = item.id === firstQuiz?.id;
+          const showLessonTooltip = tourActive && currentStep === TOUR_STEPS.LESSONS_SECTION && item.id === firstLesson?.id && showTooltips;
+          const showQuizTooltip = tourActive && currentStep === TOUR_STEPS.ENTER_QUIZ && item.id === numbersQuizId && showTooltips;
+          const tooltipInfo = showLessonTooltip
+            ? getTourStepInfo(TOUR_STEPS.LESSONS_SECTION)
+            : showQuizTooltip
+              ? getTourStepInfo(TOUR_STEPS.ENTER_QUIZ)
+              : null;
 
-            const showLessonTooltip = tourActive && currentStep === TOUR_STEPS.LESSONS_SECTION && isFirstLesson && showTooltips;
-            const showQuizTooltip = tourActive && currentStep === TOUR_STEPS.ENTER_QUIZ && item.id === numbersQuizId && showTooltips;
+          const Icon = isLocked ? Lock : isLesson ? (item.videoUrl ? PlayCircle : BookOpen) : CircleHelp;
 
-            const tooltipVisible = (showLessonTooltip || showQuizTooltip) && showTooltips;
-
-            let tooltipInfo = null;
-            if (showLessonTooltip) tooltipInfo = getTourStepInfo(TOUR_STEPS.LESSONS_SECTION);
-            if (showQuizTooltip) tooltipInfo = getTourStepInfo(TOUR_STEPS.ENTER_QUIZ);
-
-            // Render card content
-            const cardContent = (
-              <>
-                {/* Header: Icon, Lock, and Progress */}
-                <View style={{ flexDirection: "row", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                  <View style={{ flexDirection: "row", alignItems: "center" }}>
-                    {completed ? (
-                      <CheckCircle2 size={24} color="#2E9A5E" />
-                    ) : isLesson ? (
-                      (item.videoUrl) ? (
-                        <Play size={24} color={isDark ? "#C9AAFB" : "#7A4BDB"} fill={isDark ? "#C9AAFB" : "#7A4BDB"} />
-                      ) : (
-                        <BookOpen size={24} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-                      )
-                    ) : (
-                      <Trophy size={24} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-                    )}
-                  </View>
-                  <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-                    {quizProgress !== null && (
-                      <Text style={{
-                        fontSize: 16,
-                        fontWeight: "bold",
-                        color: isDark ? "#C9AAFB" : "#7A4BDB",
-                      }}>
-                        {quizProgress}%
-                      </Text>
-                    )}
-                    {isLocked && <Lock size={16} color={isDark ? "#7E7889" : "#9C95A8"} />}
-                  </View>
-                </View>
-
-                {/* Title */}
-                <Text
-                  style={{
-                    fontSize: 14,
-                    fontWeight: "600",
-                    color: isDark ? "#F4F1F8" : "#0B0A0F",
-                    marginBottom: 4,
-                  }}
-                  numberOfLines={1}
-                >
-                  {item.title}
-                </Text>
-
-                {/* Type Badge and Question Count */}
+          const card = (
+            <Tap
+              onPress={() => handleItemPress(item, index)}
+              style={({ pressed }) => ({
+                flex: 1,
+                flexDirection: "row",
+                alignItems: "center",
+                gap: 12,
+                padding: 14,
+                borderRadius: 20,
+                backgroundColor: isNext ? c.lav : c.surface,
+                borderWidth: isNext ? 0 : 1,
+                borderColor: c.line,
+                opacity: pressed ? 0.85 : 1,
+              })}
+            >
+              <View style={{ flex: 1, gap: 6 }}>
                 <View style={{ flexDirection: "row", alignItems: "center", gap: 6 }}>
-                  <View style={{
-                    paddingHorizontal: 8,
-                    paddingVertical: 4,
-                    borderRadius: 8,
-                    backgroundColor: completed ? "#2E9A5E10" : (isLesson ? "#8A5CE610" : "#8A5CE610"),
-                  }}>
-                    <Text style={{
-                      fontSize: 11,
-                      fontWeight: "600",
-                      color: completed ? "#2E9A5E" : (isLesson ? "#8A5CE6" : "#8A5CE6"),
-                    }}>
-                      {item.type.toUpperCase()}
-                    </Text>
-                  </View>
+                  <Icon size={14} color={isNext ? c.onPastel : c.muted} strokeWidth={2.2} />
+                  <T variant="caption" color={isNext ? c.onPastel : c.muted}>
+                    {isLesson ? (item.videoUrl ? "Video lesson" : "Lesson") : "Quiz"}
+                    {!isLesson && item.questionCount ? ` · ${plural(item.questionCount, "question")}` : ""}
+                  </T>
+                </View>
+                <T variant="bodyStrong" color={isNext ? c.onPastel : c.ink} numberOfLines={2}>
+                  {item.title.trim()}
+                </T>
+                {isNext && (
+                  <T variant="smallStrong" onPastel>
+                    Up next →
+                  </T>
+                )}
+              </View>
+              {quizScore !== null && <Tag label={`${quizScore}%`} tone={quizScore >= 70 ? "mint" : "butter"} />}
+              {isLocked && <Tag label="PRO" tone="ink" icon={Lock} />}
+            </Tap>
+          );
 
-                  {/* Question count for quizzes */}
-                  {!isLesson && item.questionCount !== undefined && item.questionCount > 0 && (
-                    <Text style={{
-                      fontSize: 11,
-                      fontWeight: "500",
-                      color: isDark ? "#9C95A8" : "#6B6577",
-                    }}>
-                      • {item.questionCount} {item.questionCount === 1 ? 'question' : 'questions'}
-                    </Text>
+          return (
+            <View key={item.id} style={{ flexDirection: "row", gap: 12 }}>
+              {/* Timeline */}
+              <View style={{ width: 34, alignItems: "center" }}>
+                <View style={{ width: 2, height: 18, backgroundColor: index === 0 ? "transparent" : completed ? c.ink : c.line }} />
+                <View
+                  style={{
+                    width: 34,
+                    height: 34,
+                    borderRadius: 17,
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: completed ? c.inkButton : isNext ? c.lav : c.surface,
+                    borderWidth: completed || isNext ? 0 : 1.5,
+                    borderColor: c.line,
+                  }}
+                >
+                  {completed ? (
+                    <Check size={17} color={c.inkButtonText} strokeWidth={3} />
+                  ) : (
+                    <T variant="smallStrong" color={isNext ? c.onPastel : c.muted}>
+                      {index + 1}
+                    </T>
                   )}
                 </View>
-              </>
-            );
+                {!last && <View style={{ width: 2, flex: 1, backgroundColor: completed && isCompleted(items[index + 1]) ? c.ink : c.line }} />}
+              </View>
 
-            // Wrap with tooltip if needed
-            if (tooltipVisible && tooltipInfo) {
-              return (
-                <View
-                  key={item.id}
-                  style={{
-                    position: "absolute",
-                    left: pos.x,
-                    top: pos.y,
-                    width: CARD_WIDTH,
-                    zIndex: 1000,
-                  }}
-                >
+              <View style={{ flex: 1, paddingVertical: 6 }}>
+                {tooltipInfo ? (
                   <TourTooltip
-                    visible={tooltipVisible}
+                    visible
                     onNext={handleTourNext}
                     onPrev={handleTourPrev}
                     onSkip={skipTour}
@@ -403,61 +238,32 @@ export default function ChapterScreen() {
                     skipButtonText="Skip Tour"
                     showSkipButton={currentStep !== TOUR_STEPS.ENTER_QUIZ}
                   >
-                    <TouchableOpacity
-                      onPress={() => handleItemPress(item, index)}
-                      activeOpacity={isLocked ? 1 : 0.7}
-                      style={{
-                        width: CARD_WIDTH,
-                        backgroundColor: isDark ? "#17151C" : "#ffffff",
-                        borderRadius: 16,
-                        padding: 16,
-                        borderLeftWidth: 4,
-                        borderLeftColor: completed ? "#2E9A5E" : (isLesson ? "#8A5CE6" : "#8A5CE6"),
-                        shadowColor: "#000",
-                        shadowOffset: { width: 0, height: 2 },
-                        shadowOpacity: 0.1,
-                        shadowRadius: 8,
-                        elevation: 3,
-                        opacity: isLocked ? 0.5 : 1,
-                      }}
-                    >
-                      {cardContent}
-                    </TouchableOpacity>
+                    <View>{card}</View>
                   </TourTooltip>
-                </View>
-              );
-            }
+                ) : (
+                  card
+                )}
+              </View>
+            </View>
+          );
+        })}
+      </View>
 
-            // Normal card without tooltip
-            return (
-              <TouchableOpacity
-                key={item.id}
-                onPress={() => handleItemPress(item, index)}
-                activeOpacity={isLocked ? 1 : 0.7}
-                style={{
-                  position: "absolute",
-                  left: pos.x,
-                  top: pos.y,
-                  width: CARD_WIDTH,
-                  backgroundColor: isDark ? "#17151C" : "#ffffff",
-                  borderRadius: 16,
-                  padding: 16,
-                  borderLeftWidth: 4,
-                  borderLeftColor: completed ? "#2E9A5E" : (isLesson ? "#8A5CE6" : "#8A5CE6"),
-                  shadowColor: "#000",
-                  shadowOffset: { width: 0, height: 2 },
-                  shadowOpacity: 0.1,
-                  shadowRadius: 8,
-                  elevation: 3,
-                  opacity: isLocked ? 0.5 : 1,
-                }}
-              >
-                {cardContent}
-              </TouchableOpacity>
-            );
-          })}
-        </View>
-      </ScrollView>
-    </View>
+      {!next && items.length > 0 && (
+        <PastelCard tone="mint" radius={24} style={{ flexDirection: "row", alignItems: "center", gap: 12 }}>
+          <View style={{ width: 40, height: 40, borderRadius: 20, backgroundColor: c.onPastel, alignItems: "center", justifyContent: "center" }}>
+            <Check size={20} color="#fff" strokeWidth={3} />
+          </View>
+          <View style={{ flex: 1 }}>
+            <T variant="bodyStrong" onPastel>
+              Chapter complete
+            </T>
+            <T variant="caption" onPastel>
+              Retake any quiz to raise your score.
+            </T>
+          </View>
+        </PastelCard>
+      )}
+    </Screen>
   );
 }

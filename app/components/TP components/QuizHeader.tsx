@@ -1,10 +1,12 @@
-import { View, Text, TouchableOpacity, Animated } from "react-native";
-import { ArrowLeft, Clock, RotateCcw, LayoutGrid } from "lucide-react-native";
+import React from "react";
+import { View, Animated } from "react-native";
+import { Clock, RotateCcw, LayoutGrid, X } from "lucide-react-native";
+import { Fonts, usePalette } from "@/constants/palette";
+import { CircleButton, T } from "@/components/ds";
 import TimeAlert from "./TimeAlert";
 import { Question } from "@/types";
 import { useEffect, useImperativeHandle, useState, useRef } from "react";
 import Toast from "react-native-toast-message";
-import { useColorScheme } from "@/hooks/useColorScheme";
 
 export interface QuizHeaderRef {
   startExam: () => void;
@@ -154,16 +156,6 @@ export default function QuizHeader({
     submitQuizResults();
   };
 
-  const getBackButtonText = () => {
-    if (
-      Object.keys(answeredQuestions).length >= questions.length ||
-      pageType === "saved"
-    )
-      return "Back to Topics";
-    if (pageType === "exam") return "Stop Exam";
-    return "Finish Later";
-  };
-
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -171,166 +163,79 @@ export default function QuizHeader({
   };
 
   const timeRemaining = Math.max(0, timeLimit - timeSpent);
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === "dark";
+  const c = usePalette();
+  const answeredCount = Object.keys(answeredQuestions).length;
+  const showTools = pageType !== "wrong" && pageType !== "exam" && answeredCount > 0;
+  const closeLabel = isQuizCompleted || pageType === "saved" ? "Back" : pageType === "exam" ? "Stop exam" : "Finish later";
+  const lowTime = timeRemaining < 300;
+
+  // Pulses the grid / retake buttons once every question is answered
+  const pulse = (child: React.ReactNode) =>
+    isQuizCompleted && pageType !== "exam" && pageType !== "saved" ? (
+      <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>{child}</Animated.View>
+    ) : (
+      child
+    );
 
   return (
-    <View style={{ flexDirection: "column", gap: 8, marginTop: 8, paddingHorizontal: 12 }}>
-      {/* Top Header */}
-      <View style={{ flexDirection: "row", width: "100%", alignItems: "center", justifyContent: "space-between" }}>
-        {/* Back Button */}
-        <TouchableOpacity
-          onPress={() => handleBack()}
-          activeOpacity={0.7}
-          style={{
-            flexDirection: "row",
-            alignItems: "center",
-            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-            paddingHorizontal: 16,
-            paddingVertical: 10,
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: isDark ? "#2B2733" : "#E5DFEE",
-          }}
-        >
-          <ArrowLeft size={18} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-          <Text style={{
-            color: isDark ? "#C9AAFB" : "#7A4BDB",
-            fontWeight: "600",
-            marginLeft: 8,
-            fontSize: 14
-          }}>
-            {getBackButtonText()}
-          </Text>
-        </TouchableOpacity>
+    <View style={{ gap: 12 }}>
+      <View style={{ flexDirection: "row", alignItems: "center", gap: 10 }}>
+        <CircleButton icon={X} label={closeLabel} onPress={() => handleBack()} />
 
-        {/* All Tasks and Reset Buttons */}
-        {pageType !== "wrong" &&
-          pageType !== "exam" &&
-          Object.keys(answeredQuestions).length > 0 && (
-            <View style={{ flexDirection: "row", gap: 8 }}>
-              {/* All Tasks Button */}
-              <View style={{ position: "relative" }}>
-                {isQuizCompleted && (
-                  <Animated.View
-                    style={{
-                      position: "absolute",
-                      top: -4,
-                      left: -4,
-                      right: -4,
-                      bottom: -4,
-                      backgroundColor: "#8A5CE6",
-                      borderRadius: 16,
-                      opacity: glowAnim,
-                    }}
-                  />
-                )}
-                <Animated.View
+        <View style={{ flex: 1, gap: 7 }}>
+          <View style={{ flexDirection: "row", justifyContent: "space-between", gap: 8 }}>
+            <T variant="smallStrong" color={c.muted}>
+              Question {currentQuestionIndex + 1} of {questions.length}
+            </T>
+            <T variant="caption" numberOfLines={1} style={{ flexShrink: 1, textAlign: "right" }}>
+              {closeLabel === "Finish later" ? "Progress is saved" : ""}
+            </T>
+          </View>
+          {questions.length <= 20 ? (
+            <View style={{ flexDirection: "row", gap: 3 }}>
+              {questions.map((q, i) => (
+                <View
+                  key={q.id}
                   style={{
-                    transform: [{ scale: isQuizCompleted ? scaleAnim : 1 }],
+                    flex: 1,
+                    height: 6,
+                    borderRadius: 6,
+                    backgroundColor: i === currentQuestionIndex ? c.lav2 : q.id in answeredQuestions ? c.ink : c.line,
                   }}
-                >
-                  <TouchableOpacity
-                    onPress={toggleAllTasksDialog}
-                    activeOpacity={0.7}
-                    style={{
-                      backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-                      padding: 10,
-                      borderRadius: 12,
-                      borderWidth: isQuizCompleted ? 2 : 1,
-                      borderColor: isQuizCompleted
-                        ? "#8A5CE6"
-                        : isDark
-                        ? "#2B2733"
-                        : "#E5DFEE",
-                    }}
-                  >
-                    <LayoutGrid size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-                  </TouchableOpacity>
-                </Animated.View>
-              </View>
-
-              {/* Reset Button */}
-              <View style={{ position: "relative" }}>
-                {isQuizCompleted && (
-                  <Animated.View
-                    style={{
-                      position: "absolute",
-                      top: -4,
-                      left: -4,
-                      right: -4,
-                      bottom: -4,
-                      backgroundColor: "#8A5CE6",
-                      borderRadius: 16,
-                      opacity: glowAnim,
-                    }}
-                  />
-                )}
-                <Animated.View
-                  style={{
-                    transform: [{ scale: isQuizCompleted ? scaleAnim : 1 }],
-                  }}
-                >
-                  <TouchableOpacity
-                    onPress={toggleResetDialog}
-                    activeOpacity={0.7}
-                    style={{
-                      backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-                      padding: 10,
-                      borderRadius: 12,
-                      borderWidth: isQuizCompleted ? 2 : 1,
-                      borderColor: isQuizCompleted
-                        ? "#8A5CE6"
-                        : isDark
-                        ? "#2B2733"
-                        : "#E5DFEE",
-                    }}
-                  >
-                    <RotateCcw size={20} color={isDark ? "#C9AAFB" : "#7A4BDB"} />
-                  </TouchableOpacity>
-                </Animated.View>
-              </View>
+                />
+              ))}
+            </View>
+          ) : (
+            <View style={{ height: 6, borderRadius: 6, backgroundColor: c.line, overflow: "hidden" }}>
+              <View style={{ width: `${(answeredCount / questions.length) * 100}%`, height: "100%", borderRadius: 6, backgroundColor: c.ink }} />
             </View>
           )}
+        </View>
 
         {pageType === "exam" && (
-          <View style={{
-            flexDirection: "row",
-            alignItems: "center",
-            gap: 8,
-            backgroundColor: isDark ? "#17151C" : "#EFEAF7",
-            paddingHorizontal: 12,
-            paddingVertical: 8,
-            borderRadius: 12,
-            borderWidth: 1,
-            borderColor: timeRemaining < 300 ? "#D93F55" : (isDark ? "#2B2733" : "#E5DFEE"),
-          }}>
-            <Clock size={20} color={timeRemaining < 300 ? "#D93F55" : "#8A5CE6"} />
-            <Text style={{
-              fontFamily: "monospace",
-              fontSize: 16,
-              fontWeight: "600",
-              color: timeRemaining < 300 ? "#D93F55" : (isDark ? "#C9AAFB" : "#7A4BDB"),
-            }}>
+          <View
+            style={{
+              flexDirection: "row",
+              alignItems: "center",
+              gap: 6,
+              backgroundColor: lowTime ? c.rose : c.butter,
+              borderRadius: 999,
+              paddingHorizontal: 12,
+              paddingVertical: 8,
+            }}
+          >
+            <Clock size={15} color={c.onPastel} strokeWidth={2.2} />
+            <T style={{ fontFamily: Fonts.bodyHeavy, fontSize: 13.5, fontVariant: ["tabular-nums"] }} onPastel>
               {formatTime(timeRemaining)}
-            </Text>
+            </T>
           </View>
         )}
+
+        {showTools && pulse(<CircleButton icon={LayoutGrid} size={42} label="All questions" onPress={toggleAllTasksDialog} />)}
+        {showTools && pulse(<CircleButton icon={RotateCcw} size={42} label="Start again" onPress={toggleResetDialog} />)}
       </View>
 
-      {/* Question Number Scroller */}
-      {/* <QuestionNumberScroller
-        questions={questions}
-        answeredQuestions={answeredQuestions}
-        currentQuestionIndex={currentQuestionIndex}
-        pageType={pageType}
-        maxFreeIndex={maxFreeIndex}
-        setCurrentQuestionIndex={setCurrentQuestionIndex}
-        setIsProModalOpen={setIsProModalOpen}
-      /> */}
-
-      {/* Alert for last 5 minutes */}
-      {pageType === "exam" && timeRemaining < 300 && <TimeAlert />}
+      {pageType === "exam" && lowTime && <TimeAlert />}
     </View>
   );
 }

@@ -1,15 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, ActivityIndicator, Modal } from "react-native";
-import { sendMessage } from "@/lib/api/user";
+import { View } from "react-native";
+import Toast from "react-native-toast-message";
 import { useRoute } from "expo-router/react-navigation";
-import { useAuth } from "@/context/AuthContext";
 import { useRouter } from "expo-router";
-import { X } from "lucide-react-native";
+import { Bug, CircleAlert, Mails, MessageCircle, Send } from "lucide-react-native";
+import { sendMessage } from "@/lib/api/user";
+import { useAuth } from "@/context/AuthContext";
+import { Chip, Field, PillButton } from "@/components/ds";
+import { Sheet } from "@/components/ds/overlays";
 
 interface ContactDialogProps {
   isOpen: boolean;
   onClose: () => void;
-  isDark: boolean;
+  /** kept for older callers; the sheet follows the app theme */
+  isDark?: boolean;
   contextData?: {
     questionId?: string;
     quizId?: string;
@@ -19,7 +23,13 @@ interface ContactDialogProps {
   };
 }
 
-export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactDialogProps) {
+const TOPICS = [
+  { value: "mistake", label: "Mistake in a question", icon: CircleAlert },
+  { value: "problem", label: "App problem", icon: Bug },
+  { value: "other", label: "Something else", icon: MessageCircle },
+] as const;
+
+export function ContactDialog({ isOpen, onClose, contextData }: ContactDialogProps) {
   const [topic, setTopic] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -28,222 +38,51 @@ export function ContactDialog({ isOpen, onClose, isDark, contextData }: ContactD
   const { token } = useAuth();
 
   useEffect(() => {
-    if (topic === "mistake") {
-      setMessage("Topic name:\nProblem number:\n\nMessage:");
-    } else {
-      setMessage("");
-    }
+    setMessage(topic === "mistake" ? "Topic name:\nProblem number:\n\nMessage:" : "");
   }, [topic]);
 
   const handleSubmit = async () => {
-    if (!topic || !message) return;
-    setLoading(true);
-
+    if (!topic || !message.trim()) return;
     if (!token) {
+      onClose();
       router.push("/login");
       return;
     }
-
+    setLoading(true);
     try {
-      const currentRouteName = route.name;
-      let contextInfo = `\n\n---\nPage: mobile-app ${currentRouteName}`;
-
-      // Add context data if available
-      if (contextData && Object.keys(contextData).length > 0) {
-        contextInfo += `\nContext: ${JSON.stringify(contextData, null, 2)}`;
-      }
-
-      const fullMessage = `${message}${contextInfo}`;
-      const success = await sendMessage(token, topic, fullMessage);
-
-      if (!success) throw new Error("Failed to send message");
-
+      let contextInfo = `\n\n---\nPage: mobile-app ${route.name}`;
+      if (contextData && Object.keys(contextData).length > 0) contextInfo += `\nContext: ${JSON.stringify(contextData, null, 2)}`;
+      const ok = await sendMessage(token, topic, `${message}${contextInfo}`);
+      if (!ok) throw new Error("Failed to send message");
       setTopic("");
       setMessage("");
       onClose();
+      Toast.show({ type: "success", text1: "Message sent", text2: "We'll get back to you by email" });
     } catch (err) {
       console.error("❌ Error submitting message:", err);
+      Toast.show({ type: "error", text1: "Couldn't send the message", text2: "Please try again" });
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Modal visible={isOpen} onRequestClose={onClose} transparent animationType="slide">
-      <View style={{
-        flex: 1,
-        justifyContent: "center",
-        backgroundColor: "rgba(0, 0, 0, 0.5)",
-        paddingHorizontal: 16,
-      }}>
-        <View
-          style={{
-            backgroundColor: isDark ? "#17151C" : "#ffffff",
-            padding: 16,
-            borderRadius: 16,
-            shadowColor: "#000",
-            shadowOffset: { width: 0, height: 6 },
-            shadowOpacity: 0.15,
-            shadowRadius: 12,
-            elevation: 8,
-          }}
-        >
-          {/* Close Button */}
-          <TouchableOpacity
-            onPress={onClose}
-            style={{
-              position: "absolute",
-              top: 16,
-              right: 16,
-              zIndex: 10,
-              padding: 8,
-              backgroundColor: isDark ? "#2B2733" : "#EFEAF7",
-              borderRadius: 8,
-            }}
-            activeOpacity={0.7}
-          >
-            <X size={20} color={isDark ? "#F4F1F8" : "#0B0A0F"} />
-          </TouchableOpacity>
-
-          {/* Title */}
-          <Text style={{
-            fontSize: 20,
-            fontWeight: "700",
-            marginBottom: 20,
-            color: isDark ? "#F4F1F8" : "#0B0A0F",
-            paddingLeft: 8
-          }}>
-            Contact Support
-          </Text>
-
-          {/* Topic Selection */}
-          <Text style={{
-            fontSize: 14,
-            color: isDark ? "#9C95A8" : "#6B6577",
-            marginBottom: 8,
-            paddingLeft: 8
-          }}>
-            Select a topic:
-          </Text>
-          <View style={{
-            flexDirection: "row",
-            gap: 8,
-            marginBottom: 16,
-            flexWrap: "wrap",
-          }}>
-            <TouchableOpacity
-              onPress={() => setTopic("mistake")}
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                borderRadius: 12,
-                borderWidth: 2,
-                borderColor: topic === "mistake" ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
-                backgroundColor: topic === "mistake" ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={{
-                fontWeight: "600",
-                color: topic === "mistake" ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
-              }}>
-                Test Error
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setTopic("problem")}
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                borderRadius: 12,
-                borderWidth: 2,
-                borderColor: topic === "problem" ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
-                backgroundColor: topic === "problem" ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={{
-                fontWeight: "600",
-                color: topic === "problem" ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
-              }}>
-                System Issue
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              onPress={() => setTopic("other")}
-              style={{
-                paddingHorizontal: 16,
-                paddingVertical: 12,
-                borderRadius: 12,
-                borderWidth: 2,
-                borderColor: topic === "other" ? "#8A5CE6" : (isDark ? "#2B2733" : "#E5DFEE"),
-                backgroundColor: topic === "other" ? "#8A5CE6" : (isDark ? "#17151C" : "#ffffff"),
-              }}
-              activeOpacity={0.7}
-            >
-              <Text style={{
-                fontWeight: "600",
-                color: topic === "other" ? "#ffffff" : (isDark ? "#F4F1F8" : "#0B0A0F"),
-              }}>
-                Other
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* Message Input */}
-          <TextInput
-            multiline
-            placeholder="Your message..."
-            placeholderTextColor={isDark ? "#7E7889" : "#9C95A8"}
-            value={message}
-            onChangeText={setMessage}
-            style={{
-              minHeight: 150,
-              borderWidth: 1,
-              borderColor: isDark ? "#2B2733" : "#E5DFEE",
-              borderRadius: 12,
-              padding: 16,
-              textAlignVertical: "top",
-              color: isDark ? "#F4F1F8" : "#0B0A0F",
-              backgroundColor: isDark ? "#0B0A0F" : "#F4F1F9",
-              marginBottom: 16,
-              fontSize: 16,
-            }}
-          />
-
-          {/* Submit Button */}
-          <TouchableOpacity
-            onPress={handleSubmit}
-            disabled={loading || !topic || !message}
-            style={{
-              backgroundColor: loading || !topic || !message ? (isDark ? "#2B2733" : "#D9D2E5") : "#8A5CE6",
-              borderRadius: 12,
-              paddingVertical: 14,
-              alignItems: "center",
-              shadowColor: "#000",
-              shadowOffset: { width: 0, height: 2 },
-              shadowOpacity: 0.1,
-              shadowRadius: 4,
-              elevation: 3,
-            }}
-            activeOpacity={0.8}
-          >
-            {loading ? (
-              <ActivityIndicator color="#ffffff" />
-            ) : (
-              <Text style={{
-                color: loading || !topic || !message ? (isDark ? "#9C95A8" : "#6B6577") : "#ffffff",
-                fontWeight: "600",
-                fontSize: 16,
-              }}>
-                Send
-              </Text>
-            )}
-          </TouchableOpacity>
-        </View>
+    <Sheet
+      visible={isOpen}
+      onClose={onClose}
+      icon={Mails}
+      tone="butter"
+      title="Contact us"
+      text="Found a mistake or something isn't working? Tell us and we'll fix it."
+      scroll
+      footer={<PillButton title={token ? "Send" : "Log in to send"} icon={Send} loading={loading} disabled={!topic || !message.trim()} onPress={handleSubmit} />}
+    >
+      <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 8, marginBottom: 14 }}>
+        {TOPICS.map((t) => (
+          <Chip key={t.value} label={t.label} icon={t.icon} active={topic === t.value} onPress={() => setTopic(t.value)} />
+        ))}
       </View>
-    </Modal>
+      <Field multiline value={message} onChangeText={setMessage} placeholder="Your message..." />
+    </Sheet>
   );
 }
