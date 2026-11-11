@@ -111,7 +111,12 @@ const LessonContent = ({
                 <h1 className="text-[30px] font-semibold leading-tight sm:text-[40px]">{lesson.title}</h1>
             </header>
 
-            {lesson.youTubeVideoUrl && (
+            {lesson.videoUrl ? (
+                // Uploaded from the admin panel (Cloudflare R2); the mobile app plays the same file
+                <div className="overflow-hidden rounded-[28px] border bg-black">
+                    <video src={lesson.videoUrl} controls playsInline preload="metadata" className="aspect-video w-full" />
+                </div>
+            ) : lesson.youTubeVideoUrl && (
                 <div className="overflow-hidden rounded-[28px] border bg-card">
                     <LessonYouTubeVideo youTubeVideoUrl={lesson.youTubeVideoUrl} />
                 </div>

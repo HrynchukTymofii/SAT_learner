@@ -15,6 +15,7 @@ import { Subscript } from "@tiptap/extension-subscript";
 import { Superscript } from "@tiptap/extension-superscript";
 import { Underline } from "@tiptap/extension-underline";
 import Mathematics from "@tiptap/extension-mathematics";
+import Youtube from "@tiptap/extension-youtube";
 import { TextStyleKit } from "@tiptap/extension-text-style";
 
 
@@ -100,6 +101,8 @@ export function ReadOnlyEditor({ initialContent = "" }: ReadOnlyEditorProps) {
       }),
       TrailingNode,
       Link.configure({ openOnClick: false }),
+      // Videos embedded in lessons from the admin editor
+      Youtube.configure({ nocookie: true, height: 360 }),
       TextStyleKit,
     ],
     content: getInitialContent(),
