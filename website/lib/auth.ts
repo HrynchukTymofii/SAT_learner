@@ -76,6 +76,9 @@ export const authOptions: NextAuthOptions = {
         domain: process.env.AUTH_COOKIE_DOMAIN || undefined,
       },
     },
+    // Google/Apple sign-in starts on app.satlearner.com but returns to NEXTAUTH_URL
+    // (www.satlearner.com), so these short-lived check cookies must be shared too.
+    // Without the domain the callback can't find them and fails with error=OAuthCallback.
     pkceCodeVerifier: {
       name: "next-auth.pkce.code_verifier",
       options: {
@@ -83,6 +86,36 @@ export const authOptions: NextAuthOptions = {
         sameSite: "none",
         path: "/",
         secure: true,
+        domain: process.env.AUTH_COOKIE_DOMAIN || undefined,
+      },
+    },
+    state: {
+      name: `${useSecureCookies ? "__Secure-" : ""}next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+        domain: process.env.AUTH_COOKIE_DOMAIN || undefined,
+      },
+    },
+    nonce: {
+      name: `${useSecureCookies ? "__Secure-" : ""}next-auth.nonce`,
+      options: {
+        httpOnly: true,
+        sameSite: "none",
+        path: "/",
+        secure: true,
+        domain: process.env.AUTH_COOKIE_DOMAIN || undefined,
+      },
+    },
+    callbackUrl: {
+      name: `${useSecureCookies ? "__Secure-" : ""}next-auth.callback-url`,
+      options: {
+        sameSite: "lax",
+        path: "/",
+        secure: useSecureCookies,
+        domain: process.env.AUTH_COOKIE_DOMAIN || undefined,
       },
     },
   },
