@@ -3,7 +3,7 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { SessionProvider, signOut } from "next-auth/react"
-import { BarChart2, Bookmark, Calendar, ExternalLink, Home, ListChecks, LogOut, RotateCcw, User } from "lucide-react"
+import { BarChart2, Bookmark, Calendar, ExternalLink, Home, ListChecks, LogOut, RotateCcw, ShieldCheck, User } from "lucide-react"
 import ToasterProvider from "@/components/toaster-provider"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Brand } from "@/components/site/brand"
@@ -31,7 +31,11 @@ const SECTIONS = [
   },
   {
     title: "Account",
-    items: [{ href: "/profile", label: "Profile", icon: User, mobile: true }],
+    items: [
+      { href: "/profile", label: "Profile", icon: User, mobile: true },
+      // Shown only to course admins (see lib/admin.ts)
+      { href: "/admin", label: "Admin", icon: ShieldCheck, adminOnly: true },
+    ],
   },
 ]
 const ITEMS = SECTIONS.flatMap((s) => s.items)
@@ -48,12 +52,13 @@ function activeHref(pathname: string) {
 
 interface PlatformShellProps {
   user: { name: string | null; image: string | null; isPro: boolean }
+  isAdmin?: boolean
   children: React.ReactNode
 }
 
 // Learning platform layout: black sidebar whose active item cuts into the page on desktop,
 // a floating tab bar on phones
-export function PlatformShell({ user, children }: PlatformShellProps) {
+export function PlatformShell({ user, isAdmin = false, children }: PlatformShellProps) {
   const active = activeHref(usePathname())
 
   return (
@@ -65,7 +70,7 @@ export function PlatformShell({ user, children }: PlatformShellProps) {
           {SECTIONS.map((section) => (
             <div key={section.title} className="mb-2">
               <p className="px-3 pb-1.5 pt-3 text-[11px] font-extrabold uppercase tracking-[.12em] text-frame-muted">{section.title}</p>
-              {section.items.map(({ href, label, icon: Icon }) => {
+              {section.items.filter((i) => isAdmin || !("adminOnly" in i)).map(({ href, label, icon: Icon }) => {
                 const isActive = href === active
                 return (
                   <Link

@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowRight, Bookmark, CheckCircle2, Clock, ListChecks, Play, RotateCcw } from "lucide-react"
+import { ArrowRight, Bookmark, CheckCircle2, Clock, ListChecks, Play, RotateCcw, ShieldCheck } from "lucide-react"
 import type { CourseWithProgress } from "@/lib/course-progress"
 import { SystemDoodle } from "@/components/site/doodles"
 import { cn } from "@/lib/utils"
@@ -13,12 +13,32 @@ const PRACTICE = [
 const PASTELS = ["bg-lav", "bg-butter", "bg-mint"]
 
 // Platform home: continue banner, every course with its progress, then practice modes
-export function PlatformHome({ firstName, courses }: { firstName?: string; courses: CourseWithProgress[] }) {
+export function PlatformHome({ firstName, courses, isAdmin = false }: { firstName?: string; courses: CourseWithProgress[]; isAdmin?: boolean }) {
   const current = courses.find((c) => c.next) ?? null
 
   return (
     <div className="grid w-full max-w-6xl gap-8">
       <h1 className="text-[32px] font-semibold leading-tight sm:text-[40px]">{firstName ? `Hi, ${firstName}` : "Welcome back"}</h1>
+
+      {/* Admins only: black, unlike the pastel learner cards, so it never reads as course content */}
+      {isAdmin && (
+        <Link
+          href="/admin"
+          className="group flex flex-wrap items-center gap-5 rounded-[32px] bg-frame p-6 text-frame-foreground ring-1 ring-transparent transition-transform dark:ring-frame-line hover:-translate-y-0.5 sm:p-7"
+        >
+          <span className="grid size-14 shrink-0 place-items-center rounded-[18px] bg-brand text-white dark:text-black">
+            <ShieldCheck className="size-7" />
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block text-[11.5px] font-extrabold uppercase tracking-[.12em] text-frame-muted">Admin</span>
+            <span className="block text-[24px] font-semibold leading-tight sm:text-[28px]">Go to the admin dashboard</span>
+            <span className="block text-sm font-semibold text-frame-muted">Edit chapters, lessons, quizzes and questions. Upload images and videos.</span>
+          </span>
+          <span className="inline-flex items-center gap-2 rounded-full bg-white px-5 py-3 font-bold text-black">
+            Open admin <ArrowRight className="size-4 transition-transform group-hover:translate-x-0.5" />
+          </span>
+        </Link>
+      )}
 
       {current?.next ? (
         <section className="paper relative grid min-h-[230px] content-center gap-3.5 overflow-hidden rounded-[32px] bg-lav p-7 sm:p-8">
