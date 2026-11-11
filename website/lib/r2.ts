@@ -33,7 +33,7 @@ function env(name: string) {
 }
 
 let client: S3Client | null = null;
-function r2() {
+export function r2() {
   client ??= new S3Client({
     region: "auto",
     endpoint: `https://${env("R2_ACCOUNT_ID")}.r2.cloudflarestorage.com`,
