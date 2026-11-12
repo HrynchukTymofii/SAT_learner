@@ -4,6 +4,7 @@ import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { BookOpen, Bell, ShieldCheck } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { AdminViewToggle } from "@/components/platform/admin-view-toggle"
 
 const TABS = [
   { href: "/admin", label: "Course", icon: BookOpen, match: (p: string) => !p.includes("/admin/notifications") },
@@ -28,9 +29,12 @@ export function AdminNav({ name }: { name: string }) {
           </Link>
         ))}
       </nav>
-      <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold">
-        <ShieldCheck className="size-4" /> Admin · {name}
-      </span>
+      <div className="flex flex-wrap items-center gap-4">
+        <AdminViewToggle className="min-w-[220px]" />
+        <span className="text-muted-foreground flex items-center gap-1.5 text-xs font-semibold">
+          <ShieldCheck className="size-4" /> Admin · {name}
+        </span>
+      </div>
     </div>
   )
 }

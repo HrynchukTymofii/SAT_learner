@@ -20,6 +20,8 @@ const AuthContext = createContext<AuthContextType>({
 export interface UserType {
   name: string;
   isPro: boolean;
+  isAdmin?: boolean;      // course admin: PRO from the server
+  previewFree?: boolean;  // admin chose "preview as free student" in Settings
   categories: string;
   email?: string;
   image?: string;

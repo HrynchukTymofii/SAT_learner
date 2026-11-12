@@ -5,6 +5,7 @@ import { db } from "@/lib/db"
 import bcrypt from "bcryptjs"
 import { NextAuthOptions } from "next-auth"
 import { hasActiveProEntitlement } from "@/lib/revenuecat"
+import { isCourseAdmin } from "@/lib/admin-check"
 
 // How often the session re-checks PRO with RevenueCat
 const PRO_CHECK_INTERVAL_MS = 10 * 60 * 1000
@@ -153,7 +154,7 @@ export const authOptions: NextAuthOptions = {
       return baseUrl
     },
 
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger, session }) {
         // If logging in for the first time (user is available)
         if (user) {
             token.email = user.email
@@ -184,6 +185,16 @@ export const authOptions: NextAuthOptions = {
                     }
                 }
                 token.isPro = (token.rcPro as boolean | undefined) ?? existingUser.isPro
+
+                // Admins see everything as PRO, unless they switched to "view as free"
+                // (useSession().update({ previewFree }) from the admin toggle)
+                const admin = isCourseAdmin(existingUser)
+                token.isAdmin = admin
+                if (!admin) token.previewFree = false
+                else {
+                    if (trigger === "update" && typeof session?.previewFree === "boolean") token.previewFree = session.previewFree
+                    token.isPro = !token.previewFree
+                }
                 token.points = existingUser.points
                 token.name = existingUser.name || token.name
                 token.picture = existingUser.image || token.picture
@@ -201,6 +212,8 @@ export const authOptions: NextAuthOptions = {
           session.user.name = token.name
           session.user.image = token.picture
           session.user.isPro = token.isPro
+          session.user.isAdmin = !!token.isAdmin
+          session.user.previewFree = !!token.previewFree
         return session
     },
     }

@@ -11,6 +11,7 @@ import { ThemeSwitch } from "@/components/site/theme-switch"
 import { APP_STORE_URL } from "@/lib/site"
 import { cn } from "@/lib/utils"
 import { siteUrl } from "@/lib/urls"
+import { AdminViewToggle } from "./admin-view-toggle"
 
 const SECTIONS = [
   {
@@ -93,6 +94,7 @@ export function PlatformShell({ user, isAdmin = false, children }: PlatformShell
           ))}
 
           <div className="mt-auto space-y-2 pr-5 pt-6">
+            {isAdmin && <AdminViewToggle onFrame className="px-1.5 pb-2" />}
             {!user.isPro && (
               <div className="paper grid gap-2.5 rounded-3xl bg-butter p-4">
                 <p className="font-display text-[17px] font-semibold leading-tight">Unlock the whole course</p>

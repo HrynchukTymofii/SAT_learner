@@ -6,6 +6,7 @@ import { checkAppNeedSync, checkForQuizUpdates } from "./api/quiz";
 import { processOfflineQueue } from "./offlineQueue";
 import { saveToken } from "./secureStorage";
 import { getUserSession } from "./session";
+import { getAdminPreviewFree } from "./adminPreview";
 import { useLogout } from "@/hooks/useLogout";
 import Purchases from "react-native-purchases";
 import { router } from "expo-router";
@@ -78,6 +79,11 @@ export function useLoadUserInBackground() {
           ...serverUser,
           categories: serverUser.league,
         };
+        // Admins are PRO unless they chose to preview the app as a free student
+        if (mappedUser.isAdmin) {
+          mappedUser.previewFree = await getAdminPreviewFree();
+          mappedUser.isPro = !mappedUser.previewFree;
+        }
         setUser(mappedUser);
 
         try {

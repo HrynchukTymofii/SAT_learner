@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { View } from "react-native";
 import { useRouter } from "expo-router";
 import Toast from "react-native-toast-message";
-import { Bell, KeyRound, LogOut, Monitor, Moon, Sun, Trash2 } from "lucide-react-native";
+import { Bell, Eye, KeyRound, LogOut, Monitor, Moon, Sun, Trash2 } from "lucide-react-native";
 import { useAuth } from "@/context/AuthContext";
 import { updateUser, deleteUserAccount } from "@/lib/api/user";
 import { useLogout } from "@/hooks/useLogout";
 import { useTheme } from "@/context/ThemeContext";
 import { cancelDailyStudyReminder, isDailyReminderScheduled, scheduleDailyStudyReminder, setDailyReminderTurnedOff } from "@/lib/notifications";
 import { usePalette } from "@/constants/palette";
+import { setAdminPreviewFree } from "@/lib/adminPreview";
 import { Field, Group, GroupRow, PillButton, Screen, T, TopBar } from "@/components/ds";
 import { Segmented, Sheet, SwitchRow } from "@/components/ds/overlays";
 
@@ -19,7 +20,7 @@ import { Segmented, Sheet, SwitchRow } from "@/components/ds/overlays";
 export default function SettingsScreen() {
   const router = useRouter();
   const c = usePalette();
-  const { token } = useAuth();
+  const { token, user, setUser } = useAuth();
   const logout = useLogout();
   const { themeMode, setThemeMode } = useTheme();
 
@@ -128,6 +129,25 @@ export default function SettingsScreen() {
           />
         </Group>
       </View>
+
+      {user?.isAdmin && (
+        <View style={{ gap: 10 }}>
+          <T variant="label">Admin</T>
+          <Group>
+            <SwitchRow
+              icon={Eye}
+              tone="mint"
+              title="Preview as free student"
+              subtitle={user.previewFree ? "PRO lessons and quizzes are locked" : "You see everything as PRO"}
+              value={!!user.previewFree}
+              onChange={async (on) => {
+                await setAdminPreviewFree(on);
+                setUser({ ...user, previewFree: on, isPro: !on });
+              }}
+            />
+          </Group>
+        </View>
+      )}
 
       {token && (
         <View style={{ gap: 10 }}>

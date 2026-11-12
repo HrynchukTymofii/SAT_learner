@@ -16,6 +16,7 @@ export async function getUserData(userId: string) {
         email: true,
         image: true,
         isPro: true,
+        role: true,
         league: true,
         points: true,
         platform: true,

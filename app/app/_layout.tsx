@@ -93,6 +93,9 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
           // Logged out meanwhile: don't bring the old user back with setUser
           const loggedOut = () => startedSession !== getUserSession();
 
+          // Admins get PRO from the server, not from a subscription: don't add or remove it
+          if (currentUser.isAdmin) return;
+
           // If RevenueCat login failed we'd be looking at the anonymous user
           // (no entitlements) and would wrongly remove PRO
           if (await Purchases.isAnonymous()) return;

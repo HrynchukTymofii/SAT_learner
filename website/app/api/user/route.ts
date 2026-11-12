@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { deleteUserAccount, getUserData } from "@/app/actions/user-actions"
 import { requireAuth } from "@/lib/expo-auth"
 import { getRefreshedToken } from "@/lib/jwt"
+import { isCourseAdmin } from "@/lib/admin-check"
 
 export async function GET(req: NextRequest) {
   // Invalid or expired token → 401 "Unauthorized", which the app treats as logged out
@@ -17,8 +18,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 404 })
     }
 
+    // Course admins always get PRO in the app (they can preview as free in Settings)
+    const { role, ...user } = result.user
+    const isAdmin = isCourseAdmin({ role, email: user.email })
+    const body = { ...user, isAdmin, isPro: user.isPro || isAdmin }
+
     const token = getRefreshedToken(req, result.user)
-    return NextResponse.json(token ? { ...result.user, token } : result.user)
+    return NextResponse.json(token ? { ...body, token } : body)
   } catch (error) {
     console.error("❌ Error fetching user:", error)
     return NextResponse.json({ error: "Failed to fetch user" }, { status: 500 })

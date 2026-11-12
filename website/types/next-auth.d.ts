@@ -8,6 +8,8 @@ declare module "next-auth" {
       email?: string | null
       image?: string | null
       isPro?: boolean
+      isAdmin?: boolean
+      previewFree?: boolean
       points?: number
     } & DefaultSession["user"]
   }
@@ -24,6 +26,8 @@ declare module "next-auth/jwt" {
   interface JWT {
     userId?: string
     isPro?: boolean
+    isAdmin?: boolean
+    previewFree?: boolean
     points?: number
   }
 }
