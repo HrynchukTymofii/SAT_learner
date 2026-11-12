@@ -24,7 +24,8 @@ import RatePromptSheet from "@/components/modals/RatePromptSheet";
 import { ThemeProvider as CustomThemeProvider } from "@/context/ThemeContext";
 import { Suspense, useEffect, useRef, useState } from "react";
 import * as SecureStore from "expo-secure-store";
-import { SQLiteProvider } from "expo-sqlite";
+import { SQLiteProvider, useSQLiteContext } from "expo-sqlite";
+import { syncCourseContent } from "@/lib/db/contentSync";
 import CustomPreloadScreen from "@/components/ui/CustomPreloadScreen";
 import * as Network from "expo-network";
 
@@ -137,6 +138,17 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
       console.error("Background sync failed:", err);
     }
   };
+
+  // Course content from the server (edits made in the website's /admin). Needs no account,
+  // runs on start and whenever the app comes back to the foreground
+  const sqlite = useSQLiteContext();
+  useEffect(() => {
+    syncCourseContent(sqlite);
+    const sub = AppState.addEventListener("change", (state) => {
+      if (state === "active") syncCourseContent(sqlite);
+    });
+    return () => sub.remove();
+  }, [sqlite]);
 
   // 1️⃣ Fire-and-forget sync on app start
   useEffect(() => {
