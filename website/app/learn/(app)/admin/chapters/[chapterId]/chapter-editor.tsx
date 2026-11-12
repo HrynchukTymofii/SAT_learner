@@ -26,16 +26,20 @@ export function ChapterEditor({ chapter, items }: { chapter: Chapter; items: Ite
     if (await act(updateChapter(chapter.id, { title, description }), "Chapter saved")) router.refresh()
     setSaving(false)
   }
-  const toggle = async (data: { isPublished?: boolean; isFree?: boolean }) => {
-    if (await act(updateChapter(chapter.id, data))) router.refresh()
+  const toggle = async (data: { isPublished?: boolean }) => {
+    if (!(await act(updateChapter(chapter.id, data)))) return false
+    router.refresh()
+    return true
   }
+  // Free/PRO is decided per lesson and quiz (the app and website never read Chapter.isFree)
+  const freeCount = items.filter((it) => it.isFree).length
 
   return (
     <div className="space-y-6">
       <Back href="/admin">All chapters</Back>
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="font-heading text-3xl font-semibold tracking-tight">{chapter.title}</h1>
-        <StatusBadge published={chapter.isPublished} free={chapter.isFree} />
+        <StatusBadge published={chapter.isPublished} />
       </div>
 
       <Panel title="Chapter">
@@ -50,7 +54,14 @@ export function ChapterEditor({ chapter, items }: { chapter: Chapter; items: Ite
         <Button onClick={save} disabled={!dirty || saving || !title.trim()}>{saving ? "Saving…" : "Save"}</Button>
         <div className="grid gap-4 border-t pt-4 sm:grid-cols-2">
           <Toggle label="Published" hint="Students can see this chapter" checked={chapter.isPublished} onChange={(v) => toggle({ isPublished: v })} />
-          <Toggle label="Free" hint="Open without PRO" checked={chapter.isFree} onChange={(v) => toggle({ isFree: v })} />
+          <div className="text-sm">
+            <span className="block font-semibold">
+              {items.length ? `${freeCount} of ${items.length} free` : "Nothing to make free yet"}
+            </span>
+            <span className="text-muted-foreground block text-xs">
+              Students can always open the chapter. Free or PRO is set on each lesson and quiz below.
+            </span>
+          </div>
         </div>
       </Panel>
 

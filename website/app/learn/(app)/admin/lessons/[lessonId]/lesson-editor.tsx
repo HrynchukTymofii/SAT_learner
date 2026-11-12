@@ -51,10 +51,10 @@ export function LessonEditor({ lesson, chapter }: { lesson: Lesson; chapter: { i
   useSaveShortcut(save)
 
   const toggle = async (data: { isPublished?: boolean; isFree?: boolean }) => {
-    if (await act(updateLesson(lesson.id, data))) {
-      setForm((f) => ({ ...f, ...data }))
-      setSaved((s) => ({ ...s, ...data }))
-    }
+    if (!(await act(updateLesson(lesson.id, data)))) return false
+    setForm((f) => ({ ...f, ...data }))
+    setSaved((s) => ({ ...s, ...data }))
+    return true
   }
 
   return (

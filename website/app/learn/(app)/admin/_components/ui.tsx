@@ -3,7 +3,7 @@
 import * as React from "react"
 import Link from "next/link"
 import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd"
-import { ChevronLeft, GripVertical, Save, Trash2 } from "lucide-react"
+import { ChevronLeft, GripVertical, Loader2, Save, Trash2 } from "lucide-react"
 import toast from "react-hot-toast"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -47,22 +47,48 @@ export function StatusBadge({ published, free }: { published: boolean; free?: bo
   )
 }
 
-/** A labelled on/off switch that saves right away. */
-export function Toggle({ label, hint, checked, onChange, disabled }: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => void; disabled?: boolean }) {
+/**
+ * A labelled on/off switch that saves right away. It flips at once and shows a spinner while
+ * saving; if onChange resolves to a falsy value (the save failed) it flips back.
+ */
+export function Toggle({ label, hint, checked, onChange, disabled }: { label: string; hint?: string; checked: boolean; onChange: (v: boolean) => unknown; disabled?: boolean }) {
+  const [value, setValue] = React.useState(checked)
+  const [pending, setPending] = React.useState(false)
+  React.useEffect(() => setValue(checked), [checked])
+
+  const flip = async () => {
+    const next = !value
+    setValue(next)
+    setPending(true)
+    try {
+      if (!(await onChange(next))) setValue(!next)
+    } catch {
+      setValue(!next)
+    } finally {
+      setPending(false)
+    }
+  }
+
   return (
-    <label className={cn("flex cursor-pointer items-start gap-3", disabled && "cursor-not-allowed opacity-60")}>
+    <label className={cn("flex cursor-pointer items-start gap-3", (disabled || pending) && "cursor-not-allowed", disabled && "opacity-60")}>
       <button
         type="button"
         role="switch"
-        aria-checked={checked}
-        disabled={disabled}
-        onClick={() => onChange(!checked)}
-        className={cn("relative mt-0.5 h-6 w-10 shrink-0 rounded-full transition-colors", checked ? "bg-primary" : "bg-muted-foreground/30")}
+        aria-checked={value}
+        aria-busy={pending}
+        disabled={disabled || pending}
+        onClick={flip}
+        className={cn("relative mt-0.5 h-6 w-10 shrink-0 rounded-full transition-colors", value ? "bg-primary" : "bg-muted-foreground/30")}
       >
-        <span className={cn("bg-background absolute top-0.5 size-5 rounded-full shadow transition-all", checked ? "left-[18px]" : "left-0.5")} />
+        <span className={cn("bg-background absolute top-0.5 grid size-5 place-items-center rounded-full shadow transition-all", value ? "left-[18px]" : "left-0.5")}>
+          {pending && <Loader2 className="text-muted-foreground size-3.5 animate-spin" />}
+        </span>
       </button>
       <span>
-        <span className="block text-sm font-semibold">{label}</span>
+        <span className="flex items-center gap-1.5 text-sm font-semibold">
+          {label}
+          {pending && <span className="text-muted-foreground text-xs font-medium">Saving…</span>}
+        </span>
         {hint && <span className="text-muted-foreground block text-xs">{hint}</span>}
       </span>
     </label>

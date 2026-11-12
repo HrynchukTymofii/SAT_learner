@@ -83,7 +83,9 @@ export function QuizEditor({
     setSaving(false)
   }
   const toggle = async (data: { isPublished?: boolean; isFree?: boolean }) => {
-    if (await act(updateQuiz(quiz.id, data))) router.refresh()
+    if (!(await act(updateQuiz(quiz.id, data)))) return false
+    router.refresh()
+    return true
   }
   const add = async () => {
     setAdding(true)

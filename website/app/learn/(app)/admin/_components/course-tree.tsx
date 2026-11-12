@@ -6,7 +6,7 @@ import { ChevronRight } from "lucide-react"
 import { createChapter, reorderChapters } from "../actions"
 import { act, AddForm, Panel, SortableList, StatusBadge } from "./ui"
 
-type Chapter = { id: string; title: string; isPublished: boolean; isFree: boolean; lessons: number; quizzes: number }
+type Chapter = { id: string; title: string; isPublished: boolean; free: number; lessons: number; quizzes: number }
 
 export function CourseTree({ courseId, title, chapters }: { courseId: string; title: string; chapters: Chapter[] }) {
   const router = useRouter()
@@ -33,9 +33,10 @@ export function CourseTree({ courseId, title, chapters }: { courseId: string; ti
                   <span className="block truncate font-semibold">{ch.title}</span>
                   <span className="text-muted-foreground text-xs">
                     {ch.lessons} lesson{ch.lessons === 1 ? "" : "s"} · {ch.quizzes} quiz{ch.quizzes === 1 ? "" : "zes"}
+                    {ch.free > 0 && ` · ${ch.free === ch.lessons + ch.quizzes ? "all" : ch.free} free`}
                   </span>
                 </span>
-                <StatusBadge published={ch.isPublished} free={ch.isFree} />
+                <StatusBadge published={ch.isPublished} />
                 <ChevronRight className="text-muted-foreground size-4 shrink-0" />
               </Link>
             )}
