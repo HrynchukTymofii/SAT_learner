@@ -1,0 +1,15 @@
+{
+  "voice": "en-US-AvaNeural",
+  "rate": "+10%",
+  "lines": [
+    { "id": "intro", "text": "Triangles are on every SAT. Let's learn their key angle rules in a minute.", "gap": 0.25 },
+    { "id": "interior", "text": "Every triangle has three interior angles: A, B, and C.", "gap": 0.2 },
+    { "id": "line", "text": "Line them up along a parallel through the top vertex, and they form a straight angle: A plus B plus C always equals one eighty.", "gap": 0.25 },
+    { "id": "exterior", "text": "Now extend the base past vertex C. That outside corner is an exterior angle, d.", "gap": 0.25 },
+    { "id": "shortcut", "text": "Notice that C and d also sit on a straight line, so they add to one eighty too. That means the exterior angle d equals A plus B.", "gap": 0.3 },
+    { "id": "numeric", "text": "Here is how it saves time. If A is fifty-two degrees and B is seventy-one, skip angle C. Just add fifty-two and seventy-one: one twenty-three degrees.", "gap": 0.3 },
+    { "id": "example", "text": "On harder SAT problems, the angles are expressions: A is two x plus twelve, B is x plus nineteen, and the exterior angle is one twenty-one.", "gap": 0.25 },
+    { "id": "solve", "text": "Set A plus B equal to the exterior angle: three x plus thirty-one equals one twenty-one. Three x is ninety, so x equals thirty.", "gap": 0.35 },
+    { "id": "outro", "text": "Practice it on real SAT problems in SAT Math Learner.", "gap": 1.4 }
+  ]
+}

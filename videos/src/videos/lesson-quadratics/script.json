@@ -1,0 +1,15 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "rate": "+10%",
+  "lines": [
+    { "id": "intro", "text": "Parabolas and quadratics are everywhere on the SAT. Let's master vertex shifts and the discriminant in sixty seconds.", "gap": 0.2 },
+    { "id": "vertex", "text": "Start with y equals x squared at zero, zero. Vertex form is a times x minus h squared, plus k.", "gap": 0.2 },
+    { "id": "shifts", "text": "Watch the sign trap! x minus three shifts the vertex right to positive three, and minus four drops it down to negative four.", "gap": 0.25 },
+    { "id": "discriminant", "text": "How many times does it cross the x axis? Check the discriminant: b squared minus four a c. Right now it crosses twice: D is positive, two real roots.", "gap": 0.25 },
+    { "id": "one_root", "text": "Slide the vertex right onto the x axis, and the two roots merge into one! D equals zero.", "gap": 0.25 },
+    { "id": "no_roots", "text": "Lift it above the x axis, and it never touches at all: D is negative, zero real solutions.", "gap": 0.3 },
+    { "id": "example", "text": "Now here is a classic SAT problem: for what value of c does y equals x squared minus six x plus c touch the x axis at exactly one point?", "gap": 0.25 },
+    { "id": "solve", "text": "One point means D equals zero! Negative six squared is thirty-six, minus four c equals zero. Four c is thirty-six, so c equals nine!", "gap": 0.35 },
+    { "id": "outro", "text": "Practice this right now in the Functions quiz inside SAT Math Learner.", "gap": 1.2 }
+  ]
+}

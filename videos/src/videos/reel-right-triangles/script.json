@@ -1,0 +1,20 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "rate": "+30%",
+  "tight": true,
+  "lines": [
+    { "id": "hook", "text": "Right triangles in thirty seconds. Go.", "gap": 0.05 },
+    { "id": "ninety", "text": "One angle is exactly ninety degrees.", "gap": 0 },
+    { "id": "hyp", "text": "Across from it: the hypotenuse, always the longest side.", "gap": 0 },
+    { "id": "pyth", "text": "a squared plus b squared equals c squared.", "gap": 0 },
+    { "id": "ex", "text": "Three, four, five: nine plus sixteen is twenty five.", "gap": 0 },
+    { "id": "triples", "text": "Learn the triples: five, twelve, thirteen. Eight, fifteen, seventeen. And six, eight, ten.", "gap": 0 },
+    { "id": "s45", "text": "Forty five, forty five, ninety: x, x, x root two.", "gap": 0 },
+    { "id": "s30", "text": "Thirty, sixty, ninety: x, x root three, two x.", "gap": 0 },
+    { "id": "soh", "text": "SOH CAH TOA. Sine: opposite over hypotenuse. Cosine: adjacent over hypotenuse. Tangent: opposite over adjacent.", "gap": 0.05 },
+    { "id": "quiz", "text": "Quick test: legs six and eight. Hypotenuse?", "gap": 0 },
+    { "id": "think", "silence": 1.0 },
+    { "id": "answer", "text": "Ten. It's three four five, doubled.", "gap": 0.05 },
+    { "id": "cta", "text": "Save this, and practice right triangles in SAT Math Learner.", "gap": 0.9 }
+  ]
+}

@@ -1,0 +1,62 @@
+/* SAT Learner store creatives.
+   creatives.html?v=<kind>&s=<n>   one image at its export size (see SIZE in creatives.html)
+   No params: a gallery of everything, scaled down.
+   App screens are drawn in iOS points (iPhone 402x874, iPad 768x1024) with the app's tokens
+   (app/constants/palette.ts) and fonts (Outfit headings, Manrope body). */
+:root{
+  --bg:#F4F1F9; --surface:#FFFFFF; --surface2:#EFEAF7; --ink:#0B0A0F; --muted:#6B6577; --subtle:#9C95A8; --line:#E5DFEE; --brand:#7A4BDB;
+  --lav:#E4CDFF; --lav2:#C9AAFB; --butter:#FEE7A6; --mint:#CDEFD9; --rose:#FFD6DE; --mintInk:#0E7A43; --roseInk:#B4233F;
+  --grid:rgba(11,10,15,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:#0B0A0F}
+body{font-family:Manrope,system-ui,sans-serif;font-weight:500;-webkit-font-smoothing:antialiased;color:var(--ink)}
+body.export{overflow:hidden}
+.abs{position:absolute}
+.stage{position:relative;overflow:hidden;transform-origin:0 0}
+.d{font-family:Outfit,sans-serif;font-weight:600}
+svg.i{fill:none;stroke:currentColor;stroke-linecap:round;stroke-linejoin:round;flex:none;display:block}
+.paper{background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);background-size:18px 18px}
+.lav{background-color:var(--lav)}.lav2{background-color:var(--lav2)}.butter{background-color:var(--butter)}.mint{background-color:var(--mint)}.rose{background-color:var(--rose)}
+
+/* ---------- device frames ---------- */
+.device{position:absolute;background:#121117;box-shadow:0 50px 100px rgba(0,0,0,.55),0 0 0 2px #34303d inset}
+.device .screen{position:absolute;overflow:hidden;background:var(--bg)}
+.device .island{position:absolute;left:50%;transform:translateX(-50%);background:#000;border-radius:999px;z-index:50}
+.app{position:absolute;left:0;top:0;transform-origin:0 0;overflow:hidden;background:var(--bg)}
+.app .scroll{position:absolute;left:0;right:0;top:0;bottom:0;padding:62px 20px 0;display:flex;flex-direction:column;gap:18px}
+.app.ipad .scroll{padding:46px 28px 0}
+
+/* status bar */
+.sb{position:absolute;left:0;right:0;top:0;height:54px;display:flex;align-items:center;justify-content:space-between;padding:6px 34px 0 46px;font-family:-apple-system,"SF Pro Text",Manrope,sans-serif;font-weight:700;font-size:17px;z-index:40}
+.sb .r{display:flex;gap:6px;align-items:center}
+.sb.ipad{height:30px;padding:0 24px;font-size:14px;font-weight:600}
+.sb.android{height:40px;padding:4px 26px 0 28px;font-size:15px;font-weight:600}
+
+/* tab bar: attached to the bottom, top corners rounded, raised lavender chip on the open tab */
+.tabbar{position:absolute;left:0;right:0;bottom:0;background:#fff;border-radius:28px 28px 0 0;box-shadow:0 -6px 20px rgba(0,0,0,.08);padding:0 14px;z-index:30}
+.tabbar .row{height:60px;display:flex;align-items:center}
+.tabbar .t{flex:1;height:44px;display:grid;place-items:center;color:var(--muted)}
+.tabbar .t.on{flex:2;background:var(--lav2);border-radius:15px;box-shadow:0 3px 0 #9F7AEA;color:var(--ink);display:flex;justify-content:center;gap:8px;font-weight:700;font-size:15px}
+
+/* atoms */
+.tag{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:5px 11px;font-weight:700;font-size:12px}
+.tag.ink{background:var(--ink);color:#fff}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:22px}
+.h2{font-family:Outfit;font-weight:600;font-size:20px;letter-spacing:-.3px}
+.cap{font-size:12.5px;font-weight:600;color:var(--muted)}
+.prog{height:6px;border-radius:9px;background:rgba(11,10,15,.12);overflow:hidden}
+.prog b{display:block;height:100%;background:var(--ink)}
+.pill{display:flex;align-items:center;justify-content:space-between;background:#fff;color:var(--ink);border-radius:999px;min-height:54px;padding:5px 5px 5px 22px;font-weight:700;font-size:16px}
+.pill i{width:44px;height:44px;border-radius:50%;background:var(--ink);color:#fff;display:grid;place-items:center}
+.icT{display:grid;place-items:center;color:var(--ink);flex:none}
+
+/* floating detail cards */
+.float{background:#fff;border-radius:26px;box-shadow:0 30px 60px rgba(0,0,0,.45),0 0 0 1px rgba(255,255,255,.4) inset;color:var(--ink)}
+
+/* ---------- gallery ---------- */
+.gallery{padding:40px;background:#1A1722;color:#F4F1F8;font-family:Manrope}
+.gallery h2{font-family:Outfit;font-weight:600;font-size:28px;margin:34px 0 6px}
+.gallery p{color:#9C95A8;margin-bottom:16px}
+.gallery .row{display:flex;gap:18px;flex-wrap:wrap;align-items:flex-start}
+.gallery .cell{border-radius:10px;overflow:hidden;box-shadow:0 6px 20px rgba(0,0,0,.3)}

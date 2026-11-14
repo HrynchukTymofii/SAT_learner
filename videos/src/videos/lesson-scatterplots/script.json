@@ -1,0 +1,17 @@
+{
+  "voice": "en-US-AvaNeural",
+  "rate": "+10%",
+  "lines": [
+    { "id": "intro", "text": "Scatterplots are on every SAT. Let's learn to read one in a minute.", "gap": 0.25 },
+    { "id": "dot", "text": "Each dot is one observation: a pair of values, x and y.", "gap": 0.15 },
+    { "id": "cloud", "text": "Here, each dot is a student: hours studied, and math score.", "gap": 0.25 },
+    { "id": "direction", "text": "Check four things. One: direction. As x grows, y goes up, so the trend is positive.", "gap": 0.25 },
+    { "id": "form", "text": "Two: form. Do the dots follow a line, or a curve?", "gap": 0.25 },
+    { "id": "strength", "text": "Three: strength. Tightly packed dots mean a strong relationship. Spread out, a weak one.", "gap": 0.25 },
+    { "id": "outlier", "text": "Four: unusual points. This student studied a lot but scored low. An outlier.", "gap": 0.3 },
+    { "id": "fit", "text": "The line of best fit runs through the middle of the cloud, about half the dots above, half below.", "gap": 0.25 },
+    { "id": "equation", "text": "Its equation: y hat equals a plus b x. The slope b is the change in y per unit of x. And a is the prediction at x equals zero.", "gap": 0.25 },
+    { "id": "predict", "text": "Here b is twelve: each extra hour adds about twelve points.", "gap": 0.35 },
+    { "id": "outro", "text": "Practice it on real SAT problems in SAT Math Learner.", "gap": 1.4 }
+  ]
+}

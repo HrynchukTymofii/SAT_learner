@@ -1,0 +1,14 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "rate": "+8%",
+  "lines": [
+    { "id": "hook", "text": "Oh great, a graph problem. This one wrecks half the kids on the SAT.", "gap": 0.15 },
+    { "id": "question", "text": "Three sixty bucks. x student tickets, y adult tickets. Which equation fits the graph?", "gap": 0.25 },
+    { "id": "adult", "text": "Look at the ends, genius. No students? Eighteen adults. Three sixty over eighteen: twenty bucks a ticket.", "gap": 0.2 },
+    { "id": "student", "text": "No adults? Twenty-four students. Three sixty over twenty-four: fifteen bucks. Not rocket science. I'd know.", "gap": 0.2 },
+    { "id": "prompt", "text": "You've got both prices. Write the equation. I'll wait.", "gap": 0 },
+    { "id": "think", "silence": 3 },
+    { "id": "build", "text": "Fifteen x for the students, plus twenty y for the adults, equals the budget. Boom: fifteen x plus twenty y equals three sixty.", "gap": 0.4 },
+    { "id": "cta", "text": "Seven hundred more in SAT Math Learner. Go get smarter.", "gap": 1.0 }
+  ]
+}

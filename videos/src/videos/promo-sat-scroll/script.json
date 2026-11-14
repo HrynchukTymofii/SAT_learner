@@ -1,0 +1,14 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "rate": "+12%",
+  "lines": [
+    { "id": "hook", "text": "What if studying for the SAT felt like scrolling your feed?", "gap": 0.2 },
+    { "id": "intro", "text": "Meet SAT Scroll, the new feature in SAT Math Learner.", "gap": 0.15 },
+    { "id": "theory", "text": "Swipe up: thirty seconds of theory. One idea, no textbook.", "gap": 0.1 },
+    { "id": "task", "text": "Swipe again: a real SAT problem. Tap your answer.", "gap": 0.1 },
+    { "id": "video", "text": "Stuck? A short video explains it in under a minute.", "gap": 0.2 },
+    { "id": "adaptive", "text": "And it's adaptive. Get it right, and the next card gets harder. Miss it, and it slows down and teaches you again.", "gap": 0.2 },
+    { "id": "math", "text": "Ten minutes a day is about forty cards. That's two hundred eighty a week, without opening a book.", "gap": 0.2 },
+    { "id": "cta", "text": "SAT Scroll is coming soon. Comment SCROLL and I'll send you early access.", "gap": 1.2 }
+  ]
+}

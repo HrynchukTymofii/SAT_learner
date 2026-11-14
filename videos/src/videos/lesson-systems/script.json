@@ -1,0 +1,16 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "rate": "+10%",
+  "lines": [
+    { "id": "intro", "text": "Systems of linear equations! Every SAT has them, and most students waste two minutes doing algebra they don't even need.", "gap": 0.2 },
+    { "id": "one", "text": "Graph two lines. Different slopes? They cross once. Here, x plus y equals eight and two x minus y equals four collide right at four, four. One solution.", "gap": 0.25 },
+    { "id": "none", "text": "Now lock them to the exact same slope, with different intercepts. Parallel tracks! They never touch. Zero solutions.", "gap": 0.25 },
+    { "id": "infinite", "text": "What if the second equation is just the first one times two? Same slope, same intercept. One line disguised as two: infinitely many solutions.", "gap": 0.3 },
+    { "id": "elim", "text": "When you do need the point, stack them and add! Plus y and minus y vaporize on contact.", "gap": 0.2 },
+    { "id": "solve", "text": "Three x equals twelve, so x is four. Plug it back in: y is four. Ten seconds flat.", "gap": 0.35 },
+    { "id": "example", "text": "Now watch this classic SAT trap: twelve x minus a y equals ten, and four x minus three y equals negative five. What value of a gives no solution?", "gap": 0.25 },
+    { "id": "match", "text": "No solution means parallel, so the x and y coefficients must scale together! Multiply the bottom row by three to match twelve x.", "gap": 0.25 },
+    { "id": "answer", "text": "Four times three is twelve, so three times three gives a equals nine! Boom, parallel lines, zero solutions.", "gap": 0.35 },
+    { "id": "outro", "text": "Test yourself on the practice problems right after this in SAT Math Learner.", "gap": 1.2 }
+  ]
+}

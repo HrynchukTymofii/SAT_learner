@@ -1,0 +1,27 @@
+{
+  "name": "sat-videos",
+  "version": "1.0.0",
+  "description": "Promo and lesson videos for SAT Math Learner (Remotion)",
+  "private": true,
+  "scripts": {
+    "dev": "remotion studio",
+    "voice": "python scripts/voice.py",
+    "render": "tsx scripts/render.ts"
+  },
+  "dependencies": {
+    "@remotion/cli": "4.0.436",
+    "@remotion/google-fonts": "4.0.436",
+    "@remotion/renderer": "4.0.436",
+    "@remotion/bundler": "4.0.436",
+    "katex": "0.16.22",
+    "react": "19.2.3",
+    "react-dom": "19.2.3",
+    "remotion": "4.0.436"
+  },
+  "devDependencies": {
+    "@types/katex": "0.16.7",
+    "@types/react": "19.2.7",
+    "tsx": "^4.21.0",
+    "typescript": "5.9.3"
+  }
+}

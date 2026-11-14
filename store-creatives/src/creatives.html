@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>SAT Learner Store Creatives</title>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="kit.css">
+</head>
+<body>
+<div id="root"></div>
+<script src="kit.js"></script>
+<script>
+/* Each kind is drawn in design px and zoomed to its export size: [design W, design H, export W, export H] */
+const SIZE = {
+  "iphone-6.9": [660, 1434, 1320, 2868],
+  "iphone-6.3": [603, 1311, 1206, 2622],
+  "ipad-13":    [1032, 1376, 2064, 2752],
+  "gp-phone":   [540, 960, 1080, 1920],
+  "gp-tablet-7":  [2000, 1125, 2560, 1440],
+  "gp-tablet-10": [2000, 1125, 3840, 2160],
+  "header":     [2000, 857, 3840, 1646],
+  "listing":    [2000, 1333, 3840, 2560],
+  "feature":    [1024, 500, 1024, 500],
+};
+function draw(kind, s) {
+  const [W, H] = SIZE[kind], i = s - 1;
+  if (kind === "header") return header();
+  if (kind === "listing") return LISTINGS[i].draw(W, H);
+  if (kind === "feature") return FEATURES[i].draw(W, H);
+  if (kind.startsWith("gp-tablet")) return slideWide(SLIDES[i], i, W, H);
+  return slide(SLIDES[i], i, W, H, kind === "ipad-13" ? "ipad" : kind === "gp-phone" ? "android" : "phone");
+}
+function stage(kind, s, zoom) {
+  const [W, H, EW] = SIZE[kind];
+  return `<div class="stage" style="width:${W}px;height:${H}px;zoom:${zoom ?? EW / W}">${draw(kind, s)}</div>`;
+}
+
+const q = new URLSearchParams(location.search), v = q.get("v"), root = document.getElementById("root");
+if (v) {
+  document.body.classList.add("export");
+  root.innerHTML = stage(v, +q.get("s") || 1);
+} else {
+  const row = (kind, n, zoom) => `<div class="row">${Array.from({ length: n }, (_, k) => `<div class="cell">${stage(kind, k + 1, zoom)}</div>`).join("")}</div>`;
+  root.innerHTML = `<div class="gallery">
+    <h2>App Store · iPhone 6.9"</h2><p>1320×2868</p>${row("iphone-6.9", 6, .36)}
+    <h2>App Store · iPhone 6.3"</h2><p>1206×2622</p>${row("iphone-6.3", 6, .4)}
+    <h2>App Store · iPad 13"</h2><p>2064×2752</p>${row("ipad-13", 6, .28)}
+    <h2>App Store · header</h2><p>3840×1646</p>${row("header", 1, .5)}
+    <h2>App Store · listing</h2><p>3840×2560</p>${row("listing", 2, .4)}
+    <h2>Google Play · feature graphic</h2><p>1024×500</p>${row("feature", 2, .8)}
+    <h2>Google Play · phone</h2><p>1080×1920</p>${row("gp-phone", 6, .45)}
+    <h2>Google Play · tablet</h2><p>2560×1440 (7") and 3840×2160 (10"), same layout</p>${row("gp-tablet-10", 6, .25)}
+  </div>`;
+}
+Promise.all(['500','600','700'].map(w=>document.fonts.load(w+' 20px Outfit')).concat(['500','600','700','800'].map(w=>document.fonts.load(w+' 20px Manrope')))).then(()=>document.fonts.ready).then(() => document.querySelectorAll(".stage").forEach(placeLifts)).then(() => Promise.all([...document.images].map(im => im.complete ? 0 : new Promise(r => { im.onload = im.onerror = r; })))).then(() => { document.title = "ready"; });
+</script>
+</body>
+</html>

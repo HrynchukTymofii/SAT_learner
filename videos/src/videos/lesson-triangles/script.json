@@ -1,0 +1,15 @@
+{
+  "voice": "en-US-AndrewNeural",
+  "rate": "+10%",
+  "lines": [
+    { "id": "intro", "text": "Triangle angles show up on every single SAT. Here is the one shortcut that saves you half the work.", "gap": 0.2 },
+    { "id": "interior", "text": "Start with any triangle: three interior angles, A, B, and C.", "gap": 0.2 },
+    { "id": "line", "text": "Slide A and B up next to C, and they snap into a flat straight line: A plus B plus C always equals one eighty.", "gap": 0.25 },
+    { "id": "exterior", "text": "Now extend the bottom side past C. That outside corner is the exterior angle, d.", "gap": 0.25 },
+    { "id": "shortcut", "text": "Notice that C plus d is also a straight line, one eighty! Drop C from both, and boom: the exterior angle d equals A plus B.", "gap": 0.3 },
+    { "id": "numeric", "text": "So if A is fifty-two degrees and B is seventy-one, don't touch C! Just add fifty-two plus seventy-one: one twenty-three.", "gap": 0.3 },
+    { "id": "example", "text": "On a harder SAT problem, they hide it in algebra: A is two x plus twelve, B is x plus nineteen, and the exterior angle is one twenty-one.", "gap": 0.25 },
+    { "id": "solve", "text": "Set A plus B equal to the outside angle: three x plus thirty-one equals one twenty-one. Three x is ninety, so x equals thirty!", "gap": 0.35 },
+    { "id": "outro", "text": "Try the interactive check below, then jump into the geometry quiz in SAT Math Learner.", "gap": 1.2 }
+  ]
+}
