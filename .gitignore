@@ -1,0 +1,32 @@
+# Tool/session output
+.playwright-mcp/
+
+# Personal docs and scratch files
+*.pdf
+test-katex.html
+
+# Duplicate download of app/google-services.json
+app/google-services (1).json
+
+# DNS zone export (infrastructure details)
+docs/cloudflare/
+
+# Raw design/media assets (kept locally, not needed in the repo)
+assets/tasks_images/
+assets/problems/
+assets/app store/
+assets/play store/
+assets/icon.png
+assets/icon1.png
+assets/adaptive-icon.png
+assets/ios-*.png
+assets/splash-icon-*.png
+
+# Store creatives: keep the kit (src/), ignore rendered images
+store-creatives/app-store/
+store-creatives/google-play/
+
+# Remotion videos: keep source, ignore media and renders
+videos/public/
+videos/out/
+videos/node_modules/
