@@ -507,8 +507,8 @@ model StripeCustomer {
 model Apps{
   id String @id @default(uuid())
   name String
-  needSync Boolean @default(false)
   version String?
+  needSync Boolean @default(false)
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
