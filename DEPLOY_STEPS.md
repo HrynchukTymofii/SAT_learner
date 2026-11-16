@@ -200,7 +200,7 @@ this database, must never run `db push`/`migrate` against it: its schema still h
 
 ## Local development
 
-No env changes needed. Run `npm run dev` in `website/` and open:
+No env changes needed. Run `pnpm dev` in `website/` and open:
 - http://localhost:3000 — marketing site
 - http://app.localhost:3000 — platform (Chrome and Edge open `*.localhost` without any setup)
 
