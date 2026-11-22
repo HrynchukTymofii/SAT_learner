@@ -22,6 +22,13 @@ in the 2026 lavender / butter / ink brand (`src/brand.ts`). Math is typeset with
 ## Mascot
 `src/mascot/Unit1600.tsx`: Unit-1600, a tired, sarcastic robot that has graded ten million SAT tests. A video directs it with keyframes (`{t, expr, arms, gaze}`; expressions neutral / bored / smug / wide / happy / wink, arms down / point / cheer / wave), usually cued to words with `cue()`. Its mouth follows the voice's loudness (`env` in timing.json), it blinks and bobs, and its antenna lights up while it talks.
 
+## Setup
+- `npm install` (Node 20+).
+- Python 3 with `pip install edge-tts numpy`, and `ffmpeg` + `ffprobe` on PATH (used by `scripts/voice.py`).
+- `public/` (voice lines, music, sound effects, reference images) and `out/` (renders) are **not in git**.
+  Get `public/` as a zip from the previous owner, or regenerate: `python scripts/voice.py <id>` for voices,
+  `python scripts/sfx.py` for sounds/beat.
+
 ## Commands
 - `npm run dev`: Remotion Studio, to scrub through and tweak.
 - `npx tsx scripts/review.ts <id> 2,10,20`: a contact sheet of those seconds → `out/review/<id>.png`.

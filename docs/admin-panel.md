@@ -17,25 +17,26 @@ Ctrl+S saves; moving to the next question saves the current one.
 Code: `website/app/learn/(app)/admin/` (pages + `actions.ts`), `website/components/admin/rich-editor.tsx`,
 `website/lib/admin.ts` (who is admin), `website/lib/r2.ts` + `website/app/api/admin/upload/route.ts` (uploads).
 
-## 1. Make the 2 admins
+## 1. Make someone an admin
 
 Both are needed: the role in the database **and** the email in `ADMIN_EMAILS`.
+Admins also get PRO and can switch to "preview as a free student" on the platform.
 
-Neon → SAT project (`ep-flat-water-b5gr6vex`) → SQL Editor:
+Neon → the SAT project → SQL Editor:
 
 ```sql
 -- check first
-SELECT "userId", email, role, platform FROM "User"
-WHERE email ILIKE 'tim.20049090@%' OR email ILIKE 'skotsiubynska@%';
+SELECT "userId", email, role, platform FROM "User" WHERE email ILIKE 'new.admin@example.com';
 
-UPDATE "User" SET role = 'admin'
-WHERE email ILIKE 'tim.20049090@%' OR email ILIKE 'skotsiubynska@%';
+UPDATE "User" SET role = 'admin' WHERE email ILIKE 'new.admin@example.com';
+
+-- remove an admin
+UPDATE "User" SET role = 'user' WHERE email ILIKE 'old.admin@example.com';
 ```
 
 If one person has two accounts (e.g. Google + email), set the role only on the one they log in with.
 
-Vercel → SAT project → Settings → Environment Variables:
-`ADMIN_EMAILS = tim.20049090@gmail.com,<second admin's full email>`
+Vercel → SAT project → Settings → Environment Variables → `ADMIN_EMAILS` (comma separated) → Redeploy.
 
 ## 2. Cloudflare R2 (images + videos)
 
@@ -77,8 +78,9 @@ so size isn't limited by Vercel. R2 has no egress fees; storage is about $0.015/
 
 ## Notes
 
-- Old images uploaded through Fibipals live on UploadThing (`utfs.io` URLs) under the Fibipals account. They keep
-  working as long as that account exists. Moving them to R2 is a separate one-off script.
+- All old UploadThing images were copied to R2 (`media.satlearner.com/uploadthing/…`) and the database URLs
+  rewritten; nothing depends on UploadThing any more.
+- Files deleted from the editor stay in R2 until the weekly cleanup (`/api/cron/r2-cleanup`) removes files
+  no row references.
 - The mobile app plays only `Lesson.videoUrl` (the uploaded video). A YouTube link shows only on the website.
 - Deleting a chapter/quiz/question also removes students' results and saved questions for it.
-- No database migration was needed. All tables already existed.

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "remotion studio",
     "voice": "python scripts/voice.py",
-    "render": "tsx scripts/render.ts"
+    "render": "remotion render"
   },
   "dependencies": {
     "@remotion/cli": "4.0.436",

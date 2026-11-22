@@ -110,11 +110,8 @@ model Course{
   price Float?
   isFree Boolean @default(true)
   isPublished Boolean @default(false)
-  categories CourseCategory[]
 
   chapters Chapter[]
-
-  attachments Attachment[]
 
   purchases Purchase[]
 
@@ -151,38 +148,6 @@ model CourseSubscription {
   @@unique([userId, courseId])
 }
 
-model Category{
-  id String @id @default(uuid())
-  name String @unique
-  courses    CourseCategory[]
-}
-
-model CourseCategory {
-  id         String   @id @default(uuid())
-  courseId   String
-  categoryId String
-
-  course     Course   @relation(fields: [courseId], references: [id])
-  category   Category @relation(fields: [categoryId], references: [id])
-
-  @@unique([courseId, categoryId])
-}
-
-
-model Attachment{
-  id String @id @default(uuid())
-  name String
-  url String @db.Text
-
-  courseId String
-  course Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([courseId])
-}
-
 model Chapter {
   id String @id @default(uuid())
   title String
@@ -198,8 +163,7 @@ model Chapter {
 
   userProgress UserProgress[]
   lessons     Lesson[] 
-  quizzes     Quiz[]        
-  challenges  Challenge[]
+  quizzes     Quiz[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -219,10 +183,6 @@ model Lesson {
   isFree      Boolean @default(false)
   points      Int     @default(10)
 
-  muxData MuxData?
-
-  lessonSections LessonSection[]
-
   chapterId   String
   chapter     Chapter    @relation(fields: [chapterId], references: [id], onDelete: Cascade)
   progress LessonProgress[]
@@ -233,20 +193,6 @@ model Lesson {
   updatedAt   DateTime   @updatedAt
 }
 
-model LessonSection {
-  id        String   @id @default(uuid())
-  text      String?  @db.Text
-  position  Int
-  type      String   @default("Text")
-  lines     String   @default("1")
-  lessonId  String
-  lesson    Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([lessonId])
-}
 
 model LessonProgress {
   id          String    @id @default(uuid())
@@ -380,51 +326,6 @@ model Comment {
   @@index([quizQuestionId, isApproved, createdAt])
 }
 
-model Challenge {
-  id          String          @id @default(uuid())
-  title       String
-  description String?         @db.Text
-  position    Int
-  isPublished Boolean         @default(false)
-  isFree      Boolean @default(false)
-  points      Int     @default(50)
-
-  chapterId   String
-  chapter     Chapter         @relation(fields: [chapterId], references: [id], onDelete: Cascade)
-
-  tasks       ChallengeTask[] 
-
-  createdAt   DateTime        @default(now())
-  updatedAt   DateTime        @updatedAt
-}
-
-model ChallengeTask {
-  id          String     @id @default(uuid())
-  task        String     @db.Text
-  language    Int
-  hint        String?
-  taskCode    String
-  test        Json
-  points      Int     @default(10)
-  position    Int
-
-  challengeId String
-  challenge   Challenge  @relation(fields: [challengeId], references: [id], onDelete: Cascade)
-
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-}
-
-model MuxData {
-  id String @id @default(uuid())
-  assetId String
-  playbackId String?
-
-  lessonId   String @unique
-  lesson     Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
-
-}
-
 model UserProgress {
   id String @id @default(uuid())
   userId String
@@ -444,38 +345,6 @@ model UserProgress {
 
 
 
-model Article{
-  id String @id @default(uuid())
-  userId String 
-  title String @db.Text
-  imageUrl String? @db.Text
-  preview String? @db.Text
-  isPublished Boolean @default(false)
-  needLogin Boolean @default(true)
-  isFree Boolean @default(true)
-
-  articleSections ArticleSection[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
-
-model ArticleSection {
-  id String @id @default(uuid())
-  text String? @db.Text
-  position Int
-  type String @default("Text")
-  lines String @default("1")
-  articleId String
-  article Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([articleId])
-}
-
-
 model Purchase {
   id String @id @default(uuid())
   userId String
@@ -493,15 +362,6 @@ model Purchase {
 
   @@unique([userId, courseId])
   @@index([courseId])
-}
-
-model StripeCustomer {
-  id String @id @default(uuid())
-  userId String @unique
-  stripeCustomerId String @unique
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 }
 
 model Apps{

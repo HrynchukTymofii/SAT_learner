@@ -44,3 +44,9 @@ android/
 # local env files
 .env
 .env*.local
+
+# Signing keys (keep a private copy, never commit)
+*.keystore
+
+# Output of scripts/build-offline-db.ts (copied into assets/databases/)
+offline-build/

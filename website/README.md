@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# website/ — Next.js site, learning platform and API
 
-## Getting Started
+One Next.js 15 (App Router) project deployed on Vercel. It serves three things:
 
-First, run the development server:
+| Host / path | What | Code |
+|---|---|---|
+| `satlearner.com` | Marketing: home, `/sat-course`, `/info/*` articles, privacy, terms | `app/(main)/` |
+| `app.satlearner.com` | Learning platform (login required): home, course, lessons, quizzes, tests & exams, planner, stats dashboard, profile, `/admin` course editor | `app/learn/` |
+| `satlearner.com/api/*` | REST API used by the mobile app (and the platform) | `app/api/` |
+| `satlearner.com/expo-course/*` | Lesson/question pages the app shows in a WebView | `app/(expo)/` |
+
+`middleware.ts` decides which is which by host name (the `app.` host is rewritten to `app/learn/*`).
+Platform links are written without `/learn` (e.g. `/tests`).
+
+## Run locally
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cp .env.example .env    # every variable is explained in the file
+npm install             # runs prisma generate
+npm run dev             # http://localhost:3000 (marketing), http://app.localhost:3000 (platform)
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Leave `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_APP_URL` and `AUTH_COOKIE_DOMAIN` empty locally.
+Use a **Neon dev branch** URL in `.env` if you will write data; the production URL works but it's real data.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Minimum to boot: `DATABASE_URL`, `DATABASE_URL_UNPOOLED`, `COURSE_ID`, `NEXTAUTH_SECRET`, `JWT_SECRET`.
+Google/Apple login, R2 uploads, RevenueCat and push each need their own block of variables.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Before pushing: `npx tsc --noEmit` and `npx next build`.
 
-## Learn More
+## Folder map
 
-To learn more about Next.js, take a look at the following resources:
+```
+app/
+  (main)/              marketing pages (home is static, revalidated hourly)
+  learn/(auth)/        login, register
+  learn/(app)/         platform: page.tsx home, course/, courses/[id], tests/, test/, planner/, dashboard/,
+                       profile/, pricing/, admin/ (chapters, lessons, quizzes, questions, notifications)
+  (expo)/expo-course/  pages embedded in the mobile app
+  api/auth/            app logins: login, register, google, apple; [...nextauth] for the website
+  api/user/            user, course progress, quizzes, saved/wrong questions, stats, planner, push token,
+                       notifications inbox, subscription/upgrade, content sync (course/content)
+  api/admin/           upload (presigned R2 URLs), notifications (send push)
+  api/cron/r2-cleanup  weekly: deletes R2 files no longer referenced (vercel.json)
+  actions/             server-side helpers (not exposed as server actions)
+components/
+  ui/                  shadcn/ui primitives
+  site/, home/         marketing header/footer/sections
+  platform/            platform shell, skeletons, course cards, admin preview toggle
+  admin/rich-editor.tsx  TipTap editor used in /admin
+  tiptap-*/            TipTap building blocks (nodes, toolbar, icons); readonly-editor renders lessons
+lib/                   see CLAUDE.md "Where things are"
+prisma/                schema.prisma + migrations/ (Prisma Migrate)
+scripts/               generate-apple-secret.mjs (APPLE_SECRET, every 6 months)
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Auth
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+- Website: NextAuth (`lib/auth.ts`) with credentials, Google and Apple. Session cookie shared across
+  `satlearner.com` and `app.satlearner.com` through `AUTH_COOKIE_DOMAIN`.
+- App: `/api/auth/*` return a JWT signed with `JWT_SECRET` (60 days, refreshed by `/api/user`).
+  Changing `JWT_SECRET` logs every app user out.
+- Admins: email in `ADMIN_EMAILS` **and** `User.role = 'admin'` (`lib/admin.ts`). See `../docs/admin-panel.md`.
 
-## Deploy on Vercel
+## Database
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Prisma + Neon Postgres. Read `../docs/database.md` before any schema change. Never `prisma db push`.
