@@ -35,7 +35,7 @@ const SECTIONS = [
     items: [
       { href: "/profile", label: "Profile", icon: User, mobile: true },
       // Shown only to course admins (see lib/admin.ts)
-      { href: "/admin", label: "Admin", icon: ShieldCheck, adminOnly: true },
+      { href: "/admin", label: "Admin", icon: ShieldCheck, adminOnly: true, mobile: true },
     ],
   },
 ]
@@ -145,14 +145,14 @@ export function PlatformShell({ user, isAdmin = false, children }: PlatformShell
           aria-label="Main"
           className="fixed bottom-[max(16px,env(safe-area-inset-bottom))] left-1/2 z-40 flex -translate-x-1/2 gap-1 rounded-full bg-primary p-1.5 text-primary-foreground shadow-[0_14px_30px_-12px_rgba(0,0,0,.5)] md:hidden"
         >
-          {ITEMS.filter((i) => i.mobile).map(({ href, label, icon: Icon }) => (
+          {ITEMS.filter((i) => "mobile" in i && (isAdmin || !("adminOnly" in i))).map(({ href, label, icon: Icon }) => (
             <Link
               key={href}
               href={href}
               aria-label={label}
               aria-current={href === active ? "page" : undefined}
               className={cn(
-                "grid size-12 place-items-center rounded-full transition-colors",
+                "grid size-11 place-items-center rounded-full transition-colors min-[380px]:size-12",
                 href === active ? "bg-background text-foreground" : "opacity-75"
               )}
             >

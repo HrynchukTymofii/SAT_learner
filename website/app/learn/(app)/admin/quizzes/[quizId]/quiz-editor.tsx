@@ -98,7 +98,7 @@ export function QuizEditor({
     <div className="space-y-6 pb-24">
       <Back href={`/admin/chapters/${chapter.id}`}>{chapter.title}</Back>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">{quiz.title}</h1>
+        <h1 className="font-heading min-w-0 text-2xl font-semibold tracking-tight break-words sm:text-3xl">{quiz.title}</h1>
         <div className="flex items-center gap-3">
           <StatusBadge published={quiz.isPublished} free={quiz.isFree} />
           <a href={`/course/${chapter.id}/quizzes/${quiz.id}`} target="_blank" rel="noreferrer" className="text-muted-foreground hover:text-foreground inline-flex items-center gap-1 text-sm font-semibold">
@@ -126,7 +126,7 @@ export function QuizEditor({
       <Panel
         title={`Questions (${questions.length}, ${quiz.maxScore} points)`}
         action={
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {questions.length > 0 && (
               <Button size="sm" variant="outline" onClick={() => setOpen(allOpen ? new Set() : new Set(questions.map((q) => q.id)))}>
                 {allOpen ? <ChevronsDownUp className="size-4" /> : <ChevronsUpDown className="size-4" />}

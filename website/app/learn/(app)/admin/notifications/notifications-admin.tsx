@@ -43,15 +43,15 @@ export default function NotificationsAdmin({ phones, history }: { phones: number
   }
 
   return (
-    <div className="mx-auto max-w-3xl space-y-8 p-4 md:p-8">
+    <div className="mx-auto w-full max-w-3xl space-y-8 md:p-8">
       <div>
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">Notifications</h1>
+        <h1 className="font-heading text-2xl font-semibold tracking-tight sm:text-3xl">Notifications</h1>
         <p className="text-muted-foreground mt-1 text-sm">
           Shows up in the app inbox (the bell on Home) and, if push is on, on the phone. {phones} phone{phones === 1 ? "" : "s"} registered.
         </p>
       </div>
 
-      <form onSubmit={send} className="bg-card space-y-4 rounded-3xl border p-5">
+      <form onSubmit={send} className="bg-card space-y-4 rounded-3xl border p-4 sm:p-5">
         <div className="space-y-2">
           <Label htmlFor="n-title">Title</Label>
           <Input id="n-title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} required placeholder="New practice exam is live" />
@@ -84,7 +84,7 @@ export default function NotificationsAdmin({ phones, history }: { phones: number
           <input type="checkbox" checked={push} onChange={(e) => setPush(e.target.checked)} className="size-4" />
           Also send as a push notification
         </label>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <Button type="submit" disabled={sending} className="rounded-full">
             <Send className="size-4" /> {sending ? "Sending…" : "Send"}
           </Button>
@@ -99,8 +99,8 @@ export default function NotificationsAdmin({ phones, history }: { phones: number
           <div key={n.id} className="bg-card flex gap-3 rounded-2xl border p-4">
             <div className="bg-lav grid size-10 shrink-0 place-items-center rounded-full text-[#0B0A0F]"><Bell className="size-4" /></div>
             <div className="min-w-0 flex-1">
-              <p className="font-semibold">{n.title}</p>
-              <p className="text-muted-foreground text-sm">{n.body}</p>
+              <p className="font-semibold break-words">{n.title}</p>
+              <p className="text-muted-foreground text-sm break-words">{n.body}</p>
               <p className="text-muted-foreground mt-1 text-xs">
                 {AUDIENCE_LABEL[n.audience] ?? n.audience} · {new Date(n.createdAt).toLocaleString()} · {n.pushCount} pushed · {n.reads} read
               </p>

@@ -38,7 +38,7 @@ export function ChapterEditor({ chapter, items }: { chapter: Chapter; items: Ite
     <div className="space-y-6">
       <Back href="/admin">All chapters</Back>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="font-heading text-3xl font-semibold tracking-tight">{chapter.title}</h1>
+        <h1 className="font-heading min-w-0 text-2xl font-semibold tracking-tight break-words sm:text-3xl">{chapter.title}</h1>
         <StatusBadge published={chapter.isPublished} />
       </div>
 

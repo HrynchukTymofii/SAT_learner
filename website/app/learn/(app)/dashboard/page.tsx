@@ -128,9 +128,9 @@ const CircularProgress = ({
   }
 
   return (
-    <div className="flex flex-col items-center space-y-3">
-      <div className="relative">
-        <svg width={size} height={size} className="transform -rotate-90">
+    <div className="flex min-w-0 flex-col items-center space-y-3">
+      <div className="relative w-full" style={{ maxWidth: size }}>
+        <svg viewBox={`0 0 ${size} ${size}`} style={{ maxWidth: size }} className="h-auto w-full -rotate-90 transform">
           <circle
             cx={size / 2}
             cy={size / 2}
@@ -152,12 +152,12 @@ const CircularProgress = ({
           />
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="text-3xl font-bold">{Math.round(animatedValue)}%</span>
+          <span className="text-lg font-bold sm:text-3xl">{Math.round(animatedValue)}%</span>
         </div>
       </div>
       <div className="text-center">
-        <p className="font-semibold">{label}</p>
-        <p className="text-sm text-muted-foreground">{sublabel}</p>
+        <p className="text-xs font-semibold sm:text-base">{label}</p>
+        <p className="text-xs text-muted-foreground sm:text-sm">{sublabel}</p>
       </div>
     </div>
   )
@@ -235,7 +235,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen p-4 md:p-6 relative overflow-hidden">
+    <div className="relative w-full min-w-0 overflow-hidden md:p-6">
       {/* Background decorations */}
 
       <div className="max-w-7xl mx-auto relative z-10">
@@ -244,20 +244,20 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="mb-8"
+          className="mb-6 md:mb-8"
         >
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-2">
+              <h1 className="text-3xl md:text-5xl font-bold mb-2">
                 SAT Prep Dashboard
               </h1>
-              <p className="text-xl text-muted-foreground">
+              <p className="text-base md:text-xl text-muted-foreground">
                 Welcome back, {user?.name?.split(" ")[0] || "Student"}!
               </p>
             </div>
 
             {/* Quick Stats */}
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10">
                 <Trophy className="h-5 w-5 text-primary" />
                 <span className="font-semibold">{stats.user.points} pts</span>
@@ -279,7 +279,7 @@ export default function DashboardPage() {
           >
             <Card className="shadow-xl pb-6">
               <CardHeader>
-                <CardTitle className="text-2xl font-bold flex items-center gap-3">
+                <CardTitle className="text-xl sm:text-2xl font-bold flex items-center gap-3">
                   <div className="p-2 bg-primary rounded-xl">
                     <Target className="h-6 w-6 text-primary-foreground" />
                   </div>
@@ -289,7 +289,7 @@ export default function DashboardPage() {
               <CardContent>
                 <div className="space-y-8">
                   {/* Progress Circles */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  <div className="grid grid-cols-3 gap-3 sm:gap-8">
                     <CircularProgress
                       value={stats.progress.courseProgress}
                       color="primary"
@@ -311,17 +311,17 @@ export default function DashboardPage() {
                   </div>
 
                   {/* Performance Summary */}
-                  <div className="border-t pt-8">
-                    <h3 className="text-lg font-semibold mb-6 flex items-center gap-2">
+                  <div className="border-t pt-6 sm:pt-8">
+                    <h3 className="text-lg font-semibold mb-4 sm:mb-6 flex items-center gap-2">
                       <TrendingUp className="h-5 w-5 text-success" />
                       Performance Summary
                     </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
                       {stats.scores.lastQuiz && (
-                        <Card className="bg-primary/5 border-primary/20">
-                          <CardContent className="p-5">
+                        <Card className="col-span-2 bg-primary/5 border-primary/20 sm:col-span-1">
+                          <CardContent className="p-4 sm:p-5">
                             <div className="flex items-center justify-between mb-2">
-                              <span className="text-sm font-semibold">Last Test</span>
+                              <span className="text-xs sm:text-sm font-semibold">Last Test</span>
                               <Calendar className="h-5 w-5 text-primary" />
                             </div>
                             <p className="font-bold mb-1 truncate">{stats.scores.lastQuiz.title}</p>
@@ -333,12 +333,12 @@ export default function DashboardPage() {
                       )}
 
                       <Card className="bg-mint border-success/40 pb-6">
-                        <CardContent className="p-5">
+                        <CardContent className="p-4 sm:p-5">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold">Est. SAT Score</span>
+                            <span className="text-xs sm:text-sm font-semibold">Est. SAT Score</span>
                             <Trophy className="h-5 w-5 text-success" />
                           </div>
-                          <p className="text-3xl font-bold text-success">
+                          <p className="text-2xl sm:text-3xl font-bold text-success">
                             {stats.scores.estimatedSatScore}
                           </p>
                           <p className="text-xs text-muted-foreground mt-1">Based on practice</p>
@@ -346,23 +346,23 @@ export default function DashboardPage() {
                       </Card>
 
                       <Card className="bg-lav-2 border-lav-2 pb-6">
-                        <CardContent className="p-5">
+                        <CardContent className="p-4 sm:p-5">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold">Avg. Score</span>
+                            <span className="text-xs sm:text-sm font-semibold">Avg. Score</span>
                             <BookOpen className="h-5 w-5 text-brand" />
                           </div>
-                          <p className="text-3xl font-bold">{stats.scores.averageScore}%</p>
+                          <p className="text-2xl sm:text-3xl font-bold">{stats.scores.averageScore}%</p>
                           <Progress value={stats.scores.averageScore} className="h-2 mt-2" />
                         </CardContent>
                       </Card>
 
                       <Card className="bg-butter border-[#F2C94C] pb-6">
-                        <CardContent className="p-5">
+                        <CardContent className="p-4 sm:p-5">
                           <div className="flex items-center justify-between mb-2">
-                            <span className="text-sm font-semibold">Saved Questions</span>
+                            <span className="text-xs sm:text-sm font-semibold">Saved Questions</span>
                             <Bookmark className="h-5 w-5 text-warn" />
                           </div>
-                          <p className="text-3xl font-bold">{stats.savedQuestionsCount}</p>
+                          <p className="text-2xl sm:text-3xl font-bold">{stats.savedQuestionsCount}</p>
                           <Link href="/tests/saved" className="text-xs text-primary hover:underline mt-1 inline-block">
                             Review saved
                           </Link>
@@ -399,8 +399,8 @@ export default function DashboardPage() {
                         key={chapter.id}
                         className={cn("p-4 rounded-xl", chapterBgColors[chapter.colorIndex])}
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium truncate">{chapter.title}</span>
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <span className="min-w-0 font-medium truncate">{chapter.title}</span>
                           <span className="text-sm font-bold">{chapter.progress}%</span>
                         </div>
                         <div className="h-2 bg-background/50 rounded-full overflow-hidden">
@@ -443,8 +443,8 @@ export default function DashboardPage() {
                         key={area.id}
                         className="p-4 rounded-xl bg-destructive/5 border border-destructive/20"
                       >
-                        <div className="flex items-center justify-between mb-2">
-                          <span className="font-medium">{area.title}</span>
+                        <div className="flex items-center justify-between gap-3 mb-2">
+                          <span className="min-w-0 font-medium break-words">{area.title}</span>
                           <Badge variant="destructive">{area.averageScore}%</Badge>
                         </div>
                         <Link
@@ -486,11 +486,11 @@ export default function DashboardPage() {
                   {stats.recentActivity.map((activity) => (
                     <div
                       key={activity.id}
-                      className="flex items-center justify-between p-4 rounded-xl border hover:bg-muted/50 transition-colors"
+                      className="flex items-center justify-between gap-3 p-3 sm:p-4 rounded-xl border hover:bg-muted/50 transition-colors"
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="flex min-w-0 items-center gap-3">
                         <div className={cn(
-                          "p-2 rounded-lg",
+                          "shrink-0 p-2 rounded-lg",
                           activity.type === "quiz" ? "bg-primary/10" : "bg-mint"
                         )}>
                           {activity.type === "quiz" ? (
@@ -499,14 +499,14 @@ export default function DashboardPage() {
                             <BookOpen className="h-5 w-5 text-success" />
                           )}
                         </div>
-                        <div>
-                          <p className="font-medium">{activity.title}</p>
+                        <div className="min-w-0">
+                          <p className="font-medium truncate">{activity.title}</p>
                           <p className="text-sm text-muted-foreground">
                             {new Date(activity.date).toLocaleDateString()}
                           </p>
                         </div>
                       </div>
-                      <Badge variant={activity.completed ? "default" : "secondary"}>
+                      <Badge variant={activity.completed ? "default" : "secondary"} className="shrink-0">
                         {activity.score}/{activity.maxScore}
                       </Badge>
                     </div>
@@ -530,7 +530,7 @@ export default function DashboardPage() {
           >
             <Link href="/tests/wrong">
               <Card className="shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-                <CardContent className="p-6 flex items-center gap-4">
+                <CardContent className="p-4 sm:p-6 flex items-center gap-4">
                   <div className="p-3 bg-destructive/10 rounded-xl group-hover:bg-destructive/20 transition-colors">
                     <AlertCircle className="h-6 w-6 text-destructive" />
                   </div>
@@ -544,7 +544,7 @@ export default function DashboardPage() {
 
             <Link href="/tests/saved">
               <Card className="shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-                <CardContent className="p-6 flex items-center gap-4">
+                <CardContent className="p-4 sm:p-6 flex items-center gap-4">
                   <div className="p-3 bg-butter rounded-xl group-hover:bg-butter transition-colors">
                     <Bookmark className="h-6 w-6 text-warn" />
                   </div>
@@ -558,7 +558,7 @@ export default function DashboardPage() {
 
             <Link href="/planner">
               <Card className="shadow-lg hover:shadow-xl transition-shadow cursor-pointer group">
-                <CardContent className="p-6 flex items-center gap-4">
+                <CardContent className="p-4 sm:p-6 flex items-center gap-4">
                   <div className="p-3 bg-primary/10 rounded-xl group-hover:bg-primary/20 transition-colors">
                     <Calendar className="h-6 w-6 text-primary" />
                   </div>
