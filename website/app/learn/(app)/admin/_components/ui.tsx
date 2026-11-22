@@ -19,7 +19,7 @@ export function Back({ href, children }: { href: string; children: React.ReactNo
 
 export function Panel({ title, action, children, className }: { title?: React.ReactNode; action?: React.ReactNode; children: React.ReactNode; className?: string }) {
   return (
-    <section className={cn("bg-card space-y-4 rounded-3xl border p-5", className)}>
+    <section className={cn("bg-card min-w-0 space-y-4 rounded-3xl border p-4 sm:p-5", className)}>
       {(title || action) && (
         <div className="flex flex-wrap items-center justify-between gap-2">
           {title && <h2 className="font-heading text-lg font-semibold">{title}</h2>}
@@ -268,7 +268,7 @@ export function useSaveShortcut(save: () => void) {
 export function SaveBar({ dirty, saving, onSave }: { dirty: boolean; saving: boolean; onSave: () => void }) {
   if (!dirty && !saving) return null
   return (
-    <div className="fixed inset-x-0 bottom-4 z-40 flex justify-center px-4">
+    <div className="fixed inset-x-0 bottom-24 z-50 md:bottom-4 flex justify-center px-4">
       <div className="bg-foreground text-background flex items-center gap-4 rounded-full py-2 pr-2 pl-5 shadow-xl">
         <span className="text-sm font-semibold">{saving ? "Saving…" : "Unsaved changes"}</span>
         <Button size="sm" variant="secondary" onClick={onSave} disabled={saving}>
