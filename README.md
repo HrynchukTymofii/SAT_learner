@@ -23,19 +23,19 @@ SAT Math prep: a website with a learning platform, and an iOS/Android app. Both 
 
 ## Run it locally (short version)
 
-Needs Node 20+ and git. Each folder has its own `package.json`; there is no root workspace.
+Needs Node 20+, git and pnpm 10 (`npm i -g pnpm`). `website/` and `app/` use **pnpm**; `videos/` uses npm. Each folder is a separate project; there is no root workspace.
 
 ```bash
 # Website + API (http://localhost:3000 = marketing, http://app.localhost:3000 = platform)
 cd website
 cp .env.example .env      # fill in at least DATABASE_URL, DATABASE_URL_UNPOOLED, COURSE_ID, NEXTAUTH_SECRET, JWT_SECRET
-npm install               # also runs `prisma generate`
-npm run dev
+pnpm install              # also runs `prisma generate`
+pnpm dev
 
 # Mobile app (needs a development build, not Expo Go: native modules)
 cd app
 cp .env.example .env      # Google client IDs
-npm install
+pnpm install
 npx expo start            # then press a / i, or open the dev build on a phone
 ```
 

@@ -41,6 +41,8 @@ import { upgradeToPro, removePro } from "@/lib/api/user";
 import { scheduleDailyStudyReminder, isDailyReminderTurnedOff, requestNotificationPermissions } from "@/lib/notifications";
 import { registerPushToken } from "@/lib/inbox";
 import * as Notifications from "expo-notifications";
+import { checkForUpdates } from "@/lib/version";
+import { UpdateRequiredModal } from "@/components/modals/UpdateRequiredModal";
 
 configureReanimatedLogger({
   level: ReanimatedLogLevel.warn,
@@ -69,6 +71,14 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
       Purchases.configure({ apiKey: "goog_RDVEiwhMsfMcTDNFxFdGkPiMLes" });
     }
   }, []);
+
+  // Version check state
+  const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [updateInfo, setUpdateInfo] = useState<{
+    forceUpdate: boolean;
+    updateMessage?: string;
+    requiredVersion?: string;
+  }>({ forceUpdate: false });
 
   const syncIfOnline = async () => {
     if (!token) return;
@@ -203,7 +213,42 @@ function AppSyncWrapper({ children }: { children: React.ReactNode }) {
     return () => sub.remove();
   }, [router]);
 
-  return <>{children}</>;
+  // Check for app updates on startup
+  useEffect(() => {
+    const checkAppVersion = async () => {
+      try {
+        const networkState = await Network.getNetworkStateAsync();
+        if (!networkState.isConnected) return;
+
+        const result = await checkForUpdates();
+        if (result.updateRequired) {
+          setUpdateInfo({
+            forceUpdate: result.forceUpdate,
+            updateMessage: result.updateMessage,
+            requiredVersion: result.requiredVersion,
+          });
+          setShowUpdateModal(true);
+        }
+      } catch (error) {
+        console.warn("Failed to check for updates:", error);
+      }
+    };
+
+    checkAppVersion();
+  }, []);
+
+  return (
+    <>
+      {children}
+      <UpdateRequiredModal
+        isOpen={showUpdateModal}
+        onClose={() => setShowUpdateModal(false)}
+        forceUpdate={updateInfo.forceUpdate}
+        updateMessage={updateInfo.updateMessage}
+        requiredVersion={updateInfo.requiredVersion}
+      />
+    </>
+  );
 }
 
 

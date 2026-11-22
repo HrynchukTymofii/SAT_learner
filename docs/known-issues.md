@@ -30,7 +30,7 @@ Open items carried over from the previous owner's task list (2026-11). Fixed ite
 
 ## App
 
-- `npm run lint` reports ~100 React Compiler rule errors (refs, set-state-in-effect, …) from SDK 57's lint
+- `pnpm lint` reports ~100 React Compiler rule errors (refs, set-state-in-effect, …) from SDK 57's lint
   config. Not runtime errors; only matter if the React Compiler is enabled.
 - Needs a device test pass: logout/login, purchase + restore (sandbox), expired token, offline quiz → back
   online, account deletion.

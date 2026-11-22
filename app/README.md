@@ -11,6 +11,9 @@ Expo SDK 57, React Native 0.86, expo-router, NativeWind, expo-sqlite, RevenueCat
 - **Planner** (`calendar/`), daily study reminder, achievements (22 badges), onboarding + guided tour.
 - **PRO** subscription via RevenueCat (`payment.tsx`); logged-out buyers are asked to log in to activate.
 - **Inbox + push notifications** sent from the website admin (`docs/push-notifications.md`).
+- **Update prompt**: on start the app compares its version with `GET /api/app-version` (`lib/version.ts`,
+  `components/modals/UpdateRequiredModal.tsx`). The required version is `Apps.version` of the "SAT prep" row:
+  after a new store release, set it with `UPDATE "Apps" SET version = '1.0.9' WHERE name = 'SAT prep';`.
 - **Works offline**: course content lives in local SQLite; answers made offline are queued and sent later.
 
 ## How content gets to the phone
@@ -30,7 +33,7 @@ and `lib/offlineQueue.ts`. Logout (`hooks/useLogout.ts`) clears it.
 
 ```bash
 cp .env.example .env       # Google OAuth client IDs (see comments in the file)
-npm install
+pnpm install
 npx expo start
 ```
 

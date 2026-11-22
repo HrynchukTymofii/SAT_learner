@@ -52,9 +52,12 @@ Read this before changing anything. Human overview: `README.md`. Per-folder deta
 
 | Where | Check before you finish | Run |
 |---|---|---|
-| `website/` | `npx tsc --noEmit` and `npx next build` | `npm run dev` |
-| `app/` | `npx tsc --noEmit` and `npx expo export --platform android` (bundle builds) | `npx expo start` (dev build) |
-| `videos/` | `npx tsc --noEmit` | `npm run dev` (Remotion Studio) |
+| `website/` (pnpm) | `npx tsc --noEmit` and `npx next build` | `pnpm dev` |
+| `app/` (pnpm) | `npx tsc --noEmit` and `npx expo export --platform android` (bundle builds) | `npx expo start` (dev build) |
+| `videos/` (npm) | `npx tsc --noEmit` | `npm run dev` (Remotion Studio) |
+
+Install with `pnpm install` in `website/` and `app/` (lockfile `pnpm-lock.yaml`; `app/` uses the hoisted linker,
+see `app/.npmrc`). Don't add a `package-lock.json` there.
 
 DB inspection without touching data: `npx prisma migrate status`, `npx prisma studio`, or a read-only
 `$queryRaw` script. Release the app: `eas build --platform all --profile production`, then `eas submit`
@@ -70,7 +73,8 @@ DB inspection without touching data: `npx prisma migrate status`, `npx prisma st
 - `app/api/user/**` app + platform API (app auth: `requireAuth` in `lib/expo-auth.ts` checks the Bearer JWT; platform pages use the NextAuth
   session via `lib/getAuth.ts`. Many older routes still copy-paste the JWT check, see known issues)
   · `app/api/auth/**` app logins · `app/api/admin/**` uploads + notifications · `app/api/cron/r2-cleanup`
-  weekly unused-file cleanup (Vercel Cron, `vercel.json`).
+  weekly unused-file cleanup (Vercel Cron, `vercel.json`) · `app/api/app-version` minimum app version
+  (`Apps.version` of the row named "SAT prep").
 - `lib/` — `db.ts` Prisma client, `auth.ts` NextAuth config, `jwt.ts` app tokens, `admin.ts` who is admin
   (`ADMIN_EMAILS` + `role='admin'`), `r2.ts` uploads, `app-content.ts` TipTap→app HTML, `answers.ts` answer
   checking shared by web quiz + API, `revenuecat.ts`, `notifications.ts` Expo push, `course-outline.ts` cached

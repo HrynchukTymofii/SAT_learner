@@ -16,8 +16,8 @@ Platform links are written without `/learn` (e.g. `/tests`).
 
 ```bash
 cp .env.example .env    # every variable is explained in the file
-npm install             # runs prisma generate
-npm run dev             # http://localhost:3000 (marketing), http://app.localhost:3000 (platform)
+pnpm install            # runs prisma generate
+pnpm dev                # http://localhost:3000 (marketing), http://app.localhost:3000 (platform)
 ```
 
 Leave `NEXT_PUBLIC_SITE_URL`, `NEXT_PUBLIC_APP_URL` and `AUTH_COOKIE_DOMAIN` empty locally.

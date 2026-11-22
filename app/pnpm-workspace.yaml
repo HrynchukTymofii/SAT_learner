@@ -1,0 +1,8 @@
+nodeLinker: hoisted
+allowBuilds:
+  sqlite3: true
+  unrs-resolver: true
+# Same list for older pnpm (v10) on build servers like EAS
+onlyBuiltDependencies:
+  - sqlite3
+  - unrs-resolver
