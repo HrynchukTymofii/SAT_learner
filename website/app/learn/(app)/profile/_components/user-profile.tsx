@@ -6,7 +6,6 @@ import { ArrowRight, Bookmark, BookOpen, ChevronRight, FileText, LogOut, Mail, S
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { ThemeSwitch } from "@/components/site/theme-switch"
 import { LineDoodle } from "@/components/site/doodles"
-import { CONTACT_EMAIL } from "@/lib/site"
 import { siteUrl } from "@/lib/urls"
 import { cn } from "@/lib/utils"
 
@@ -123,7 +122,7 @@ export default function UserProfile({ name, email, image, isPro, joinedAt, stats
             <span className="font-bold">Appearance</span>
             <ThemeSwitch />
           </div>
-          <Row href={`mailto:${CONTACT_EMAIL}`} icon={Mail} label="Contact support" />
+          <Row href={siteUrl("/support")} icon={Mail} label="Help & support" />
           <Row href={siteUrl("/privacy-policy")} icon={Shield} label="Privacy policy" />
           <Row href={siteUrl("/terms-of-service")} icon={FileText} label="Terms of service" />
           <button

@@ -26,6 +26,7 @@ const COLUMNS = [
     links: [
       { href: APP_STORE_URL, label: "App Store" },
       { href: PLAY_STORE_URL, label: "Google Play" },
+      { href: "/support", label: "Support" },
       { href: `mailto:${CONTACT_EMAIL}`, label: "Contact us" },
     ],
   },
