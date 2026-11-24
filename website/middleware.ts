@@ -15,7 +15,7 @@ import { getToken } from "next-auth/jwt";
 // Pages of the platform, as seen in the browser
 const PLATFORM_PATHS = ["/dashboard", "/course", "/courses", "/tests", "/test", "/planner", "/profile", "/login", "/register", "/pricing", "/admin"];
 // Pages of the marketing site that the platform links to
-const MARKETING_PATHS = ["/info", "/privacy-policy", "/terms-of-service", "/sat-course", "/sww"];
+const MARKETING_PATHS = ["/info", "/privacy-policy", "/terms-of-service", "/sat-course", "/sww", "/support"];
 // Landing pages a logged-in student doesn't need: they go straight to the platform
 const LANDING_PATHS = ["/", "/sat-course"];
 

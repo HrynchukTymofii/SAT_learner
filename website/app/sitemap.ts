@@ -12,6 +12,7 @@ const PAGES: { path: string; priority: number }[] = [
   { path: "/info/how-sat-is-scored", priority: 0.7 },
   { path: "/info/test-dates-registration", priority: 0.7 },
   { path: "/sww", priority: 0.5 },
+  { path: "/support", priority: 0.4 },
   { path: "/privacy-policy", priority: 0.2 },
   { path: "/terms-of-service", priority: 0.2 },
 ];
